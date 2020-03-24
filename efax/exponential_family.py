@@ -4,7 +4,7 @@ import jax
 from ipromise import AbstractBaseClass
 from jax import numpy as jnp
 
-from cmm.tensors import Shape, Tensor, real_dtype
+from efax.tensors import Shape, Tensor, real_dtype
 
 __all__ = ['ExponentialFamily']
 

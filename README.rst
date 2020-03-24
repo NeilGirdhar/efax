@@ -1,13 +1,15 @@
-=======
-Tikzify
-=======
-.. image:: https://badge.fury.io/py/tikzify.svg
-    :target: https://badge.fury.io/py/tikzify
+====
+EFAX
+====
+.. image:: https://badge.fury.io/py/efax.svg
+    :target: https://badge.fury.io/py/efax
 
 .. role:: bash(code)
     :language: bash
 
-A set of utilities for programmatically generating TikZ code.
+This library provides a set of tools for working with exponential family distributions in the differential programming library JAX.
+The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
+For an introduction to exponential families, see `pdf <exfam.pdf>`.
 
 Contribution guidelines
 =======================
@@ -22,21 +24,6 @@ Contribution guidelines
   - :bash:`autopep8 -r -i .`
   - :bash:`pylint *`
   - :bash:`flake8 .`
-
-Running
-=======
-
-- This macro is helpful for running examples:
-
-.. code-block:: bash
-
-    function dm {
-        python "$1.py" $2 && pdflatex -shell-escape $1 && open $1.pdf
-    }
-
-- The basal ganglia example can be run by doing :bash:`dm basal_ganglia` from the examples folder.  It should produce :bash:`basal_ganglia.pdf`, which shows all of the output, as well as :bash:`figures/basal_ganglia-*.pdf`, which are the individual diagrams to be included.
-
-- A copy of the `pdf <basal_ganglia.pdf>` is provided at the top level folder.  It shows three programmatically-generated diagrams, with various sections highlighted.
 
 Whom do I talk to?
 ==================

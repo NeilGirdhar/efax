@@ -7,7 +7,7 @@ from jax import numpy as jnp
 from jax.nn import softplus
 from scipy.special import iv
 
-from cmm.tensors import inverse_softplus
+from efax.tensors import inverse_softplus
 
 from .exponential_family import ExponentialFamily
 

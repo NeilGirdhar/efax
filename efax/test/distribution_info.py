@@ -1,6 +1,6 @@
 import numpy as np
 
-from cmm.tensors import demote_dtype
+from efax.tensors import demote_dtype
 
 from ..exponential_family import ExponentialFamily
 
