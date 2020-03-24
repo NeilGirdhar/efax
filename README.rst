@@ -14,9 +14,7 @@ For an introduction to exponential families, see `pdf <exfam.pdf>`.
 Contribution guidelines
 =======================
 
-- Conventions
-
-  - Naming conventions are according to PEP8.
+- Conventions: PEP8.
 
 - How to clean the source:
 
