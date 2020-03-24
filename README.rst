@@ -1,6 +1,6 @@
-====
-EFAX
-====
+=================================
+EFAX: Exponential Families in JAX
+=================================
 .. image:: https://badge.fury.io/py/efax.svg
     :target: https://badge.fury.io/py/efax
 
@@ -24,8 +24,3 @@ Contribution guidelines
   - :bash:`autopep8 -r -i .`
   - :bash:`pylint *`
   - :bash:`flake8 .`
-
-Whom do I talk to?
-==================
-
-- Neil Girdhar
