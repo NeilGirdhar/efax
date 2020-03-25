@@ -62,7 +62,7 @@ class ExponentialFamily(AbstractBaseClass):
                 x, = primals
                 x_dot, = tangents
                 y = self.log_normalizer(x)
-                y_dot = self.nat_to_exp(x) * x_dot
+                y_dot = jnp.sum(self.nat_to_exp(x) * x_dot, axis=-1)
                 return y, y_dot
 
     def __repr__(self):
