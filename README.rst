@@ -7,6 +7,9 @@ EFAX: Exponential Families in JAX
 .. role:: bash(code)
     :language: bash
 
+.. role:: python(code)
+   :language: python
+
 This library provides a set of tools for working with *exponential family distributions* in the differential programming library `JAX <>`.
 The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
 For an explaination of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
@@ -14,7 +17,7 @@ For an explaination of the fundamental ideas behind this library, see our `overv
 Usage
 =====
 In SciPy, a distribution is represented by a single object, so a thousand distributions need a thousand objects.  Each object encodes the distribution family, and the parameters of the distribution.
-EFAX has a different representation.  Each `ExponentialFamily` object encodes only the distribution family for many (say, one thousand) distributions.  The parameters of the distributions are passed in to various methods on the object to evaluate various things.  For example,
+EFAX has a different representation.  Each :python:`ExponentialFamily` object encodes only the distribution family for many (say, one thousand) distributions.  The parameters of the distributions are passed in to various methods on the object to evaluate various things.  For example,
 
 .. code:: python
 
@@ -89,8 +92,6 @@ Thanks to JAX, any gradient of the cross entropy will automatically be as accura
 
     # Compare with the true value.
     print(b.exp_to_nat(p))
-
-More examples to come...
 
 Contribution guidelines
 =======================

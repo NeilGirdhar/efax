@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='efax',
-    version='0.1',
+    version='0.2',
     description=(
         'Exponential families for JAX'),
     author='Neil Girdhar',
