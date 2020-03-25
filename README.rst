@@ -7,16 +7,16 @@ EFAX: Exponential Families in JAX
 .. role:: bash(code)
     :language: bash
 
-.. highlight:: python
-
-This library provides a set of tools for working with exponential family distributions in the differential programming library JAX.
+This library provides a set of tools for working with *exponential family distributions* in the differential programming library `JAX <>`.
 The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
-For an introduction to exponential families, see :download:`expfam.pdf`.
+For an explaination of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`.
 
 Usage
 =====
 In SciPy, a distribution is represented by a single object, so a thousand distributions need a thousand objects.  Each object encodes the distribution family, and the parameters of the distribution.
-EFAX has a different representation.  Each :py:class:`ExponentialFamily` object encodes only the distribution family for many (say, one thousand) distributions.  The parameters of the distributions are passed in to various methods on the object to evaluate various things.  For example::
+EFAX has a different representation.  Each `ExponentialFamily` object encodes only the distribution family for many (say, one thousand) distributions.  The parameters of the distributions are passed in to various methods on the object to evaluate various things.  For example::
+
+.. code:: python
 
     from jax import numpy as jnp
 
@@ -48,6 +48,8 @@ EFAX has a different representation.  Each :py:class:`ExponentialFamily` object 
 With exponential families, maximum likelihood estimation is just expectation over expectation parameters.  Models that combine independent predictors just sum natural parameters.  When we want to optimize such models, we just want to take the gradient of cross entropy with respect to predictions.
 
 Thanks to JAX, any gradient of the cross entropy will automatically be as accurate and numerically stable as possible.  This is because the gradient of the cross entropy involves the gradient of the log-normalizer, which typically has a very nice form.  For example::
+
+.. code:: python
 
     import jax
     from jax import lax
