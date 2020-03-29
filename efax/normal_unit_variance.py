@@ -4,6 +4,7 @@ from ipromise import implements, overrides
 from jax import numpy as jnp
 
 from .exponential_family import ExponentialFamily
+from .tensors import RealTensor, real_dtype
 
 __all__ = ['NormalUnitVariance']
 
@@ -17,25 +18,28 @@ class NormalUnitVariance(ExponentialFamily):
 
     # Implemented methods -----------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: RealTensor) -> RealTensor:
         return 0.5 * (jnp.sum(jnp.square(q), axis=-1)
                       + self.num_parameters * math.log(math.pi * 2.0))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: RealTensor) -> RealTensor:
         return q
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p):
+    def exp_to_nat(self, p: RealTensor) -> RealTensor:
         return p
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x):
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x
 
     # Overridden methods ------------------------------------------------------
     @overrides(ExponentialFamily)
-    def scaled_cross_entropy(self, k, kp, q):
+    def scaled_cross_entropy(self,
+                             k: real_dtype,
+                             kp: RealTensor,
+                             q: RealTensor) -> RealTensor:
         p = kp / k
         return jnp.where(
             k == 0.0,
@@ -44,11 +48,11 @@ class NormalUnitVariance(ExponentialFamily):
                    + k * (jnp.log(math.pi * 2.0) + 1.0)))
 
     @overrides(ExponentialFamily)
-    def carrier_measure(self, x):
+    def carrier_measure(self, x: RealTensor) -> RealTensor:
         # The second moment of a delta distribution at x.
         return -0.5 * jnp.square(x)
 
     @overrides(ExponentialFamily)
-    def expected_carrier_measure(self, p):
+    def expected_carrier_measure(self, p: RealTensor) -> RealTensor:
         # The second moment of a normal distribution with mean p.
         return -0.5 * (jnp.sum(jnp.square(p), axis=-1) + 1.0)

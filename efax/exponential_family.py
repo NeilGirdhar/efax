@@ -4,7 +4,7 @@ import jax
 from ipromise import AbstractBaseClass
 from jax import numpy as jnp
 
-from efax.tensors import Shape, Tensor, real_dtype
+from .tensors import RealTensor, Shape, Tensor, real_dtype
 
 __all__ = ['ExponentialFamily']
 
@@ -70,7 +70,7 @@ class ExponentialFamily(AbstractBaseClass):
 
     # Abstract methods --------------------------------------------------------
     @abstractmethod
-    def log_normalizer(self, q: Tensor):
+    def log_normalizer(self, q: Tensor) -> RealTensor:
         """
         Args:
             q:
@@ -82,7 +82,7 @@ class ExponentialFamily(AbstractBaseClass):
         raise NotImplementedError
 
     @abstractmethod
-    def nat_to_exp(self, q: Tensor):
+    def nat_to_exp(self, q: Tensor) -> Tensor:
         """
         Args:
             q:
@@ -95,7 +95,7 @@ class ExponentialFamily(AbstractBaseClass):
         raise NotImplementedError
 
     @abstractmethod
-    def exp_to_nat(self, p: Tensor):
+    def exp_to_nat(self, p: Tensor) -> Tensor:
         """
         Args:
             q:
@@ -108,7 +108,7 @@ class ExponentialFamily(AbstractBaseClass):
         raise NotImplementedError
 
     @abstractmethod
-    def sufficient_statistics(self, x: Tensor):
+    def sufficient_statistics(self, x: Tensor) -> Tensor:
         """
         Args:
             x: The sample having shape self.shape_including_observations().
@@ -119,13 +119,13 @@ class ExponentialFamily(AbstractBaseClass):
         raise NotImplementedError
 
     # New methods -------------------------------------------------------------
-    def shape_including_parameters(self):
+    def shape_including_parameters(self) -> Shape:
         return (*self.shape, self.num_parameters)
 
-    def shape_including_observations(self):
+    def shape_including_observations(self) -> Shape:
         return (*self.shape, *self.observation_shape)
 
-    def cross_entropy(self, p: Tensor, q: Tensor):
+    def cross_entropy(self, p: Tensor, q: Tensor) -> RealTensor:
         """
         Args:
             p:
@@ -142,7 +142,7 @@ class ExponentialFamily(AbstractBaseClass):
                 + self.log_normalizer(q)
                 - self.expected_carrier_measure(p))
 
-    def entropy(self, q: Tensor):
+    def entropy(self, q: Tensor) -> RealTensor:
         """
         Args:
             q:
@@ -153,7 +153,8 @@ class ExponentialFamily(AbstractBaseClass):
         """
         return self.cross_entropy(self.nat_to_exp(q), q)
 
-    def scaled_cross_entropy(self, k: real_dtype, kp: Tensor, q: Tensor):
+    def scaled_cross_entropy(
+            self, k: real_dtype, kp: Tensor, q: Tensor) -> RealTensor:
         """
         Args:
             k: The scale.
@@ -174,7 +175,7 @@ class ExponentialFamily(AbstractBaseClass):
                 + k * (self.log_normalizer(q)
                        - self.expected_carrier_measure(kp / k)))
 
-    def carrier_measure(self, x: Tensor):
+    def carrier_measure(self, x: Tensor) -> RealTensor:
         """
         Args:
             x: The sample having shape self.shape_including_observations().
@@ -183,7 +184,7 @@ class ExponentialFamily(AbstractBaseClass):
         """
         return jnp.zeros(self.shape)
 
-    def expected_carrier_measure(self, p: Tensor):
+    def expected_carrier_measure(self, p: Tensor) -> RealTensor:
         """
         Args:
             p:
@@ -197,7 +198,7 @@ class ExponentialFamily(AbstractBaseClass):
         # pylint: disable=unused-argument
         return jnp.zeros(self.shape)
 
-    def pdf(self, q: Tensor, x: Tensor):
+    def pdf(self, q: Tensor, x: Tensor) -> RealTensor:
         """
         Args:
             q:

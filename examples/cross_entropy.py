@@ -4,19 +4,19 @@ from efax import Bernoulli
 
 b = Bernoulli(shape=(3,))
 
-# p are expectation parameters of a Bernoulli distribution corresponding to
-# probabilities 0.4, 0.5, and 0.6.
+# p are expectation parameters of Bernoulli distributions having probabilities
+# 0.4, 0.5, and 0.6.
 p = jnp.array([[0.4], [0.5], [0.6]])
 
-# q are natural parameters of a Bernoulli distribution corresponding to
-# log-odds 0, which is probability 0.5.
+# q are natural parameters of Bernoulli distributions having log-odds 0, which
+# is probability 0.5.
 q = jnp.zeros((3, 1))
 
 print(b.cross_entropy(p, q))
 # [0.6931472 0.6931472 0.6931472]
 
-# q are natural parameters of a Bernoulli distribution corresponding to
-# a probability of 0.3.
+# q are natural parameters of Bernoulli distributions having a probability
+# of 0.3.
 q = b.exp_to_nat(0.3 * jnp.ones((3, 1)))
 
 print(b.cross_entropy(p, q))

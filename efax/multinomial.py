@@ -4,6 +4,7 @@ from ipromise import implements
 from jax import numpy as jnp
 
 from .exponential_family import ExponentialFamily
+from .tensors import RealTensor
 
 __all__ = ['Multinomial']
 
@@ -28,7 +29,7 @@ class Multinomial(ExponentialFamily):
 
     # Implemented methods -----------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: RealTensor) -> RealTensor:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(
@@ -36,7 +37,7 @@ class Multinomial(ExponentialFamily):
         return max_q + log_scaled_A
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: RealTensor) -> RealTensor:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(
@@ -45,17 +46,17 @@ class Multinomial(ExponentialFamily):
                        - log_scaled_A[..., np.newaxis])
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p):
+    def exp_to_nat(self, p: RealTensor) -> RealTensor:
         p_k = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
         return jnp.log(p / p_k)
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x):
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x
 
     # New methods -------------------------------------------------------------
     @staticmethod
-    def nat_to_probability(q):
+    def nat_to_probability(q: RealTensor) -> RealTensor:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(
@@ -66,6 +67,6 @@ class Multinomial(ExponentialFamily):
         return jnp.concatenate([p, final_p], axis=-1)
 
     @staticmethod
-    def nat_to_surprisal(q):
+    def nat_to_surprisal(q: RealTensor) -> RealTensor:
         total_p = Multinomial.nat_to_probability(q)
         return -jnp.log(total_p)

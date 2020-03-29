@@ -6,6 +6,7 @@ from ipromise import implements, overrides
 from jax import numpy as jnp
 
 from .exponential_family import ExponentialFamily
+from .tensors import RealTensor
 
 __all__ = ['Logarithmic']
 
@@ -17,11 +18,11 @@ class Logarithmic(ExponentialFamily):
 
     # Implemented methods -----------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: RealTensor) -> RealTensor:
         return jnp.log(-jnp.log1p(-jnp.exp(q[..., 0])))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: RealTensor) -> RealTensor:
         exp_q = jnp.exp(q)
         return jnp.where(
             q < -100,
@@ -29,7 +30,7 @@ class Logarithmic(ExponentialFamily):
             exp_q / (jnp.expm1(q) * jnp.log1p(-exp_q)))
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p):
+    def exp_to_nat(self, p: RealTensor) -> RealTensor:
         q = np.empty_like(p)
         it = np.nditer([p, q],
                        op_flags=[['readonly'], ['writeonly', 'allocate']])
@@ -57,14 +58,14 @@ class Logarithmic(ExponentialFamily):
         return q
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x):
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x
 
     # Overridden methods ------------------------------------------------------
     @overrides(ExponentialFamily)
-    def carrier_measure(self, x):
+    def carrier_measure(self, x: RealTensor) -> RealTensor:
         return -jnp.log(x)
 
     @overrides(ExponentialFamily)
-    def expected_carrier_measure(self, p):
+    def expected_carrier_measure(self, p: RealTensor) -> RealTensor:
         raise NotImplementedError

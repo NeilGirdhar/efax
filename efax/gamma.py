@@ -8,6 +8,7 @@ from jax import numpy as jnp
 from scipy.special import polygamma
 
 from .exponential_family import ExponentialFamily
+from .tensors import RealTensor
 
 __all__ = ['Gamma']
 
@@ -23,7 +24,7 @@ class Gamma(ExponentialFamily):
 
     # Implemented methods -----------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: RealTensor) -> RealTensor:
         negative_rate = q[..., 0]
         shape_minus_one = q[..., 1]
         shape = shape_minus_one + 1.0
@@ -31,7 +32,7 @@ class Gamma(ExponentialFamily):
                 - shape * jnp.log(-negative_rate))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: RealTensor) -> RealTensor:
         negative_rate = q[..., 0]
         shape_minus_one = q[..., 1]
         shape = shape_minus_one + 1.0
@@ -42,7 +43,7 @@ class Gamma(ExponentialFamily):
             axis=q.ndim - 1)
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p):
+    def exp_to_nat(self, p: RealTensor) -> RealTensor:
         mean = p[..., 0]
         mean_log = p[..., 1]
         shape = Gamma.solve_for_shape(mean, mean_log)
@@ -50,12 +51,12 @@ class Gamma(ExponentialFamily):
         return jnp.stack([-rate, shape - 1.0], axis=p.ndim - 1)
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x):
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return jnp.stack([x, jnp.log(x)], axis=x.ndim)
 
     # New methods -------------------------------------------------------------
     @staticmethod
-    def solve_for_shape(mean, mean_log):
+    def solve_for_shape(mean: RealTensor, mean_log: RealTensor) -> RealTensor:
         def f(shape):
             return (math.log(shape)
                     - scipy.special.digamma(shape)
@@ -84,7 +85,8 @@ class Gamma(ExponentialFamily):
         return output_shape
 
     @staticmethod
-    def solve_for_shape_and_scale(mean, mean_log):
+    def solve_for_shape_and_scale(mean: RealTensor,
+                                  mean_log: RealTensor) -> RealTensor:
         shape = Gamma.solve_for_shape(mean, mean_log)
         scale = mean / shape
         return shape, scale
