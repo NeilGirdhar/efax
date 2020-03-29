@@ -10,7 +10,7 @@ EFAX: Exponential Families in JAX
 .. role:: python(code)
    :language: python
 
-This library provides a set of tools for working with *exponential family distributions* in the differential programming library `JAX <>`.
+This library provides a set of tools for working with *exponential family distributions* in the differential programming library `JAX <https://github.com/google/jax/>`_.
 The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
 For an explaination of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
 
@@ -27,26 +27,25 @@ EFAX has a different representation.  Each :python:`ExponentialFamily` object en
 
     b = Bernoulli(shape=(3,))
 
-    # p are expectation parameters of a Bernoulli distribution corresponding to
-    # probabilities 0.4, 0.5, and 0.6.
+    # p are expectation parameters of Bernoulli distributions having probabilities
+    # 0.4, 0.5, and 0.6.
     p = jnp.array([[0.4], [0.5], [0.6]])
 
-    # q are natural parameters of a Bernoulli distribution corresponding to
-    # log-odds 0, which is probability 0.5.
+    # q are natural parameters of Bernoulli distributions having log-odds 0, which
+    # is probability 0.5.
     q = jnp.zeros((3, 1))
 
     print(b.cross_entropy(p, q))
     # [0.6931472 0.6931472 0.6931472]
 
-    # q are natural parameters of a Bernoulli distribution corresponding to
-    # a probability of 0.3.
+    # q are natural parameters of Bernoulli distributions having a probability
+    # of 0.3.
     q = b.exp_to_nat(0.3 * jnp.ones((3, 1)))
 
     print(b.cross_entropy(p, q))
     # [0.6955941  0.78032386 0.86505365]
     # A Bernoulli distribution with probability 0.3 predicts a Bernoulli
     # observation with probability 0.4 better than the other observations.
-
 
 With exponential families, maximum likelihood estimation is just expectation over expectation parameters.  Models that combine independent predictors just sum natural parameters.  When we want to optimize such models, we just want to take the gradient of cross entropy with respect to predictions.
 
@@ -97,6 +96,8 @@ Contribution guidelines
 =======================
 
 - Conventions: PEP8.
+
+- How to run tests: :bash:`pytest .`
 
 - How to clean the source:
 

@@ -10,13 +10,14 @@ from scipy.special import iv
 from efax.tensors import inverse_softplus
 
 from .exponential_family import ExponentialFamily
+from .tensors import RealTensor
 
 __all__ = ['VonMises', 'VonMisesFisher']
 
 
 class VonMisesFisher(ExponentialFamily):
 
-    def __init__(self, num_parameters):
+    def __init__(self, num_parameters: int):
         if not isinstance(num_parameters, int):
             raise TypeError
         if num_parameters < 2:
@@ -30,7 +31,7 @@ class VonMisesFisher(ExponentialFamily):
 
     # Implemented methods -----------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: RealTensor) -> RealTensor:
         half_k = q.shape[-1] * 0.5
         kappa = jnp.linalg.norm(q, 2, axis=-1)
         return -jnp.log(kappa ** (half_k - 1.0)
@@ -38,14 +39,14 @@ class VonMisesFisher(ExponentialFamily):
                            * iv(half_k - 1.0, kappa)))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: RealTensor) -> RealTensor:
         kappa = jnp.linalg.norm(q, 2, axis=-1, keepdims=True)
         return jnp.where(kappa == 0.0,
                          q,
                          q * (VonMisesFisher._a_k(q.shape[-1], kappa) / kappa))
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p):
+    def exp_to_nat(self, p: RealTensor) -> RealTensor:
         k = p.shape[-1]
         mu = jnp.linalg.norm(p, 2, axis=-1)
         q = np.empty_like(p)
@@ -57,17 +58,17 @@ class VonMisesFisher(ExponentialFamily):
         return q
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x):
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x
 
     # Private methods ---------------------------------------------------------
     @staticmethod
-    def _a_k(k, kappa):
+    def _a_k(k, kappa: RealTensor) -> RealTensor:
         half_k = k * 0.5
         return iv(half_k, kappa) / iv(half_k - 1.0, kappa)
 
     @staticmethod
-    def _find_kappa(k, mu):
+    def _find_kappa(k: RealTensor, mu: RealTensor) -> RealTensor:
         assert 0 <= mu <= 1.0
         if mu == 0.0:
             return 0.0
@@ -80,7 +81,7 @@ class VonMisesFisher(ExponentialFamily):
                                        tol=1e-5)
         if not solution.success:
             raise ValueError(
-                f"Failed to find kappa for because {solution.message}.")
+                f"Failed to find kappa because {solution.message}.")
         return softplus(solution.x)
 
 
@@ -95,7 +96,7 @@ class VonMises(VonMisesFisher):
 
     # Overridden methods ------------------------------------------------------
     @staticmethod
-    def nat_to_kappa_angle(q):
+    def nat_to_kappa_angle(q: RealTensor) -> RealTensor:
         kappa = np.linalg.norm(q, axis=-1)
         angles = np.where(kappa == 0.0,
                           0.0,

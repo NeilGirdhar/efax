@@ -3,6 +3,7 @@ from ipromise import overrides
 from jax import numpy as jnp
 
 from .multinomial import Multinomial
+from .tensors import RealTensor
 
 __all__ = ['Bernoulli']
 
@@ -14,10 +15,10 @@ class Bernoulli(Multinomial):
 
     # Overridden methods ------------------------------------------------------
     @overrides(Multinomial)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: RealTensor) -> RealTensor:
         q = q[..., 0]
         return jnp.logaddexp(q, 0.0)
 
     @overrides(Multinomial)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: RealTensor) -> RealTensor:
         return jss.expit(q)

@@ -5,6 +5,7 @@ from ipromise import implements
 from jax import numpy as jnp
 
 from .exponential_family import ExponentialFamily
+from .tensors import RealTensor
 
 __all__ = ['Beta', 'Dirichlet']
 
@@ -36,13 +37,13 @@ class Dirichlet(ExponentialFamily):
                 - jss.gammaln(jnp.sum(q, axis=-1) + q.shape[-1]))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: RealTensor) -> RealTensor:
         return (jss.digamma(q + 1.0)
                 - jss.digamma(jnp.sum(q, axis=-1, keepdims=True)
                               + q.shape[-1]))
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p):
+    def exp_to_nat(self, p: RealTensor) -> RealTensor:
         q = np.empty_like(p)
         for i in np.ndindex(p.shape[: -1]):
             this_p = p[i]
@@ -63,7 +64,7 @@ class Dirichlet(ExponentialFamily):
         return q
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x):
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return jnp.log(x)
 
 
