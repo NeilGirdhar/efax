@@ -1,4 +1,4 @@
-from jax import numpy as jnp
+import jax.numpy as jnp
 
 from efax import Bernoulli
 

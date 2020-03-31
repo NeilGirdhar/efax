@@ -1,9 +1,9 @@
 import math
 
+import jax.numpy as jnp
 import numpy as np
 import scipy.optimize
 from ipromise import implements
-from jax import numpy as jnp
 from jax.nn import softplus
 from scipy.special import iv
 

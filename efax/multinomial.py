@@ -1,7 +1,7 @@
+import jax.numpy as jnp
 import jax.scipy.special as jss
 import numpy as np
 from ipromise import implements
-from jax import numpy as jnp
 
 from .exponential_family import ExponentialFamily
 from .tensors import RealTensor
