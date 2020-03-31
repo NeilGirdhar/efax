@@ -1,10 +1,10 @@
 import math
 
+import jax.numpy as jnp
 import jax.scipy.special as jss
 import numpy as np
 import scipy
 from ipromise import implements
-from jax import numpy as jnp
 from scipy.special import polygamma
 
 from .exponential_family import ExponentialFamily

@@ -1,6 +1,6 @@
+import jax.numpy as jnp
 import jax.scipy.special as jss
 from ipromise import overrides
-from jax import numpy as jnp
 
 from .multinomial import Multinomial
 from .tensors import RealTensor

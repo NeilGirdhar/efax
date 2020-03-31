@@ -1,6 +1,6 @@
 import jax
+import jax.numpy as jnp
 from jax import lax
-from jax import numpy as jnp
 
 from efax import Bernoulli
 
