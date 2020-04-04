@@ -14,6 +14,14 @@ This library provides a set of tools for working with *exponential family distri
 The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
 For an explaination of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
 
+Installation
+============
+efax depends on https://github.com/google/jax/pull/2487, so the easiest way to get it working is to install jax from https://github.com/NeilGirdhar/jax:
+
+.. code:: bash
+
+    pip install --upgrade git+https://github.com/NeilGirdhar/jax.git
+
 Usage
 =====
 In SciPy, a distribution is represented by a single object, so a thousand distributions need a thousand objects.  Each object encodes the distribution family, and the parameters of the distribution.
@@ -53,8 +61,7 @@ Thanks to JAX, any gradient of the cross entropy will automatically be as accura
 
 .. code:: python
 
-    import jax
-    from jax import lax
+    from jax import grad, jit, lax
     from jax import numpy as jnp
 
     from efax import Bernoulli
@@ -66,31 +73,31 @@ Thanks to JAX, any gradient of the cross entropy will automatically be as accura
         return b.cross_entropy(p, q)
 
 
-    gce = jax.jit(jax.grad(cross_entropy_loss, 1))
+    gce = jit(grad(cross_entropy_loss, 1))
 
 
     def body_fun(q):
-        return q - gce(p, q) * 1e-4
+        return q - gce(some_p, q) * 1e-4
 
 
     def cond_fun(q):
-        return jnp.sum(gce(p, q) ** 2) > 1e-7
+        return jnp.sum(gce(some_p, q) ** 2) > 1e-7
 
 
-    # p are expectation parameters of a Bernoulli distribution corresponding to
-    # probability 0.4.
-    p = jnp.array([0.4])
+    # some_p are expectation parameters of a Bernoulli distribution corresponding
+    # to probability 0.4.
+    some_p = jnp.array([0.4])
 
-    # q are natural parameters of a Bernoulli distribution corresponding to
+    # some_q are natural parameters of a Bernoulli distribution corresponding to
     # log-odds 0, which is probability 0.5.
-    q = jnp.array([0.0])
+    some_q = jnp.array([0.0])
 
     # Optimize the predictive distribution iteratively.
-    print(lax.while_loop(cond_fun, body_fun, q))
+    print(lax.while_loop(cond_fun, body_fun, some_q))
     # Outputs the natural parameters that correspond to 0.4.
 
     # Compare with the true value.
-    print(b.exp_to_nat(p))
+    print(b.exp_to_nat(some_p))
 
 Contribution guidelines
 =======================
