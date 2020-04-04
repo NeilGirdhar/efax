@@ -109,6 +109,5 @@ Contribution guidelines
 - How to clean the source:
 
   - :bash:`isort -rc -y`
-  - :bash:`autopep8 -r -i .`
   - :bash:`pylint *`
   - :bash:`flake8 .`
