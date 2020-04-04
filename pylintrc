@@ -9,10 +9,14 @@ extension-pkg-whitelist=PyQt5,
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=README.rst,
+ignore=LICENSE,
+       README.rst,
        backup,
-       pylintrc,
-       todo.txt
+       build,
+       dist,
+       efax.egg-info,
+       expfam.pdf,
+       pylintrc
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
