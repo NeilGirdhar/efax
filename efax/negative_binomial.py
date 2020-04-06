@@ -45,6 +45,18 @@ class NegativeBinomial(ExponentialFamily):
             return jnp.zeros(self.shape)
         raise NotImplementedError
 
+    # Magic methods -----------------------------------------------------------
+    def __eq__(self, other):
+        if not isinstance(other, NegativeBinomial):
+            return NotImplemented
+        return super().__eq__(other) and self.r == other.r
+
+    def __hash__(self):
+        return hash((self.num_parameters,
+                     self.shape,
+                     self.observation_shape,
+                     self.r))
+
 
 class Geometric(NegativeBinomial):
 

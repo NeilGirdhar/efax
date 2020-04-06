@@ -68,6 +68,21 @@ class ExponentialFamily(AbstractBaseClass):
     def __repr__(self):
         return f"{type(self).__name__}(shape={self.shape})"
 
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return (self.num_parameters == other.num_parameters
+                and self.shape == other.shape
+                and self.observation_shape == other.observation_shape)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self.num_parameters,
+                     self.shape,
+                     self.observation_shape))
+
     # Abstract methods --------------------------------------------------------
     @abstractmethod
     def log_normalizer(self, q: Tensor) -> RealTensor:
