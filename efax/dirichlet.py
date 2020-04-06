@@ -5,7 +5,7 @@ import scipy.optimize
 from ipromise import implements
 
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor
+from .tensors import RealTensor, Shape
 
 __all__ = ['Beta', 'Dirichlet']
 
@@ -17,6 +17,7 @@ class Dirichlet(ExponentialFamily):
             raise TypeError
         if num_parameters < 2:
             raise ValueError
+        observation_shape: Shape
         if num_parameters == 2:
             observation_shape = ()
         else:
