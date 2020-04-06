@@ -4,7 +4,7 @@ import numpy as np
 from ipromise import implements
 
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor
+from .tensors import RealTensor, Shape
 
 __all__ = ['Multinomial']
 
@@ -14,6 +14,7 @@ class Multinomial(ExponentialFamily):
     def __init__(self, *, num_parameters: int, **kwargs):
         if num_parameters < 0:
             raise ValueError
+        observation_shape: Shape
         if num_parameters == 1:
             observation_shape = ()
         else:
