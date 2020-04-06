@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "efax"
+version = "0.2.1"
+description = "Exponential families for JAX"
+license = "MIT"
+authors = ["Neil Girdhar <mistersheik@gmail.com>"]
+readme = "README.rst"
+repository = "https://github.com/NeilGirdhar/efax"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+ipromise = "^1.5"
+jax = "^0.1.61"
+jaxlib = "^0.1.42"
+nptyping = "^1"
+numpy = "^1.18"
+scipy = "^1.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5"
+
+[tool.isort]
+line_lenth = 79
+multi_line_output = 0
+not_skip = "__init__.py"
+known_third_party = ["ipromise", "jax"]
+
+[tool.pycodestyle]
+max-line-length = 79
+exclude = ["__init__.py", "__pycache__"]
+
+[tool.pytest]
