@@ -24,14 +24,14 @@ class Generator(TensorLike):
         self.key, subkey = jax.random.split(self.key)
         return subkey
 
-    def normal(self, std_dev, shape=None):
+    def normal(self, std_dev, shape=()):
         subkey = self.split_out_subkey()
         return std_dev * jax.random.normal(subkey, shape)
 
     def __repr__(self):
         return f"{type(self).__name__}({self.key})"
 
-    # Overridden methods ------------------------------------------------------
+    # Implemented methods -----------------------------------------------------
     @classmethod
     def from_tensor(cls, values, aux_data):
         return cls(key=values)
