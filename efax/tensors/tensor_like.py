@@ -7,7 +7,9 @@ __all__ = ['TensorLike']
 
 class TensorLike:
 
-    def __init_subclass__(cls):
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
         def special_unflatten(aux_data, children):
             return cls.from_tensor(children, aux_data)
 
@@ -20,10 +22,10 @@ class TensorLike:
     def from_tensor(cls, values, aux_data):
         """
         Args:
-            values: A JAX pytree of values from which the objects are
-                constructed.
-            aux_data: Data that will be treated as constant through JAX
-                operations.
+            values:
+                A JAX pytree of values from which the object is constructed.
+            aux_data:
+                Data that will be treated as constant through JAX operations.
         Returns:
             A constructed object.
         """
@@ -34,8 +36,7 @@ class TensorLike:
         """
         Returns:
             values: A JAX pytree of values representing the object.
-                aux_data.
-            aux_data: Data that will be treated as constant through JAX
-                operations.
+            aux_data:
+                Data that will be treated as constant through JAX operations.
         """
         raise NotImplementedError
