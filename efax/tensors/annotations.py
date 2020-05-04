@@ -1,22 +1,27 @@
 from __future__ import annotations
 
-from typing import Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Container, Sequence, Tuple, Union
 
-from nptyping import Array
-
-from .dtypes import complex_dtype, real_dtype
+import numpy as np
+from jax import numpy as jnp
 
 __all__ = ['Shape',
            'ShapeLike',
            'SliceLike',
            'Tensor',
            'RealTensor',
-           'ComplexTensor']
+           'ComplexTensor',
+           'PyTree']
 
 
 Shape = Tuple[int, ...]
 ShapeLike = Union[int, Sequence[int]]
 SliceLike = Tuple[Union[int, None, slice], ...]
-Tensor = Union[Array[real_dtype], Array[complex_dtype]]
-RealTensor = Array[real_dtype]
-ComplexTensor = Array[complex_dtype]
+Tensor = Union[np.ndarray, jnp.ndarray]
+RealTensor = Tensor
+ComplexTensor = Tensor
+PyTree = Union[Tensor, 'PyTreeLike', Container['PyTree'], None]
+
+
+if TYPE_CHECKING:
+    from .pytree_like import PyTreeLike

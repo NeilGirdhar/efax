@@ -13,7 +13,7 @@ __all__ = ['Logarithmic']
 
 class Logarithmic(ExponentialFamily):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(num_parameters=1)
 
     # Implemented methods -----------------------------------------------------
@@ -43,7 +43,8 @@ class Logarithmic(ExponentialFamily):
                 if this_p == 1.0:
                     return math.inf
 
-                def f(log_minus_q, this_p=this_p):
+                def f(log_minus_q: RealTensor,
+                      this_p: RealTensor = this_p) -> RealTensor:
                     return (self.nat_to_exp(-math.exp(log_minus_q))
                             - this_p)
 

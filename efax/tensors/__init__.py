@@ -8,6 +8,5 @@ The interface is implemented using cpu and gpu routines.
 """
 from .annotations import *
 from .dtypes import *
-from .jax_generator import *
-from .tensor_like import *
+from .pytree_like import *
 from .tools import *

@@ -12,7 +12,7 @@ __all__ = ['NormalUnitVariance']
 class NormalUnitVariance(ExponentialFamily):
 
     # Magic methods -----------------------------------------------------------
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"{type(self).__name__}(shape={self.shape}, "
                 f"num_parameters={self.num_parameters})")
 

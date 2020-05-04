@@ -13,13 +13,13 @@ from .tensors import RealTensor
 __all__ = ['Gamma']
 
 
-def trigamma(x):
+def trigamma(x: RealTensor) -> RealTensor:
     return polygamma(1, x)
 
 
 class Gamma(ExponentialFamily):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(num_parameters=2)
 
     # Implemented methods -----------------------------------------------------
@@ -57,12 +57,12 @@ class Gamma(ExponentialFamily):
     # New methods -------------------------------------------------------------
     @staticmethod
     def solve_for_shape(mean: RealTensor, mean_log: RealTensor) -> RealTensor:
-        def f(shape):
+        def f(shape: float) -> float:
             return (math.log(shape)
                     - scipy.special.digamma(shape)
                     - log_mean_minus_mean_log)
 
-        def f_prime(shape):
+        def f_prime(shape: float) -> float:
             return 1.0 / shape - trigamma(shape)
 
         output_shape = np.empty_like(mean)

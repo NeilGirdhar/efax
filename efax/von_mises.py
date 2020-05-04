@@ -1,4 +1,5 @@
 import math
+from typing import Tuple
 
 import jax.numpy as jnp
 import numpy as np
@@ -25,7 +26,7 @@ class VonMisesFisher(ExponentialFamily):
         super().__init__(num_parameters=num_parameters)
 
     # Magic methods -----------------------------------------------------------
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"{type(self).__name__}(shape={self.shape}, "
                 f"num_parameters={self.num_parameters})")
 
@@ -63,7 +64,7 @@ class VonMisesFisher(ExponentialFamily):
 
     # Private methods ---------------------------------------------------------
     @staticmethod
-    def _a_k(k, kappa: RealTensor) -> RealTensor:
+    def _a_k(k: RealTensor, kappa: RealTensor) -> RealTensor:
         half_k = k * 0.5
         return iv(half_k, kappa) / iv(half_k - 1.0, kappa)
 
@@ -74,7 +75,7 @@ class VonMisesFisher(ExponentialFamily):
             return 0.0
         initial_solution = (mu * k - mu ** 3) / (1.0 - mu ** 2)
 
-        def f(isp_kappa):
+        def f(isp_kappa: RealTensor) -> RealTensor:
             return VonMisesFisher._a_k(k, softplus(isp_kappa)) - mu
         solution = scipy.optimize.root(f,
                                        inverse_softplus(initial_solution),
@@ -87,16 +88,16 @@ class VonMisesFisher(ExponentialFamily):
 
 class VonMises(VonMisesFisher):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(num_parameters=2)
 
     # Magic methods -----------------------------------------------------------
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{type(self).__name__}(shape={self.shape})"
 
     # Overridden methods ------------------------------------------------------
     @staticmethod
-    def nat_to_kappa_angle(q: RealTensor) -> RealTensor:
+    def nat_to_kappa_angle(q: RealTensor) -> Tuple[RealTensor, RealTensor]:
         kappa = np.linalg.norm(q, axis=-1)
         angles = np.where(kappa == 0.0,
                           0.0,

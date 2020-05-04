@@ -1,3 +1,5 @@
+from typing import Any
+
 import jax.numpy as jnp
 import jax.scipy.special as jss
 import numpy as np
@@ -12,7 +14,7 @@ __all__ = ['Beta', 'Dirichlet']
 
 class Dirichlet(ExponentialFamily):
 
-    def __init__(self, num_parameters: int, **kwargs):
+    def __init__(self, num_parameters: int, **kwargs: Any):
         if not isinstance(num_parameters, int):
             raise TypeError
         if num_parameters < 2:
@@ -27,13 +29,13 @@ class Dirichlet(ExponentialFamily):
                          **kwargs)
 
     # Magic methods -----------------------------------------------------------
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"{type(self).__name__}(shape={self.shape}, "
                 f"num_parameters={self.num_parameters})")
 
     # Implemented methods -----------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: RealTensor) -> RealTensor:
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
                 - jss.gammaln(jnp.sum(q, axis=-1) + q.shape[-1]))
 
@@ -49,7 +51,8 @@ class Dirichlet(ExponentialFamily):
         for i in np.ndindex(p.shape[: -1]):
             this_p = p[i]
 
-            def f(some_q, this_p=this_p):
+            def f(some_q: RealTensor,
+                  this_p: RealTensor = this_p) -> RealTensor:
                 some_q = jnp.maximum(-0.999, some_q)
                 some_p = self.nat_to_exp(some_q)
                 return some_p - this_p
@@ -71,5 +74,5 @@ class Dirichlet(ExponentialFamily):
 
 class Beta(Dirichlet):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(num_parameters=2, **kwargs)
