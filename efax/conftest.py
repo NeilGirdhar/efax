@@ -1,13 +1,15 @@
 import logging
 import subprocess
+from typing import Generator
 
 import numpy as np
 import pytest
 from fastlog import log
+from numpy.random import Generator as NumpyGenerator
 
 
 @pytest.fixture
-def no_log():
+def no_log() -> Generator[None, None, None]:
     log.setLevel(logging.CRITICAL)
     try:
         yield
@@ -16,12 +18,12 @@ def no_log():
 
 
 @pytest.fixture
-def generator():
+def generator() -> NumpyGenerator:
     return np.random.default_rng(123)
 
 
 @pytest.fixture(scope='session')
-def configure_numpy():
+def configure_numpy() -> Generator[None, None, None]:
     line_width = [
         int(x)
         for x in subprocess.check_output(['stty',

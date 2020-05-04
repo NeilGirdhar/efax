@@ -11,7 +11,7 @@ __all__ = ['Poisson']
 
 class Poisson(ExponentialFamily):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(num_parameters=1)
 
     # Implemented methods -----------------------------------------------------

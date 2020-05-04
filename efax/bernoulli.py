@@ -1,3 +1,5 @@
+from typing import Any
+
 import jax.numpy as jnp
 import jax.scipy.special as jss
 from ipromise import overrides
@@ -10,7 +12,7 @@ __all__ = ['Bernoulli']
 
 class Bernoulli(Multinomial):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
         super().__init__(num_parameters=1, **kwargs)
 
     # Overridden methods ------------------------------------------------------

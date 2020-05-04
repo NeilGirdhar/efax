@@ -1,3 +1,5 @@
+from typing import Any
+
 import jax.numpy as jnp
 import numpy as np
 from ipromise import implements, overrides
@@ -10,7 +12,7 @@ __all__ = ['Normal']
 
 class Normal(ExponentialFamily):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
         super().__init__(num_parameters=2, **kwargs)
 
     # Implemented methods -----------------------------------------------------

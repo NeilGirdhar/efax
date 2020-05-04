@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Any, Tuple
 
 import jax
 import jax.numpy as jnp
@@ -31,7 +32,7 @@ class ExponentialFamily(AbstractBaseClass):
         self.observation_shape = observation_shape
 
     # Magic methods -----------------------------------------------------------
-    def __init_subclass__(cls):
+    def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         if cls.__name__ in ['VonMises', 'VonMisesFisher']:
             return
@@ -58,27 +59,29 @@ class ExponentialFamily(AbstractBaseClass):
 
             # pylint: disable=unused-variable
             @method.defjvp
-            def ln_jvp(self, primals, tangents):
+            def ln_jvp(self: ExponentialFamily,
+                       primals: Tuple[Tensor],
+                       tangents: Tuple[Tensor]) -> Tuple[Tensor, Tensor]:
                 x, = primals
                 x_dot, = tangents
                 y = self.log_normalizer(x)
                 y_dot = jnp.sum(self.nat_to_exp(x) * x_dot, axis=-1)
                 return y, y_dot
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{type(self).__name__}(shape={self.shape})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
         return (self.num_parameters == other.num_parameters
                 and self.shape == other.shape
                 and self.observation_shape == other.observation_shape)
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         return not self.__eq__(other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.num_parameters,
                      self.shape,
                      self.observation_shape))

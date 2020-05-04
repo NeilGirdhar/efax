@@ -1,4 +1,5 @@
 from functools import partial
+from typing import List
 
 import numpy as np
 import scipy.stats as ss
@@ -18,7 +19,7 @@ from ..von_mises import VonMises
 from .distribution_info import DistributionInfo
 
 
-def create_infos():
+def create_infos() -> List[DistributionInfo]:
     # Discrete
     bernoulli = DistributionInfo(
         Bernoulli(),

@@ -1,3 +1,5 @@
+from typing import Any
+
 import jax.numpy as jnp
 import jax.scipy.special as jss
 from ipromise import implements, overrides
@@ -46,12 +48,12 @@ class NegativeBinomial(ExponentialFamily):
         raise NotImplementedError
 
     # Magic methods -----------------------------------------------------------
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, NegativeBinomial):
             return NotImplemented
         return super().__eq__(other) and self.r == other.r
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.num_parameters,
                      self.shape,
                      self.observation_shape,
@@ -60,5 +62,5 @@ class NegativeBinomial(ExponentialFamily):
 
 class Geometric(NegativeBinomial):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(r=1)

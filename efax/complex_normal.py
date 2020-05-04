@@ -3,6 +3,8 @@ import math
 import jax.numpy as jnp
 from ipromise import implements
 
+from efax.tensors import ComplexTensor, RealTensor
+
 from .exponential_family import ExponentialFamily
 
 __all__ = ['ComplexNormal']
@@ -10,12 +12,12 @@ __all__ = ['ComplexNormal']
 
 class ComplexNormal(ExponentialFamily):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(num_parameters=3)
 
     # Implemented methods -----------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q):
+    def log_normalizer(self, q: ComplexTensor) -> RealTensor:
         eta = q[..., 0]
         precision = q[..., 1]
         pseudo_precision = q[..., 2]
@@ -37,7 +39,7 @@ class ComplexNormal(ExponentialFamily):
                 + math.log(math.pi))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q):
+    def nat_to_exp(self, q: ComplexTensor) -> ComplexTensor:
         eta = q[..., 0]
         precision = q[..., 1]
         pseudo_precision = q[..., 2]
@@ -57,7 +59,7 @@ class ComplexNormal(ExponentialFamily):
             axis=q.ndim - 1)
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p):
+    def exp_to_nat(self, p: ComplexTensor) -> ComplexTensor:
         mean = p[..., 0]
         second_moment = p[..., 1]
         pseudo_second_moment = p[..., 2]
@@ -76,6 +78,6 @@ class ComplexNormal(ExponentialFamily):
             axis=p.ndim - 1)
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x):
+    def sufficient_statistics(self, x: ComplexTensor) -> ComplexTensor:
         return jnp.stack([x, jnp.conj(x) * x, jnp.square(x)],
                          axis=x.ndim)

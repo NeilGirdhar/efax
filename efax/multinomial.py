@@ -1,3 +1,5 @@
+from typing import Any
+
 import jax.numpy as jnp
 import jax.scipy.special as jss
 import numpy as np
@@ -11,7 +13,7 @@ __all__ = ['Multinomial']
 
 class Multinomial(ExponentialFamily):
 
-    def __init__(self, *, num_parameters: int, **kwargs):
+    def __init__(self, *, num_parameters: int, **kwargs: Any) -> None:
         if num_parameters < 0:
             raise ValueError
         observation_shape: Shape
@@ -24,7 +26,7 @@ class Multinomial(ExponentialFamily):
                          **kwargs)
 
     # Magic methods -----------------------------------------------------------
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f"{type(self).__name__}(shape={self.shape}, "
                 f"num_parameters={self.num_parameters})")
 

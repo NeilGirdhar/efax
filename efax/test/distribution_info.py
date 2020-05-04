@@ -1,19 +1,33 @@
-import numpy as np
+from typing import Any, Callable, Optional
 
-from efax.tensors import demote_dtype
+import numpy as np
+from jax.dtypes import canonicalize_dtype
+from numpy.random import Generator
+
+from efax.tensors import Shape
 
 from ..exponential_family import ExponentialFamily
 
 
+def canonicalize_array(array: np.ndarray) -> np.ndarray:
+    return array.astype(canonicalize_dtype(array.dtype))
+
+
 class DistributionInfo:
 
-    def __init__(self,
-                 my_distribution: ExponentialFamily,
-                 exp_to_scipy_distribution=None,
-                 nat_to_scipy_distribution=None,
-                 exp_parameter_generator=None,
-                 nat_parameter_generator=None,
-                 my_observation=None):
+    def __init__(
+            self,
+            my_distribution: ExponentialFamily,
+            exp_to_scipy_distribution: Optional[
+                Callable[[np.ndarray], Any]] = None,
+            nat_to_scipy_distribution: Optional[
+                Callable[[np.ndarray], Any]] = None,
+            exp_parameter_generator: Optional[
+                Callable[[Generator, Shape], Any]] = None,
+            nat_parameter_generator: Optional[
+                Callable[[Generator, Shape], Any]] = None,
+            my_observation: Optional[
+                Callable[[np.ndarray], np.ndarray]] = None):
         """
         Args:
             my_distribution:
@@ -40,11 +54,14 @@ class DistributionInfo:
             if isinstance(exp_parameter_generator(np.random, ()), tuple):
                 raise TypeError("This should return a number or an ndarray")
 
-        self.exp_to_scipy_distribution = (
-            exp_to_scipy_distribution
-            if exp_to_scipy_distribution is not None
-            else lambda exp: nat_to_scipy_distribution(
-                my_distribution.exp_to_nat(exp)))
+        if exp_to_scipy_distribution is None:
+            if nat_to_scipy_distribution is None:
+                raise TypeError
+            self.exp_to_scipy_distribution = (
+                lambda exp: nat_to_scipy_distribution(
+                    my_distribution.exp_to_nat(exp)))
+        else:
+            self.exp_to_scipy_distribution = exp_to_scipy_distribution
 
         self.nat_to_scipy_distribution = (
             nat_to_scipy_distribution
@@ -69,12 +86,16 @@ class DistributionInfo:
                                else my_observation)
 
     # New methods -------------------------------------------------------------
-    def exp_parameter_generator(self, rng, shape):
-        return demote_dtype(self._exp_parameter_generator(rng, shape))
+    def exp_parameter_generator(self,
+                                rng: Generator,
+                                shape: Shape) -> np.ndarray:
+        return canonicalize_array(self._exp_parameter_generator(rng, shape))
 
-    def nat_parameter_generator(self, rng, shape):
-        return demote_dtype(self._nat_parameter_generator(rng, shape))
+    def nat_parameter_generator(self,
+                                rng: Generator,
+                                shape: Shape) -> np.ndarray:
+        return canonicalize_array(self._nat_parameter_generator(rng, shape))
 
     # Magic methods -----------------------------------------------------------
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"DistributionInfo({self.my_distribution})"
