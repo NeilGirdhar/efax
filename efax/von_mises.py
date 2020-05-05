@@ -8,7 +8,7 @@ from ipromise import implements
 from jax.nn import softplus
 from scipy.special import iv
 
-from efax.tensors import inverse_softplus
+from .tensors import inverse_softplus
 
 from .exponential_family import ExponentialFamily
 from .tensors import RealTensor

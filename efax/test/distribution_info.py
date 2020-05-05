@@ -4,7 +4,7 @@ import numpy as np
 from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
 
-from efax.tensors import Shape
+from .tensors import Shape
 
 from ..exponential_family import ExponentialFamily
 
