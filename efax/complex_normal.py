@@ -3,7 +3,7 @@ import math
 import jax.numpy as jnp
 from ipromise import implements
 
-from efax.tensors import ComplexTensor, RealTensor
+from .tensors import ComplexTensor, RealTensor
 
 from .exponential_family import ExponentialFamily
 

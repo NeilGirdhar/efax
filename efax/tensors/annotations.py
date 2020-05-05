@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Container, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Hashable, List, Sequence, Tuple, Union
 
 import numpy as np
 from jax import numpy as jnp
@@ -20,7 +20,12 @@ SliceLike = Tuple[Union[int, None, slice], ...]
 Tensor = Union[np.ndarray, jnp.ndarray]
 RealTensor = Tensor
 ComplexTensor = Tensor
-PyTree = Union[Tensor, 'PyTreeLike', Container['PyTree'], None]
+PyTree = Union[Tensor,
+               'PyTreeLike',
+               Tuple['PyTree', ...],
+               List['PyTree'],
+               Dict[Hashable, 'PyTree'],
+               None]
 
 
 if TYPE_CHECKING:

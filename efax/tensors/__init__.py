@@ -8,5 +8,4 @@ The interface is implemented using cpu and gpu routines.
 """
 from .annotations import *
 from .dtypes import *
-from .pytree_like import *
 from .tools import *
