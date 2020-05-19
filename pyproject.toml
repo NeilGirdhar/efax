@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "efax"
-version = "0.2.2"
+version = "0.2.3"
 description = "Exponential families for JAX"
 license = "MIT"
 authors = ["Neil Girdhar <mistersheik@gmail.com>"]
