@@ -4,7 +4,7 @@ import pytest
 from numpy.testing import assert_allclose
 from scipy.stats import multivariate_normal
 
-from . import ScipyComplexMultivariateNormal, ScipyComplexNormal
+from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 
 @pytest.fixture(scope='module')
