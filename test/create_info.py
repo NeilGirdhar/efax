@@ -4,18 +4,11 @@ from typing import List
 import numpy as np
 import scipy.stats as ss
 
-from ..bernoulli import Bernoulli
-from ..complex_normal import ComplexNormal
-from ..dirichlet import Beta, Dirichlet
-from ..exponential import Exponential
-from ..gamma import Gamma
-from ..logarithmic import Logarithmic
-from ..negative_binomial import Geometric, NegativeBinomial
-from ..normal import Normal
-from ..normal_unit_variance import NormalUnitVariance
-from ..poisson import Poisson
-from ..scipy_replacement import ScipyComplexNormal, ScipyDirichlet
-from ..von_mises import VonMises
+from efax import (Bernoulli, Beta, ComplexNormal, Dirichlet, Exponential,
+                  Gamma, Geometric, Logarithmic, NegativeBinomial, Normal,
+                  NormalUnitVariance, Poisson, ScipyComplexNormal,
+                  ScipyDirichlet, VonMises)
+
 from .distribution_info import DistributionInfo
 
 

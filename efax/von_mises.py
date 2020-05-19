@@ -8,10 +8,8 @@ from ipromise import implements
 from jax.nn import softplus
 from scipy.special import iv
 
-from .tensors import inverse_softplus
-
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor
+from .tensors import RealTensor, inverse_softplus
 
 __all__ = ['VonMises', 'VonMisesFisher']
 

@@ -3,9 +3,8 @@ import math
 import jax.numpy as jnp
 from ipromise import implements
 
-from .tensors import ComplexTensor, RealTensor
-
 from .exponential_family import ExponentialFamily
+from .tensors import ComplexTensor, RealTensor
 
 __all__ = ['ComplexNormal']
 

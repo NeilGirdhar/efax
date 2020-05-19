@@ -1,8 +1,7 @@
 from jax import grad, jit
 from numpy.testing import assert_allclose
 
-from ..complex_normal import ComplexNormal
-from ..von_mises import VonMises
+from efax import ComplexNormal, VonMises
 
 # todo: Block VonMises until https://github.com/google/jax/issues/2466 is
 # resolved.

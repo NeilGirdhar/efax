@@ -4,9 +4,8 @@ import numpy as np
 from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
 
-from .tensors import Shape
-
-from ..exponential_family import ExponentialFamily
+from efax import ExponentialFamily
+from efax.tensors import Shape
 
 
 def canonicalize_array(array: np.ndarray) -> np.ndarray:

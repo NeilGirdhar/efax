@@ -4,7 +4,7 @@ These tests ensure that our distributions match scipy's.
 import numpy as np
 from numpy.testing import assert_allclose
 
-from ..logarithmic import Logarithmic
+from efax import Logarithmic
 
 
 def test_entropy(generator, distribution_info):
