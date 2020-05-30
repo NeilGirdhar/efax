@@ -14,8 +14,7 @@ def test_entropy(generator, distribution_info):
     if isinstance(distribution_info.my_distribution,
                   (Logarithmic,)):
         return
-    nat_parameters = distribution_info.nat_parameter_generator(
-        generator, shape=(3, 2))
+    nat_parameters = distribution_info.nat_parameter_generator(generator, shape=(3, 2))
     my_distribution = distribution_info.my_distribution
     scipy_distribution = distribution_info.nat_to_scipy_distribution(
         nat_parameters)
@@ -37,11 +36,9 @@ def test_pdf(generator, distribution_info):
     if isinstance(distribution_info.my_distribution, Logarithmic):
         return
     for _ in range(10):
-        nat_parameters = distribution_info.nat_parameter_generator(
-            generator, shape=())
+        nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         my_distribution = distribution_info.my_distribution
-        scipy_distribution = distribution_info.nat_to_scipy_distribution(
-            nat_parameters)
+        scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
         x = np.asarray(scipy_distribution.rvs(random_state=generator))
         my_x = np.asarray(distribution_info.my_observation(x))
 
@@ -52,32 +49,25 @@ def test_pdf(generator, distribution_info):
         except NotImplementedError:
             continue
 
-        assert_allclose(
-            my_distribution.pdf(nat_parameters, my_x),
-            density,
-            rtol=1e-4)
+        assert_allclose(my_distribution.pdf(nat_parameters, my_x), density, rtol=1e-4)
 
 
 def test_maximum_likelihood_estimation(generator, distribution_info):
     """
-    Test that maximum likelihood estimation from scipy-generated variates
-    produce the same distribution from which they were drawn.
+    Test that maximum likelihood estimation from scipy-generated variates produce the same
+    distribution from which they were drawn.
     """
     if isinstance(distribution_info.my_distribution, Logarithmic):
         return
-    parameters = distribution_info.exp_parameter_generator(
-        generator, shape=())
+    parameters = distribution_info.exp_parameter_generator(generator, shape=())
     my_distribution = distribution_info.my_distribution
-    scipy_distribution = distribution_info.exp_to_scipy_distribution(
-        parameters)
+    scipy_distribution = distribution_info.exp_to_scipy_distribution(parameters)
     x = scipy_distribution.rvs(random_state=generator, size=70000)
     my_x = distribution_info.my_observation(x)
     sufficient_stats = my_distribution.sufficient_statistics(my_x)
     shrink = int(my_distribution.num_parameters > 1)
 
-    calculated_parameters = np.mean(
-        sufficient_stats,
-        axis=tuple(range(sufficient_stats.ndim - shrink)))
+    calculated_parameters = np.mean(sufficient_stats,
+                                    axis=tuple(range(sufficient_stats.ndim - shrink)))
 
-    assert_allclose(parameters, calculated_parameters,
-                    rtol=2e-2)
+    assert_allclose(parameters, calculated_parameters, rtol=2e-2)

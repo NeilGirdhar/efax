@@ -28,12 +28,12 @@ class Dirichlet(ExponentialFamily):
                          observation_shape=observation_shape,
                          **kwargs)
 
-    # Magic methods -----------------------------------------------------------
+    # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:
         return (f"{type(self).__name__}(shape={self.shape}, "
                 f"num_parameters={self.num_parameters})")
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
@@ -42,8 +42,7 @@ class Dirichlet(ExponentialFamily):
     @implements(ExponentialFamily)
     def nat_to_exp(self, q: RealTensor) -> RealTensor:
         return (jss.digamma(q + 1.0)
-                - jss.digamma(jnp.sum(q, axis=-1, keepdims=True)
-                              + q.shape[-1]))
+                - jss.digamma(jnp.sum(q, axis=-1, keepdims=True) + q.shape[-1]))
 
     @implements(ExponentialFamily)
     def exp_to_nat(self, p: RealTensor) -> RealTensor:

@@ -14,29 +14,23 @@ class ScipyComplexMultivariateNormal:
         self.variance = variance
         self.pseudo_variance = pseudo_variance
         if mean.shape != (self.size,):
-            raise ValueError(f"Mean has shape {mean.shape} "
-                             f"instead of {(self.size,)}.")
+            raise ValueError(f"Mean has shape {mean.shape} instead of {(self.size,)}.")
         if variance.shape != (self.size, self.size):
-            raise ValueError(
-                f"The variance has shape "
-                f"{variance.shape} "
-                f"instead of {(self.size, self.size)}.")
+            raise ValueError("The variance has shape "
+                             f"{variance.shape} "
+                             f"instead of {(self.size, self.size)}.")
         if pseudo_variance.shape != (self.size, self.size):
-            raise ValueError(
-                f"The pseudo-variance has shape "
-                f"{pseudo_variance.shape} "
-                f"instead of {(self.size, self.size)}.")
+            raise ValueError("The pseudo-variance has shape "
+                             f"{pseudo_variance.shape} "
+                             f"instead of {(self.size, self.size)}.")
         if not np.all(np.linalg.eigvals(variance) >= 0):
-            raise ValueError(
-                "The variance is not positive semidefinite.")
+            raise ValueError("The variance is not positive semidefinite.")
         if not np.allclose(variance, variance.T.conj()):
-            raise ValueError(
-                "The variance is not Hermitian.")
+            raise ValueError("The variance is not Hermitian.")
         if not np.allclose(pseudo_variance, pseudo_variance.T):
-            raise ValueError(
-                "The pseudo-variance is not symmetric.")
+            raise ValueError("The pseudo-variance is not symmetric.")
 
-    # New methods -------------------------------------------------------------
+    # New methods ----------------------------------------------------------------------------------
     def log_normalizer(self):
         mu = self.mean
         _, precision, pseudo_precision = self.natural_parameters()
@@ -80,13 +74,12 @@ class ScipyComplexMultivariateNormal:
     def rvs(self, size=(), random_state=None):
         if random_state is None:
             random_state = np.random
-        xy_rvs = random_state.multivariate_normal(
-            mean=self._multivariate_normal_mean(),
-            cov=self._multivariate_normal_cov(),
-            size=size)
+        xy_rvs = random_state.multivariate_normal(mean=self._multivariate_normal_mean(),
+                                                  cov=self._multivariate_normal_cov(),
+                                                  size=size)
         return xy_rvs[..., :self.size] + 1j * xy_rvs[..., self.size:]
 
-    # Private methods ---------------------------------------------------------
+    # Private methods ------------------------------------------------------------------------------
     def _r_and_p_c(self):
         r = self.pseudo_variance.conj().T @ inv(self.variance)
         p_c = self.variance - (r @ self.pseudo_variance).conj()

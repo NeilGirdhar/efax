@@ -21,10 +21,9 @@ def random_complex(generator):
 def build_uvcn(generator):
     mean = random_complex(generator)
     variance = generator.exponential()
-    pseudo_variance = (
-        variance
-        * generator.beta(2, 2)
-        * np.exp(1j * generator.uniform(0, 2 * np.pi)))
+    pseudo_variance = (variance
+                       * generator.beta(2, 2)
+                       * np.exp(1j * generator.uniform(0, 2 * np.pi)))
     return ScipyComplexNormal(mean, variance, pseudo_variance)
 
 

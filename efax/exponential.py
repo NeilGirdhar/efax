@@ -12,7 +12,7 @@ class Exponential(ExponentialFamily):
     def __init__(self) -> None:
         super().__init__(num_parameters=1)
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         return -jnp.log(-q[..., 0])

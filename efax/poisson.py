@@ -14,7 +14,7 @@ class Poisson(ExponentialFamily):
     def __init__(self) -> None:
         super().__init__(num_parameters=1)
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         # pylint: disable=no-self-use
@@ -32,7 +32,7 @@ class Poisson(ExponentialFamily):
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x[..., np.newaxis]
 
-    # Overridden methods ------------------------------------------------------
+    # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)
     def carrier_measure(self, x: RealTensor) -> RealTensor:
         return -jss.gammaln(x + 1)

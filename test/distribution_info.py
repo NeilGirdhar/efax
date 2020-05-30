@@ -4,8 +4,8 @@ import numpy as np
 from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
 
-from efax import ExponentialFamily
-from efax.tensors import Shape
+from ..exponential_family import ExponentialFamily
+from .tensors import Shape
 
 
 def canonicalize_array(array: np.ndarray) -> np.ndarray:
@@ -84,7 +84,7 @@ class DistributionInfo:
                                if my_observation is None
                                else my_observation)
 
-    # New methods -------------------------------------------------------------
+    # New methods ----------------------------------------------------------------------------------
     def exp_parameter_generator(self,
                                 rng: Generator,
                                 shape: Shape) -> np.ndarray:
@@ -95,6 +95,6 @@ class DistributionInfo:
                                 shape: Shape) -> np.ndarray:
         return canonicalize_array(self._nat_parameter_generator(rng, shape))
 
-    # Magic methods -----------------------------------------------------------
+    # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:
         return f"DistributionInfo({self.my_distribution})"

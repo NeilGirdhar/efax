@@ -14,7 +14,7 @@ class ComplexNormal(ExponentialFamily):
     def __init__(self) -> None:
         super().__init__(num_parameters=3)
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: ComplexTensor) -> RealTensor:
         eta = q[..., 0]
@@ -51,11 +51,10 @@ class ComplexNormal(ExponentialFamily):
                  / ((k * jnp.conj(k) - 1.0) * precision))
         mu = (jnp.conj(l_eta)
               - jnp.conj(pseudo_precision / precision) * l_eta)
-        return jnp.stack(
-            [mu,
-             s + jnp.conj(mu) * mu,
-             u + jnp.square(mu)],
-            axis=q.ndim - 1)
+        return jnp.stack([mu,
+                          s + jnp.conj(mu) * mu,
+                          u + jnp.square(mu)],
+                         axis=q.ndim - 1)
 
     @implements(ExponentialFamily)
     def exp_to_nat(self, p: ComplexTensor) -> ComplexTensor:
@@ -72,9 +71,8 @@ class ComplexNormal(ExponentialFamily):
         pseudo_precision = r * p_inv_c
         eta = -2.0 * (precision * mean.conjugate()
                       + pseudo_precision * mean)
-        return jnp.stack(
-            [eta, precision, pseudo_precision],
-            axis=p.ndim - 1)
+        return jnp.stack([eta, precision, pseudo_precision],
+                         axis=p.ndim - 1)
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: ComplexTensor) -> ComplexTensor:

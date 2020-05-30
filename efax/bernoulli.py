@@ -15,7 +15,7 @@ class Bernoulli(Multinomial):
     def __init__(self, **kwargs: Any):
         super().__init__(num_parameters=1, **kwargs)
 
-    # Overridden methods ------------------------------------------------------
+    # Overridden methods ---------------------------------------------------------------------------
     @overrides(Multinomial)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         q = q[..., 0]
