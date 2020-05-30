@@ -11,12 +11,12 @@ __all__ = ['NormalUnitVariance']
 
 class NormalUnitVariance(ExponentialFamily):
 
-    # Magic methods -----------------------------------------------------------
+    # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:
         return (f"{type(self).__name__}(shape={self.shape}, "
                 f"num_parameters={self.num_parameters})")
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         return 0.5 * (jnp.sum(jnp.square(q), axis=-1)
@@ -34,18 +34,17 @@ class NormalUnitVariance(ExponentialFamily):
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x
 
-    # Overridden methods ------------------------------------------------------
+    # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)
     def scaled_cross_entropy(self,
                              k: real_dtype,
                              kp: RealTensor,
                              q: RealTensor) -> RealTensor:
         p = kp / k
-        return jnp.where(
-            k == 0.0,
-            0.0,
-            0.5 * (jnp.sum((kp - k * q) * (p - q), axis=-1)
-                   + k * (jnp.log(math.pi * 2.0) + 1.0)))
+        return jnp.where(k == 0.0,
+                         0.0,
+                         0.5 * (jnp.sum((kp - k * q) * (p - q), axis=-1)
+                                + k * (jnp.log(math.pi * 2.0) + 1.0)))
 
     @overrides(ExponentialFamily)
     def carrier_measure(self, x: RealTensor) -> RealTensor:

@@ -23,12 +23,11 @@ class VonMisesFisher(ExponentialFamily):
             raise ValueError
         super().__init__(num_parameters=num_parameters)
 
-    # Magic methods -----------------------------------------------------------
+    # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:
-        return (f"{type(self).__name__}(shape={self.shape}, "
-                f"num_parameters={self.num_parameters})")
+        return (f"{type(self).__name__}(shape={self.shape}, num_parameters={self.num_parameters})")
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         half_k = q.shape[-1] * 0.5
@@ -60,7 +59,7 @@ class VonMisesFisher(ExponentialFamily):
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x
 
-    # Private methods ---------------------------------------------------------
+    # Private methods ------------------------------------------------------------------------------
     @staticmethod
     def _a_k(k: RealTensor, kappa: RealTensor) -> RealTensor:
         half_k = k * 0.5
@@ -79,8 +78,7 @@ class VonMisesFisher(ExponentialFamily):
                                        inverse_softplus(initial_solution),
                                        tol=1e-5)
         if not solution.success:
-            raise ValueError(
-                f"Failed to find kappa because {solution.message}.")
+            raise ValueError(f"Failed to find kappa because {solution.message}.")
         return softplus(solution.x)
 
 
@@ -89,11 +87,11 @@ class VonMises(VonMisesFisher):
     def __init__(self) -> None:
         super().__init__(num_parameters=2)
 
-    # Magic methods -----------------------------------------------------------
+    # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:
         return f"{type(self).__name__}(shape={self.shape})"
 
-    # Overridden methods ------------------------------------------------------
+    # Overridden methods ---------------------------------------------------------------------------
     @staticmethod
     def nat_to_kappa_angle(q: RealTensor) -> Tuple[RealTensor, RealTensor]:
         kappa = np.linalg.norm(q, axis=-1)

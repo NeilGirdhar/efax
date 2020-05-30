@@ -40,8 +40,7 @@ class ScipyDirichlet:
         return retval
 
     def pdf(self, x):
-        retval = np.empty(self.shape,
-                          dtype=self.parameters.dtype)
+        retval = np.empty(self.shape, dtype=self.parameters.dtype)
         for i in np.ndindex(self.shape):
             xi = x[i].astype(np.float64)
             if not np.allclose(1, np.sum(xi), atol=1e-5, rtol=0):
@@ -52,8 +51,7 @@ class ScipyDirichlet:
         return retval
 
     def entropy(self):
-        retval = np.empty(self.shape,
-                          dtype=self.parameters.dtype)
+        retval = np.empty(self.shape, dtype=self.parameters.dtype)
         for i in np.ndindex(self.shape):
             retval[i] = self.objects[i].entropy()
         return retval

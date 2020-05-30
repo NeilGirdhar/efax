@@ -27,7 +27,7 @@ class ScipyComplexNormal:
                 == self.pseudo_variance.shape):
             raise ValueError("Shape mismatch.")
 
-    # New methods -------------------------------------------------------------
+    # New methods ----------------------------------------------------------------------------------
     @classmethod
     def init_using_angle(cls, mean, variance, angle, polarization):
         r = polarization * np.exp(1j * 2 * np.pi * angle * 2)
@@ -98,7 +98,7 @@ class ScipyComplexNormal:
             retval[i] = mvn.entropy()
         return retval
 
-    # Private methods ---------------------------------------------------------
+    # Private methods ------------------------------------------------------------------------------
     def _r_and_p_c(self):
         r = self.pseudo_variance.conjugate() / self.variance
         p_c = self.variance - (r * self.pseudo_variance).conjugate()

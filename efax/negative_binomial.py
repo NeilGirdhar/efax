@@ -16,7 +16,7 @@ class NegativeBinomial(ExponentialFamily):
         super().__init__(num_parameters=1)
         self.r = r
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         return -self.r * jnp.log1p(-jnp.exp(q[..., 0]))
@@ -33,7 +33,7 @@ class NegativeBinomial(ExponentialFamily):
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x
 
-    # Overridden methods ------------------------------------------------------
+    # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)
     def carrier_measure(self, x: RealTensor) -> RealTensor:
         lgamma = jss.gammaln
@@ -47,7 +47,7 @@ class NegativeBinomial(ExponentialFamily):
             return jnp.zeros(self.shape)
         raise NotImplementedError
 
-    # Magic methods -----------------------------------------------------------
+    # Magic methods --------------------------------------------------------------------------------
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, NegativeBinomial):
             return NotImplemented

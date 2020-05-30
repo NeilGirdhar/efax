@@ -31,7 +31,7 @@ class ExponentialFamily(AbstractBaseClass):
         self.shape = shape
         self.observation_shape = observation_shape
 
-    # Magic methods -----------------------------------------------------------
+    # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         if cls.__name__ in ['VonMises', 'VonMisesFisher']:
@@ -86,14 +86,12 @@ class ExponentialFamily(AbstractBaseClass):
                      self.shape,
                      self.observation_shape))
 
-    # Abstract methods --------------------------------------------------------
+    # Abstract methods -----------------------------------------------------------------------------
     @abstractmethod
     def log_normalizer(self, q: Tensor) -> RealTensor:
         """
         Args:
-            q:
-                The natural parameters having shape
-                self.shape_including_parameters().
+            q: The natural parameters having shape self.shape_including_parameters().
         Returns:
             The log-normalizer having shape self.shape.
         """
@@ -103,12 +101,9 @@ class ExponentialFamily(AbstractBaseClass):
     def nat_to_exp(self, q: Tensor) -> Tensor:
         """
         Args:
-            q:
-                The natural parameters having shape
-                self.shape_including_parameters().
+            q: The natural parameters having shape self.shape_including_parameters().
         Returns:
-            The corresponding expectation parameters having shape
-            self.shape_including_parameters().
+            The corresponding expectation parameters having shape self.shape_including_parameters().
         """
         raise NotImplementedError
 
@@ -116,12 +111,9 @@ class ExponentialFamily(AbstractBaseClass):
     def exp_to_nat(self, p: Tensor) -> Tensor:
         """
         Args:
-            q:
-                The expectation parameters having shape
-                self.shape_including_parameters().
+            q: The expectation parameters having shape self.shape_including_parameters().
         Returns:
-            The corresponding natural parameters having shape
-            self.shape_including_parameters().
+            The corresponding natural parameters having shape self.shape_including_parameters().
         """
         raise NotImplementedError
 
@@ -131,12 +123,11 @@ class ExponentialFamily(AbstractBaseClass):
         Args:
             x: The sample having shape self.shape_including_observations().
         Returns:
-            The corresponding sufficient statistics having shape
-            self.shape_including_parameters().
+            The corresponding sufficient statistics having shape self.shape_including_parameters().
         """
         raise NotImplementedError
 
-    # New methods -------------------------------------------------------------
+    # New methods ----------------------------------------------------------------------------------
     def shape_including_parameters(self) -> Shape:
         return (*self.shape, self.num_parameters)
 
@@ -177,8 +168,8 @@ class ExponentialFamily(AbstractBaseClass):
         Args:
             k: The scale.
             kp:
-                The expectation parameters of the observation times k, having
-                shape self.shape_including_parameters().
+                The expectation parameters of the observation times k, having shape
+                self.shape_including_parameters().
             q:
                 The natural parameters of the prediction having shape
                 self.shape_including_parameters().
@@ -209,9 +200,9 @@ class ExponentialFamily(AbstractBaseClass):
                 The expectation parameters of a distribution having shape
                 self.shape_including_parameters().
         Returns:
-            The expected carrier measure of the distribution having shape
-            self.shape.  This is the missing term from the inner product
-            between the observed distribution and the predicted distribution.
+            The expected carrier measure of the distribution having shape self.shape.  This is the
+            missing term from the inner product between the observed distribution and the predicted
+            distribution.
         """
         # pylint: disable=unused-argument
         return jnp.zeros(self.shape)
@@ -224,8 +215,7 @@ class ExponentialFamily(AbstractBaseClass):
                 self.shape_including_parameters().
             x: The sample having shape self.shape_including_observations().
         Returns:
-            The distribution's density or mass function at x having shape
-            self.shape.
+            The distribution's density or mass function at x having shape self.shape.
         """
         tx = self.sufficient_statistics(x)
         tx_dot_q = jnp.real(jnp.sum(tx * q, axis=-1))

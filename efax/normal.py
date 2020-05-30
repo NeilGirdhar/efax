@@ -15,22 +15,20 @@ class Normal(ExponentialFamily):
     def __init__(self, **kwargs: Any):
         super().__init__(num_parameters=2, **kwargs)
 
-    # Implemented methods -----------------------------------------------------
+    # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def log_normalizer(self, q: RealTensor) -> RealTensor:
         qa = q[..., 0]
         qb = q[..., 1]
-        return (-jnp.square(qa)
-                / (4.0 * qb) + 0.5 * jnp.log(-np.pi / qb))
+        return (-jnp.square(qa) / (4.0 * qb) + 0.5 * jnp.log(-np.pi / qb))
 
     @implements(ExponentialFamily)
     def nat_to_exp(self, q: RealTensor) -> RealTensor:
         qa = q[..., 0]
         qb = q[..., 1]
         ratio = -qa / (2 * qb)
-        return jnp.stack(
-            [ratio, (jnp.square(ratio) - 0.5 / qb)],
-            axis=q.ndim - 1)
+        return jnp.stack([ratio, (jnp.square(ratio) - 0.5 / qb)],
+                         axis=q.ndim - 1)
 
     @implements(ExponentialFamily)
     def exp_to_nat(self, p: RealTensor) -> RealTensor:
@@ -44,7 +42,7 @@ class Normal(ExponentialFamily):
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return jnp.stack([x, jnp.square(x)], axis=x.ndim)
 
-    # Overridden methods ------------------------------------------------------
+    # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)
     def scaled_cross_entropy(self,
                              k: real_dtype,
@@ -55,5 +53,4 @@ class Normal(ExponentialFamily):
         qa = q[..., 0]
         qb = q[..., 1]
         return (-kpa * qa - kpb * qb
-                + k * (-jnp.square(qa) / (4.0 * qb)
-                       + 0.5 * jnp.log(-np.pi / qb)))
+                + k * (-jnp.square(qa) / (4.0 * qb) + 0.5 * jnp.log(-np.pi / qb)))
