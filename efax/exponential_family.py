@@ -49,24 +49,36 @@ class ExponentialFamily(AbstractBaseClass):
                      'pdf']:
             original_method = getattr(cls, name)
             method = jax.jit(original_method, static_argnums=(0,))
-            if name == 'log_normalizer':
-                method = jax.custom_jvp(method, nondiff_argnums=(0,))
             setattr(cls, f'_original_{name}', method)
-            setattr(cls, name, method)
 
             if name != 'log_normalizer':
+                setattr(cls, name, method)
                 continue
 
-            # pylint: disable=unused-variable
-            @method.defjvp
+            method_jvp = jax.custom_jvp(method, nondiff_argnums=(0,))
+            setattr(cls, name, method_jvp)
+
             def ln_jvp(self: ExponentialFamily,
                        primals: Tuple[Tensor],
                        tangents: Tuple[Tensor]) -> Tuple[Tensor, Tensor]:
-                x, = primals
-                x_dot, = tangents
-                y = self.log_normalizer(x)
-                y_dot = jnp.sum(self.nat_to_exp(x) * x_dot, axis=-1)
+                q, = primals
+                q_dot, = tangents
+                y = self.log_normalizer(q)
+                y_dot = jnp.sum(self.nat_to_exp(q) * q_dot, axis=-1)
                 return y, y_dot
+
+            method_jvp.defjvp(ln_jvp)
+
+            # def method_fwd(self: ExponentialFamily, q: Tensor) -> Tuple[Tensor, Tuple[Tensor]]:
+            #     return self.log_normalizer(q), (self.nat_to_exp(q),)
+            #
+            # def method_bwd(self: ExponentialFamily,
+            #                residuals: Tuple[Tensor],
+            #                y_bar: Tensor) -> Tuple[Tensor]:
+            #     exp_parameters, = residuals
+            #     return (y_bar * exp_parameters,)
+            #
+            # method.defvjp(method_fwd, method_bwd)
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(shape={self.shape})"

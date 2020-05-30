@@ -1,4 +1,6 @@
-from jax import grad, jit
+from jax import grad, jit, jvp
+from jax import numpy as jnp
+from jax import vjp
 from numpy.testing import assert_allclose
 
 from efax import ComplexNormal, VonMises
@@ -53,12 +55,10 @@ def test_gradient_log_normalizer(generator, distribution_info):
         return
     my_distribution = distribution_info.my_distribution
 
-    def original_f(q):
-        # pylint: disable=protected-access
-        return my_distribution._original_log_normalizer(q)
+    # pylint: disable=protected-access
+    original_f = my_distribution._original_log_normalizer
 
-    def f(q):
-        return my_distribution.log_normalizer(q)
+    f = my_distribution.log_normalizer
 
     original_gln = jit(grad(original_f))
     gln = jit(grad(f))
@@ -71,5 +71,16 @@ def test_gradient_log_normalizer(generator, distribution_info):
         gln_x = gln(nat_parameters)
         exp_parameters = nat_to_exp(nat_parameters)
 
+        # Test primal evaluation.
         assert_allclose(original_gln_x, exp_parameters, rtol=1e-5)
         assert_allclose(gln_x, exp_parameters, rtol=1e-5)
+
+        # Test JVP.
+        original_gradients = jvp(original_f, (nat_parameters,), (jnp.ones_like(nat_parameters),))
+        gradients = jvp(f, (nat_parameters,), (jnp.ones_like(nat_parameters),))
+        assert_allclose(original_gradients, gradients, rtol=1e-5)
+
+        # Test VJP.
+        _, original_g = vjp(original_f, nat_parameters)
+        _, g = vjp(f, nat_parameters)
+        assert_allclose(original_g(1.0), g(1.0), rtol=1e-5)
