@@ -1,4 +1,4 @@
-import jax.numpy as jnp
+from jax import numpy as jnp
 
 from .annotations import Tensor
 

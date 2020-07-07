@@ -32,9 +32,8 @@ scipy = "^1.4"
 pytest = "^5"
 
 [tool.isort]
-line_lenth = 100
+line_length = 100
 multi_line_output = 0
-not_skip = "__init__.py"
 known_third_party = ["ipromise", "jax"]
 
 [tool.pycodestyle]

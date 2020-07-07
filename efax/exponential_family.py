@@ -2,8 +2,8 @@ from abc import abstractmethod
 from typing import Any, Tuple
 
 import jax
-import jax.numpy as jnp
 from ipromise import AbstractBaseClass
+from jax import numpy as jnp
 
 from .tensors import RealTensor, Shape, Tensor, real_dtype
 

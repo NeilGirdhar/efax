@@ -2,12 +2,11 @@ from functools import partial
 from typing import List
 
 import numpy as np
-import scipy.stats as ss
+from scipy import stats as ss
 
-from efax import (Bernoulli, Beta, ComplexNormal, Dirichlet, Exponential,
-                  Gamma, Geometric, Logarithmic, NegativeBinomial, Normal,
-                  NormalUnitVariance, Poisson, ScipyComplexNormal,
-                  ScipyDirichlet, VonMises)
+from efax import (Bernoulli, Beta, ComplexNormal, Dirichlet, Exponential, Gamma, Geometric,
+                  Logarithmic, NegativeBinomial, Normal, NormalUnitVariance, Poisson,
+                  ScipyComplexNormal, ScipyDirichlet, VonMises)
 
 from .distribution_info import DistributionInfo
 
