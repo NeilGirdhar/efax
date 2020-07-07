@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.stats as ss
+from scipy import stats as ss
 
 __all__ = ['ScipyDirichlet']
 

@@ -1,8 +1,8 @@
 from typing import Any
 
-import jax.numpy as jnp
-import jax.scipy.special as jss
 from ipromise import implements, overrides
+from jax import numpy as jnp
+from jax.scipy import special as jss
 
 from .exponential_family import ExponentialFamily
 from .tensors import RealTensor
