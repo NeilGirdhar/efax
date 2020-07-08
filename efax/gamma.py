@@ -6,9 +6,9 @@ from ipromise import implements
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from scipy.special import polygamma
+from tjax import RealTensor
 
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor
 
 __all__ = ['Gamma']
 

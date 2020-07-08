@@ -121,7 +121,7 @@ def create_infos() -> List[DistributionInfo]:
 
     def dirichlet_parameter_generator(n, rng, shape):
         # q can be as low as -1, but we prevent low values
-        return rng.exponential(size=(*shape, n), scale=4.0) + 0.5
+        return rng.exponential(size=(*shape, n), scale=4.0) + 0.7
 
     def beta_my_observation(x):
         x = np.asarray(x)

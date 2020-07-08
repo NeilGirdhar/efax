@@ -24,7 +24,7 @@ def test_entropy(generator, distribution_info):
         if (scipy_entropy.shape
                 and my_entropy.shape == scipy_entropy.shape[:-1]):
             scipy_entropy = scipy_entropy[..., 0]
-        assert_allclose(my_entropy, scipy_entropy, rtol=1e-5)
+        assert_allclose(my_entropy, scipy_entropy, rtol=1.5e-5)
     except NotImplementedError:
         pass
 

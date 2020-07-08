@@ -5,9 +5,9 @@ import scipy.optimize
 from ipromise import implements
 from jax import numpy as jnp
 from jax.scipy import special as jss
+from tjax import RealTensor, Shape
 
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor, Shape
 
 __all__ = ['Beta', 'Dirichlet']
 

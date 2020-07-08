@@ -2,9 +2,9 @@ import math
 
 from ipromise import implements
 from jax import numpy as jnp
+from tjax import ComplexTensor, RealTensor
 
 from .exponential_family import ExponentialFamily
-from .tensors import ComplexTensor, RealTensor
 
 __all__ = ['ComplexNormal']
 

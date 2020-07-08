@@ -3,8 +3,7 @@ from typing import Optional
 import numpy as np
 from numpy.random import Generator
 from scipy import stats as ss
-
-from ..tensors import Shape
+from tjax import Shape
 
 __all__ = ['ScipyMultivariateNormal']
 

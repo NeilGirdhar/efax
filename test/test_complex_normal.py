@@ -80,7 +80,7 @@ def test_univariate_rvs(generator):
     estimated_pseudo_variance = np.average(np.square(centered_rvs))
 
     assert_allclose(estimated_mean, dist.mean, rtol=1e-2)
-    assert_allclose(estimated_variance, dist.variance, rtol=1e-2)
+    assert_allclose(estimated_variance, dist.variance, rtol=1e-2, atol=5e-3)
     assert_allclose(estimated_pseudo_variance, dist.pseudo_variance,
                     rtol=1e-2, atol=1e-2)
 

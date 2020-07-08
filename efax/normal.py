@@ -3,9 +3,9 @@ from typing import Any
 import numpy as np
 from ipromise import implements, overrides
 from jax import numpy as jnp
+from tjax import RealTensor, real_dtype
 
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor, real_dtype
 
 __all__ = ['Normal']
 
