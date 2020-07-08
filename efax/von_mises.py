@@ -7,11 +7,17 @@ from ipromise import implements
 from jax import numpy as jnp
 from jax.nn import softplus
 from scipy.special import iv
+from tjax import RealTensor, Tensor
 
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor, inverse_softplus
 
 __all__ = ['VonMises', 'VonMisesFisher']
+
+
+def inverse_softplus(y: Tensor) -> Tensor:
+    return jnp.where(y > 80.0,
+                     y,
+                     jnp.log(jnp.expm1(y)))
 
 
 class VonMisesFisher(ExponentialFamily):

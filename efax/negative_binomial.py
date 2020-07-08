@@ -3,9 +3,9 @@ from typing import Any
 from ipromise import implements, overrides
 from jax import numpy as jnp
 from jax.scipy import special as jss
+from tjax import RealTensor
 
 from .exponential_family import ExponentialFamily
-from .tensors import RealTensor
 
 __all__ = ['NegativeBinomial', 'Geometric']
 

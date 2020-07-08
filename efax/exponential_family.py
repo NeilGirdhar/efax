@@ -4,8 +4,7 @@ from typing import Any, Tuple
 import jax
 from ipromise import AbstractBaseClass
 from jax import numpy as jnp
-
-from .tensors import RealTensor, Shape, Tensor, real_dtype
+from tjax import RealTensor, Shape, Tensor, real_dtype
 
 __all__ = ['ExponentialFamily']
 
@@ -50,13 +49,12 @@ class ExponentialFamily(AbstractBaseClass):
             original_method = getattr(cls, name)
             method = jax.jit(original_method, static_argnums=(0,))
             setattr(cls, f'_original_{name}', method)
+            setattr(cls, name, method)
 
             if name != 'log_normalizer':
-                setattr(cls, name, method)
                 continue
 
             method_jvp = jax.custom_jvp(method, nondiff_argnums=(0,))
-            setattr(cls, name, method_jvp)
 
             def ln_jvp(self: ExponentialFamily,
                        primals: Tuple[Tensor],
