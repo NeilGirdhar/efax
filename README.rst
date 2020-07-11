@@ -108,7 +108,7 @@ Contribution guidelines
 
 - How to clean the source:
 
-  - :bash:`isort -rc -y`
+  - :bash:`isort .`
   - :bash:`pylint efax`
   - :bash:`flake8 efax`
   - :bash:`mypy efax`
