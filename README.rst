@@ -14,14 +14,6 @@ This library provides a set of tools for working with *exponential family distri
 The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
 For an explaination of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
 
-Installation
-============
-efax depends on https://github.com/google/jax/pull/2487, so the easiest way to get it working is to install jax from https://github.com/NeilGirdhar/jax:
-
-.. code:: bash
-
-    pip install --upgrade git+https://github.com/NeilGirdhar/jax.git
-
 Usage
 =====
 In SciPy, a distribution is represented by a single object, so a thousand distributions need a thousand objects.  Each object encodes the distribution family, and the parameters of the distribution.
