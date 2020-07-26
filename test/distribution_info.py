@@ -3,9 +3,9 @@ from typing import Any, Callable, Optional
 import numpy as np
 from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
+from tjax import Shape
 
 from ..exponential_family import ExponentialFamily
-from .tensors import Shape
 
 
 def canonicalize_array(array: np.ndarray) -> np.ndarray:
