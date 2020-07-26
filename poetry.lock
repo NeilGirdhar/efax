@@ -243,7 +243,7 @@ description = "Tools for JAX."
 name = "tjax"
 optional = false
 python-versions = ">=3.8,<4.0"
-version = "0.2.1"
+version = "0.3"
 
 [package.dependencies]
 colorful = ">=0.5.4,<0.6.0"
@@ -262,7 +262,7 @@ python-versions = "*"
 version = "0.2.5"
 
 [metadata]
-content-hash = "1faa62959bc355cd48d3c29768fdc897a06847347065df38b7f01f60630ce045"
+content-hash = "6faf03d73f06a9b0b7ba85f13374a29daf2d78ef8bc050914aae4d8bf4ef46d1"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -392,8 +392,8 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 tjax = [
-    {file = "tjax-0.2.1-py3-none-any.whl", hash = "sha256:b36573c9968ed2d26e3fca848f6f190dd4b62549d2d1f2f94533b629e8cfb0c9"},
-    {file = "tjax-0.2.1.tar.gz", hash = "sha256:164e44cc38b10d17bc46a81a0d5bdf7a55749f264cdca8951da53819d41bf937"},
+    {file = "tjax-0.3-py3-none-any.whl", hash = "sha256:fd17b8ef8aa9f3323d5a9774e07d28068402f7be6d859dce05d83edcfb1dc72a"},
+    {file = "tjax-0.3.tar.gz", hash = "sha256:e4ba8d43aeca5f96e0e5879ff8a3bdcc52af232f287490ac3964beedff7987e6"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
