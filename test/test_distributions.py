@@ -1,9 +1,12 @@
 from jax import grad, jit, jvp
 from jax import numpy as jnp
 from jax import vjp
+from numpy.random import Generator
 from numpy.testing import assert_allclose
 
 from efax import ComplexNormal, VonMises
+
+from .distribution_info import DistributionInfo
 
 # todo: Block VonMises until https://github.com/google/jax/issues/2466 is
 # resolved.
@@ -11,58 +14,58 @@ from efax import ComplexNormal, VonMises
 # resolved.
 
 
-def test_conversion(generator, distribution_info):
+def test_conversion(generator: Generator, distribution_info: DistributionInfo) -> None:
     """
     Test that the conversion between the different parametrizations are consistent.
     """
-    if isinstance(distribution_info.my_distribution, VonMises):
+    if isinstance(distribution_info.exp_family, VonMises):
         return
-    my_distribution = distribution_info.my_distribution
+    exp_family = distribution_info.exp_family
 
     for _ in range(10):
         parameters = distribution_info.exp_parameter_generator(generator, shape=(4, 3))
-        nat_parameters = my_distribution.exp_to_nat(parameters)
-        exp_parameters = my_distribution.nat_to_exp(nat_parameters)
+        nat_parameters = exp_family.exp_to_nat(parameters)
+        exp_parameters = exp_family.nat_to_exp(nat_parameters)
         assert_allclose(parameters, exp_parameters, rtol=1e-4)
 
 
-def test_scaled_cross_entropy(generator, distribution_info):
+def test_scaled_cross_entropy(generator: Generator, distribution_info: DistributionInfo) -> None:
     """
     Test that the “scaled cross entropy” matches the cross entropy, scaled.
     """
-    if isinstance(distribution_info.my_distribution, VonMises):
+    if isinstance(distribution_info.exp_family, VonMises):
         return
     k = 0.3
     p = distribution_info.exp_parameter_generator(generator, shape=())
     q = distribution_info.nat_parameter_generator(generator, shape=())
-    my_distribution = distribution_info.my_distribution
+    exp_family = distribution_info.exp_family
     try:
-        assert_allclose(my_distribution.scaled_cross_entropy(k, k * p, q),
-                        k * my_distribution.cross_entropy(p, q),
+        assert_allclose(exp_family.scaled_cross_entropy(k, k * p, q),
+                        k * exp_family.cross_entropy(p, q),
                         rtol=3e-6)
     except NotImplementedError:
         pass
 
 
-def test_gradient_log_normalizer(generator, distribution_info):
+def test_gradient_log_normalizer(generator: Generator, distribution_info: DistributionInfo) -> None:
     """
     Tests that the gradient log-normalizer evaluates to the same as the gradient of the
     log-normalizer.
     """
-    if isinstance(distribution_info.my_distribution, VonMises):
+    if isinstance(distribution_info.exp_family, VonMises):
         return
-    if isinstance(distribution_info.my_distribution, ComplexNormal):
+    if isinstance(distribution_info.exp_family, ComplexNormal):
         return
-    my_distribution = distribution_info.my_distribution
+    exp_family = distribution_info.exp_family
 
     # pylint: disable=protected-access
-    original_f = my_distribution._original_log_normalizer
+    original_f = exp_family._original_log_normalizer
 
-    f = my_distribution.log_normalizer
+    f = exp_family.log_normalizer
 
     original_gln = jit(grad(original_f))
     gln = jit(grad(f))
-    nat_to_exp = my_distribution.nat_to_exp
+    nat_to_exp = exp_family.nat_to_exp
 
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
