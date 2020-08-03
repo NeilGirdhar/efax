@@ -50,19 +50,15 @@ class Dirichlet(ExponentialFamily):
         for i in np.ndindex(p.shape[: -1]):
             this_p = p[i]
 
-            def f(some_q: RealTensor,
-                  this_p: RealTensor = this_p) -> RealTensor:
+            def f(some_q: RealTensor, this_p: RealTensor = this_p) -> RealTensor:
                 some_q = jnp.maximum(-0.999, some_q)
                 some_p = self.nat_to_exp(some_q)
                 return some_p - this_p
 
-            solution = scipy.optimize.root(f,
-                                           np.zeros_like(this_p),
-                                           tol=1e-5)
+            solution = scipy.optimize.root(f, np.zeros_like(this_p), tol=1e-5)
             if not solution.success:
-                raise ValueError(
-                    "Failed to find natural parmaeters for "
-                    f"{this_p} because {solution.message}.")
+                raise ValueError("Failed to find natural parmaeters for "
+                                 f"{this_p} because {solution.message}.")
             q[i] = solution.x
         return q
 

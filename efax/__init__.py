@@ -2,6 +2,7 @@
 This package provides various exponential family probability distributions.
 """
 from .bernoulli import *
+from .chi_square import *
 from .complex_normal import *
 from .dirichlet import *
 from .exponential import *

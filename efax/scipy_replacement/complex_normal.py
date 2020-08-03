@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from math import log, pi
 from numbers import Real
+from typing import Optional, Tuple
 
 import numpy as np
+from numpy.random import Generator
 from scipy.stats import multivariate_normal
+from tjax import Shape
 
 __all__ = ['ScipyComplexNormal']
 
@@ -13,7 +18,7 @@ class ScipyComplexNormal:
     Represents an array of univariate complex normal distributions.
     """
 
-    def __init__(self, mean, variance, pseudo_variance):
+    def __init__(self, mean: np.ndarray, variance: np.ndarray, pseudo_variance: np.ndarray):
         self.mean = np.asarray(mean)
         self.variance = np.asarray(variance)
         self.pseudo_variance = np.asarray(pseudo_variance)
@@ -29,11 +34,12 @@ class ScipyComplexNormal:
 
     # New methods ----------------------------------------------------------------------------------
     @classmethod
-    def init_using_angle(cls, mean, variance, angle, polarization):
+    def init_using_angle(cls, mean: np.ndarray, variance: np.ndarray, angle: np.ndarray,
+                         polarization: np.ndarray) -> ScipyComplexNormal:
         r = polarization * np.exp(1j * 2 * np.pi * angle * 2)
         return cls(mean, variance, r * variance)
 
-    def log_normalizer(self):
+    def log_normalizer(self) -> np.ndarray:
         _, precision, pseudo_precision = self.natural_parameters()
         mu = self.mean
         det_s = self.variance.real
@@ -44,7 +50,7 @@ class ScipyComplexNormal:
                 - 0.5 * log(det_h)
                 + log(pi)).real
 
-    def natural_parameters(self):
+    def natural_parameters(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         r, p_c = self._r_and_p_c()
         p_inv_c = 1.0 / p_c
         precision = -p_inv_c
@@ -54,7 +60,11 @@ class ScipyComplexNormal:
                 precision,
                 pseudo_precision)
 
-    def natural_to_sample(self, eta, precision, pseudo_precision):
+    def natural_to_sample(self,
+                          eta: np.ndarray,
+                          precision: np.ndarray,
+                          pseudo_precision: np.ndarray) -> (
+                              Tuple[np.ndarray, np.ndarray, np.ndarray]):
         r = -pseudo_precision / precision
         s = 1.0 / ((r.conjugate() * r - 1.0) * precision)
         u = (r * s).conjugate()
@@ -64,7 +74,7 @@ class ScipyComplexNormal:
               - (pseudo_precision / precision).conjugate() * l_eta)
         return mu, s, u
 
-    def pdf(self, z, out=None):
+    def pdf(self, z: np.ndarray, out: None = None) -> np.ndarray:
         log_normalizer = self.log_normalizer()
         eta, precision, pseudo_precision = self.natural_parameters()
         return np.exp((eta * z).real
@@ -72,11 +82,11 @@ class ScipyComplexNormal:
                       + (z * z * pseudo_precision).real
                       - log_normalizer)
 
-    def rvs(self, size=(), random_state=None):
+    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> np.ndarray:
         if isinstance(size, int):
             size = (size,)
         if random_state is None:
-            random_state = np.random
+            random_state = np.random.default_rng()
         # Work around limitation https://github.com/numpy/numpy/issues/15530
         mv_mean = self._multivariate_normal_mean()
         mv_cov = self._multivariate_normal_cov()
@@ -87,7 +97,7 @@ class ScipyComplexNormal:
             retval[i] = xy_rvs[..., 0] + 1j * xy_rvs[..., 1]
         return retval
 
-    def entropy(self):
+    def entropy(self) -> np.ndarray:
         # Work around limitation https://github.com/numpy/numpy/issues/15530
         mv_mean = self._multivariate_normal_mean()
         mv_cov = self._multivariate_normal_cov()
@@ -99,15 +109,15 @@ class ScipyComplexNormal:
         return retval
 
     # Private methods ------------------------------------------------------------------------------
-    def _r_and_p_c(self):
+    def _r_and_p_c(self) -> Tuple[np.ndarray, np.ndarray]:
         r = self.pseudo_variance.conjugate() / self.variance
         p_c = self.variance - (r * self.pseudo_variance).conjugate()
         return r, p_c
 
-    def _multivariate_normal_mean(self):
+    def _multivariate_normal_mean(self) -> np.ndarray:
         return np.stack([self.mean.real, self.mean.imag], axis=-1)
 
-    def _multivariate_normal_cov(self):
+    def _multivariate_normal_cov(self) -> np.ndarray:
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
         xx = 0.5 * cov_sum.real

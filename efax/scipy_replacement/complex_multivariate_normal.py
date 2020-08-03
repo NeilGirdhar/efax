@@ -1,14 +1,18 @@
 from math import log, pi
+from typing import Optional, Tuple
 
 import numpy as np
 from numpy.linalg import det, inv
+from numpy.random import Generator
+from scipy.stats import multivariate_normal
+from tjax import Shape
 
 __all__ = ['ScipyComplexMultivariateNormal']
 
 
 class ScipyComplexMultivariateNormal:
 
-    def __init__(self, mean, variance, pseudo_variance):
+    def __init__(self, mean: np.ndarray, variance: np.ndarray, pseudo_variance: np.ndarray):
         self.size = mean.shape[0]
         self.mean = mean
         self.variance = variance
@@ -31,7 +35,7 @@ class ScipyComplexMultivariateNormal:
             raise ValueError("The pseudo-variance is not symmetric.")
 
     # New methods ----------------------------------------------------------------------------------
-    def log_normalizer(self):
+    def log_normalizer(self) -> np.ndarray:
         mu = self.mean
         _, precision, pseudo_precision = self.natural_parameters()
         det_s = det(self.variance).real
@@ -42,7 +46,7 @@ class ScipyComplexMultivariateNormal:
                 - 0.5 * log(det_h)
                 + self.size * log(pi)).real
 
-    def natural_parameters(self):
+    def natural_parameters(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         r, p_c = self._r_and_p_c()
         p_inv_c = inv(p_c)
         precision = -p_inv_c
@@ -51,7 +55,11 @@ class ScipyComplexMultivariateNormal:
                       + pseudo_precision.dot(self.mean))
         return (eta, precision, pseudo_precision)
 
-    def natural_to_sample(self, eta, precision, pseudo_precision):
+    def natural_to_sample(self,
+                          eta: np.ndarray,
+                          precision: np.ndarray,
+                          pseudo_precision: np.ndarray) -> (
+                              Tuple[np.ndarray, np.ndarray, np.ndarray]):
         inv_precision = inv(precision)
         r = -(pseudo_precision @ inv_precision).T
         s = inv(r.conj() @ r - np.eye(self.size)) @ inv_precision
@@ -63,7 +71,7 @@ class ScipyComplexMultivariateNormal:
               - (inv_precision.T @ pseudo_precision).conj().dot(l_eta))
         return mu, s, u
 
-    def pdf(self, z):
+    def pdf(self, z: np.ndarray, out: None = None) -> np.ndarray:
         log_normalizer = self.log_normalizer()
         eta, precision, pseudo_precision = self.natural_parameters()
         return np.exp((eta.dot(z)
@@ -71,24 +79,24 @@ class ScipyComplexMultivariateNormal:
                        + z.dot(pseudo_precision).dot(z)).real
                       - log_normalizer)
 
-    def rvs(self, size=(), random_state=None):
+    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> np.ndarray:
         if random_state is None:
-            random_state = np.random
+            random_state = np.random.default_rng()
         xy_rvs = random_state.multivariate_normal(mean=self._multivariate_normal_mean(),
                                                   cov=self._multivariate_normal_cov(),
                                                   size=size)
         return xy_rvs[..., :self.size] + 1j * xy_rvs[..., self.size:]
 
     # Private methods ------------------------------------------------------------------------------
-    def _r_and_p_c(self):
+    def _r_and_p_c(self) -> Tuple[np.ndarray, np.ndarray]:
         r = self.pseudo_variance.conj().T @ inv(self.variance)
         p_c = self.variance - (r @ self.pseudo_variance).conj()
         return r, p_c
 
-    def _multivariate_normal_mean(self):
+    def _multivariate_normal_mean(self) -> np.ndarray:
         return np.concatenate([self.mean.real, self.mean.imag])
 
-    def _multivariate_normal_cov(self):
+    def _multivariate_normal_cov(self) -> np.ndarray:
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
         xx = 0.5 * cov_sum.real

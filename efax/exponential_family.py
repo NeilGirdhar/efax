@@ -54,7 +54,7 @@ class ExponentialFamily(AbstractBaseClass):
             if name != 'log_normalizer':
                 continue
 
-            method_jvp = custom_jvp(method, nondiff_argnums=(0,))
+            method_jvp: Any = custom_jvp(method, nondiff_argnums=(0,))
 
             def ln_jvp(self: ExponentialFamily,
                        primals: Tuple[Tensor],
@@ -229,7 +229,6 @@ class ExponentialFamily(AbstractBaseClass):
         """
         tx = self.sufficient_statistics(x)
         tx_dot_q = jnp.real(jnp.sum(tx * q, axis=-1))
-        return jnp.exp(
-            tx_dot_q
-            - self.log_normalizer(q)
-            + self.carrier_measure(x))
+        return jnp.exp(tx_dot_q
+                       - self.log_normalizer(q)
+                       + self.carrier_measure(x))
