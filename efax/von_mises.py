@@ -27,7 +27,8 @@ class VonMisesFisher(ExponentialFamily):
             raise TypeError
         if num_parameters < 2:
             raise ValueError
-        super().__init__(num_parameters=num_parameters)
+        super().__init__(num_parameters=num_parameters,
+                         observation_shape=(num_parameters,))
 
     # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:

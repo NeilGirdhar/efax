@@ -54,7 +54,7 @@ class Logarithmic(ExponentialFamily):
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
-        return x
+        return x[..., np.newaxis]
 
     # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)

@@ -27,20 +27,18 @@ class Normal(ExponentialFamily):
         qa = q[..., 0]
         qb = q[..., 1]
         ratio = -qa / (2 * qb)
-        return jnp.stack([ratio, (jnp.square(ratio) - 0.5 / qb)],
-                         axis=q.ndim - 1)
+        return jnp.stack([ratio, (jnp.square(ratio) - 0.5 / qb)], axis=-1)
 
     @implements(ExponentialFamily)
     def exp_to_nat(self, p: RealTensor) -> RealTensor:
         mean = p[..., 0]
         second_moment = p[..., 1]
         variance = second_moment - jnp.square(mean)
-        return jnp.stack([mean / variance, -0.5 / variance],
-                         axis=p.ndim - 1)
+        return jnp.stack([mean / variance, -0.5 / variance], axis=-1)
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
-        return jnp.stack([x, jnp.square(x)], axis=x.ndim)
+        return jnp.stack([x, jnp.square(x)], axis=-1)
 
     # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)

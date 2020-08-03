@@ -2,7 +2,7 @@ from typing import Any
 
 import numpy as np
 import scipy.optimize
-from ipromise import implements
+from ipromise import implements, overrides
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealTensor, Shape
@@ -64,10 +64,15 @@ class Dirichlet(ExponentialFamily):
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
-        return jnp.log(x)
+        one_minus_total_x = 1.0 - jnp.sum(x, axis=-1, keepdims=True)
+        return jnp.append(jnp.log(x), jnp.log(one_minus_total_x), axis=-1)
 
 
 class Beta(Dirichlet):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(num_parameters=2, **kwargs)
+
+    @overrides(Dirichlet)
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+        return jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1)

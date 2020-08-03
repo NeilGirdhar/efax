@@ -1,5 +1,6 @@
 from typing import Any
 
+import numpy as np
 from ipromise import implements, overrides
 from jax import numpy as jnp
 from jax.scipy import special as jss
@@ -31,7 +32,7 @@ class NegativeBinomial(ExponentialFamily):
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
-        return x
+        return x[..., np.newaxis]
 
     # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)
@@ -44,7 +45,8 @@ class NegativeBinomial(ExponentialFamily):
     @overrides(ExponentialFamily)
     def expected_carrier_measure(self, p: RealTensor) -> RealTensor:
         if self.r == 1:
-            return jnp.zeros(self.shape)
+            shape = p.shape[: -1]
+            return jnp.zeros(shape)
         raise NotImplementedError
 
     # Magic methods --------------------------------------------------------------------------------

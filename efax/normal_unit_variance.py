@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 from ipromise import implements, overrides
 from jax import numpy as jnp
 from tjax import RealTensor, real_dtype
@@ -32,7 +33,7 @@ class NormalUnitVariance(ExponentialFamily):
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
-        return x
+        return x[..., np.newaxis]
 
     # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExponentialFamily)

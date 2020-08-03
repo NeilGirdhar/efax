@@ -1,4 +1,7 @@
-from typing import Any, Callable, Generic, Optional, TypeVar
+from __future__ import annotations
+
+from copy import copy
+from typing import Any, Callable, Generic, Optional, Type, TypeVar
 
 import numpy as np
 from jax.dtypes import canonicalize_dtype
@@ -17,26 +20,6 @@ T = TypeVar('T', bound=ExponentialFamily)
 
 class DistributionInfo(Generic[T]):
 
-    def __init_subclass__(cls, **kwargs: Any) -> None:
-        super().__init_subclass__(**kwargs)
-
-        if (cls.exp_to_scipy_distribution is DistributionInfo.exp_to_scipy_distribution
-                and cls.nat_to_scipy_distribution is DistributionInfo.nat_to_scipy_distribution):
-            raise TypeError
-
-        if (cls.exp_parameter_generator is DistributionInfo.exp_parameter_generator
-                and cls.nat_parameter_generator is DistributionInfo.nat_parameter_generator):
-            raise TypeError
-
-        for method in ['exp_parameter_generator', 'nat_parameter_generator',
-                       'exp_to_scipy_distribution', 'nat_to_scipy_distribution',
-                       'scipy_to_exp_family_observation']:
-            old_method = getattr(cls, method)
-            def new_method(*args: Any, old_method=old_method, **kwargs: Any) -> np.ndarray:
-                return canonicalize_array(old_method(*args, **kwargs))
-
-            setattr(cls, method, new_method)
-
     def __init__(self, exp_family: T):
         """
         Args:
@@ -47,6 +30,11 @@ class DistributionInfo(Generic[T]):
         self.exp_family = exp_family
 
     # New methods ----------------------------------------------------------------------------------
+    def with_shape(self, shape: Shape) -> DistributionInfo[T]:
+        new_exp_family = copy(self.exp_family)
+        new_exp_family.shape = shape
+        return type(self)(new_exp_family)
+
     def exp_to_scipy_distribution(self, p: np.ndarray) -> Any:
         """
         Args:
@@ -86,5 +74,24 @@ class DistributionInfo(Generic[T]):
         return x
 
     # Magic methods --------------------------------------------------------------------------------
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+
+        if (cls.exp_to_scipy_distribution is DistributionInfo.exp_to_scipy_distribution
+                and cls.nat_to_scipy_distribution is DistributionInfo.nat_to_scipy_distribution):
+            raise TypeError
+
+        if (cls.exp_parameter_generator is DistributionInfo.exp_parameter_generator
+                and cls.nat_parameter_generator is DistributionInfo.nat_parameter_generator):
+            raise TypeError
+
+        for method in ['exp_parameter_generator', 'nat_parameter_generator',
+                       'scipy_to_exp_family_observation']:
+            old_method = getattr(cls, method)
+            def new_method(*args: Any, old_method=old_method, **kwargs: Any) -> np.ndarray:
+                return canonicalize_array(old_method(*args, **kwargs))
+
+            setattr(cls, method, new_method)
+
     def __repr__(self) -> str:
         return f"DistributionInfo({self.exp_family})"

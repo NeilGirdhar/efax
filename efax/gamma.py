@@ -37,7 +37,7 @@ class Gamma(ExponentialFamily):
         shape = shape_minus_one + 1.0
         return jnp.stack([-shape / negative_rate,
                           jss.digamma(shape) - jnp.log(-negative_rate)],
-                         axis=q.ndim - 1)
+                         axis=-1)
 
     @implements(ExponentialFamily)
     def exp_to_nat(self, p: RealTensor) -> RealTensor:
@@ -45,11 +45,11 @@ class Gamma(ExponentialFamily):
         mean_log = p[..., 1]
         shape = Gamma.solve_for_shape(mean, mean_log)
         rate = shape / mean
-        return jnp.stack([-rate, shape - 1.0], axis=p.ndim - 1)
+        return jnp.stack([-rate, shape - 1.0], axis=-1)
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
-        return jnp.stack([x, jnp.log(x)], axis=x.ndim)
+        return jnp.stack([x, jnp.log(x)], axis=-1)
 
     # New methods ----------------------------------------------------------------------------------
     @staticmethod
