@@ -102,8 +102,7 @@ class ExponentialFamily(AbstractBaseClass):
         """
         Args:
             q: The natural parameters having shape self.shape_including_parameters().
-        Returns:
-            The log-normalizer having shape self.shape.
+        Returns: The log-normalizer having shape self.shape.
         """
         raise NotImplementedError
 
@@ -112,8 +111,8 @@ class ExponentialFamily(AbstractBaseClass):
         """
         Args:
             q: The natural parameters having shape self.shape_including_parameters().
-        Returns:
-            The corresponding expectation parameters having shape self.shape_including_parameters().
+        Returns: The corresponding expectation parameters having shape
+            self.shape_including_parameters().
         """
         raise NotImplementedError
 
@@ -122,8 +121,8 @@ class ExponentialFamily(AbstractBaseClass):
         """
         Args:
             q: The expectation parameters having shape self.shape_including_parameters().
-        Returns:
-            The corresponding natural parameters having shape self.shape_including_parameters().
+        Returns: The corresponding natural parameters having shape
+            self.shape_including_parameters().
         """
         raise NotImplementedError
 
@@ -132,8 +131,8 @@ class ExponentialFamily(AbstractBaseClass):
         """
         Args:
             x: The sample having shape self.shape_including_observations().
-        Returns:
-            The corresponding sufficient statistics having shape self.shape_including_parameters().
+        Returns: The corresponding sufficient statistics having shape
+            self.shape_including_parameters().
         """
         raise NotImplementedError
 
@@ -147,11 +146,9 @@ class ExponentialFamily(AbstractBaseClass):
     def cross_entropy(self, p: Tensor, q: Tensor) -> RealTensor:
         """
         Args:
-            p:
-                The expectation parameters of the observation having shape
+            p: The expectation parameters of the observation having shape
                 self.shape_including_parameters().
-            q:
-                The natural parameters of the prediction having shape
+            q: The natural parameters of the prediction having shape
                 self.shape_including_parameters().
         Returns:
             The cross entropy having shape self.shape.
@@ -164,11 +161,9 @@ class ExponentialFamily(AbstractBaseClass):
     def entropy(self, q: Tensor) -> RealTensor:
         """
         Args:
-            q:
-                The natural parameters of the prediction having shape
+            q: The natural parameters of the prediction having shape
                 self.shape_including_parameters().
-        Returns:
-            The entropy having shape self.shape.
+        Returns: The entropy having shape self.shape.
         """
         return self.cross_entropy(self.nat_to_exp(q), q)
 
@@ -177,16 +172,11 @@ class ExponentialFamily(AbstractBaseClass):
         """
         Args:
             k: The scale.
-            kp:
-                The expectation parameters of the observation times k, having shape
+            kp: The expectation parameters of the observation times k, having shape
                 self.shape_including_parameters().
-            q:
-                The natural parameters of the prediction having shape
+            q: The natural parameters of the prediction having shape
                 self.shape_including_parameters().
-        Returns:
-            k * self.cross_entropy(kp / k, q)
-
-            having shape self.shape.
+        Returns: k * self.cross_entropy(kp / k, q) having shape self.shape.
 
         Avoids division when the expected_carrier_measure is zero.
         """
@@ -198,34 +188,31 @@ class ExponentialFamily(AbstractBaseClass):
         """
         Args:
             x: The sample having shape self.shape_including_observations().
-        Returns:
-            The corresponding carrier measure having shape self.shape.
+        Returns: The corresponding carrier measure having shape self.shape.
         """
-        return jnp.zeros(self.shape)
+        shape = x.shape[: len(x.shape) - len(self.observation_shape)]
+        return jnp.zeros(shape)
 
     def expected_carrier_measure(self, p: Tensor) -> RealTensor:
         """
         Args:
-            p:
-                The expectation parameters of a distribution having shape
+            p: The expectation parameters of a distribution having shape
                 self.shape_including_parameters().
-        Returns:
-            The expected carrier measure of the distribution having shape self.shape.  This is the
-            missing term from the inner product between the observed distribution and the predicted
-            distribution.
+        Returns: The expected carrier measure of the distribution having shape self.shape.  This is
+            the missing term from the inner product between the observed distribution and the
+            predicted distribution.
         """
         # pylint: disable=unused-argument
-        return jnp.zeros(self.shape)
+        shape = p.shape[: -1]
+        return jnp.zeros(shape)
 
     def pdf(self, q: Tensor, x: Tensor) -> RealTensor:
         """
         Args:
-            q:
-                The natural parameters of a distribution having shape
+            q: The natural parameters of a distribution having shape
                 self.shape_including_parameters().
             x: The sample having shape self.shape_including_observations().
-        Returns:
-            The distribution's density or mass function at x having shape self.shape.
+        Returns: The distribution's density or mass function at x having shape self.shape.
         """
         tx = self.sufficient_statistics(x)
         tx_dot_q = jnp.real(jnp.sum(tx * q, axis=-1))

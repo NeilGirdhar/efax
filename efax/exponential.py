@@ -1,3 +1,4 @@
+import numpy as np
 from ipromise import implements
 from jax import numpy as jnp
 from tjax import RealTensor
@@ -27,4 +28,4 @@ class Exponential(ExponentialFamily):
 
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
-        return x
+        return x[..., np.newaxis]

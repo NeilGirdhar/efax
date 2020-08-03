@@ -25,7 +25,7 @@ def create_infos() -> List[DistributionInfo]:
     class GeometricInfo(DistributionInfo[Geometric]):
         def exp_to_scipy_distribution(self, p: np.ndarray) -> Any:
             # p is inverse odds
-            return ss.geom(1.0 / (1.0 + p))
+            return ss.geom(1.0 / (1.0 + p[..., 0]))
 
         def exp_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return rng.exponential(size=(*shape, 1))
@@ -44,7 +44,7 @@ def create_infos() -> List[DistributionInfo]:
 
     class NegativeBinomialInfo(DistributionInfo[NegativeBinomial]):
         def exp_to_scipy_distribution(self, p: np.ndarray) -> Any:
-            return ss.nbinom(self.exp_family.r, 1.0 / (1.0 + p / self.exp_family.r))
+            return ss.nbinom(self.exp_family.r, 1.0 / (1.0 + p[..., 0] / self.exp_family.r))
 
         def exp_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return rng.exponential(size=(*shape, 1))
@@ -52,7 +52,7 @@ def create_infos() -> List[DistributionInfo]:
 
     class LogarithmicInfo(DistributionInfo[Logarithmic]):
         def nat_to_scipy_distribution(self, q: np.ndarray) -> Any:
-            return ss.logser(np.exp(q))
+            return ss.logser(np.exp(q[..., 0]))
 
         def exp_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return rng.exponential(size=(*shape, 1)) + 1.0
@@ -74,7 +74,7 @@ def create_infos() -> List[DistributionInfo]:
 
     class NormalUnitVarianceInfo(DistributionInfo[NormalUnitVariance]):
         def exp_to_scipy_distribution(self, p: np.ndarray) -> Any:
-            return ss.norm(p, self.exp_family.num_parameters)
+            return ss.norm(p[..., 0], self.exp_family.num_parameters)
 
         def exp_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return rng.normal(size=(*shape, self.exp_family.num_parameters))
@@ -101,7 +101,7 @@ def create_infos() -> List[DistributionInfo]:
 
     class ExponentialInfo(DistributionInfo[Exponential]):
         def exp_to_scipy_distribution(self, p: np.ndarray) -> Any:
-            return ss.expon(0, p)
+            return ss.expon(0, p[..., 0])
 
         def exp_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return rng.exponential(size=(*shape, 1))
@@ -131,13 +131,6 @@ def create_infos() -> List[DistributionInfo]:
 
         def nat_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return dirichlet_parameter_generator(2, rng, shape)
-
-        def scipy_to_exp_family_observation(self, x: np.ndarray) -> np.ndarray:
-            x = np.asarray(x)
-            result = np.empty(x.shape + (2,))
-            result[..., 0] = x
-            result[..., 1] = 1.0 - x
-            return result
     beta = BetaInfo(Beta())
 
     class DirichletInfo(DistributionInfo[Dirichlet]):
@@ -146,6 +139,9 @@ def create_infos() -> List[DistributionInfo]:
 
         def nat_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return dirichlet_parameter_generator(self.exp_family.num_parameters, rng, shape)
+
+        def scipy_to_exp_family_observation(self, x: np.ndarray) -> np.ndarray:
+            return x[..., : -1]
     dirichlet = DirichletInfo(Dirichlet(5))
 
     class VonMisesInfo(DistributionInfo[VonMises]):
@@ -165,7 +161,7 @@ def create_infos() -> List[DistributionInfo]:
 
     class ChiSquareInfo(DistributionInfo[ChiSquare]):
         def nat_to_scipy_distribution(self, q: np.ndarray) -> Any:
-            return ss.chi2((q + 1.0) * 2.0)
+            return ss.chi2((q[..., 0] + 1.0) * 2.0)
 
         def nat_parameter_generator(self, rng: Generator, shape: Shape) -> np.ndarray:
             return rng.exponential(size=(*shape, 1))

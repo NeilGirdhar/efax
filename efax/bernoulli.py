@@ -1,5 +1,6 @@
 from typing import Any
 
+import numpy as np
 from ipromise import overrides
 from jax import numpy as jnp
 from jax.scipy import special as jss
@@ -24,3 +25,7 @@ class Bernoulli(Multinomial):
     @overrides(Multinomial)
     def nat_to_exp(self, q: RealTensor) -> RealTensor:
         return jss.expit(q)
+
+    @overrides(Multinomial)
+    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+        return x[..., np.newaxis]
