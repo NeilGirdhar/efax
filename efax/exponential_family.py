@@ -2,9 +2,8 @@ from abc import abstractmethod
 from typing import Any, Tuple
 
 from ipromise import AbstractBaseClass
-from jax import jit
 from jax import numpy as jnp
-from tjax import RealTensor, Shape, Tensor, custom_jvp, real_dtype
+from tjax import RealTensor, Shape, Tensor, custom_jvp, real_dtype, jit
 
 __all__ = ['ExponentialFamily']
 
