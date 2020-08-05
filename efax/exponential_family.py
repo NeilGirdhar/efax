@@ -3,7 +3,7 @@ from typing import Any, Tuple
 
 from ipromise import AbstractBaseClass
 from jax import numpy as jnp
-from tjax import RealTensor, Shape, Tensor, custom_jvp, real_dtype, jit
+from tjax import RealTensor, Shape, Tensor, custom_jvp, jit, real_dtype
 
 __all__ = ['ExponentialFamily']
 

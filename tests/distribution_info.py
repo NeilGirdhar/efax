@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import Any, Callable, Generic, Optional, Type, TypeVar
+from typing import Any, Generic, TypeVar
 
 import numpy as np
 from jax.dtypes import canonicalize_dtype
@@ -88,6 +88,7 @@ class DistributionInfo(Generic[T]):
         for method in ['exp_parameter_generator', 'nat_parameter_generator',
                        'scipy_to_exp_family_observation']:
             old_method = getattr(cls, method)
+
             def new_method(*args: Any, old_method=old_method, **kwargs: Any) -> np.ndarray:
                 return canonicalize_array(old_method(*args, **kwargs))
 
