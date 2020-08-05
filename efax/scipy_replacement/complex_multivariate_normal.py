@@ -4,7 +4,6 @@ from typing import Optional, Tuple
 import numpy as np
 from numpy.linalg import det, inv
 from numpy.random import Generator
-from scipy.stats import multivariate_normal
 from tjax import Shape
 
 __all__ = ['ScipyComplexMultivariateNormal']

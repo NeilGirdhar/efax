@@ -1,17 +1,19 @@
 import math
+from jax.nn import softplus
+from typing import Optional
 
 import numpy as np
-import scipy.optimize
 from ipromise import implements, overrides
 from jax import numpy as jnp
-from tjax import RealTensor
+from tjax import RealTensor, Tensor
 
+from .exp_to_nat import ExpToNat
 from .exponential_family import ExponentialFamily
 
 __all__ = ['Logarithmic']
 
 
-class Logarithmic(ExponentialFamily):
+class Logarithmic(ExpToNat, ExponentialFamily):
 
     def __init__(self) -> None:
         super().__init__(num_parameters=1)
@@ -29,30 +31,6 @@ class Logarithmic(ExponentialFamily):
                          exp_q / (jnp.expm1(q) * jnp.log1p(-exp_q)))
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p: RealTensor) -> RealTensor:
-        q = np.empty_like(p)
-        it = np.nditer([p, q], op_flags=[['readonly'], ['writeonly', 'allocate']])
-        with it:
-            for this_p, this_q in it:
-                # Work on the transformed problem.  Find log(-q), which is
-                # over the whole real line.
-                if this_p < 1.0:
-                    raise ValueError
-                if this_p == 1.0:
-                    return math.inf
-
-                def f(log_minus_q: RealTensor,
-                      this_p: RealTensor = this_p) -> RealTensor:
-                    return self.nat_to_exp(-math.exp(log_minus_q)) - this_p
-
-                solution = scipy.optimize.root(f, 0.0, tol=1e-5)
-                if not solution.success:
-                    raise ValueError("Failed to find natural parmaeters for "
-                                     f"{this_p} because {solution.message}.")
-                this_q[...] = -math.exp(solution.x)
-        return q
-
-    @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealTensor) -> RealTensor:
         return x[..., np.newaxis]
 
@@ -64,3 +42,16 @@ class Logarithmic(ExponentialFamily):
     @overrides(ExponentialFamily)
     def expected_carrier_measure(self, p: RealTensor) -> RealTensor:
         raise NotImplementedError
+
+    @overrides(ExpToNat)
+    def exp_to_nat_early_out(self, p: Tensor) -> Optional[Tensor]:
+        if p < 1.0:
+            raise ValueError
+        if p == 1.0:
+            return math.inf
+        return None
+
+    @overrides(ExpToNat)
+    def exp_to_nat_transform_q(self, transformed_q: Tensor) -> Tensor:
+        # Run Newton's method on the whole real line.
+        return -softplus(transformed_q)

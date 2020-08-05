@@ -1,5 +1,4 @@
 import numpy as np
-import scipy
 from ipromise import implements, overrides
 from jax import numpy as jnp
 from jax.scipy import special as jss
