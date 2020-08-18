@@ -1,10 +1,11 @@
 from typing import Any
-from jax.nn import softplus
 
+from chex import Array
 from ipromise import implements, overrides
 from jax import numpy as jnp
+from jax.nn import softplus
 from jax.scipy import special as jss
-from tjax import RealTensor, Shape, Tensor
+from tjax import RealArray, Shape
 
 from .exp_to_nat import ExpToNat
 from .exponential_family import ExponentialFamily
@@ -35,23 +36,23 @@ class Dirichlet(ExpToNat, ExponentialFamily):
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q: RealTensor) -> RealTensor:
+    def log_normalizer(self, q: RealArray) -> RealArray:
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
                 - jss.gammaln(jnp.sum(q, axis=-1) + q.shape[-1]))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q: RealTensor) -> RealTensor:
+    def nat_to_exp(self, q: RealArray) -> RealArray:
         return (jss.digamma(q + 1.0)
                 - jss.digamma(jnp.sum(q, axis=-1, keepdims=True) + q.shape[-1]))
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+    def sufficient_statistics(self, x: RealArray) -> RealArray:
         one_minus_total_x = 1.0 - jnp.sum(x, axis=-1, keepdims=True)
         return jnp.append(jnp.log(x), jnp.log(one_minus_total_x), axis=-1)
 
     # Overridden methods ---------------------------------------------------------------------------
     @overrides(ExpToNat)
-    def exp_to_nat_transform_q(self, transformed_q: Tensor) -> Tensor:
+    def exp_to_nat_transform_q(self, transformed_q: Array) -> Array:
         # Run Newton's method on the whole real line.
         return softplus(transformed_q) - 1.0
 
@@ -62,5 +63,5 @@ class Beta(Dirichlet):
         super().__init__(num_parameters=2, **kwargs)
 
     @overrides(Dirichlet)
-    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+    def sufficient_statistics(self, x: RealArray) -> RealArray:
         return jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1)

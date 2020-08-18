@@ -2,7 +2,7 @@ import math
 
 from ipromise import implements
 from jax import numpy as jnp
-from tjax import ComplexTensor, RealTensor
+from tjax import ComplexArray, RealArray
 
 from .exponential_family import ExponentialFamily
 
@@ -16,7 +16,7 @@ class ComplexNormal(ExponentialFamily):
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q: ComplexTensor) -> RealTensor:
+    def log_normalizer(self, q: ComplexArray) -> RealArray:
         eta = q[..., 0]
         precision = q[..., 1]
         pseudo_precision = q[..., 2]
@@ -38,7 +38,7 @@ class ComplexNormal(ExponentialFamily):
                 + math.log(math.pi))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q: ComplexTensor) -> ComplexTensor:
+    def nat_to_exp(self, q: ComplexArray) -> ComplexArray:
         eta = q[..., 0]
         precision = q[..., 1]
         pseudo_precision = q[..., 2]
@@ -54,7 +54,7 @@ class ComplexNormal(ExponentialFamily):
         return jnp.stack([mu, s + jnp.conj(mu) * mu, u + jnp.square(mu)], axis=-1)
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p: ComplexTensor) -> ComplexTensor:
+    def exp_to_nat(self, p: ComplexArray) -> ComplexArray:
         mean = p[..., 0]
         second_moment = p[..., 1]
         pseudo_second_moment = p[..., 2]
@@ -71,5 +71,5 @@ class ComplexNormal(ExponentialFamily):
         return jnp.stack([eta, precision, pseudo_precision], axis=-1)
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x: ComplexTensor) -> ComplexTensor:
+    def sufficient_statistics(self, x: ComplexArray) -> ComplexArray:
         return jnp.stack([x, jnp.conj(x) * x, jnp.square(x)], axis=-1)

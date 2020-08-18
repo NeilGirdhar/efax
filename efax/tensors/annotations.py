@@ -8,19 +8,19 @@ from jax import numpy as jnp
 __all__ = ['Shape',
            'ShapeLike',
            'SliceLike',
-           'Tensor',
-           'RealTensor',
-           'ComplexTensor',
+           'Array',
+           'RealArray',
+           'ComplexArray',
            'PyTree']
 
 
 Shape = Tuple[int, ...]
 ShapeLike = Union[int, Sequence[int]]
 SliceLike = Tuple[Union[int, None, slice], ...]
-Tensor = Union[np.ndarray, jnp.ndarray]
-RealTensor = Tensor
-ComplexTensor = Tensor
-PyTree = Union[Tensor,
+Array = Union[np.ndarray, jnp.ndarray]
+RealArray = Array
+ComplexArray = Array
+PyTree = Union[Array,
                'PyTreeLike',
                Tuple['PyTree', ...],
                List['PyTree'],

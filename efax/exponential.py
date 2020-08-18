@@ -1,7 +1,7 @@
 import numpy as np
 from ipromise import implements
 from jax import numpy as jnp
-from tjax import RealTensor
+from tjax import RealArray
 
 from .exponential_family import ExponentialFamily
 
@@ -15,17 +15,17 @@ class Exponential(ExponentialFamily):
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q: RealTensor) -> RealTensor:
+    def log_normalizer(self, q: RealArray) -> RealArray:
         return -jnp.log(-q[..., 0])
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q: RealTensor) -> RealTensor:
+    def nat_to_exp(self, q: RealArray) -> RealArray:
         return -1.0 / q
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p: RealTensor) -> RealTensor:
+    def exp_to_nat(self, p: RealArray) -> RealArray:
         return -1.0 / p
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+    def sufficient_statistics(self, x: RealArray) -> RealArray:
         return x[..., np.newaxis]
