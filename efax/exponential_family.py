@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from typing import Any, Tuple
 
+from chex import Array
 from ipromise import AbstractBaseClass
 from jax import numpy as jnp
-from tjax import RealTensor, Shape, Tensor, custom_jvp, jit, real_dtype
+from tjax import RealArray, Shape, custom_jvp, jit, real_dtype
 
 __all__ = ['ExponentialFamily']
 
@@ -56,8 +57,8 @@ class ExponentialFamily(AbstractBaseClass):
             method_jvp: Any = custom_jvp(method, nondiff_argnums=(0,))
 
             def ln_jvp(self: ExponentialFamily,
-                       primals: Tuple[Tensor],
-                       tangents: Tuple[Tensor]) -> Tuple[Tensor, Tensor]:
+                       primals: Tuple[Array],
+                       tangents: Tuple[Array]) -> Tuple[Array, Array]:
                 q, = primals
                 q_dot, = tangents
                 y = self.log_normalizer(q)
@@ -66,12 +67,12 @@ class ExponentialFamily(AbstractBaseClass):
 
             method_jvp.defjvp(ln_jvp)
 
-            # def method_fwd(self: ExponentialFamily, q: Tensor) -> Tuple[Tensor, Tuple[Tensor]]:
+            # def method_fwd(self: ExponentialFamily, q: Array) -> Tuple[Array, Tuple[Array]]:
             #     return self.log_normalizer(q), (self.nat_to_exp(q),)
             #
             # def method_bwd(self: ExponentialFamily,
-            #                residuals: Tuple[Tensor],
-            #                y_bar: Tensor) -> Tuple[Tensor]:
+            #                residuals: Tuple[Array],
+            #                y_bar: Array) -> Tuple[Array]:
             #     exp_parameters, = residuals
             #     return (y_bar * exp_parameters,)
             #
@@ -97,7 +98,7 @@ class ExponentialFamily(AbstractBaseClass):
 
     # Abstract methods -----------------------------------------------------------------------------
     @abstractmethod
-    def log_normalizer(self, q: Tensor) -> RealTensor:
+    def log_normalizer(self, q: Array) -> RealArray:
         """
         Args:
             q: The natural parameters having shape self.shape_including_parameters().
@@ -106,7 +107,7 @@ class ExponentialFamily(AbstractBaseClass):
         raise NotImplementedError
 
     @abstractmethod
-    def nat_to_exp(self, q: Tensor) -> Tensor:
+    def nat_to_exp(self, q: Array) -> Array:
         """
         Args:
             q: The natural parameters having shape self.shape_including_parameters().
@@ -116,7 +117,7 @@ class ExponentialFamily(AbstractBaseClass):
         raise NotImplementedError
 
     @abstractmethod
-    def exp_to_nat(self, p: Tensor) -> Tensor:
+    def exp_to_nat(self, p: Array) -> Array:
         """
         Args:
             q: The expectation parameters having shape self.shape_including_parameters().
@@ -126,7 +127,7 @@ class ExponentialFamily(AbstractBaseClass):
         raise NotImplementedError
 
     @abstractmethod
-    def sufficient_statistics(self, x: Tensor) -> Tensor:
+    def sufficient_statistics(self, x: Array) -> Array:
         """
         Args:
             x: The sample having shape self.shape_including_observations().
@@ -142,7 +143,7 @@ class ExponentialFamily(AbstractBaseClass):
     def shape_including_observations(self) -> Shape:
         return (*self.shape, *self.observation_shape)
 
-    def cross_entropy(self, p: Tensor, q: Tensor) -> RealTensor:
+    def cross_entropy(self, p: Array, q: Array) -> RealArray:
         """
         Args:
             p: The expectation parameters of the observation having shape
@@ -157,7 +158,7 @@ class ExponentialFamily(AbstractBaseClass):
                 + self.log_normalizer(q)
                 - self.expected_carrier_measure(p))
 
-    def entropy(self, q: Tensor) -> RealTensor:
+    def entropy(self, q: Array) -> RealArray:
         """
         Args:
             q: The natural parameters of the prediction having shape
@@ -167,7 +168,7 @@ class ExponentialFamily(AbstractBaseClass):
         return self.cross_entropy(self.nat_to_exp(q), q)
 
     def scaled_cross_entropy(
-            self, k: real_dtype, kp: Tensor, q: Tensor) -> RealTensor:
+            self, k: real_dtype, kp: Array, q: Array) -> RealArray:
         """
         Args:
             k: The scale.
@@ -183,7 +184,7 @@ class ExponentialFamily(AbstractBaseClass):
                 + k * (self.log_normalizer(q)
                        - self.expected_carrier_measure(kp / k)))
 
-    def carrier_measure(self, x: Tensor) -> RealTensor:
+    def carrier_measure(self, x: Array) -> RealArray:
         """
         Args:
             x: The sample having shape self.shape_including_observations().
@@ -192,7 +193,7 @@ class ExponentialFamily(AbstractBaseClass):
         shape = x.shape[: len(x.shape) - len(self.observation_shape)]
         return jnp.zeros(shape)
 
-    def expected_carrier_measure(self, p: Tensor) -> RealTensor:
+    def expected_carrier_measure(self, p: Array) -> RealArray:
         """
         Args:
             p: The expectation parameters of a distribution having shape
@@ -205,7 +206,7 @@ class ExponentialFamily(AbstractBaseClass):
         shape = p.shape[: -1]
         return jnp.zeros(shape)
 
-    def pdf(self, q: Tensor, x: Tensor) -> RealTensor:
+    def pdf(self, q: Array, x: Array) -> RealArray:
         """
         Args:
             q: The natural parameters of a distribution having shape

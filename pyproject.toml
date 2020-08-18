@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "efax"
-version = "0.4.1"
+version = "0.5"
 description = "Exponential families for JAX"
 license = "MIT"
 authors = ["Neil Girdhar <mistersheik@gmail.com>"]
@@ -21,12 +21,13 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
+chex = "^0.0.2"
 ipromise = "^1.5"
 jax = "^0.1.61"
 jaxlib = "^0.1.42"
 numpy = "^1.18"
 scipy = "^1.4"
-tjax = "^0.3"
+tjax = "^0.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5"

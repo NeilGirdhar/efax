@@ -4,7 +4,7 @@ import numpy as np
 from ipromise import overrides
 from jax import numpy as jnp
 from jax.scipy import special as jss
-from tjax import RealTensor
+from tjax import RealArray
 
 from .multinomial import Multinomial
 
@@ -18,14 +18,14 @@ class Bernoulli(Multinomial):
 
     # Overridden methods ---------------------------------------------------------------------------
     @overrides(Multinomial)
-    def log_normalizer(self, q: RealTensor) -> RealTensor:
+    def log_normalizer(self, q: RealArray) -> RealArray:
         q = q[..., 0]
         return jnp.logaddexp(q, 0.0)
 
     @overrides(Multinomial)
-    def nat_to_exp(self, q: RealTensor) -> RealTensor:
+    def nat_to_exp(self, q: RealArray) -> RealArray:
         return jss.expit(q)
 
     @overrides(Multinomial)
-    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+    def sufficient_statistics(self, x: RealArray) -> RealArray:
         return x[..., np.newaxis]

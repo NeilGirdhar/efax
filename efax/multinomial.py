@@ -4,7 +4,7 @@ import numpy as np
 from ipromise import implements
 from jax import numpy as jnp
 from jax.scipy import special as jss
-from tjax import RealTensor, Shape
+from tjax import RealArray, Shape
 
 from .exponential_family import ExponentialFamily
 
@@ -32,31 +32,31 @@ class Multinomial(ExponentialFamily):
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q: RealTensor) -> RealTensor:
+    def log_normalizer(self, q: RealArray) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return max_q + log_scaled_A
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q: RealTensor) -> RealTensor:
+    def nat_to_exp(self, q: RealArray) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis])
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p: RealTensor) -> RealTensor:
+    def exp_to_nat(self, p: RealArray) -> RealArray:
         p_k = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
         return jnp.log(p / p_k)
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+    def sufficient_statistics(self, x: RealArray) -> RealArray:
         return x
 
     # New methods ----------------------------------------------------------------------------------
     @staticmethod
-    def nat_to_probability(q: RealTensor) -> RealTensor:
+    def nat_to_probability(q: RealArray) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
@@ -65,6 +65,6 @@ class Multinomial(ExponentialFamily):
         return jnp.concatenate([p, final_p], axis=-1)
 
     @staticmethod
-    def nat_to_surprisal(q: RealTensor) -> RealTensor:
+    def nat_to_surprisal(q: RealArray) -> RealArray:
         total_p = Multinomial.nat_to_probability(q)
         return -jnp.log(total_p)

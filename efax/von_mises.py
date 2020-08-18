@@ -3,18 +3,19 @@ from typing import Tuple
 
 import numpy as np
 import scipy.optimize
+from chex import Array
 from ipromise import implements
 from jax import numpy as jnp
 from jax.nn import softplus
 from scipy.special import iv
-from tjax import RealTensor, Tensor
+from tjax import RealArray
 
 from .exponential_family import ExponentialFamily
 
 __all__ = ['VonMises', 'VonMisesFisher']
 
 
-def inverse_softplus(y: Tensor) -> Tensor:
+def inverse_softplus(y: Array) -> Array:
     return jnp.where(y > 80.0,
                      y,
                      jnp.log(jnp.expm1(y)))
@@ -36,7 +37,7 @@ class VonMisesFisher(ExponentialFamily):
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q: RealTensor) -> RealTensor:
+    def log_normalizer(self, q: RealArray) -> RealArray:
         half_k = q.shape[-1] * 0.5
         kappa = jnp.linalg.norm(q, 2, axis=-1)
         return -jnp.log(kappa ** (half_k - 1.0)
@@ -44,14 +45,14 @@ class VonMisesFisher(ExponentialFamily):
                            * iv(half_k - 1.0, kappa)))
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q: RealTensor) -> RealTensor:
+    def nat_to_exp(self, q: RealArray) -> RealArray:
         kappa = jnp.linalg.norm(q, 2, axis=-1, keepdims=True)
         return jnp.where(kappa == 0.0,
                          q,
                          q * (VonMisesFisher._a_k(q.shape[-1], kappa) / kappa))
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p: RealTensor) -> RealTensor:
+    def exp_to_nat(self, p: RealArray) -> RealArray:
         k = p.shape[-1]
         mu = jnp.linalg.norm(p, 2, axis=-1)
         q = np.empty_like(p)
@@ -63,23 +64,23 @@ class VonMisesFisher(ExponentialFamily):
         return q
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+    def sufficient_statistics(self, x: RealArray) -> RealArray:
         return x
 
     # Private methods ------------------------------------------------------------------------------
     @staticmethod
-    def _a_k(k: RealTensor, kappa: RealTensor) -> RealTensor:
+    def _a_k(k: RealArray, kappa: RealArray) -> RealArray:
         half_k = k * 0.5
         return iv(half_k, kappa) / iv(half_k - 1.0, kappa)
 
     @staticmethod
-    def _find_kappa(k: RealTensor, mu: RealTensor) -> RealTensor:
+    def _find_kappa(k: RealArray, mu: RealArray) -> RealArray:
         assert 0 <= mu <= 1.0
         if mu == 0.0:
             return 0.0
         initial_solution = (mu * k - mu ** 3) / (1.0 - mu ** 2)
 
-        def f(isp_kappa: RealTensor) -> RealTensor:
+        def f(isp_kappa: RealArray) -> RealArray:
             return VonMisesFisher._a_k(k, softplus(isp_kappa)) - mu
         solution = scipy.optimize.root(f,
                                        inverse_softplus(initial_solution),
@@ -100,7 +101,7 @@ class VonMises(VonMisesFisher):
 
     # Overridden methods ---------------------------------------------------------------------------
     @staticmethod
-    def nat_to_kappa_angle(q: RealTensor) -> Tuple[RealTensor, RealTensor]:
+    def nat_to_kappa_angle(q: RealArray) -> Tuple[RealArray, RealArray]:
         kappa = np.linalg.norm(q, axis=-1)
         angles = np.where(kappa == 0.0,
                           0.0,

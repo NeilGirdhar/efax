@@ -1,30 +1,30 @@
 [[package]]
-category = "main"
-description = "Abseil Python Common Libraries, see https://github.com/abseil/abseil-py."
 name = "absl-py"
+version = "0.9.0"
+description = "Abseil Python Common Libraries, see https://github.com/abseil/abseil-py."
+category = "main"
 optional = false
 python-versions = "*"
-version = "0.9.0"
 
 [package.dependencies]
 six = "*"
 
 [[package]]
-category = "dev"
-description = "Atomic file writes."
-marker = "sys_platform == \"win32\""
 name = "atomicwrites"
+version = "1.4.0"
+description = "Atomic file writes."
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "1.4.0"
+marker = "sys_platform == \"win32\""
 
 [[package]]
-category = "dev"
-description = "Classes Without Boilerplate"
 name = "attrs"
+version = "19.3.0"
+description = "Classes Without Boilerplate"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "19.3.0"
 
 [package.extras]
 azure-pipelines = ["coverage", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface", "pytest-azurepipelines"]
@@ -33,56 +33,71 @@ docs = ["sphinx", "zope.interface"]
 tests = ["coverage", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
 
 [[package]]
+name = "chex"
+version = "0.0.2"
+description = "Chex: Testing made fun, in JAX!"
 category = "main"
-description = "Cross-platform colored terminal text."
-marker = "platform_system == \"Windows\" or sys_platform == \"win32\""
-name = "colorama"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "0.4.3"
+python-versions = ">=3.6"
+
+[package.dependencies]
+absl-py = ">=0.9.0"
+jax = ">=0.1.55"
+jaxlib = ">=0.1.37"
+numpy = ">=1.18.0"
+toolz = ">=0.9.0"
 
 [[package]]
+name = "colorama"
+version = "0.4.3"
+description = "Cross-platform colored terminal text."
 category = "main"
-description = "Terminal string styling done right, in Python."
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+marker = "platform_system == \"Windows\" or sys_platform == \"win32\""
+
+[[package]]
 name = "colorful"
+version = "0.5.4"
+description = "Terminal string styling done right, in Python."
+category = "main"
 optional = false
 python-versions = "*"
-version = "0.5.4"
 
 [package.dependencies]
 colorama = "*"
 
 [[package]]
-category = "main"
-description = "Cooperative dataclasses."
 name = "cooperative-dataclasses"
+version = "0.2.2"
+description = "Cooperative dataclasses."
+category = "main"
 optional = false
-python-versions = ">=3.8,<4.0"
-version = "0.2"
+python-versions = ">=3.7,<4.0"
 
 [[package]]
-category = "main"
-description = "Decorators for Humans"
 name = "decorator"
+version = "4.4.2"
+description = "Decorators for Humans"
+category = "main"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*"
-version = "4.4.2"
 
 [[package]]
-category = "main"
-description = "A Python base class that provides various decorators for specifying promises relating to inheritance."
 name = "ipromise"
+version = "1.9"
+description = "A Python base class that provides various decorators for specifying promises relating to inheritance."
+category = "main"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "1.9"
 
 [[package]]
-category = "main"
-description = "Differentiate, compile, and transform Numpy code."
 name = "jax"
+version = "0.1.75"
+description = "Differentiate, compile, and transform Numpy code."
+category = "main"
 optional = false
 python-versions = ">=3.6"
-version = "0.1.73"
 
 [package.dependencies]
 absl-py = "*"
@@ -90,12 +105,12 @@ numpy = ">=1.12"
 opt_einsum = "*"
 
 [[package]]
-category = "main"
-description = "XLA library for JAX"
 name = "jaxlib"
+version = "0.1.52"
+description = "XLA library for JAX"
+category = "main"
 optional = false
 python-versions = ">=3.6"
-version = "0.1.52"
 
 [package.dependencies]
 absl-py = "*"
@@ -103,23 +118,20 @@ numpy = ">=1.12"
 scipy = "*"
 
 [[package]]
-category = "dev"
-description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
+version = "8.4.0"
+description = "More routines for operating on iterables, beyond itertools"
+category = "dev"
 optional = false
 python-versions = ">=3.5"
-version = "8.4.0"
 
 [[package]]
-category = "main"
-description = "Python package for creating and manipulating graphs and networks"
 name = "networkx"
+version = "2.4"
+description = "Python package for creating and manipulating graphs and networks"
+category = "main"
 optional = false
 python-versions = ">=3.5"
-version = "2.4"
-
-[package.dependencies]
-decorator = ">=4.3.0"
 
 [package.extras]
 all = ["numpy", "scipy", "pandas", "matplotlib", "pygraphviz", "pydot", "pyyaml", "gdal", "lxml", "pytest"]
@@ -134,75 +146,82 @@ pytest = ["pytest"]
 pyyaml = ["pyyaml"]
 scipy = ["scipy"]
 
+[package.dependencies]
+decorator = ">=4.3.0"
+
 [[package]]
-category = "main"
-description = "NumPy is the fundamental package for array computing with Python."
 name = "numpy"
+version = "1.19.1"
+description = "NumPy is the fundamental package for array computing with Python."
+category = "main"
 optional = false
 python-versions = ">=3.6"
-version = "1.19.1"
 
 [[package]]
-category = "main"
-description = "Optimizing numpys einsum function"
 name = "opt-einsum"
+version = "3.3.0"
+description = "Optimizing numpys einsum function"
+category = "main"
 optional = false
 python-versions = ">=3.5"
-version = "3.3.0"
-
-[package.dependencies]
-numpy = ">=1.7"
 
 [package.extras]
 docs = ["sphinx (1.2.3)", "sphinxcontrib-napoleon", "sphinx-rtd-theme", "numpydoc"]
 tests = ["pytest", "pytest-cov", "pytest-pep8"]
 
+[package.dependencies]
+numpy = ">=1.7"
+
 [[package]]
-category = "dev"
-description = "Core utilities for Python packages"
 name = "packaging"
+version = "20.4"
+description = "Core utilities for Python packages"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "20.4"
 
 [package.dependencies]
 pyparsing = ">=2.0.2"
 six = "*"
 
 [[package]]
-category = "dev"
-description = "plugin and hook calling mechanisms for python"
 name = "pluggy"
+version = "0.13.1"
+description = "plugin and hook calling mechanisms for python"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "0.13.1"
 
 [package.extras]
 dev = ["pre-commit", "tox"]
 
 [[package]]
-category = "dev"
-description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
+version = "1.9.0"
+description = "library with cross-python path, ini-parsing, io, code, log facilities"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "1.9.0"
 
 [[package]]
-category = "dev"
-description = "Python parsing module"
 name = "pyparsing"
+version = "2.4.7"
+description = "Python parsing module"
+category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "2.4.7"
 
 [[package]]
-category = "dev"
-description = "pytest: simple powerful testing with Python"
 name = "pytest"
+version = "5.4.3"
+description = "pytest: simple powerful testing with Python"
+category = "dev"
 optional = false
 python-versions = ">=3.5"
-version = "5.4.3"
+
+[package.extras]
+checkqa-mypy = ["mypy (v0.761)"]
+testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [package.dependencies]
 atomicwrites = ">=1.0"
@@ -214,38 +233,35 @@ pluggy = ">=0.12,<1.0"
 py = ">=1.5.0"
 wcwidth = "*"
 
-[package.extras]
-checkqa-mypy = ["mypy (v0.761)"]
-testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
-
 [[package]]
-category = "main"
-description = "SciPy: Scientific Library for Python"
 name = "scipy"
+version = "1.5.2"
+description = "SciPy: Scientific Library for Python"
+category = "main"
 optional = false
 python-versions = ">=3.6"
-version = "1.5.2"
 
 [package.dependencies]
 numpy = ">=1.14.5"
 
 [[package]]
-category = "main"
-description = "Python 2 and 3 compatibility utilities"
 name = "six"
+version = "1.15.0"
+description = "Python 2 and 3 compatibility utilities"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "1.15.0"
 
 [[package]]
-category = "main"
-description = "Tools for JAX."
 name = "tjax"
+version = "0.4.0"
+description = "Tools for JAX."
+category = "main"
 optional = false
-python-versions = ">=3.8,<4.0"
-version = "0.3"
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
+chex = ">=0.0.2,<0.0.3"
 colorful = ">=0.5.4,<0.6.0"
 cooperative_dataclasses = ">=0.2.0,<0.3.0"
 jax = ">=0.1.72,<0.2.0"
@@ -254,17 +270,25 @@ networkx = ">=2.4,<3.0"
 numpy = ">=1.19,<2.0"
 
 [[package]]
-category = "dev"
-description = "Measures the displayed width of unicode strings in a terminal"
+name = "toolz"
+version = "0.10.0"
+description = "List processing tools and functional utilities"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[[package]]
 name = "wcwidth"
+version = "0.2.5"
+description = "Measures the displayed width of unicode strings in a terminal"
+category = "dev"
 optional = false
 python-versions = "*"
-version = "0.2.5"
 
 [metadata]
-content-hash = "6faf03d73f06a9b0b7ba85f13374a29daf2d78ef8bc050914aae4d8bf4ef46d1"
 lock-version = "1.0"
 python-versions = "^3.8"
+content-hash = "8b81940c980b824abfdd7979adf82dec1fcab5d50238de248fa4127e9339d6b9"
 
 [metadata.files]
 absl-py = [
@@ -278,6 +302,10 @@ attrs = [
     {file = "attrs-19.3.0-py2.py3-none-any.whl", hash = "sha256:08a96c641c3a74e44eb59afb61a24f2cb9f4d7188748e76ba4bb5edfa3cb7d1c"},
     {file = "attrs-19.3.0.tar.gz", hash = "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"},
 ]
+chex = [
+    {file = "chex-0.0.2-py3-none-any.whl", hash = "sha256:030e52437babe16c228712a27070bde27b3e04c14af7d566cf49210ab5e1572e"},
+    {file = "chex-0.0.2.tar.gz", hash = "sha256:9dcf29880740985c30e9248127b0acb7bdc76f915afdd555ebd0f9c1322a2778"},
+]
 colorama = [
     {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
     {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
@@ -287,8 +315,8 @@ colorful = [
     {file = "colorful-0.5.4.tar.gz", hash = "sha256:86848ad4e2eda60cd2519d8698945d22f6f6551e23e95f3f14dfbb60997807ea"},
 ]
 cooperative-dataclasses = [
-    {file = "cooperative_dataclasses-0.2-py3-none-any.whl", hash = "sha256:76dc8492c7b84eafa27131cfc234f430c3c5b2f0118bcf39d20ec7707736c86c"},
-    {file = "cooperative_dataclasses-0.2.tar.gz", hash = "sha256:99d5fc3677964cfa31ef083629ddb277c4888f994e29251ec43b09e8f8cbfabb"},
+    {file = "cooperative_dataclasses-0.2.2-py3-none-any.whl", hash = "sha256:7cc82c8edc596290427035cdc7be04089b88758a471416ca3c5f9cf84c3c5d5c"},
+    {file = "cooperative_dataclasses-0.2.2.tar.gz", hash = "sha256:87f6ebb421121e6cd701b91cc721a71e6bf6ca75deca71cbc227e6736ecf4822"},
 ]
 decorator = [
     {file = "decorator-4.4.2-py2.py3-none-any.whl", hash = "sha256:41fa54c2a0cc4ba648be4fd43cff00aedf5b9465c9bf18d64325bc225f08f760"},
@@ -299,7 +327,7 @@ ipromise = [
     {file = "ipromise-1.9.tar.gz", hash = "sha256:7a58426ad1c5bdab781dbe862aec657c1088e057ee16045b9bf13b94667ad39f"},
 ]
 jax = [
-    {file = "jax-0.1.73.tar.gz", hash = "sha256:23459fc35f9dc29e59b83f06a60c10dc2b2a437d1e4c013afbf8d60d3657577b"},
+    {file = "jax-0.1.75.tar.gz", hash = "sha256:140b0b7ff9e7483c3efae54fa3dd2cc86559536482ea15d2b2cad6001780c85e"},
 ]
 jaxlib = [
     {file = "jaxlib-0.1.52-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:7f089df0a9cd76164a125e6fc6660f32c9708fedd2dc80d1ac9816a0d0ef2526"},
@@ -392,8 +420,11 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 tjax = [
-    {file = "tjax-0.3-py3-none-any.whl", hash = "sha256:fd17b8ef8aa9f3323d5a9774e07d28068402f7be6d859dce05d83edcfb1dc72a"},
-    {file = "tjax-0.3.tar.gz", hash = "sha256:e4ba8d43aeca5f96e0e5879ff8a3bdcc52af232f287490ac3964beedff7987e6"},
+    {file = "tjax-0.4.0-py3-none-any.whl", hash = "sha256:cb6b07285c592956c6ce445eefa23623cd2fb02287fa7cb67b739d9c984a2d78"},
+    {file = "tjax-0.4.0.tar.gz", hash = "sha256:7c4753ab10e03960a9da535a6deb4d0ff8a8f76dc1737fa1a853185959d24742"},
+]
+toolz = [
+    {file = "toolz-0.10.0.tar.gz", hash = "sha256:08fdd5ef7c96480ad11c12d472de21acd32359996f69a5259299b540feba4560"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

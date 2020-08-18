@@ -2,9 +2,9 @@ from typing import List, Optional
 
 import numpy as np
 import scipy
+from chex import Array
 from ipromise import implements
 from jax import jacfwd
-from tjax import Tensor
 
 from .exponential_family import ExponentialFamily
 
@@ -19,13 +19,13 @@ class ExpToNat(ExponentialFamily):
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p: Tensor) -> Tensor:
+    def exp_to_nat(self, p: Array) -> Array:
         q = np.empty_like(p)
         for i in np.ndindex(p.shape[: -1]):
             this_p = p[i]
             this_q = self.exp_to_nat_early_out(this_p)
             if this_q is None:
-                def f(transformed_q: Tensor, this_p: Tensor = this_p) -> Tensor:
+                def f(transformed_q: Array, this_p: Array = this_p) -> Array:
                     some_p = self.nat_to_exp(self.exp_to_nat_transform_q(transformed_q))
                     print(f"Trying {self.exp_to_nat_transform_q(transformed_q)}, which gives "
                           f"{some_p} -> {this_p}")
@@ -41,7 +41,7 @@ class ExpToNat(ExponentialFamily):
         return q
 
     # New methods ----------------------------------------------------------------------------------
-    def exp_to_nat_early_out(self, p: Tensor) -> Optional[Tensor]:
+    def exp_to_nat_early_out(self, p: Array) -> Optional[Array]:
         """
         Args:
             p: The expectation parameters passed to exp_to_nat having shape (self.num_parameters,).
@@ -49,7 +49,7 @@ class ExpToNat(ExponentialFamily):
         """
         return None
 
-    def exp_to_nat_initial_q(self, p: Tensor) -> Tensor:
+    def exp_to_nat_initial_q(self, p: Array) -> Array:
         """
         Args:
             p: The expectation parameters passed to exp_to_nat having shape (self.num_parameters,).
@@ -57,7 +57,7 @@ class ExpToNat(ExponentialFamily):
         """
         return np.zeros_like(p)
 
-    def exp_to_nat_transform_q(self, transformed_q: Tensor) -> Tensor:
+    def exp_to_nat_transform_q(self, transformed_q: Array) -> Array:
         """
         Args:
             transformed_q: A form of the natural parameters that Newton's method will run on having

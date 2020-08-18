@@ -6,14 +6,14 @@ from ipromise import implements
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from scipy.special import polygamma
-from tjax import RealTensor
+from tjax import RealArray
 
 from .exponential_family import ExponentialFamily
 
 __all__ = ['Gamma']
 
 
-def trigamma(x: RealTensor) -> RealTensor:
+def trigamma(x: RealArray) -> RealArray:
     return polygamma(1, x)
 
 
@@ -24,14 +24,14 @@ class Gamma(ExponentialFamily):
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
-    def log_normalizer(self, q: RealTensor) -> RealTensor:
+    def log_normalizer(self, q: RealArray) -> RealArray:
         negative_rate = q[..., 0]
         shape_minus_one = q[..., 1]
         shape = shape_minus_one + 1.0
         return jss.gammaln(shape) - shape * jnp.log(-negative_rate)
 
     @implements(ExponentialFamily)
-    def nat_to_exp(self, q: RealTensor) -> RealTensor:
+    def nat_to_exp(self, q: RealArray) -> RealArray:
         negative_rate = q[..., 0]
         shape_minus_one = q[..., 1]
         shape = shape_minus_one + 1.0
@@ -40,7 +40,7 @@ class Gamma(ExponentialFamily):
                          axis=-1)
 
     @implements(ExponentialFamily)
-    def exp_to_nat(self, p: RealTensor) -> RealTensor:
+    def exp_to_nat(self, p: RealArray) -> RealArray:
         mean = p[..., 0]
         mean_log = p[..., 1]
         shape = Gamma.solve_for_shape(mean, mean_log)
@@ -48,12 +48,12 @@ class Gamma(ExponentialFamily):
         return jnp.stack([-rate, shape - 1.0], axis=-1)
 
     @implements(ExponentialFamily)
-    def sufficient_statistics(self, x: RealTensor) -> RealTensor:
+    def sufficient_statistics(self, x: RealArray) -> RealArray:
         return jnp.stack([x, jnp.log(x)], axis=-1)
 
     # New methods ----------------------------------------------------------------------------------
     @staticmethod
-    def solve_for_shape(mean: RealTensor, mean_log: RealTensor) -> RealTensor:
+    def solve_for_shape(mean: RealArray, mean_log: RealArray) -> RealArray:
         def f(shape: float) -> float:
             return math.log(shape) - scipy.special.digamma(shape) - log_mean_minus_mean_log
 
@@ -77,7 +77,7 @@ class Gamma(ExponentialFamily):
         return output_shape
 
     @staticmethod
-    def solve_for_shape_and_scale(mean: RealTensor, mean_log: RealTensor) -> RealTensor:
+    def solve_for_shape_and_scale(mean: RealArray, mean_log: RealArray) -> RealArray:
         shape = Gamma.solve_for_shape(mean, mean_log)
         scale = mean / shape
         return shape, scale
