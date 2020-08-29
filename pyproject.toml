@@ -1,3 +1,7 @@
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+
 [tool.poetry]
 name = "efax"
 version = "0.5"
@@ -42,3 +46,7 @@ max-line-length = 100
 exclude = ["__init__.py", "__pycache__"]
 
 [tool.pytest]
+
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
