@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "efax"
-version = "0.6"
+version = "0.6.2"
 description = "Exponential families for JAX"
 license = "MIT"
 authors = ["Neil Girdhar <mistersheik@gmail.com>"]
@@ -29,7 +29,7 @@ jax = "^0.2"
 jaxlib = "^0.1.55"
 numpy = "^1.18"
 scipy = "^1.4"
-tjax = "^0.5"
+tjax = "^0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5"
