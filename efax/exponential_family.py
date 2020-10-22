@@ -54,7 +54,7 @@ class ExponentialFamily(AbstractBaseClass):
             if name != 'log_normalizer':
                 continue
 
-            method_jvp: Any = custom_jvp(method, nondiff_argnums=(0,))
+            method_jvp: Any = custom_jvp(method, static_argnums=(0,))
 
             def ln_jvp(self: ExponentialFamily,
                        primals: Tuple[Array],
