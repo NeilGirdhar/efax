@@ -3,9 +3,13 @@ build/
 dist/
 .eggs/
 *.egg-info/
+setup.py
 
-# MyPy
+# my[py]
 .mypy_cache/
+
+# pytype
+.pytype/
 
 # Byte-compiled Python
 *.pyc

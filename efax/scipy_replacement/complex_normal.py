@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from math import log, pi
 from numbers import Real
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from numpy.random import Generator
@@ -18,7 +18,10 @@ class ScipyComplexNormal:
     Represents an array of univariate complex normal distributions.
     """
 
-    def __init__(self, mean: np.ndarray, variance: np.ndarray, pseudo_variance: np.ndarray):
+    def __init__(self,
+                 mean: Union[complex, np.ndarray],
+                 variance: Union[float, np.ndarray],
+                 pseudo_variance: Union[complex, np.ndarray]):
         self.mean = np.asarray(mean)
         self.variance = np.asarray(variance)
         self.pseudo_variance = np.asarray(pseudo_variance)
@@ -34,8 +37,11 @@ class ScipyComplexNormal:
 
     # New methods ----------------------------------------------------------------------------------
     @classmethod
-    def init_using_angle(cls, mean: np.ndarray, variance: np.ndarray, angle: np.ndarray,
-                         polarization: np.ndarray) -> ScipyComplexNormal:
+    def init_using_angle(cls,
+                         mean: Union[complex, np.ndarray],
+                         variance: Union[float, np.ndarray],
+                         angle: Union[float, np.ndarray],
+                         polarization: Union[complex, np.ndarray]) -> ScipyComplexNormal:
         r = polarization * np.exp(1j * 2 * np.pi * angle * 2)
         return cls(mean, variance, r * variance)
 
@@ -74,7 +80,7 @@ class ScipyComplexNormal:
               - (pseudo_precision / precision).conjugate() * l_eta)
         return mu, s, u
 
-    def pdf(self, z: np.ndarray, out: None = None) -> np.ndarray:
+    def pdf(self, z: Union[float, np.ndarray], out: None = None) -> np.ndarray:
         log_normalizer = self.log_normalizer()
         eta, precision, pseudo_precision = self.natural_parameters()
         return np.exp((eta * z).real
