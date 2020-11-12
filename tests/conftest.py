@@ -1,23 +1,12 @@
-import logging
 import subprocess
 from typing import Any, Generator, List
 
 import numpy as np
 import pytest
-from fastlog import log
 from numpy.random import Generator as NumpyGenerator
 
 from .create_info import create_infos
 from .distribution_info import DistributionInfo
-
-
-@pytest.fixture
-def no_log() -> Generator[None, None, None]:
-    log.setLevel(logging.CRITICAL)
-    try:
-        yield
-    finally:
-        log.setLevel(logging.INFO)
 
 
 @pytest.fixture
