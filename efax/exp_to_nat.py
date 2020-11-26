@@ -4,7 +4,7 @@ import numpy as np
 import scipy
 from chex import Array
 from ipromise import implements
-from jax import jacfwd
+from jax import jacfwd, jit
 
 from .exponential_family import ExponentialFamily
 
@@ -20,15 +20,17 @@ class ExpToNat(ExponentialFamily):
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
     def exp_to_nat(self, p: Array) -> Array:
+        p = np.asarray(p)  # Ensure that p is concrete.
         q = np.empty_like(p)
         for i in np.ndindex(p.shape[: -1]):
             this_p = p[i]
             this_q = self.exp_to_nat_early_out(this_p)
             if this_q is None:
+                @jit
                 def f(transformed_q: Array, this_p: Array = this_p) -> Array:
                     some_p = self.nat_to_exp(self.exp_to_nat_transform_q(transformed_q))
-                    print(f"Trying {self.exp_to_nat_transform_q(transformed_q)}, which gives "
-                          f"{some_p} -> {this_p}")
+                    # print(f"Trying {self.exp_to_nat_transform_q(transformed_q)}, which gives "
+                    #       f"{some_p} -> {this_p}")
                     return some_p - this_p
 
                 solution = scipy.optimize.root(
