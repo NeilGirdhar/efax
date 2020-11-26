@@ -1,10 +1,11 @@
 from abc import abstractmethod
+from functools import partial
 from typing import Any, Tuple
 
 from chex import Array
 from ipromise import AbstractBaseClass
 from jax import numpy as jnp
-from tjax import RealArray, Shape, custom_jvp, jit, real_dtype
+from tjax import RealArray, Shape, custom_jvp, jit
 
 __all__ = ['ExponentialFamily']
 
@@ -45,12 +46,15 @@ class ExponentialFamily(AbstractBaseClass):
                      'carrier_measure',
                      'expected_carrier_measure',
                      'pdf']:
+            super_cls = super(cls, cls)
             original_method = getattr(cls, name)
+            if hasattr(super_cls, name) and getattr(super_cls, name) is original_method:
+                continue  # We only need to jit new methods.
             method = jit(original_method, static_argnums=(0,))
             setattr(cls, f'_original_{name}', method)
-            setattr(cls, name, method)
 
             if name != 'log_normalizer':
+                setattr(cls, name, method)
                 continue
 
             method_jvp: Any = custom_jvp(method, static_argnums=(0,))
@@ -65,6 +69,8 @@ class ExponentialFamily(AbstractBaseClass):
                 return y, y_dot
 
             method_jvp.defjvp(ln_jvp)
+
+            setattr(cls, name, method_jvp)
 
             # def method_fwd(self: ExponentialFamily, q: Array) -> Tuple[Array, Tuple[Array]]:
             #     return self.log_normalizer(q), (self.nat_to_exp(q),)
@@ -142,6 +148,7 @@ class ExponentialFamily(AbstractBaseClass):
     def shape_including_observations(self) -> Shape:
         return (*self.shape, *self.observation_shape)
 
+    @partial(jit, static_argnums=(0,))
     def cross_entropy(self, p: Array, q: Array) -> RealArray:
         """
         Args:
@@ -157,6 +164,7 @@ class ExponentialFamily(AbstractBaseClass):
                 + self.log_normalizer(q)
                 - self.expected_carrier_measure(p))
 
+    @partial(jit, static_argnums=(0,))
     def entropy(self, q: Array) -> RealArray:
         """
         Args:
@@ -166,6 +174,7 @@ class ExponentialFamily(AbstractBaseClass):
         """
         return self.cross_entropy(self.nat_to_exp(q), q)
 
+    @partial(jit, static_argnums=(0,))
     def carrier_measure(self, x: Array) -> RealArray:
         """
         Args:
@@ -175,6 +184,7 @@ class ExponentialFamily(AbstractBaseClass):
         shape = x.shape[: len(x.shape) - len(self.observation_shape)]
         return jnp.zeros(shape)
 
+    @partial(jit, static_argnums=(0,))
     def expected_carrier_measure(self, p: Array) -> RealArray:
         """
         Args:
@@ -188,6 +198,7 @@ class ExponentialFamily(AbstractBaseClass):
         shape = p.shape[: -1]
         return jnp.zeros(shape)
 
+    @partial(jit, static_argnums=(0,))
     def pdf(self, q: Array, x: Array) -> RealArray:
         """
         Args:
