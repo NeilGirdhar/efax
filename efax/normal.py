@@ -1,9 +1,9 @@
 from typing import Any
 
 import numpy as np
-from ipromise import implements, overrides
+from ipromise import implements
 from jax import numpy as jnp
-from tjax import RealArray, real_dtype
+from tjax import RealArray
 
 from .exponential_family import ExponentialFamily
 
@@ -39,16 +39,3 @@ class Normal(ExponentialFamily):
     @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealArray) -> RealArray:
         return jnp.stack([x, jnp.square(x)], axis=-1)
-
-    # Overridden methods ---------------------------------------------------------------------------
-    @overrides(ExponentialFamily)
-    def scaled_cross_entropy(self,
-                             k: real_dtype,
-                             kp: RealArray,
-                             q: RealArray) -> RealArray:
-        kpa = kp[..., 0]
-        kpb = kp[..., 1]
-        qa = q[..., 0]
-        qb = q[..., 1]
-        return (-kpa * qa - kpb * qb
-                + k * (-jnp.square(qa) / (4.0 * qb) + 0.5 * jnp.log(-np.pi / qb)))

@@ -42,7 +42,6 @@ class ExponentialFamily(AbstractBaseClass):
                      'sufficient_statistics',
                      'cross_entropy',
                      'entropy',
-                     'scaled_cross_entropy',
                      'carrier_measure',
                      'expected_carrier_measure',
                      'pdf']:
@@ -166,23 +165,6 @@ class ExponentialFamily(AbstractBaseClass):
         Returns: The entropy having shape self.shape.
         """
         return self.cross_entropy(self.nat_to_exp(q), q)
-
-    def scaled_cross_entropy(
-            self, k: real_dtype, kp: Array, q: Array) -> RealArray:
-        """
-        Args:
-            k: The scale.
-            kp: The expectation parameters of the observation times k, having shape
-                self.shape_including_parameters().
-            q: The natural parameters of the prediction having shape
-                self.shape_including_parameters().
-        Returns: k * self.cross_entropy(kp / k, q) having shape self.shape.
-
-        Avoids division when the expected_carrier_measure is zero.
-        """
-        return (-jnp.real(jnp.sum(kp * q, axis=-1))
-                + k * (self.log_normalizer(q)
-                       - self.expected_carrier_measure(kp / k)))
 
     def carrier_measure(self, x: Array) -> RealArray:
         """

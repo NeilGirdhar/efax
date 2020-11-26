@@ -29,24 +29,6 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo) -
         assert_allclose(parameters, exp_parameters, rtol=1e-4)
 
 
-def test_scaled_cross_entropy(generator: Generator, distribution_info: DistributionInfo) -> None:
-    """
-    Test that the “scaled cross entropy” matches the cross entropy, scaled.
-    """
-    if isinstance(distribution_info.exp_family, VonMises):
-        return
-    k = 0.3
-    p = distribution_info.exp_parameter_generator(generator, shape=())
-    q = distribution_info.nat_parameter_generator(generator, shape=())
-    exp_family = distribution_info.exp_family
-    try:
-        assert_allclose(exp_family.scaled_cross_entropy(k, k * p, q),
-                        k * exp_family.cross_entropy(p, q),
-                        rtol=3e-6)
-    except NotImplementedError:
-        pass
-
-
 def test_gradient_log_normalizer(generator: Generator, distribution_info: DistributionInfo) -> None:
     """
     Tests that the gradient log-normalizer evaluates to the same as the gradient of the

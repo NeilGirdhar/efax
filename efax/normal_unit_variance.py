@@ -3,7 +3,7 @@ import math
 import numpy as np
 from ipromise import implements, overrides
 from jax import numpy as jnp
-from tjax import RealArray, real_dtype
+from tjax import RealArray
 
 from .exponential_family import ExponentialFamily
 
@@ -36,17 +36,6 @@ class NormalUnitVariance(ExponentialFamily):
         return x[..., np.newaxis]
 
     # Overridden methods ---------------------------------------------------------------------------
-    @overrides(ExponentialFamily)
-    def scaled_cross_entropy(self,
-                             k: real_dtype,
-                             kp: RealArray,
-                             q: RealArray) -> RealArray:
-        p = kp / k
-        return jnp.where(k == 0.0,
-                         0.0,
-                         0.5 * (jnp.sum((kp - k * q) * (p - q), axis=-1)
-                                + k * (jnp.log(math.pi * 2.0) + 1.0)))
-
     @overrides(ExponentialFamily)
     def carrier_measure(self, x: RealArray) -> RealArray:
         # The second moment of a delta distribution at x.
