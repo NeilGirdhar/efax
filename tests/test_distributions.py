@@ -4,7 +4,7 @@ from jax import vjp
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 
-from efax import ComplexNormal, VonMises
+from efax import VonMises
 
 from .distribution_info import DistributionInfo
 
@@ -35,8 +35,6 @@ def test_gradient_log_normalizer(generator: Generator, distribution_info: Distri
     log-normalizer.
     """
     if isinstance(distribution_info.exp_family, VonMises):
-        return
-    if isinstance(distribution_info.exp_family, ComplexNormal):
         return
     exp_family = distribution_info.exp_family
 

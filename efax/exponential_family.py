@@ -66,7 +66,7 @@ class ExponentialFamily(AbstractBaseClass):
                 q_dot, = tangents
                 y = self.log_normalizer(q)
                 y_dot = jnp.sum(self.nat_to_exp(q) * q_dot, axis=-1)
-                return y, y_dot
+                return y, y_dot.real
 
             method_jvp.defjvp(ln_jvp)
 
