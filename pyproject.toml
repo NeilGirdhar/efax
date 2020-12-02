@@ -43,9 +43,3 @@ known_third_party = ["ipromise", "jax"]
 [tool.pycodestyle]
 max-line-length = 100
 exclude = ["__init__.py", "__pycache__"]
-
-[tool.pytest]
-
-[tool.dephell.main]
-from = {format = "poetry", path = "pyproject.toml"}
-to = {format = "setuppy", path = "setup.py"}
