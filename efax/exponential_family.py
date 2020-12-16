@@ -175,30 +175,6 @@ class ExponentialFamily(AbstractBaseClass):
         return self.cross_entropy(self.nat_to_exp(q), q)
 
     @partial(jit, static_argnums=(0,))
-    def carrier_measure(self, x: Array) -> RealArray:
-        """
-        Args:
-            x: The sample having shape self.shape_including_observations().
-        Returns: The corresponding carrier measure having shape self.shape.
-        """
-        shape = x.shape[: len(x.shape) - len(self.observation_shape)]
-        return jnp.zeros(shape)
-
-    @partial(jit, static_argnums=(0,))
-    def expected_carrier_measure(self, p: Array) -> RealArray:
-        """
-        Args:
-            p: The expectation parameters of a distribution having shape
-                self.shape_including_parameters().
-        Returns: The expected carrier measure of the distribution having shape self.shape.  This is
-            the missing term from the inner product between the observed distribution and the
-            predicted distribution.
-        """
-        # pylint: disable=unused-argument
-        shape = p.shape[: -1]
-        return jnp.zeros(shape)
-
-    @partial(jit, static_argnums=(0,))
     def pdf(self, q: Array, x: Array) -> RealArray:
         """
         Args:
@@ -212,3 +188,31 @@ class ExponentialFamily(AbstractBaseClass):
         return jnp.exp(tx_dot_q
                        - self.log_normalizer(q)
                        + self.carrier_measure(x))
+
+    def carrier_measure(self, x: Array) -> RealArray:
+        """
+        Args:
+            x: The sample having shape self.shape_including_observations().
+        Returns: The corresponding carrier measure having shape self.shape.
+        """
+        shape = x.shape[: len(x.shape) - len(self.observation_shape)]
+        return jnp.zeros(shape)
+
+    # Work around decorators ruining the type annotation.
+    carrier_measure = jit(carrier_measure, static_argnums=(0,))
+
+    def expected_carrier_measure(self, p: Array) -> RealArray:
+        """
+        Args:
+            p: The expectation parameters of a distribution having shape
+                self.shape_including_parameters().
+        Returns: The expected carrier measure of the distribution having shape self.shape.  This is
+            the missing term from the inner product between the observed distribution and the
+            predicted distribution.
+        """
+        # pylint: disable=unused-argument
+        shape = p.shape[: -1]
+        return jnp.zeros(shape)
+
+    # Work around decorators ruining the type annotation.
+    expected_carrier_measure = jit(expected_carrier_measure, static_argnums=(0,))
