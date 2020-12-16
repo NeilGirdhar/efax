@@ -10,8 +10,6 @@ from .distribution_info import DistributionInfo
 
 # todo: Block VonMises until https://github.com/google/jax/issues/2466 is
 # resolved.
-# todo: Block ComplexNormal until https://github.com/google/jax/issues/2488 is
-# resolved.
 
 
 def test_conversion(generator: Generator, distribution_info: DistributionInfo) -> None:

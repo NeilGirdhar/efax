@@ -1,6 +1,8 @@
 import numpy as np
 from numpy.random import Generator
 
+from efax import VonMises
+
 from .distribution_info import DistributionInfo
 
 
@@ -8,6 +10,8 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     """
     Test that the methods produce the correct shapes.
     """
+    if isinstance(distribution_info.exp_family, VonMises):
+        return
     shape = (3, 4)
     exp_family = distribution_info.exp_family
 

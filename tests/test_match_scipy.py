@@ -5,7 +5,7 @@ import numpy as np
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 
-from efax import Logarithmic
+from efax import Logarithmic, VonMises
 
 from .distribution_info import DistributionInfo
 
@@ -14,8 +14,7 @@ def test_entropy(generator, distribution_info):
     """
     Test that the entropy calculation matches scipy's.
     """
-    if isinstance(distribution_info.exp_family,
-                  (Logarithmic,)):
+    if isinstance(distribution_info.exp_family, (Logarithmic, VonMises)):
         return
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=(3, 2))
     exp_family = distribution_info.exp_family
@@ -36,7 +35,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo):
     """
     Test that the density/mass function calculation matches scipy's.
     """
-    if isinstance(distribution_info.exp_family, Logarithmic):
+    if isinstance(distribution_info.exp_family, (Logarithmic, VonMises)):
         return
     for _ in range(10):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
