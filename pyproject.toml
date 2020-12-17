@@ -33,7 +33,7 @@ scipy = "^1.4"
 tjax = ">=0.6,<1.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5"
+pytest = "^6"
 
 [tool.isort]
 line_length = 100
