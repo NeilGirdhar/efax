@@ -60,6 +60,13 @@ class Dirichlet(ExpToNat, ExponentialFamily):
 
 
 class Beta(Dirichlet):
+    """
+    The Beta distribution.
+
+    The best way to interpret the parameters of the beta distribution are that an observation x in
+    [0, 1] represents the Bernoulli probability that outcome 0 (out of {0, 1}) is realized.  In this
+    way, the Beta class coincides with a special case of the Dirichlet class.
+    """
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(num_parameters=2, **kwargs)

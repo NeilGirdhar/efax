@@ -33,7 +33,7 @@ class VonMisesFisher(ExponentialFamily):
 
     # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:
-        return (f"{type(self).__name__}(shape={self.shape}, num_parameters={self.num_parameters})")
+        return f"{type(self).__name__}(shape={self.shape}, num_parameters={self.num_parameters})"
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)

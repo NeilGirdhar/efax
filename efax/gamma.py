@@ -1,4 +1,5 @@
 import math
+from typing import Any
 
 import numpy as np
 import scipy
@@ -19,8 +20,8 @@ def trigamma(x: RealArray) -> RealArray:
 
 class Gamma(ExponentialFamily):
 
-    def __init__(self) -> None:
-        super().__init__(num_parameters=2)
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(num_parameters=2, **kwargs)
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)

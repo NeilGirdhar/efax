@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from abc import abstractmethod
 from functools import partial
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 from chex import Array
 from ipromise import AbstractBaseClass
@@ -216,3 +218,9 @@ class ExponentialFamily(AbstractBaseClass):
 
     # Work around decorators ruining the type annotation.
     expected_carrier_measure = jit(expected_carrier_measure, static_argnums=(0,))
+
+    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
+        return None
+
+    def conjugate_prior_distribution(self, p: Array, n: Array) -> Array:
+        raise NotImplementedError

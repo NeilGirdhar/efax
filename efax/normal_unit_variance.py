@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 
 import numpy as np
 from ipromise import implements, overrides
@@ -6,11 +7,13 @@ from jax import numpy as jnp
 from tjax import RealArray
 
 from .exponential_family import ExponentialFamily
+from .normal import Normal
 
 __all__ = ['NormalUnitVariance']
 
 
 class NormalUnitVariance(ExponentialFamily):
+    "The normal distribution with variance fixed at one.  This is a curved exponential family."
 
     # Magic methods --------------------------------------------------------------------------------
     def __repr__(self) -> str:
@@ -45,3 +48,10 @@ class NormalUnitVariance(ExponentialFamily):
     def expected_carrier_measure(self, p: RealArray) -> RealArray:
         # The second moment of a normal distribution with mean p.
         return -0.5 * (jnp.sum(jnp.square(p), axis=-1) + 1.0)
+
+    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
+        return Normal(shape=self.shape)
+
+    def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
+        reshaped_n = n[..., np.newaxis]
+        return jnp.append(reshaped_n * p, -0.5 * reshaped_n, axis=-1)

@@ -20,7 +20,7 @@ class Normal(ExponentialFamily):
     def log_normalizer(self, q: RealArray) -> RealArray:
         qa = q[..., 0]
         qb = q[..., 1]
-        return (-jnp.square(qa) / (4.0 * qb) + 0.5 * jnp.log(-np.pi / qb))
+        return -jnp.square(qa) / (4.0 * qb) + 0.5 * jnp.log(-np.pi / qb)
 
     @implements(ExponentialFamily)
     def nat_to_exp(self, q: RealArray) -> RealArray:

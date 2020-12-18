@@ -14,6 +14,10 @@ __all__ = ['NegativeBinomial', 'Geometric']
 class NegativeBinomial(ExponentialFamily):
 
     def __init__(self, r: int):
+        """
+        Args:
+            r: The failure number.
+        """
         super().__init__(num_parameters=1)
         self.r = r
 
@@ -48,6 +52,13 @@ class NegativeBinomial(ExponentialFamily):
             shape = p.shape[: -1]
             return jnp.zeros(shape)
         raise NotImplementedError
+    #
+    # def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
+    #     return BetaPrime(shape=self.shape)
+    #
+    # def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
+    #     reshaped_n = n[..., np.newaxis]
+    #     return reshaped_n * self.r * jnp.append(p, jnp.ones_like(p), axis=-1)
 
     # Magic methods --------------------------------------------------------------------------------
     def __eq__(self, other: Any) -> bool:

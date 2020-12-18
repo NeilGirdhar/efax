@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 import numpy as np
 from ipromise import implements, overrides
 from jax import numpy as jnp
@@ -5,14 +7,15 @@ from jax.scipy import special as jss
 from tjax import RealArray
 
 from .exponential_family import ExponentialFamily
+from .gamma import Gamma
 
 __all__ = ['Poisson']
 
 
 class Poisson(ExponentialFamily):
 
-    def __init__(self) -> None:
-        super().__init__(num_parameters=1)
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(num_parameters=1, **kwargs)
 
     # Implemented methods --------------------------------------------------------------------------
     @implements(ExponentialFamily)
@@ -40,3 +43,10 @@ class Poisson(ExponentialFamily):
     @overrides(ExponentialFamily)
     def expected_carrier_measure(self, p: RealArray) -> RealArray:
         raise NotImplementedError
+
+    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
+        return Gamma(shape=self.shape)
+
+    def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
+        reshaped_n = n[..., np.newaxis]
+        return jnp.append(-reshaped_n, reshaped_n * p, axis=-1)

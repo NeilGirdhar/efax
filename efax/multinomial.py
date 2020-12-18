@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 from ipromise import implements
@@ -6,6 +6,7 @@ from jax import numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape
 
+from .dirichlet import Dirichlet
 from .exponential_family import ExponentialFamily
 
 __all__ = ['Multinomial']
@@ -62,9 +63,18 @@ class Multinomial(ExponentialFamily):
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         p = jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis])
         final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
-        return jnp.concatenate([p, final_p], axis=-1)
+        return jnp.append(p, final_p, axis=-1)
 
     @staticmethod
     def nat_to_surprisal(q: RealArray) -> RealArray:
         total_p = Multinomial.nat_to_probability(q)
         return -jnp.log(total_p)
+
+    # Overridden methods ---------------------------------------------------------------------------
+    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
+        return Dirichlet(self.num_parameters + 1)
+
+    def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
+        reshaped_n = n[..., np.newaxis]
+        final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
+        return reshaped_n * jnp.append(p, final_p, axis=-1)
