@@ -1,6 +1,5 @@
 import math
 
-from ipromise import implements
 from jax import numpy as jnp
 from tjax import ComplexArray, RealArray
 
@@ -15,7 +14,6 @@ class ComplexNormal(ExponentialFamily):
         super().__init__(num_parameters=3)
 
     # Implemented methods --------------------------------------------------------------------------
-    @implements(ExponentialFamily)
     def log_normalizer(self, q: ComplexArray) -> RealArray:
         eta = q[..., 0]
         precision = q[..., 1]
@@ -37,7 +35,6 @@ class ComplexNormal(ExponentialFamily):
                 - 0.5 * jnp.log(det_h)
                 + math.log(math.pi))
 
-    @implements(ExponentialFamily)
     def nat_to_exp(self, q: ComplexArray) -> ComplexArray:
         eta = q[..., 0]
         precision = q[..., 1]
@@ -53,7 +50,6 @@ class ComplexNormal(ExponentialFamily):
               - jnp.conj(pseudo_precision / precision) * l_eta)
         return jnp.stack([mu, s + jnp.conj(mu) * mu, u + jnp.square(mu)], axis=-1)
 
-    @implements(ExponentialFamily)
     def exp_to_nat(self, p: ComplexArray) -> ComplexArray:
         mean = p[..., 0]
         second_moment = p[..., 1]
@@ -70,6 +66,5 @@ class ComplexNormal(ExponentialFamily):
                       + pseudo_precision * mean)
         return jnp.stack([eta, precision, pseudo_precision], axis=-1)
 
-    @implements(ExponentialFamily)
     def sufficient_statistics(self, x: ComplexArray) -> ComplexArray:
         return jnp.stack([x, jnp.conj(x) * x, jnp.square(x)], axis=-1)

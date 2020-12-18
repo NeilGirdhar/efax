@@ -3,7 +3,6 @@ from typing import Any
 
 import numpy as np
 import scipy
-from ipromise import implements
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from scipy.special import polygamma
@@ -24,14 +23,12 @@ class Gamma(ExponentialFamily):
         super().__init__(num_parameters=2, **kwargs)
 
     # Implemented methods --------------------------------------------------------------------------
-    @implements(ExponentialFamily)
     def log_normalizer(self, q: RealArray) -> RealArray:
         negative_rate = q[..., 0]
         shape_minus_one = q[..., 1]
         shape = shape_minus_one + 1.0
         return jss.gammaln(shape) - shape * jnp.log(-negative_rate)
 
-    @implements(ExponentialFamily)
     def nat_to_exp(self, q: RealArray) -> RealArray:
         negative_rate = q[..., 0]
         shape_minus_one = q[..., 1]
@@ -40,7 +37,6 @@ class Gamma(ExponentialFamily):
                           jss.digamma(shape) - jnp.log(-negative_rate)],
                          axis=-1)
 
-    @implements(ExponentialFamily)
     def exp_to_nat(self, p: RealArray) -> RealArray:
         mean = p[..., 0]
         mean_log = p[..., 1]
@@ -48,7 +44,6 @@ class Gamma(ExponentialFamily):
         rate = shape / mean
         return jnp.stack([-rate, shape - 1.0], axis=-1)
 
-    @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealArray) -> RealArray:
         return jnp.stack([x, jnp.log(x)], axis=-1)
 

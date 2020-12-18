@@ -1,7 +1,6 @@
 from typing import Any, Optional
 
 import numpy as np
-from ipromise import implements
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape
@@ -32,26 +31,22 @@ class Multinomial(ExponentialFamily):
                 f"num_parameters={self.num_parameters})")
 
     # Implemented methods --------------------------------------------------------------------------
-    @implements(ExponentialFamily)
     def log_normalizer(self, q: RealArray) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return max_q + log_scaled_A
 
-    @implements(ExponentialFamily)
     def nat_to_exp(self, q: RealArray) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
         q_minus_max_q = q - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis])
 
-    @implements(ExponentialFamily)
     def exp_to_nat(self, p: RealArray) -> RealArray:
         p_k = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
         return jnp.log(p / p_k)
 
-    @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealArray) -> RealArray:
         return x
 

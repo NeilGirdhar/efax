@@ -4,7 +4,6 @@ from typing import Tuple
 import numpy as np
 import scipy.optimize
 from chex import Array
-from ipromise import implements
 from jax import numpy as jnp
 from jax.nn import softplus
 from scipy.special import iv
@@ -36,7 +35,6 @@ class VonMisesFisher(ExponentialFamily):
         return f"{type(self).__name__}(shape={self.shape}, num_parameters={self.num_parameters})"
 
     # Implemented methods --------------------------------------------------------------------------
-    @implements(ExponentialFamily)
     def log_normalizer(self, q: RealArray) -> RealArray:
         half_k = q.shape[-1] * 0.5
         kappa = jnp.linalg.norm(q, 2, axis=-1)
@@ -44,14 +42,12 @@ class VonMisesFisher(ExponentialFamily):
                         / ((2.0 * math.pi) ** half_k
                            * iv(half_k - 1.0, kappa)))
 
-    @implements(ExponentialFamily)
     def nat_to_exp(self, q: RealArray) -> RealArray:
         kappa = jnp.linalg.norm(q, 2, axis=-1, keepdims=True)
         return jnp.where(kappa == 0.0,
                          q,
                          q * (VonMisesFisher._a_k(q.shape[-1], kappa) / kappa))
 
-    @implements(ExponentialFamily)
     def exp_to_nat(self, p: RealArray) -> RealArray:
         k = p.shape[-1]
         mu = jnp.linalg.norm(p, 2, axis=-1)
@@ -63,7 +59,6 @@ class VonMisesFisher(ExponentialFamily):
             q[i] = this_p * (kappa / this_mu)
         return q
 
-    @implements(ExponentialFamily)
     def sufficient_statistics(self, x: RealArray) -> RealArray:
         return x
 

@@ -3,7 +3,6 @@ from typing import List, Optional
 import numpy as np
 import scipy
 from chex import Array
-from ipromise import implements
 from jax import jacfwd, jit
 
 from .exponential_family import ExponentialFamily
@@ -18,7 +17,6 @@ class ExpToNat(ExponentialFamily):
     """
 
     # Implemented methods --------------------------------------------------------------------------
-    @implements(ExponentialFamily)
     def exp_to_nat(self, p: Array) -> Array:
         p = np.asarray(p)  # Ensure that p is concrete.
         q = np.empty_like(p)

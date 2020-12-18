@@ -5,14 +5,13 @@ from functools import partial
 from typing import Any, Optional, Tuple
 
 from chex import Array
-from ipromise import AbstractBaseClass
 from jax import numpy as jnp
 from tjax import RealArray, Shape, custom_jvp, jit
 
 __all__ = ['ExponentialFamily']
 
 
-class ExponentialFamily(AbstractBaseClass):
+class ExponentialFamily:
 
     """
     An Exponential family distribution.

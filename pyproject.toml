@@ -25,7 +25,6 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 chex = "^0.0.2"
-ipromise = "^1.5"
 jax = "^0.2"
 jaxlib = "^0.1.55"
 numpy = "^1.18"
@@ -38,7 +37,7 @@ pytest = "^6"
 [tool.isort]
 line_length = 100
 multi_line_output = 0
-known_third_party = ["ipromise", "jax"]
+known_third_party = ["jax"]
 
 [tool.pycodestyle]
 max-line-length = 100
