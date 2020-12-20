@@ -1,50 +1,70 @@
-import math
-from typing import Optional
+from __future__ import annotations
 
-import numpy as np
+import math
+from typing import Iterable, Optional
+
 from chex import Array
 from jax import numpy as jnp
 from jax.nn import softplus
-from tjax import RealArray
+from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
-from .exponential_family import ExponentialFamily
+from .exponential_family import NaturalParametrization
 
-__all__ = ['Logarithmic']
+__all__ = ['LogarithmicNP', 'LogarithmicEP']
 
 
-class Logarithmic(ExpToNat, ExponentialFamily):
-
-    def __init__(self) -> None:
-        super().__init__(num_parameters=1)
+@dataclass
+class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
+    log_probability: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
-        return jnp.log(-jnp.log1p(-jnp.exp(q[..., 0])))
+    def shape(self) -> Shape:
+        return self.log_probability.shape
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        exp_q = jnp.exp(q)
-        return jnp.where(q < -100,
-                         1.0,
-                         exp_q / (jnp.expm1(q) * jnp.log1p(-exp_q)))
+    def log_normalizer(self) -> RealArray:
+        return jnp.log(-jnp.log1p(-jnp.exp(self.log_probability)))
 
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        return x[..., np.newaxis]
+    def to_exp(self) -> LogarithmicEP:
+        probability = jnp.exp(self.log_probability)
+        return LogarithmicEP(jnp.where(self.log_probability < -100,
+                                       1.0,
+                                       probability / (jnp.expm1(self.log_probability)
+                                                      * jnp.log1p(-probability))))
 
-    # Overridden methods ---------------------------------------------------------------------------
     def carrier_measure(self, x: RealArray) -> RealArray:
         return -jnp.log(x)
 
-    def expected_carrier_measure(self, p: RealArray) -> RealArray:
-        raise NotImplementedError
+    def sufficient_statistics(self, x: RealArray) -> LogarithmicEP:
+        return LogarithmicEP(x)
 
-    def exp_to_nat_early_out(self, p: Array) -> Optional[Array]:
-        if p < 1.0:
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        yield 0
+
+
+@dataclass
+class LogarithmicEP(ExpToNat[LogarithmicNP]):
+    chi: RealArray  # - odds / log(1-p)
+
+    # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.chi.shape
+
+    # The expected_carrier_measure is unknown.
+
+    # Overridden methods ---------------------------------------------------------------------------
+    def to_nat_early_out(self) -> Optional[Array]:
+        if self.chi < 1.0:
             raise ValueError
-        if p == 1.0:
+        if self.chi == 1.0:
             return math.inf
         return None
 
-    def exp_to_nat_transform_q(self, transformed_q: Array) -> Array:
+    @classmethod
+    def unflatten_natural(cls, flattened_natural: Array) -> LogarithmicNP:
         # Run Newton's method on the whole real line.
-        return -softplus(transformed_q)
+        return LogarithmicNP(-softplus(flattened_natural))
+
+    def flatten_expectation(self) -> Array:
+        return self.chi

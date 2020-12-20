@@ -1,45 +1,59 @@
-from typing import Any, Optional
+from __future__ import annotations
 
-import numpy as np
+from typing import Iterable
+
 from jax import numpy as jnp
 from jax.scipy import special as jss
-from tjax import RealArray
+from tjax import RealArray, Shape, dataclass
 
-from .exponential_family import ExponentialFamily
-from .gamma import Gamma
+from .conjugate_prior import HasConjugatePrior
+from .exponential_family import NaturalParametrization
+from .gamma import GammaNP
 
-__all__ = ['Poisson']
+__all__ = ['PoissonNP', 'PoissonEP']
 
 
-class Poisson(ExponentialFamily):
-
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(num_parameters=1, **kwargs)
+@dataclass
+class PoissonNP(NaturalParametrization['PoissonEP']):
+    log_mean: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
-        # pylint: disable=no-self-use
-        return jnp.exp(q)[..., 0]
+    def shape(self) -> Shape:
+        return self.log_mean.shape
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        return jnp.exp(q)
+    def log_normalizer(self) -> RealArray:
+        return jnp.exp(self.log_mean)
 
-    def exp_to_nat(self, p: RealArray) -> RealArray:
-        return jnp.log(p)
+    def to_exp(self) -> PoissonEP:
+        return PoissonEP(jnp.exp(self.log_mean))
 
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        return x[..., np.newaxis]
-
-    # Overridden methods ---------------------------------------------------------------------------
     def carrier_measure(self, x: RealArray) -> RealArray:
         return -jss.gammaln(x + 1)
 
-    def expected_carrier_measure(self, p: RealArray) -> RealArray:
-        raise NotImplementedError
+    def sufficient_statistics(self, x: RealArray) -> PoissonEP:
+        return PoissonEP(x)
 
-    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
-        return Gamma(shape=self.shape)
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        yield 0
 
-    def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
-        reshaped_n = n[..., np.newaxis]
-        return jnp.append(-reshaped_n, reshaped_n * p, axis=-1)
+
+@dataclass
+class PoissonEP(HasConjugatePrior[PoissonNP]):
+    mean: RealArray
+
+    # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.mean.shape
+
+    def to_nat(self) -> PoissonNP:
+        return PoissonNP(jnp.log(self.mean))
+
+    # The expected_carrier_measure is unknown.
+
+    # Overridden methods ---------------------------------------------------------------------------
+    def conjugate_prior_distribution(self, n: RealArray) -> GammaNP:
+        return GammaNP(-n, n * self.mean)
+
+    def conjugate_prior_observation(self) -> RealArray:
+        return self.mean

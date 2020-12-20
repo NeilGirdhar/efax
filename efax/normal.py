@@ -1,36 +1,58 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import Iterable
 
 import numpy as np
 from jax import numpy as jnp
-from tjax import RealArray
+from tjax import RealArray, Shape, dataclass
 
-from .exponential_family import ExponentialFamily
+from .exponential_family import ExpectationParametrization, NaturalParametrization
 
-__all__ = ['Normal']
+__all__ = ['NormalNP', 'NormalEP']
 
 
-class Normal(ExponentialFamily):
-
-    def __init__(self, **kwargs: Any):
-        super().__init__(num_parameters=2, **kwargs)
+@dataclass
+class NormalNP(NaturalParametrization['NormalEP']):
+    mean_times_precision: RealArray
+    negative_half_precision: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
-        qa = q[..., 0]
-        qb = q[..., 1]
-        return -jnp.square(qa) / (4.0 * qb) + 0.5 * jnp.log(-np.pi / qb)
+    def shape(self) -> Shape:
+        return self.mean_times_precision.shape
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        qa = q[..., 0]
-        qb = q[..., 1]
-        ratio = -qa / (2 * qb)
-        return jnp.stack([ratio, (jnp.square(ratio) - 0.5 / qb)], axis=-1)
+    def log_normalizer(self) -> RealArray:
+        return (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
+                + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
 
-    def exp_to_nat(self, p: RealArray) -> RealArray:
-        mean = p[..., 0]
-        second_moment = p[..., 1]
-        variance = second_moment - jnp.square(mean)
-        return jnp.stack([mean / variance, -0.5 / variance], axis=-1)
+    def to_exp(self) -> NormalEP:
+        mean = -self.mean_times_precision / (2 * self.negative_half_precision)
+        second_moment = jnp.square(mean) - 0.5 / self.negative_half_precision
+        return NormalEP(mean, second_moment)
 
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        return jnp.stack([x, jnp.square(x)], axis=-1)
+    def carrier_measure(self, x: RealArray) -> RealArray:
+        return jnp.zeros(x.shape)
+
+    def sufficient_statistics(self, x: RealArray) -> NormalEP:
+        return NormalEP(x, jnp.square(x))
+
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        yield 0
+        yield 0
+
+
+@dataclass
+class NormalEP(ExpectationParametrization[NormalNP]):
+    mean: RealArray
+    second_moment: RealArray
+
+    # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.mean.shape
+
+    def to_nat(self) -> NormalNP:
+        variance = self.second_moment - jnp.square(self.mean)
+        return NormalNP(self.mean / variance, -0.5 / variance)
+
+    def expected_carrier_measure(self) -> RealArray:
+        return jnp.zeros(self.shape())

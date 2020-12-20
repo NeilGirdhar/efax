@@ -1,72 +1,98 @@
-from typing import Any
+from __future__ import annotations
 
-import numpy as np
+from typing import Generic, Iterable
+
 from jax import numpy as jnp
-from jax.scipy import special as jss
-from tjax import RealArray
+from jax.scipy.special import gammaln
+from tjax import RealArray, Shape, dataclass, field
 
-from .exponential_family import ExponentialFamily
+from .exponential_family import EP, NP, ExpectationParametrization, NaturalParametrization
 
-__all__ = ['NegativeBinomial', 'Geometric']
+__all__ = ['NegativeBinomialNP', 'NegativeBinomialEP', 'GeometricNP', 'GeometricEP']
 
 
-class NegativeBinomial(ExponentialFamily):
-
-    def __init__(self, r: int):
-        """
-        Args:
-            r: The failure number.
-        """
-        super().__init__(num_parameters=1)
-        self.r = r
+class NBCommonNP(NaturalParametrization[EP], Generic[EP]):
+    failures: int
+    log_not_p: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
-        return -self.r * jnp.log1p(-jnp.exp(q[..., 0]))
+    def shape(self) -> Shape:
+        return self.log_not_p.shape
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        return self.r / jnp.expm1(-q)
+    def log_normalizer(self) -> RealArray:
+        return -self.failures * jnp.log1p(-jnp.exp(self.log_not_p))
 
-    def exp_to_nat(self, p: RealArray) -> RealArray:
-        return -jnp.log1p(self.r / p)
-
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        return x[..., np.newaxis]
-
-    # Overridden methods ---------------------------------------------------------------------------
     def carrier_measure(self, x: RealArray) -> RealArray:
-        lgamma = jss.gammaln
-        a = x + self.r - 1
+        a = x + self.failures - 1
         # Return log(a choose x).
-        return lgamma(a + 1) - lgamma(x + 1) - lgamma(a - x + 1)
+        return gammaln(a + 1) - gammaln(x + 1) - gammaln(a - x + 1)
 
-    def expected_carrier_measure(self, p: RealArray) -> RealArray:
-        if self.r == 1:
-            shape = p.shape[: -1]
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        yield 0
+
+    # Private methods ------------------------------------------------------------------------------
+    def _mean(self) -> RealArray:
+        return self.failures / jnp.expm1(-self.log_not_p)
+
+
+class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
+    failures: int
+    mean: RealArray
+
+    # Implemented methods --------------------------------------------------------------------------
+    def expected_carrier_measure(self) -> RealArray:
+        if self.failures == 1:
+            shape = self.mean.shape
             return jnp.zeros(shape)
         raise NotImplementedError
-    #
-    # def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
-    #     return BetaPrime(shape=self.shape)
-    #
-    # def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
-    #     reshaped_n = n[..., np.newaxis]
-    #     return reshaped_n * self.r * jnp.append(p, jnp.ones_like(p), axis=-1)
 
-    # Magic methods --------------------------------------------------------------------------------
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, NegativeBinomial):
-            return NotImplemented
-        return super().__eq__(other) and self.r == other.r
+    # Private methods ------------------------------------------------------------------------------
+    def _log_not_p(self) -> NegativeBinomialNP:
+        return -jnp.log1p(self.failures / self.mean)
 
-    def __hash__(self) -> int:
-        return hash((self.num_parameters,
-                     self.shape,
-                     self.observation_shape,
-                     self.r))
+    # Overridden methods ---------------------------------------------------------------------------
+    # def conjugate_prior_distribution(self, n: RealArray) -> BetaPrimeNP:
+    #     return BetaPrimeNP(n * self.failures * (self.mean, jnp.ones_like(self.mean)))
 
 
-class Geometric(NegativeBinomial):
+@dataclass
+class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
+    failures: int = field(static=True)
+    log_not_p: RealArray
 
-    def __init__(self) -> None:
-        super().__init__(r=1)
+    def to_exp(self) -> NegativeBinomialEP:
+        return NegativeBinomialEP(self.failures, self._mean())
+
+    def sufficient_statistics(self, x: RealArray) -> NegativeBinomialEP:
+        return NegativeBinomialEP(self.failures, x)
+
+
+@dataclass
+class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
+    failures: int = field(static=True)
+    mean: RealArray
+
+    def to_nat(self) -> NegativeBinomialNP:
+        return NegativeBinomialNP(self.failures, self._log_not_p())
+
+
+@dataclass
+class GeometricNP(NBCommonNP['GeometricEP']):
+    log_not_p: RealArray
+    failures = 1
+
+    def to_exp(self) -> GeometricEP:
+        return GeometricEP(self._mean())
+
+    def sufficient_statistics(self, x: RealArray) -> GeometricEP:
+        return GeometricEP(x)
+
+
+@dataclass
+class GeometricEP(NBCommonEP[GeometricNP]):
+    mean: RealArray
+    failures = 1
+
+    def to_nat(self) -> GeometricNP:
+        return GeometricNP(self._log_not_p())

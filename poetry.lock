@@ -101,14 +101,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "ipromise"
-version = "1.9"
-description = "A Python base class that provides various decorators for specifying promises relating to inheritance."
-category = "main"
-optional = false
-python-versions = ">=3.6,<4.0"
-
-[[package]]
 name = "jax"
 version = "0.2.7"
 description = "Differentiate, compile, and transform Numpy code."
@@ -185,11 +177,18 @@ scipy = ["scipy"]
 
 [[package]]
 name = "numpy"
-version = "1.19.4"
+version = "1.21.0.dev0+271.gf7bc51218"
 description = "NumPy is the fundamental package for array computing with Python."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
+develop = false
+
+[package.source]
+type = "git"
+url = "https://github.com/numpy/numpy.git"
+reference = "master"
+resolved_reference = "f7bc512184a1de3992b0d154e6244a7a0d9a574f"
 
 [[package]]
 name = "opt-einsum"
@@ -320,7 +319,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "tjax"
-version = "0.7.3"
+version = "0.7.5"
 description = "Tools for JAX."
 category = "main"
 optional = false
@@ -355,7 +354,7 @@ python-versions = ">=3.5"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "fa0386eb3832ff7a950848aec93277cf6e7142b671b0a8658d3d8327fdc2b215"
+content-hash = "b7f718aa5a3cf723652dc32f713ada0565a5f002d2e36ca8975af5474d3f1721"
 
 [metadata.files]
 absl-py = [
@@ -398,17 +397,17 @@ iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
-ipromise = [
-    {file = "ipromise-1.9-py3-none-any.whl", hash = "sha256:96392914b439b3155072f02167dd7a29f6c00b286316d098c6c4c3cb5fea686a"},
-    {file = "ipromise-1.9.tar.gz", hash = "sha256:7a58426ad1c5bdab781dbe862aec657c1088e057ee16045b9bf13b94667ad39f"},
-]
 jax = [
     {file = "jax-0.2.7.tar.gz", hash = "sha256:51f55ddab1518a52f43131dabb8f5ffc3e68b5f536b945e8cb8fca7c0d3d4b23"},
 ]
 jaxlib = [
+    {file = "jaxlib-0.1.57-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:47d4bf94f38ab9a437a69c19be6a3e1d235811d6da70922a3ff6502c33361504"},
     {file = "jaxlib-0.1.57-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:669427a85df109995cf2689945c995fd36abce80d7dbc0ad1833fa9966fa935e"},
+    {file = "jaxlib-0.1.57-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:048596b2ba458b01eb0c5680936df851f2083f6135ec9cd984f2f5ea45ad619d"},
     {file = "jaxlib-0.1.57-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:2bc945849553dbc31eba737ca81546fb47ec1e7c3340872d9b7dd329006f51a7"},
+    {file = "jaxlib-0.1.57-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:0fd3a836ec91d96a2944b5fa610780c46166c9c501629446921bd406bc83fcd0"},
     {file = "jaxlib-0.1.57-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:252e2b0043dc655e889da4363af9bc22c22d4c9728b9b2b685eac763d3a4de30"},
+    {file = "jaxlib-0.1.57-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:4e449261a7a4b08525b88dda49636eae55b9c2be464f4683dd4fd25e96134dce"},
     {file = "jaxlib-0.1.57-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:2c07605172118ab3a5a62d639a62059e4c8d67cc44de655af6606c50afa1d8c9"},
 ]
 kiwisolver = [
@@ -476,42 +475,7 @@ networkx = [
     {file = "networkx-2.5-py3-none-any.whl", hash = "sha256:8c5812e9f798d37c50570d15c4a69d5710a18d77bafc903ee9c5fba7454c616c"},
     {file = "networkx-2.5.tar.gz", hash = "sha256:7978955423fbc9639c10498878be59caf99b44dc304c2286162fd24b458c1602"},
 ]
-numpy = [
-    {file = "numpy-1.19.4-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:e9b30d4bd69498fc0c3fe9db5f62fffbb06b8eb9321f92cc970f2969be5e3949"},
-    {file = "numpy-1.19.4-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:fedbd128668ead37f33917820b704784aff695e0019309ad446a6d0b065b57e4"},
-    {file = "numpy-1.19.4-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:8ece138c3a16db8c1ad38f52eb32be6086cc72f403150a79336eb2045723a1ad"},
-    {file = "numpy-1.19.4-cp36-cp36m-manylinux2010_i686.whl", hash = "sha256:64324f64f90a9e4ef732be0928be853eee378fd6a01be21a0a8469c4f2682c83"},
-    {file = "numpy-1.19.4-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:ad6f2ff5b1989a4899bf89800a671d71b1612e5ff40866d1f4d8bcf48d4e5764"},
-    {file = "numpy-1.19.4-cp36-cp36m-manylinux2014_aarch64.whl", hash = "sha256:d6c7bb82883680e168b55b49c70af29b84b84abb161cbac2800e8fcb6f2109b6"},
-    {file = "numpy-1.19.4-cp36-cp36m-win32.whl", hash = "sha256:13d166f77d6dc02c0a73c1101dd87fdf01339febec1030bd810dcd53fff3b0f1"},
-    {file = "numpy-1.19.4-cp36-cp36m-win_amd64.whl", hash = "sha256:448ebb1b3bf64c0267d6b09a7cba26b5ae61b6d2dbabff7c91b660c7eccf2bdb"},
-    {file = "numpy-1.19.4-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:27d3f3b9e3406579a8af3a9f262f5339005dd25e0ecf3cf1559ff8a49ed5cbf2"},
-    {file = "numpy-1.19.4-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:16c1b388cc31a9baa06d91a19366fb99ddbe1c7b205293ed072211ee5bac1ed2"},
-    {file = "numpy-1.19.4-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:e5b6ed0f0b42317050c88022349d994fe72bfe35f5908617512cd8c8ef9da2a9"},
-    {file = "numpy-1.19.4-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:18bed2bcb39e3f758296584337966e68d2d5ba6aab7e038688ad53c8f889f757"},
-    {file = "numpy-1.19.4-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:fe45becb4c2f72a0907c1d0246ea6449fe7a9e2293bb0e11c4e9a32bb0930a15"},
-    {file = "numpy-1.19.4-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:6d7593a705d662be5bfe24111af14763016765f43cb6923ed86223f965f52387"},
-    {file = "numpy-1.19.4-cp37-cp37m-win32.whl", hash = "sha256:6ae6c680f3ebf1cf7ad1d7748868b39d9f900836df774c453c11c5440bc15b36"},
-    {file = "numpy-1.19.4-cp37-cp37m-win_amd64.whl", hash = "sha256:9eeb7d1d04b117ac0d38719915ae169aa6b61fca227b0b7d198d43728f0c879c"},
-    {file = "numpy-1.19.4-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:cb1017eec5257e9ac6209ac172058c430e834d5d2bc21961dceeb79d111e5909"},
-    {file = "numpy-1.19.4-cp38-cp38-manylinux1_i686.whl", hash = "sha256:edb01671b3caae1ca00881686003d16c2209e07b7ef8b7639f1867852b948f7c"},
-    {file = "numpy-1.19.4-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:f29454410db6ef8126c83bd3c968d143304633d45dc57b51252afbd79d700893"},
-    {file = "numpy-1.19.4-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:ec149b90019852266fec2341ce1db513b843e496d5a8e8cdb5ced1923a92faab"},
-    {file = "numpy-1.19.4-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:1aeef46a13e51931c0b1cf8ae1168b4a55ecd282e6688fdb0a948cc5a1d5afb9"},
-    {file = "numpy-1.19.4-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:08308c38e44cc926bdfce99498b21eec1f848d24c302519e64203a8da99a97db"},
-    {file = "numpy-1.19.4-cp38-cp38-win32.whl", hash = "sha256:5734bdc0342aba9dfc6f04920988140fb41234db42381cf7ccba64169f9fe7ac"},
-    {file = "numpy-1.19.4-cp38-cp38-win_amd64.whl", hash = "sha256:09c12096d843b90eafd01ea1b3307e78ddd47a55855ad402b157b6c4862197ce"},
-    {file = "numpy-1.19.4-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:e452dc66e08a4ce642a961f134814258a082832c78c90351b75c41ad16f79f63"},
-    {file = "numpy-1.19.4-cp39-cp39-manylinux1_i686.whl", hash = "sha256:a5d897c14513590a85774180be713f692df6fa8ecf6483e561a6d47309566f37"},
-    {file = "numpy-1.19.4-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:a09f98011236a419ee3f49cedc9ef27d7a1651df07810ae430a6b06576e0b414"},
-    {file = "numpy-1.19.4-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:50e86c076611212ca62e5a59f518edafe0c0730f7d9195fec718da1a5c2bb1fc"},
-    {file = "numpy-1.19.4-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:f0d3929fe88ee1c155129ecd82f981b8856c5d97bcb0d5f23e9b4242e79d1de3"},
-    {file = "numpy-1.19.4-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:c42c4b73121caf0ed6cd795512c9c09c52a7287b04d105d112068c1736d7c753"},
-    {file = "numpy-1.19.4-cp39-cp39-win32.whl", hash = "sha256:8cac8790a6b1ddf88640a9267ee67b1aee7a57dfa2d2dd33999d080bc8ee3a0f"},
-    {file = "numpy-1.19.4-cp39-cp39-win_amd64.whl", hash = "sha256:4377e10b874e653fe96985c05feed2225c912e328c8a26541f7fc600fb9c637b"},
-    {file = "numpy-1.19.4-pp36-pypy36_pp73-manylinux2010_x86_64.whl", hash = "sha256:2a2740aa9733d2e5b2dfb33639d98a64c3b0f24765fed86b0fd2aec07f6a0a08"},
-    {file = "numpy-1.19.4.zip", hash = "sha256:141ec3a3300ab89c7f2b0775289954d193cc8edb621ea05f99db9cb181530512"},
-]
+numpy = []
 opt-einsum = [
     {file = "opt_einsum-3.3.0-py3-none-any.whl", hash = "sha256:2455e59e3947d3c275477df7f5205b30635e266fe6dc300e3d9f9646bfcea147"},
     {file = "opt_einsum-3.3.0.tar.gz", hash = "sha256:59f6475f77bbc37dcf7cd748519c0ec60722e91e63ca114e68821c0c54a46549"},
@@ -606,8 +570,8 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 tjax = [
-    {file = "tjax-0.7.3-py3-none-any.whl", hash = "sha256:e90247ddc4ed5421bfea57f41546eeeba51b811bf688dbc89b5474dbb984d119"},
-    {file = "tjax-0.7.3.tar.gz", hash = "sha256:a70d76114e523d9df77b2b0bd7cd8d067dfd1b0a16b15cf58dc374db86cd4849"},
+    {file = "tjax-0.7.5-py3-none-any.whl", hash = "sha256:8842f03ff146c8d57b35ae5d35857720d8e02804e34ac5d9e34a413ed7e7118f"},
+    {file = "tjax-0.7.5.tar.gz", hash = "sha256:ccc4d3d282abcb094899d4a354362073a42df0d920ad2b77891cf534b3b0368c"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

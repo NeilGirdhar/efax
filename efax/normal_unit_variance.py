@@ -1,50 +1,64 @@
+from __future__ import annotations
+
 import math
-from typing import Optional
+from typing import Iterable
 
-import numpy as np
 from jax import numpy as jnp
-from tjax import RealArray
+from tjax import RealArray, Shape, dataclass
 
-from .exponential_family import ExponentialFamily
-from .normal import Normal
+from .exponential_family import ExpectationParametrization, NaturalParametrization
 
-__all__ = ['NormalUnitVariance']
+__all__ = ['NormalUnitVarianceNP', 'NormalUnitVarianceEP']
 
 
-class NormalUnitVariance(ExponentialFamily):
-    "The normal distribution with variance fixed at one.  This is a curved exponential family."
-
-    # Magic methods --------------------------------------------------------------------------------
-    def __repr__(self) -> str:
-        return (f"{type(self).__name__}(shape={self.shape}, "
-                f"num_parameters={self.num_parameters})")
+@dataclass
+class NormalUnitVarianceNP(NaturalParametrization['NormalUnitVarianceEP']):
+    """
+    The multivariate normal distribution with unit variance.  This is a curved exponential family.
+    """
+    mean: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
-        return 0.5 * (jnp.sum(jnp.square(q), axis=-1)
-                      + self.num_parameters * math.log(math.pi * 2.0))
+    def shape(self) -> Shape:
+        return self.mean.shape[:-1]
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        return q
+    def log_normalizer(self) -> RealArray:
+        num_parameters = self.mean.shape[-1]
+        return 0.5 * (jnp.sum(jnp.square(self.mean), axis=-1)
+                      + num_parameters * math.log(math.pi * 2.0))
 
-    def exp_to_nat(self, p: RealArray) -> RealArray:
-        return p
+    def to_exp(self) -> NormalUnitVarianceEP:
+        return NormalUnitVarianceEP(self.mean)
 
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        return x[..., np.newaxis]
-
-    # Overridden methods ---------------------------------------------------------------------------
     def carrier_measure(self, x: RealArray) -> RealArray:
         # The second moment of a delta distribution at x.
-        return -0.5 * jnp.square(x)
+        return -0.5 * jnp.sum(jnp.square(x), axis=-1)
 
-    def expected_carrier_measure(self, p: RealArray) -> RealArray:
-        # The second moment of a normal distribution with mean p.
-        return -0.5 * (jnp.sum(jnp.square(p), axis=-1) + 1.0)
+    def sufficient_statistics(self, x: RealArray) -> NormalUnitVarianceEP:
+        return NormalUnitVarianceEP(x)
 
-    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
-        return Normal(shape=self.shape)
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        yield 1
 
-    def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
-        reshaped_n = n[..., np.newaxis]
-        return jnp.append(reshaped_n * p, -0.5 * reshaped_n, axis=-1)
+
+@dataclass
+class NormalUnitVarianceEP(ExpectationParametrization[NormalUnitVarianceNP]):
+    mean: RealArray
+
+    # Implemented methods --------------------------------------------------------------------------
+    def to_nat(self) -> NormalUnitVarianceNP:
+        return NormalUnitVarianceNP(self.mean)
+
+    def expected_carrier_measure(self) -> RealArray:
+        num_parameters = self.mean.shape[-1]
+        # The second moment of a normal distribution with the given mean.
+        return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + num_parameters)
+
+    # Overridden methods ---------------------------------------------------------------------------
+    # This is the multivariate normal.
+    # def conjugate_prior_distribution(self, n: RealArray) -> NormalNP:
+    #     return NormalNP(n * self.mean, -0.5 * n)
+    #
+    # def conjugate_prior_observation(self) -> Array:
+    #     return self.mean

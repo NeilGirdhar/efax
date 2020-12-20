@@ -1,8 +1,12 @@
+from typing import Any
+
 import numpy as np
 from numpy.random import Generator
+from tjax import field_values
 
-from efax import VonMises
+from efax import NaturalParametrization
 
+from .create_info import VonMisesInfo
 from .distribution_info import DistributionInfo
 
 
@@ -10,10 +14,9 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     """
     Test that the methods produce the correct shapes.
     """
-    if isinstance(distribution_info.exp_family, VonMises):
+    if isinstance(distribution_info, VonMisesInfo):
         return
-    shape = (3, 4)
-    exp_family = distribution_info.exp_family
+    shape = (3, 4) if distribution_info.supports_shape() else ()
 
     p = distribution_info.exp_parameter_generator(generator, shape=shape)
     q = distribution_info.nat_parameter_generator(generator, shape=shape)
@@ -21,28 +24,28 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     scipy_x = scipy_dist.rvs()
     x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
-    assert x.shape == shape + exp_family.shape_including_observations()
-    assert p.shape == shape + exp_family.shape_including_parameters()
-    assert q.shape == shape + exp_family.shape_including_parameters()
-    assert exp_family.log_normalizer(q).shape == shape + exp_family.shape
-    assert exp_family.nat_to_exp(q).shape == shape + exp_family.shape_including_parameters()
-    assert exp_family.exp_to_nat(p).shape == shape + exp_family.shape_including_parameters()
-    assert (exp_family.sufficient_statistics(x).shape
-            == shape + exp_family.shape_including_parameters())
+    def check(np: NaturalParametrization, z: Any) -> None:
+        for xf, n_axes in zip(field_values(z, static=False), np.field_axes()):
+            assert xf.shape[:len(xf.shape) - n_axes] == shape
+
+    check(q, q)
+    check(q, p)
+
+    assert q.log_normalizer().shape == shape
     try:
-        assert exp_family.cross_entropy(p, q).shape == shape + exp_family.shape
+        assert p.cross_entropy(q).shape == shape
     except NotImplementedError:
         pass
     try:
-        assert exp_family.entropy(q).shape == shape + exp_family.shape
+        assert q.entropy().shape == shape
     except NotImplementedError:
         pass
-    assert exp_family.carrier_measure(x).shape == shape + exp_family.shape
+    assert q.carrier_measure(x).shape == shape
     try:
-        assert exp_family.expected_carrier_measure(p).shape == shape + exp_family.shape
+        assert p.expected_carrier_measure().shape == shape
     except NotImplementedError:
         pass
-    assert exp_family.pdf(q, x).shape == shape + exp_family.shape
+    assert q.pdf(x).shape == shape
 
 
 def test_types(distribution_info: DistributionInfo) -> None:

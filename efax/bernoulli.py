@@ -1,49 +1,40 @@
-from typing import Any, Optional
+from __future__ import annotations
 
 import numpy as np
 from jax import numpy as jnp
 from jax.scipy import special as jss
-from tjax import RealArray
+from tjax import RealArray, dataclass
 
-from .dirichlet import Beta
-from .exponential_family import ExponentialFamily
-from .multinomial import Multinomial
+from .beta import BetaNP
+from .multinomial import MultinomialEP, MultinomialNP
 
-__all__ = ['Bernoulli']
+__all__ = ['BernoulliNP', 'BernoulliEP']
 
 
-class Bernoulli(Multinomial):
-
-    def __init__(self, **kwargs: Any):
-        super().__init__(num_parameters=1, **kwargs)
+@dataclass
+class BernoulliNP(MultinomialNP):
 
     # Overridden methods ---------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
-        q = q[..., 0]
+    def log_normalizer(self) -> RealArray:
+        q = self.log_odds[..., 0]
         return jnp.logaddexp(q, 0.0)
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        return jss.expit(q)
+    def to_exp(self) -> BernoulliEP:
+        return BernoulliEP(jss.expit(self.log_odds))
 
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        return x[..., np.newaxis]
+    def sufficient_statistics(self, x: RealArray) -> BernoulliEP:
+        ss = super().sufficient_statistics(x)
+        return BernoulliEP(ss.probability)
+
+
+@dataclass
+class BernoulliEP(MultinomialEP):
+
+    # Implemented methods --------------------------------------------------------------------------
+    def conjugate_prior_distribution(self, n: RealArray) -> BetaNP:
+        reshaped_n = n[..., np.newaxis]
+        return BetaNP(reshaped_n * jnp.append(self.probability, (1.0 - self.probability), axis=-1))
 
     # Overridden methods ---------------------------------------------------------------------------
-    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
-        return Beta(shape=self.shape)
-
-    def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
-        """
-        Args:
-            p: The expectation parameters of a distribution having shape
-                self.shape_including_parameters().
-            n: The pseudo-observed count having shape self.shape.
-        Returns: The natural parameters of the conjugate prior distribution.
-        """
-        if p.shape != self.shape_including_parameters():
-            print(self.shape_including_parameters())
-            raise ValueError
-        if n.shape != self.shape:
-            raise ValueError
-        reshaped_n = n[..., np.newaxis]
-        return reshaped_n * jnp.append(p, (1.0 - p), axis=-1)
+    def to_nat(self) -> BernoulliNP:
+        return BernoulliNP(jss.logit(self.probability))

@@ -1,67 +1,77 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import Iterable
 
 from chex import Array
 from jax import numpy as jnp
 from jax.nn import softplus
 from jax.scipy import special as jss
-from tjax import RealArray, Shape
+from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
-from .exponential_family import ExponentialFamily
+from .exponential_family import NaturalParametrization
 
-__all__ = ['Beta', 'Dirichlet']
+__all__ = ['DirichletNP', 'DirichletEP']
 
 
-class Dirichlet(ExpToNat, ExponentialFamily):
+@dataclass
+class DirichletNP(NaturalParametrization['DirichletEP']):
 
-    def __init__(self, num_parameters: int, **kwargs: Any):
-        if not isinstance(num_parameters, int):
-            raise TypeError
-        if num_parameters < 2:
-            raise ValueError
-        observation_shape: Shape
-        if num_parameters == 2:
-            observation_shape = ()
-        else:
-            observation_shape = (num_parameters - 1,)
-        super().__init__(num_parameters=num_parameters,
-                         observation_shape=observation_shape,
-                         **kwargs)
-
-    # Magic methods --------------------------------------------------------------------------------
-    def __repr__(self) -> str:
-        return (f"{type(self).__name__}(shape={self.shape}, "
-                f"num_parameters={self.num_parameters})")
+    alpha_minus_one: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
+    def shape(self) -> Shape:
+        return self.alpha_minus_one.shape[:-1]
+
+    def log_normalizer(self) -> RealArray:
+        q = self.alpha_minus_one
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
                 - jss.gammaln(jnp.sum(q, axis=-1) + q.shape[-1]))
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        return (jss.digamma(q + 1.0)
-                - jss.digamma(jnp.sum(q, axis=-1, keepdims=True) + q.shape[-1]))
+    def to_exp(self) -> DirichletEP:
+        q = self.alpha_minus_one
+        return DirichletEP(jss.digamma(q + 1.0)
+                           - jss.digamma(jnp.sum(q, axis=-1, keepdims=True) + q.shape[-1]))
 
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        if self.num_parameters == 2:
-            return jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1)
+    def carrier_measure(self, x: RealArray) -> RealArray:
+        return jnp.zeros(x.shape[:len(x.shape) - len(self.observation_shape())])
+
+    def sufficient_statistics(self, x: RealArray) -> DirichletEP:
+        if self.observation_shape() == ():
+            return DirichletEP(jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1))
         one_minus_total_x = 1.0 - jnp.sum(x, axis=-1, keepdims=True)
-        return jnp.append(jnp.log(x), jnp.log(one_minus_total_x), axis=-1)
+        return DirichletEP(jnp.append(jnp.log(x), jnp.log(one_minus_total_x), axis=-1))
+
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        yield 1
+
+    # New methods ----------------------------------------------------------------------------------
+    def observation_shape(self) -> Shape:
+        if self.alpha_minus_one.shape[-1] <= 1:
+            raise ValueError
+        if self.alpha_minus_one.shape[-1] == 2:
+            return ()
+        return (self.alpha_minus_one.shape[-1],)
+
+
+@dataclass
+class DirichletEP(ExpToNat[DirichletNP]):
+
+    mean_log_probability: RealArray  # digamma(alpha_i) - digamma(sum_i alpha_i)
+
+    # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.mean_log_probability.shape[:-1]
+
+    def expected_carrier_measure(self) -> RealArray:
+        return jnp.zeros(self.shape())
 
     # Overridden methods ---------------------------------------------------------------------------
-    def exp_to_nat_transform_q(self, transformed_q: Array) -> Array:
+    @classmethod
+    def unflatten_natural(cls, flattened_natural: Array) -> DirichletNP:
         # Run Newton's method on the whole real line.
-        return softplus(transformed_q) - 1.0
+        return DirichletNP(softplus(flattened_natural) - 1.0)
 
-
-class Beta(Dirichlet):
-    """
-    The Beta distribution.
-
-    The best way to interpret the parameters of the beta distribution are that an observation x in
-    [0, 1] represents the Bernoulli probability that outcome 0 (out of {0, 1}) is realized.  In this
-    way, the Beta class coincides with a special case of the Dirichlet class.
-    """
-
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(num_parameters=2, **kwargs)
+    def flatten_expectation(self) -> Array:
+        return self.mean_log_probability

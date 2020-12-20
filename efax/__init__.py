@@ -1,9 +1,8 @@
-"""
-This package provides various exponential family probability distributions.
-"""
 from .bernoulli import *
+from .beta import *
 from .chi_square import *
 from .complex_normal import *
+from .conjugate_prior import *
 from .dirichlet import *
 from .exponential import *
 from .exponential_family import *

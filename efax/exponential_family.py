@@ -1,36 +1,19 @@
 from __future__ import annotations
 
-from abc import abstractmethod
-from functools import partial
-from typing import Any, Optional, Tuple
+from functools import reduce
+from typing import Any, Generic, Iterable, Tuple, Type, TypeVar, final, get_type_hints
 
 from chex import Array
 from jax import numpy as jnp
-from tjax import RealArray, Shape, custom_jvp, jit
+from tjax import RealArray, Shape, custom_jvp, field_values, jit
 
-__all__ = ['ExponentialFamily']
+__all__ = ['NaturalParametrization', 'ExpectationParametrization']
 
 
-class ExponentialFamily:
+EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
 
-    """
-    An Exponential family distribution.
-    """
 
-    def __init__(self,
-                 *,
-                 num_parameters: int,
-                 shape: Shape = (),
-                 observation_shape: Shape = ()):
-        """
-        Args:
-            num_parameters: The number of parameters of the exponential family.
-            shape: The shape of this object.
-            observation_shape: The shape of an observation.
-        """
-        self.num_parameters = num_parameters
-        self.shape = shape
-        self.observation_shape = observation_shape
+class JitMethods:
 
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls) -> None:
@@ -48,178 +31,160 @@ class ExponentialFamily:
                      'expected_carrier_measure',
                      'pdf']:
             super_cls = super(cls, cls)
+            if not hasattr(cls, name):
+                continue
             original_method = getattr(cls, name)
             if hasattr(super_cls, name) and getattr(super_cls, name) is original_method:
                 continue  # We only need to jit new methods.
-            method = jit(original_method, static_argnums=(0,))
+            method = jit(original_method)
             setattr(cls, f'_original_{name}', method)
 
             if name != 'log_normalizer':
                 setattr(cls, name, method)
                 continue
 
-            method_jvp: Any = custom_jvp(method, static_argnums=(0,))
+            method_jvp: Any = custom_jvp(method)
 
-            def ln_jvp(self: ExponentialFamily,
-                       primals: Tuple[Array],
-                       tangents: Tuple[Array]) -> Tuple[Array, Array]:
+            def ln_jvp(primals: Tuple[NaturalParametrization[Any]],
+                       tangents: Tuple[NaturalParametrization[Any]]) -> Tuple[RealArray, RealArray]:
                 q, = primals
                 q_dot, = tangents
-                y = self.log_normalizer(q)
-                y_dot = jnp.sum(self.nat_to_exp(q) * q_dot, axis=-1)
-                return y, y_dot.real
+                y = q.log_normalizer()
+                p = q.to_exp()
+                y_dot = tree_dot_final(q_dot, p)
+                return y, y_dot
 
             method_jvp.defjvp(ln_jvp)
 
             setattr(cls, name, method_jvp)
 
-            # def method_fwd(self: ExponentialFamily, q: Array) -> Tuple[Array, Tuple[Array]]:
-            #     return self.log_normalizer(q), (self.nat_to_exp(q),)
-            #
-            # def method_bwd(self: ExponentialFamily,
-            #                residuals: Tuple[Array],
-            #                y_bar: Array) -> Tuple[Array]:
-            #     exp_parameters, = residuals
-            #     return (y_bar * exp_parameters,)
-            #
-            # method.defvjp(method_fwd, method_bwd)
 
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}(shape={self.shape})"
+def dot_final(x: Array, y: Array, n_axes: int) -> RealArray:
+    """
+    Returns the real component of the dot product of the final n_axes axes of two arrays.
+    """
+    axes = tuple(range(-n_axes, 0))
+    return jnp.real(jnp.sum(x * y, axis=axes))
 
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        return (self.num_parameters == other.num_parameters
-                and self.shape == other.shape
-                and self.observation_shape == other.observation_shape)
 
-    def __ne__(self, other: Any) -> bool:
-        return not self.__eq__(other)
+def tree_dot_final(x: NaturalParametrization[Any], y: Any) -> RealArray:
+    def dotted_fields() -> Iterable[Array]:
+        for xf, yf, n_axes in zip(field_values(x, static=False),
+                                  field_values(y, static=False),
+                                  x.field_axes()):
+            yield dot_final(xf, yf, n_axes)
+    return reduce(jnp.add, dotted_fields())
 
-    def __hash__(self) -> int:
-        return hash((self.num_parameters,
-                     self.shape,
-                     self.observation_shape))
 
+class NaturalParametrization(JitMethods, Generic[EP]):
+    """
+    The natural parametrization of an exponential family distribution.
+    """
     # Abstract methods -----------------------------------------------------------------------------
-    @abstractmethod
-    def log_normalizer(self, q: Array) -> RealArray:
+    def shape(self) -> Shape:
+        raise NotImplementedError
+
+    def log_normalizer(self) -> RealArray:
         """
-        Args:
-            q: The natural parameters having shape self.shape_including_parameters().
-        Returns: The log-normalizer having shape self.shape.
+        Returns: The log-normalizer.
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def nat_to_exp(self, q: Array) -> Array:
+    def to_exp(self) -> EP:
         """
-        Args:
-            q: The natural parameters having shape self.shape_including_parameters().
-        Returns: The corresponding expectation parameters having shape
-            self.shape_including_parameters().
+        Returns: The corresponding expectation parameters.
         """
         raise NotImplementedError
-
-    @abstractmethod
-    def exp_to_nat(self, p: Array) -> Array:
-        """
-        Args:
-            q: The expectation parameters having shape self.shape_including_parameters().
-        Returns: The corresponding natural parameters having shape
-            self.shape_including_parameters().
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def sufficient_statistics(self, x: Array) -> Array:
-        """
-        Args:
-            x: The sample having shape self.shape_including_observations().
-        Returns: The corresponding sufficient statistics having shape
-            self.shape_including_parameters().
-        """
-        raise NotImplementedError
-
-    # New methods ----------------------------------------------------------------------------------
-    def shape_including_parameters(self) -> Shape:
-        return (*self.shape, self.num_parameters)
-
-    def shape_including_observations(self) -> Shape:
-        return (*self.shape, *self.observation_shape)
-
-    @partial(jit, static_argnums=(0,))
-    def cross_entropy(self, p: Array, q: Array) -> RealArray:
-        """
-        Args:
-            p: The expectation parameters of the observation having shape
-                self.shape_including_parameters().
-            q: The natural parameters of the prediction having shape
-                self.shape_including_parameters().
-        Returns:
-            The cross entropy having shape self.shape.
-        """
-        p_dot_q = jnp.sum(p * q, axis=-1).real
-        return (-p_dot_q
-                + self.log_normalizer(q)
-                - self.expected_carrier_measure(p))
-
-    @partial(jit, static_argnums=(0,))
-    def entropy(self, q: Array) -> RealArray:
-        """
-        Args:
-            q: The natural parameters of the prediction having shape
-                self.shape_including_parameters().
-        Returns: The entropy having shape self.shape.
-        """
-        return self.cross_entropy(self.nat_to_exp(q), q)
-
-    @partial(jit, static_argnums=(0,))
-    def pdf(self, q: Array, x: Array) -> RealArray:
-        """
-        Args:
-            q: The natural parameters of a distribution having shape
-                self.shape_including_parameters().
-            x: The sample having shape self.shape_including_observations().
-        Returns: The distribution's density or mass function at x having shape self.shape.
-        """
-        tx = self.sufficient_statistics(x)
-        tx_dot_q = jnp.real(jnp.sum(tx * q, axis=-1))
-        return jnp.exp(tx_dot_q
-                       - self.log_normalizer(q)
-                       + self.carrier_measure(x))
 
     def carrier_measure(self, x: Array) -> RealArray:
         """
         Args:
-            x: The sample having shape self.shape_including_observations().
-        Returns: The corresponding carrier measure having shape self.shape.
+            x: The sample.
+        Returns: The corresponding carrier measure, which is typically jnp.zeros(x.shape[:-1]).
         """
-        shape = x.shape[: len(x.shape) - len(self.observation_shape)]
-        return jnp.zeros(shape)
+        raise NotImplementedError
 
-    # Work around decorators ruining the type annotation.
-    carrier_measure = jit(carrier_measure, static_argnums=(0,))
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        raise NotImplementedError
 
-    def expected_carrier_measure(self, p: Array) -> RealArray:
+    # Abstract class methods -----------------------------------------------------------------------
+    def sufficient_statistics(self, x: Array) -> EP:
         """
         Args:
-            p: The expectation parameters of a distribution having shape
-                self.shape_including_parameters().
-        Returns: The expected carrier measure of the distribution having shape self.shape.  This is
-            the missing term from the inner product between the observed distribution and the
-            predicted distribution.
+            x: The sample.
+        Returns: The corresponding sufficient statistics.
         """
-        # pylint: disable=unused-argument
-        shape = p.shape[: -1]
-        return jnp.zeros(shape)
-
-    # Work around decorators ruining the type annotation.
-    expected_carrier_measure = jit(expected_carrier_measure, static_argnums=(0,))
-
-    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
-        return None
-
-    def conjugate_prior_distribution(self, p: Array, n: Array) -> Array:
         raise NotImplementedError
+
+    # Final methods --------------------------------------------------------------------------------
+    @classmethod
+    def expectation_parametrization_cls(cls) -> Type[EP]:
+        return get_type_hints(cls.to_exp)['return']
+
+    @jit
+    @final
+    def entropy(self) -> RealArray:
+        """
+        Returns: The entropy.
+        """
+        return self.to_exp().cross_entropy(self)
+
+    @jit
+    @final
+    def pdf(self, x: Array) -> RealArray:
+        """
+        Args:
+            x: The sample.
+        Returns: The distribution's density or mass function at x.shape.
+        """
+        tx = self.sufficient_statistics(x)
+        return jnp.exp(tree_dot_final(self, tx)
+                       - self.log_normalizer()
+                       + self.carrier_measure(x))
+
+
+NP = TypeVar('NP', bound=NaturalParametrization[Any])
+
+
+class ExpectationParametrization(JitMethods, Generic[NP]):
+    """
+    The expectation parametrization of an exponential family distribution.  This class also doubles
+    as the sufficient statistics of an exponential family distribution.
+    """
+
+    # Abstract methods -----------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        raise NotImplementedError
+
+    def to_nat(self) -> NP:
+        """
+        Returns: The corresponding natural parameters.
+        """
+        raise NotImplementedError
+
+    def expected_carrier_measure(self) -> RealArray:
+        """
+        Returns: The expected carrier measure of the distribution.  This is the missing term from
+            the inner product between the observed distribution and the predicted distribution.
+            Often, it is just jnp.zeros(self.shape).
+        """
+        raise NotImplementedError
+
+    # Final methods --------------------------------------------------------------------------------
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[NP]:
+        return get_type_hints(cls.to_nat)['return']
+
+    @jit
+    @final
+    def cross_entropy(self, q: NP) -> RealArray:
+        """
+        Args:
+            q: The natural parameters of the prediction.
+        Returns:
+            The cross entropy.
+        """
+        return (-tree_dot_final(q, self)
+                + q.log_normalizer()
+                - self.expected_carrier_measure())

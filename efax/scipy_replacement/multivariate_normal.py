@@ -16,5 +16,6 @@ class ScipyMultivariateNormal(ss._multivariate.multivariate_normal_frozen):
             generator: Optional[Generator] = None) -> np.ndarray:
         retval = super().rvs(size=size, random_state=generator)
         if size == (1,):
+            assert False
             retval = retval.reshape((1, 2))
         return retval

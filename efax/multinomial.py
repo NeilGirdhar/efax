@@ -1,75 +1,94 @@
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import Iterable
 
 import numpy as np
 from jax import numpy as jnp
 from jax.scipy import special as jss
-from tjax import RealArray, Shape
+from tjax import RealArray, Shape, dataclass
 
-from .dirichlet import Dirichlet
-from .exponential_family import ExponentialFamily
+from .conjugate_prior import HasConjugatePrior
+from .dirichlet import DirichletNP
+from .exponential_family import NaturalParametrization
 
-__all__ = ['Multinomial']
+__all__ = ['MultinomialNP', 'MultinomialEP']
 
 
-class Multinomial(ExponentialFamily):
+@dataclass
+class MultinomialNP(NaturalParametrization['MultinomialEP']):
 
-    def __init__(self, *, num_parameters: int, **kwargs: Any) -> None:
-        if num_parameters < 0:
-            raise ValueError
-        observation_shape: Shape
-        if num_parameters == 1:
-            observation_shape = ()
-        else:
-            observation_shape = (num_parameters,)
-        super().__init__(num_parameters=num_parameters,
-                         observation_shape=observation_shape,
-                         **kwargs)
-
-    # Magic methods --------------------------------------------------------------------------------
-    def __repr__(self) -> str:
-        return (f"{type(self).__name__}(shape={self.shape}, "
-                f"num_parameters={self.num_parameters})")
+    log_odds: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
-    def log_normalizer(self, q: RealArray) -> RealArray:
-        max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
-        q_minus_max_q = q - max_q[..., np.newaxis]
+    def shape(self) -> Shape:
+        return self.log_odds.shape[:-1]
+
+    def log_normalizer(self) -> RealArray:
+        max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
+        q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return max_q + log_scaled_A
 
-    def nat_to_exp(self, q: RealArray) -> RealArray:
-        max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
-        q_minus_max_q = q - max_q[..., np.newaxis]
+    def to_exp(self) -> MultinomialEP:
+        max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
+        q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
-        return jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis])
+        return MultinomialEP(jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis]))
 
-    def exp_to_nat(self, p: RealArray) -> RealArray:
-        p_k = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
-        return jnp.log(p / p_k)
+    def carrier_measure(self, x: RealArray) -> RealArray:
+        return jnp.zeros(x.shape[:len(x.shape) - len(self.observation_shape())])
 
-    def sufficient_statistics(self, x: RealArray) -> RealArray:
-        return x
+    def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
+        if self.observation_shape() == ():
+            return MultinomialEP(x[..., np.newaxis])
+        return MultinomialEP(x)
+
+    @classmethod
+    def field_axes(cls) -> Iterable[int]:
+        yield 1
 
     # New methods ----------------------------------------------------------------------------------
-    @staticmethod
-    def nat_to_probability(q: RealArray) -> RealArray:
-        max_q = jnp.maximum(0.0, jnp.amax(q, axis=-1))
-        q_minus_max_q = q - max_q[..., np.newaxis]
+    def observation_shape(self) -> Shape:
+        if self.log_odds.shape[-1] == 0:
+            raise ValueError
+        if self.log_odds.shape[-1] == 1:
+            return ()
+        return self.log_odds.shape[-1]
+
+    def nat_to_probability(self) -> RealArray:
+        max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
+        q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         p = jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis])
         final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
         return jnp.append(p, final_p, axis=-1)
 
-    @staticmethod
-    def nat_to_surprisal(q: RealArray) -> RealArray:
-        total_p = Multinomial.nat_to_probability(q)
+    def nat_to_surprisal(self) -> RealArray:
+        total_p = self.nat_to_probability()
         return -jnp.log(total_p)
 
-    # Overridden methods ---------------------------------------------------------------------------
-    def conjugate_prior_family(self) -> Optional[ExponentialFamily]:
-        return Dirichlet(self.num_parameters + 1)
 
-    def conjugate_prior_distribution(self, p: RealArray, n: RealArray) -> RealArray:
+@dataclass
+class MultinomialEP(HasConjugatePrior[MultinomialNP]):
+
+    probability: RealArray
+
+    # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.probability.shape[:-1]
+
+    def to_nat(self) -> MultinomialNP:
+        p_k = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
+        return MultinomialNP(jnp.log(self.probability / p_k))
+
+    def expected_carrier_measure(self) -> RealArray:
+        return jnp.zeros(self.shape())
+
+    # Overridden methods ---------------------------------------------------------------------------
+    def conjugate_prior_distribution(self, n: RealArray) -> DirichletNP:
         reshaped_n = n[..., np.newaxis]
-        final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
-        return reshaped_n * jnp.append(p, final_p, axis=-1)
+        final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
+        return DirichletNP(reshaped_n * jnp.append(self.probability, final_p, axis=-1))
+
+    def conjugate_prior_observation(self) -> RealArray:
+        return self.probability if self.probability.shape[-1] > 1 else self.probability[..., 0]
