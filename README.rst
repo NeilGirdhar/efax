@@ -23,21 +23,21 @@ EFAX has a different representation.  Each :python:`ExponentialFamily` object en
 
     from jax import numpy as jnp
 
-    from efax import BernoulliNP, BernoulliEP
+    from efax import BernoulliEP, BernoulliNP
 
     # p is the expectation parameters of three Bernoulli distributions having probabilities 0.4, 0.5,
     # and 0.6.
-    p = BernoulliEP(jnp.array([[0.4], [0.5], [0.6]]))
+    p = BernoulliEP(jnp.array([0.4, 0.5, 0.6]))
 
     # q is the natural parameters of three Bernoulli distributions having log-odds 0, which is
     # probability 0.5.
-    q = BernoulliNP(jnp.zeros((3, 1)))
+    q = BernoulliNP(jnp.zeros(3))
 
     print(p.cross_entropy(q))
     # [0.6931472 0.6931472 0.6931472]
 
     # q2 is natural parameters of Bernoulli distributions having a probability of 0.3.
-    p2 = BernoulliEP(0.3 * jnp.ones((3, 1)))
+    p2 = BernoulliEP(0.3 * jnp.ones(3))
     q2 = p2.to_nat()
 
     print(p.cross_entropy(q2))
@@ -74,11 +74,11 @@ Thanks to JAX, any gradient of the cross entropy will automatically be as accura
 
     # some_p are expectation parameters of a Bernoulli distribution corresponding
     # to probability 0.4.
-    some_p = BernoulliEP(jnp.array([0.4]))
+    some_p = BernoulliEP(jnp.array(0.4))
 
     # some_q are natural parameters of a Bernoulli distribution corresponding to
     # log-odds 0, which is probability 0.5.
-    some_q = BernoulliNP(jnp.array([0.0]))
+    some_q = BernoulliNP(jnp.array(0.0))
 
     # Optimize the predictive distribution iteratively.
     print(lax.while_loop(cond_fun, body_fun, some_q))

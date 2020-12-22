@@ -21,11 +21,11 @@ def cond_fun(q):
 
 # some_p are expectation parameters of a Bernoulli distribution corresponding
 # to probability 0.4.
-some_p = BernoulliEP(jnp.array([0.4]))
+some_p = BernoulliEP(jnp.array(0.4))
 
 # some_q are natural parameters of a Bernoulli distribution corresponding to
 # log-odds 0, which is probability 0.5.
-some_q = BernoulliNP(jnp.array([0.0]))
+some_q = BernoulliNP(jnp.array(0.0))
 
 # Optimize the predictive distribution iteratively.
 print(lax.while_loop(cond_fun, body_fun, some_q))

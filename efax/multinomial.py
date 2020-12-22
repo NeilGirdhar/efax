@@ -36,11 +36,9 @@ class MultinomialNP(NaturalParametrization['MultinomialEP']):
         return MultinomialEP(jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis]))
 
     def carrier_measure(self, x: RealArray) -> RealArray:
-        return jnp.zeros(x.shape[:len(x.shape) - len(self.observation_shape())])
+        return jnp.zeros(x.shape[:-1])
 
     def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
-        if self.observation_shape() == ():
-            return MultinomialEP(x[..., np.newaxis])
         return MultinomialEP(x)
 
     @classmethod
@@ -48,13 +46,6 @@ class MultinomialNP(NaturalParametrization['MultinomialEP']):
         yield 1
 
     # New methods ----------------------------------------------------------------------------------
-    def observation_shape(self) -> Shape:
-        if self.log_odds.shape[-1] == 0:
-            raise ValueError
-        if self.log_odds.shape[-1] == 1:
-            return ()
-        return self.log_odds.shape[-1]
-
     def nat_to_probability(self) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
@@ -91,4 +82,4 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
         return DirichletNP(reshaped_n * jnp.append(self.probability, final_p, axis=-1))
 
     def conjugate_prior_observation(self) -> RealArray:
-        return self.probability if self.probability.shape[-1] > 1 else self.probability[..., 0]
+        return self.probability

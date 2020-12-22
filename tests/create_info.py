@@ -22,10 +22,10 @@ def dirichlet_parameter_generator(n: int, rng: Generator, shape: Shape) -> np.nd
 
 class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP]):
     def exp_to_scipy_distribution(self, p: BernoulliEP) -> Any:
-        return ss.bernoulli(p.probability[..., 0])
+        return ss.bernoulli(p.probability)
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> BernoulliEP:
-        return BernoulliEP(rng.uniform(size=(*shape, 1)))
+        return BernoulliEP(rng.uniform(size=shape))
 
 
 class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP]):
