@@ -29,7 +29,7 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
         k = eta.shape[-1]
         h_inv = jnp.linalg.inv(self.negative_half_precision)
         a = jnp.einsum("...i,...ij,...j", eta, h_inv, eta)
-        s, ld = jnp.linalg.slogdet(-self.negative_half_precision)
+        _, ld = jnp.linalg.slogdet(-self.negative_half_precision)
         return -0.25 * a - 0.5 * ld + 0.5 * k * jnp.log(np.pi)
 
     def to_exp(self) -> MultivariateNormalEP:
@@ -40,10 +40,10 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
         return MultivariateNormalEP(mean, second_moment)
 
     def carrier_measure(self, x: RealArray) -> RealArray:
-        return jnp.zeros(x.shape)
+        return jnp.zeros(x.shape[:-1])
 
     def sufficient_statistics(self, x: RealArray) -> MultivariateNormalEP:
-        return MultivariateNormalEP(x, jnp.square(x))
+        return MultivariateNormalEP(x, _broadcasted_outer(x))
 
     @classmethod
     def field_axes(cls) -> Iterable[int]:
@@ -61,9 +61,13 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP]):
         return self.mean.shape[:-1]
 
     def to_nat(self) -> MultivariateNormalNP:
-        variance = self.second_moment - _broadcasted_outer(self.mean)
-        inv_variance = jnp.linalg.inv(variance)
-        return MultivariateNormalNP(self.mean * inv_variance, -0.5 * inv_variance)
+        precision = jnp.linalg.inv(self.variance())
+        mean_times_precision = jnp.einsum("...ij,...j->...i", precision, self.mean)
+        return MultivariateNormalNP(mean_times_precision, -0.5 * precision)
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
+
+    # New methods ----------------------------------------------------------------------------------
+    def variance(self) -> RealArray:
+        return self.second_moment - _broadcasted_outer(self.mean)

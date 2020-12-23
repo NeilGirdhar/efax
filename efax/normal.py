@@ -51,8 +51,11 @@ class NormalEP(ExpectationParametrization[NormalNP]):
         return self.mean.shape
 
     def to_nat(self) -> NormalNP:
-        variance = self.second_moment - jnp.square(self.mean)
-        return NormalNP(self.mean / variance, -0.5 / variance)
+        return NormalNP(self.mean / self.variance(), -0.5 / self.variance())
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
+
+    # New methods ----------------------------------------------------------------------------------
+    def variance(self) -> RealArray:
+        return self.second_moment - jnp.square(self.mean)

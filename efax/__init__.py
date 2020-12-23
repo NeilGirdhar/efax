@@ -9,6 +9,7 @@ from .exponential_family import *
 from .gamma import *
 from .logarithmic import *
 from .multinomial import *
+from .multivariate_normal import *
 from .negative_binomial import *
 from .normal import *
 from .normal_unit_variance import *

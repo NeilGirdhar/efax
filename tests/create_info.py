@@ -8,9 +8,9 @@ from tjax import Shape
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiSquareEP, ChiSquareNP,
                   ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP,
                   ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, LogarithmicEP,
-                  LogarithmicNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP,
-                  NormalUnitVarianceEP, NormalUnitVarianceNP, PoissonEP, PoissonNP,
-                  ScipyComplexNormal, ScipyDirichlet, VonMisesEP, VonMisesNP)
+                  LogarithmicNP, MultivariateNormalEP, NegativeBinomialEP, NegativeBinomialNP,
+                  NormalEP, NormalNP, NormalUnitVarianceEP, NormalUnitVarianceNP, PoissonEP,
+                  PoissonNP, ScipyComplexNormal, ScipyDirichlet, VonMisesEP, VonMisesNP)
 
 from .distribution_info import DistributionInfo
 
@@ -69,8 +69,7 @@ class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP]):
 
 class NormalInfo(DistributionInfo[NormalNP, NormalEP]):
     def exp_to_scipy_distribution(self, p: NormalEP) -> Any:
-        variance = p.second_moment - np.square(p.mean)
-        return ss.norm(p.mean, np.sqrt(variance))
+        return ss.norm(p.mean, np.sqrt(p.variance()))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NormalEP:
         mean = rng.normal(scale=4.0, size=shape)
@@ -89,6 +88,32 @@ class NormalUnitVarianceInfo(DistributionInfo[NormalUnitVarianceNP, NormalUnitVa
         if shape != ():
             raise ValueError
         return NormalUnitVarianceEP(rng.normal(size=(*shape, self.num_parameters)))
+
+    def supports_shape(self) -> bool:
+        return False
+
+
+class MultivariateNormalInfo(DistributionInfo[NormalUnitVarianceNP, MultivariateNormalEP]):
+    def __init__(self, num_parameters: int):
+        self.num_parameters = num_parameters
+
+    def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
+        # Correct numerical errors introduced by various conversions.
+        covariance = np.tril(p.variance()) + np.triu(p.variance().T, 1)
+        return ss.multivariate_normal(mean=p.mean, cov=covariance)
+
+    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateNormalEP:
+        if shape != ():
+            raise ValueError
+        if self.num_parameters == 1:
+            covariance = rng.exponential()
+        else:
+            eigenvalues = rng.exponential(size=self.num_parameters) + 1.0
+            eigenvalues /= np.mean(eigenvalues)
+            covariance = ss.random_correlation.rvs(eigenvalues, random_state=rng)
+        mean = rng.normal(size=(*shape, self.num_parameters))
+        second_moment = covariance + np.multiply.outer(mean, mean)
+        return MultivariateNormalEP(mean, second_moment)
 
     def supports_shape(self) -> bool:
         return False
@@ -190,6 +215,7 @@ def create_infos() -> List[DistributionInfo]:
 
     # Continuous
     normal = NormalInfo()
+    multivariate_normal = MultivariateNormalInfo(num_parameters=2)
     normal_unit_variance = NormalUnitVarianceInfo(num_parameters=5)
     complex_normal = ComplexNormalInfo()
     exponential = ExponentialInfo()
@@ -200,4 +226,5 @@ def create_infos() -> List[DistributionInfo]:
     chi_square = ChiSquareInfo()
 
     return [bernoulli, beta, chi_square, complex_normal, dirichlet, exponential, gamma, geometric,
-            logarithmic, negative_binomial, normal, normal_unit_variance, poisson, von_mises]
+            logarithmic, multivariate_normal, negative_binomial, normal, normal_unit_variance,
+            poisson, von_mises]

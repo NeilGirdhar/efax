@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, TypeVar
+from typing import Any, Callable, Generic, TypeVar
 
 import numpy as np
 from jax.dtypes import canonicalize_dtype
@@ -15,8 +15,8 @@ def canonicalize_tree(tree: Any) -> Any:
     return tree_map(lambda array: array.astype(canonicalize_dtype(array.dtype)), tree)
 
 
-NP = TypeVar('NP', bound=NaturalParametrization)
-EP = TypeVar('EP', bound=ExpectationParametrization)
+NP = TypeVar('NP', bound=NaturalParametrization[Any])
+EP = TypeVar('EP', bound=ExpectationParametrization[Any])
 
 
 class DistributionInfo(Generic[NP, EP]):
@@ -65,7 +65,7 @@ class DistributionInfo(Generic[NP, EP]):
 
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls, **kwargs: Any) -> None:
-        super().__init_subclass__(**kwargs)
+        super().__init_subclass__(**kwargs)  # type: ignore
 
         if (cls.exp_to_scipy_distribution is DistributionInfo.exp_to_scipy_distribution
                 and cls.nat_to_scipy_distribution is DistributionInfo.nat_to_scipy_distribution):
@@ -79,10 +79,9 @@ class DistributionInfo(Generic[NP, EP]):
                        'scipy_to_exp_family_observation']:
             old_method = getattr(cls, method)
 
-            def new_method(*args: Any, old_method=old_method, **kwargs: Any) -> np.ndarray:
+            def new_method(*args: Any,
+                           old_method: Callable[..., Any] = old_method,
+                           **kwargs: Any) -> np.ndarray:
                 return canonicalize_tree(old_method(*args, **kwargs))
 
             setattr(cls, method, new_method)
-
-    def __repr__(self) -> str:
-        return f"DistributionInfo({self.exp_family})"
