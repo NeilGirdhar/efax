@@ -10,9 +10,9 @@ from .gamma import *
 from .logarithmic import *
 from .multinomial import *
 from .multivariate_normal import *
+from .multivariate_unit_normal import *
 from .negative_binomial import *
 from .normal import *
-from .normal_unit_variance import *
 from .poisson import *
 from .scipy_replacement import *
 from .von_mises import *

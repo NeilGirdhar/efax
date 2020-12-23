@@ -6,15 +6,16 @@ from typing import Iterable
 from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
-from .multivariate_normal import MultivariateNormalNP
 from .conjugate_prior import HasConjugatePrior
-from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .exponential_family import NaturalParametrization
+from .multivariate_normal import MultivariateNormalNP
+from .normal import NormalNP
 
-__all__ = ['NormalUnitVarianceNP', 'NormalUnitVarianceEP']
+__all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 
 @dataclass
-class NormalUnitVarianceNP(NaturalParametrization['NormalUnitVarianceEP']):
+class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP']):
     """
     The multivariate normal distribution with unit variance.  This is a curved exponential family.
     """
@@ -29,15 +30,15 @@ class NormalUnitVarianceNP(NaturalParametrization['NormalUnitVarianceEP']):
         return 0.5 * (jnp.sum(jnp.square(self.mean), axis=-1)
                       + num_parameters * math.log(math.pi * 2.0))
 
-    def to_exp(self) -> NormalUnitVarianceEP:
-        return NormalUnitVarianceEP(self.mean)
+    def to_exp(self) -> MultivariateUnitNormalEP:
+        return MultivariateUnitNormalEP(self.mean)
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         # The second moment of a delta distribution at x.
         return -0.5 * jnp.sum(jnp.square(x), axis=-1)
 
-    def sufficient_statistics(self, x: RealArray) -> NormalUnitVarianceEP:
-        return NormalUnitVarianceEP(x)
+    def sufficient_statistics(self, x: RealArray) -> MultivariateUnitNormalEP:
+        return MultivariateUnitNormalEP(x)
 
     @classmethod
     def field_axes(cls) -> Iterable[int]:
@@ -45,15 +46,15 @@ class NormalUnitVarianceNP(NaturalParametrization['NormalUnitVarianceEP']):
 
 
 @dataclass
-class NormalUnitVarianceEP(HasConjugatePrior[NormalUnitVarianceNP]):
+class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP]):
     mean: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
-    def to_nat(self) -> NormalUnitVarianceNP:
-        return NormalUnitVarianceNP(self.mean)
+    def to_nat(self) -> MultivariateUnitNormalNP:
+        return MultivariateUnitNormalNP(self.mean)
 
     def expected_carrier_measure(self) -> RealArray:
         num_parameters = self.mean.shape[-1]
@@ -70,5 +71,5 @@ class NormalUnitVarianceEP(HasConjugatePrior[NormalUnitVarianceNP]):
                                                    self.shape() + (num_parameters, num_parameters))
         return MultivariateNormalNP(n * self.mean, negative_half_precision)
 
-    def conjugate_prior_observation(self) -> Array:
+    def conjugate_prior_observation(self) -> RealArray:
         return self.mean

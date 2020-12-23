@@ -8,8 +8,8 @@ from tjax import Shape
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiSquareEP, ChiSquareNP,
                   ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP,
                   ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, LogarithmicEP,
-                  LogarithmicNP, MultivariateNormalEP, MultivariateStandardNormalEP,
-                  MultivariateStandardNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
+                  LogarithmicNP, MultivariateNormalEP, MultivariateUnitNormalEP,
+                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
                   NormalNP, PoissonEP, PoissonNP, ScipyComplexNormal, ScipyDirichlet,
                   VonMisesFisherEP, VonMisesFisherNP)
 
@@ -78,23 +78,23 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP]):
         return NormalEP(mean, mean ** 2 + variance)
 
 
-class NormalUnitVarianceInfo(DistributionInfo[NormalUnitVarianceNP, NormalUnitVarianceEP]):
+class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP, MultivariateUnitNormalEP]):
     def __init__(self, num_parameters: int):
         self.num_parameters = num_parameters
 
-    def exp_to_scipy_distribution(self, p: NormalUnitVarianceEP) -> Any:
+    def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
         return ss.multivariate_normal(mean=p.mean)
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NormalUnitVarianceEP:
+    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateUnitNormalEP:
         if shape != ():
             raise ValueError
-        return NormalUnitVarianceEP(rng.normal(size=(*shape, self.num_parameters)))
+        return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.num_parameters)))
 
     def supports_shape(self) -> bool:
         return False
 
 
-class MultivariateNormalInfo(DistributionInfo[NormalUnitVarianceNP, MultivariateNormalEP]):
+class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, MultivariateNormalEP]):
     def __init__(self, num_parameters: int):
         self.num_parameters = num_parameters
 
@@ -217,7 +217,7 @@ def create_infos() -> List[DistributionInfo]:
     # Continuous
     normal = NormalInfo()
     multivariate_normal = MultivariateNormalInfo(num_parameters=2)
-    normal_unit_variance = NormalUnitVarianceInfo(num_parameters=5)
+    multivariate_unit_normal = MultivariateUnitNormalInfo(num_parameters=5)
     complex_normal = ComplexNormalInfo()
     exponential = ExponentialInfo()
     gamma = GammaInfo()
@@ -227,5 +227,5 @@ def create_infos() -> List[DistributionInfo]:
     chi_square = ChiSquareInfo()
 
     return [bernoulli, beta, chi_square, complex_normal, dirichlet, exponential, gamma, geometric,
-            logarithmic, multivariate_normal, negative_binomial, normal, normal_unit_variance,
-            poisson, von_mises]
+            logarithmic, multivariate_normal, multivariate_unit_normal, negative_binomial,
+            normal, poisson, von_mises]
