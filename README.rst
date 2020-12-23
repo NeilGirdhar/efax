@@ -16,8 +16,17 @@ For an explaination of the fundamental ideas behind this library, see our `overv
 
 Usage
 =====
-In SciPy, a distribution is represented by a single object, so a thousand distributions need a thousand objects.  Each object encodes the distribution family, and the parameters of the distribution.
-EFAX has a different representation.  Each :python:`ExponentialFamily` object encodes only the distribution family for many (say, one thousand) distributions.  The parameters of the distributions are passed in to various methods on the object to evaluate various things.  For example,
+In SciPy, a distribution is represented by a single object, so a thousand distributions need a thousand objects.  Each object encodes the distribution family, and the parameters of the distribution.  EFAX distribution objects use broadcasting to represent any number of distributions in a single object.
+
+Each exponential family distribution has two special parametrizations: the natural and the
+expectation parametrization.  (These are described in the overview pdf.)  Consequently, each
+distribution has two objects, one inheriting from :python:`NaturalParametrization` and one from :python:`ExpectationParametrization`.
+
+EFAX provides conversions between the two parametrizations, although it sometimes requires numerical
+optimization to convert from expectation parameters to natural ones.  JAX doesn't have numerical
+optimization yet, so this is done in scipy for now.
+
+Maximum likelihood estimation is just expectation over expectation parameters.  Models that combine independent predictors just sum natural parameters.  When we want to optimize such models, we just want to take the gradient of cross entropy with respect to predictions.  For example,
 
 .. code:: python
 
@@ -44,8 +53,6 @@ EFAX has a different representation.  Each :python:`ExponentialFamily` object en
     # [0.6955941  0.78032386 0.86505365]
     # A Bernoulli distribution with probability 0.3 predicts a Bernoulli observation with probability
     # 0.4 better than the other observations.
-
-With exponential families, maximum likelihood estimation is just expectation over expectation parameters.  Models that combine independent predictors just sum natural parameters.  When we want to optimize such models, we just want to take the gradient of cross entropy with respect to predictions.
 
 Thanks to JAX, any gradient of the cross entropy will automatically be as accurate and numerically stable as possible.  This is because the gradient of the cross entropy involves the gradient of the log-normalizer, which typically has a very nice form.  For example,
 
