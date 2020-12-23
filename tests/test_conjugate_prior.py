@@ -28,7 +28,6 @@ def test_conjugate_prior(generator: Generator, distribution_info: DistributionIn
         return
 
     # Find its conjugate prior at that point with many observations.
-    print(p)
     cp_q = p.conjugate_prior_distribution(n)
 
     assert cp_q.shape() == p.shape()
@@ -36,9 +35,13 @@ def test_conjugate_prior(generator: Generator, distribution_info: DistributionIn
     # Produce a copy of p that matches the conjugate prior distribution.
     cp_x = p.conjugate_prior_observation()
 
-    # Check the gradient of the density of the conjugate prior at p is zero.
-    density = vmap(vmap(grad(type(cp_q).pdf)))
+    # Produce a function that calculates the gradient of the density with respect to p.  Ensure that
+    # it is broadcasted according to the shape.
+    density_gradient = grad(type(cp_q).pdf, argnums=1)
+    for _ in range(len(shape)):
+        density_gradient = vmap(density_gradient)
 
-    derivative = density(cp_q, cp_x)
+    # Check the gradient of the density of the conjugate prior at p is zero.
+    derivative = density_gradient(cp_q, cp_x)
     zero_derivative = tree_map(jnp.zeros_like, derivative)
     assert_jax_allclose(derivative, zero_derivative, atol=1.5)

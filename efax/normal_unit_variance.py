@@ -6,6 +6,8 @@ from typing import Iterable
 from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
+from .multivariate_normal import MultivariateNormalNP
+from .conjugate_prior import HasConjugatePrior
 from .exponential_family import ExpectationParametrization, NaturalParametrization
 
 __all__ = ['NormalUnitVarianceNP', 'NormalUnitVarianceEP']
@@ -43,10 +45,13 @@ class NormalUnitVarianceNP(NaturalParametrization['NormalUnitVarianceEP']):
 
 
 @dataclass
-class NormalUnitVarianceEP(ExpectationParametrization[NormalUnitVarianceNP]):
+class NormalUnitVarianceEP(HasConjugatePrior[NormalUnitVarianceNP]):
     mean: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.mean.shape[:-1]
+
     def to_nat(self) -> NormalUnitVarianceNP:
         return NormalUnitVarianceNP(self.mean)
 
@@ -56,9 +61,14 @@ class NormalUnitVarianceEP(ExpectationParametrization[NormalUnitVarianceNP]):
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + num_parameters)
 
     # Overridden methods ---------------------------------------------------------------------------
-    # This is the multivariate normal.
-    # def conjugate_prior_distribution(self, n: RealArray) -> NormalNP:
-    #     return NormalNP(n * self.mean, -0.5 * n)
-    #
-    # def conjugate_prior_observation(self) -> Array:
-    #     return self.mean
+    def conjugate_prior_distribution(self, n: RealArray) -> NormalNP:
+        num_parameters = self.mean.shape[-1]
+        negative_half_precision = -0.5 * n * jnp.eye(num_parameters)
+        negative_half_precision = jnp.expand_dims(negative_half_precision,
+                                                  tuple(range(len(self.shape()))))
+        negative_half_precision = jnp.broadcast_to(negative_half_precision,
+                                                   self.shape() + (num_parameters, num_parameters))
+        return MultivariateNormalNP(n * self.mean, negative_half_precision)
+
+    def conjugate_prior_observation(self) -> Array:
+        return self.mean
