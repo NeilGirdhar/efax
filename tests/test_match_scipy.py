@@ -9,7 +9,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 
-from .create_info import ComplexNormalInfo, LogarithmicInfo, VonMisesInfo
+from .create_info import ComplexNormalInfo, LogarithmicInfo, VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 
@@ -17,7 +17,7 @@ def test_entropy(generator, distribution_info):
     """
     Test that the entropy calculation matches scipy's.
     """
-    if isinstance(distribution_info, (LogarithmicInfo, VonMisesInfo)):
+    if isinstance(distribution_info, (LogarithmicInfo, VonMisesFisherInfo)):
         return
     shape = (3, 2) if distribution_info.supports_shape() else ()
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
@@ -34,7 +34,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo):
     """
     Test that the density/mass function calculation matches scipy's.
     """
-    if isinstance(distribution_info, (LogarithmicInfo, VonMisesInfo)):
+    if isinstance(distribution_info, (LogarithmicInfo, VonMisesFisherInfo)):
         return
     for _ in range(10):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())

@@ -8,9 +8,10 @@ from tjax import Shape
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiSquareEP, ChiSquareNP,
                   ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP,
                   ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, LogarithmicEP,
-                  LogarithmicNP, MultivariateNormalEP, NegativeBinomialEP, NegativeBinomialNP,
-                  NormalEP, NormalNP, NormalUnitVarianceEP, NormalUnitVarianceNP, PoissonEP,
-                  PoissonNP, ScipyComplexNormal, ScipyDirichlet, VonMisesEP, VonMisesNP)
+                  LogarithmicNP, MultivariateNormalEP, MultivariateStandardNormalEP,
+                  MultivariateStandardNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
+                  NormalNP, PoissonEP, PoissonNP, ScipyComplexNormal, ScipyDirichlet,
+                  VonMisesFisherEP, VonMisesFisherNP)
 
 from .distribution_info import DistributionInfo
 
@@ -177,14 +178,14 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP]):
         return x[..., : -1]
 
 
-class VonMisesInfo(DistributionInfo[VonMisesNP, VonMisesEP]):
-    def nat_to_scipy_distribution(self, q: VonMisesNP) -> Any:
+class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP]):
+    def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
         return ss.vonmises(*q.nat_to_kappa_angle())
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> VonMisesNP:
+    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> VonMisesFisherNP:
         if shape != ():
             raise ValueError
-        return VonMisesNP(rng.normal(size=(*shape, 2), scale=4.0))
+        return VonMisesFisherNP(rng.normal(size=(*shape, 2), scale=4.0))
 
     def scipy_to_exp_family_observation(self, x: np.ndarray) -> np.ndarray:
         x = np.asarray(x)
@@ -222,7 +223,7 @@ def create_infos() -> List[DistributionInfo]:
     gamma = GammaInfo()
     beta = BetaInfo()
     dirichlet = DirichletInfo(5)
-    von_mises = VonMisesInfo()
+    von_mises = VonMisesFisherInfo()
     chi_square = ChiSquareInfo()
 
     return [bernoulli, beta, chi_square, complex_normal, dirichlet, exponential, gamma, geometric,

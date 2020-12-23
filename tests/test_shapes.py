@@ -6,7 +6,7 @@ from tjax import field_values
 
 from efax import NaturalParametrization
 
-from .create_info import VonMisesInfo
+from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 
@@ -14,7 +14,7 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     """
     Test that the methods produce the correct shapes.
     """
-    if isinstance(distribution_info, VonMisesInfo):
+    if isinstance(distribution_info, VonMisesFisherInfo):
         return
     shape = (3, 4) if distribution_info.supports_shape() else ()
 

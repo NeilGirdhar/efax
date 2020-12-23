@@ -13,7 +13,7 @@ from tjax import RealArray, Shape, dataclass
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
 
-__all__ = ['VonMisesFisherNP', 'VonMisesFisherEP', 'VonMisesNP', 'VonMisesEP']
+__all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 
 @dataclass
@@ -44,6 +44,17 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
 
     def sufficient_statistics(self, x: RealArray) -> VonMisesFisherEP:
         return VonMisesFisherEP(x)
+
+    # New methods ----------------------------------------------------------------------------------
+    def to_kappa_angle(self) -> Tuple[RealArray, RealArray]:
+        if self.mean_times_concentration.shape[-1] != 2:
+            raise ValueError
+        kappa = np.linalg.norm(self.mean_times_concentration, axis=-1)
+        angle = np.where(kappa == 0.0,
+                         0.0,
+                         np.arctan2(self.mean_times_concentration[..., 1],
+                                    self.mean_times_concentration[..., 0]))
+        return kappa, angle
 
 
 @dataclass
@@ -88,34 +99,6 @@ def inverse_softplus(y: Array) -> Array:
     return jnp.where(y > 80.0,
                      y,
                      jnp.log(jnp.expm1(y)))
-
-
-@dataclass
-class VonMisesNP(VonMisesFisherNP):
-
-    # Overridden methods ---------------------------------------------------------------------------
-    def to_exp(self) -> VonMisesEP:
-        return VonMisesEP(super().to_exp().mean)
-
-    def sufficient_statistics(self, x: RealArray) -> VonMisesFisherEP:
-        return VonMisesEP(super().sufficient_statistics(x).mean)
-
-    # New methods ----------------------------------------------------------------------------------
-    def nat_to_kappa_angle(self) -> Tuple[RealArray, RealArray]:
-        kappa = np.linalg.norm(self.mean_times_concentration, axis=-1)
-        angle = np.where(kappa == 0.0,
-                         0.0,
-                         np.arctan2(self.mean_times_concentration[..., 1],
-                                    self.mean_times_concentration[..., 0]))
-        return kappa, angle
-
-
-@dataclass
-class VonMisesEP(VonMisesFisherEP):
-
-    # Overridden methods ---------------------------------------------------------------------------
-    def to_nat(self) -> VonMisesNP:
-        return VonMisesNP(super().to_nat().mean_times_concentration)
 
 
 # Private functions --------------------------------------------------------------------------------

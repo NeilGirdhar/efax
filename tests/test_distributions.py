@@ -6,7 +6,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose, field_values
 
-from .create_info import VonMisesInfo
+from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 # TODO: Block VonMises until https://github.com/google/jax/issues/2466 is resolved.
@@ -16,7 +16,7 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo) -
     """
     Test that the conversion between the different parametrizations are consistent.
     """
-    if isinstance(distribution_info, VonMisesInfo):
+    if isinstance(distribution_info, VonMisesFisherInfo):
         return
 
     for _ in range(10):
@@ -32,7 +32,7 @@ def test_gradient_log_normalizer(generator: Generator, distribution_info: Distri
     Tests that the gradient log-normalizer evaluates to the same as the gradient of the
     log-normalizer.
     """
-    if isinstance(distribution_info, VonMisesInfo):
+    if isinstance(distribution_info, VonMisesFisherInfo):
         return
 
     # pylint: disable=protected-access

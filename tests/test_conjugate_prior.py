@@ -1,3 +1,5 @@
+from typing import Any
+
 from jax import grad
 from jax import numpy as jnp
 from jax import vmap
@@ -7,15 +9,16 @@ from tjax import assert_jax_allclose
 
 from efax import HasConjugatePrior
 
-from .create_info import VonMisesInfo
+from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 
-def test_conjugate_prior(generator: Generator, distribution_info: DistributionInfo) -> None:
+def test_conjugate_prior(generator: Generator,
+                         distribution_info: DistributionInfo[Any, Any]) -> None:
     """
     Test that the conjugate prior actually matches the distribution.
     """
-    if isinstance(distribution_info, VonMisesInfo):
+    if isinstance(distribution_info, VonMisesFisherInfo):
         return
 
     shape = (4, 3) if distribution_info.supports_shape() else ()
