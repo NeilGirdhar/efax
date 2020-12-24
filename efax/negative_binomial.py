@@ -38,6 +38,9 @@ class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
     mean: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.mean.shape
+
     def expected_carrier_measure(self) -> RealArray:
         if self.failures == 1:
             shape = self.mean.shape

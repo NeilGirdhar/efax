@@ -2,9 +2,8 @@ from typing import Any
 
 import numpy as np
 from numpy.random import Generator
-from tjax import field_names_values_metadata
 
-from efax import NaturalParametrization
+from efax import NaturalParametrization, parameter_names_values_axes
 
 from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
@@ -25,10 +24,7 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
     def check(np: NaturalParametrization, z: Any) -> None:
-        for _, xf, m in field_names_values_metadata(z, static=False):
-            n_axes = m['axes']
-            if not isinstance(n_axes, int):
-                raise TypeError
+        for _, xf, n_axes in parameter_names_values_axes(z):
             assert xf.shape[:len(xf.shape) - n_axes] == shape
 
     check(q, q)

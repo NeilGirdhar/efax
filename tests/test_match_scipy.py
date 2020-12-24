@@ -23,10 +23,11 @@ def test_entropy(generator, distribution_info):
     shape = (3, 2) if distribution_info.supports_shape() else ()
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
+    rtol = 3e-4 if isinstance(distribution_info, ComplexNormalInfo) else 1.5e-5
     try:
         my_entropy = nat_parameters.entropy()
         scipy_entropy = scipy_distribution.entropy()
-        assert_allclose(my_entropy, scipy_entropy, rtol=1.5e-5)
+        assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
     except NotImplementedError:
         pass
 

@@ -100,7 +100,6 @@ class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP]
         self.num_parameters = num_parameters
 
     def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
-        print(p.mean, np.eye(self.num_parameters) * p.variance(), p)
         return ss.multivariate_normal(mean=p.mean, cov=np.eye(self.num_parameters) * p.variance())
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> IsotropicNormalEP:
@@ -147,7 +146,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP]):
                                   p.pseudo_second_moment - np.square(p.mean))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> ComplexNormalEP:
-        mean = rng.normal(size=shape) + 1j * rng.normal()
+        mean = rng.normal(size=shape) + 1j * rng.normal(size=shape)
         variance = rng.exponential(size=shape)
         second_moment = mean.conjugate() * mean + variance
         pseudo_variance = (variance * rng.beta(2, 2, size=shape)
@@ -226,7 +225,7 @@ class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP]):
         return ChiSquareNP(rng.exponential(size=shape))
 
 
-def create_infos() -> List[DistributionInfo]:
+def create_infos() -> List[DistributionInfo[Any, Any]]:
     # Discrete
     bernoulli = BernoulliInfo()
     geometric = GeometricInfo()

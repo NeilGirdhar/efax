@@ -65,6 +65,9 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
     pseudo_second_moment: ComplexArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.mean.shape
+
     def to_nat(self) -> ComplexNormalNP:
         variance = self.second_moment - jnp.conj(self.mean) * self.mean
         pseudo_variance = self.pseudo_second_moment - jnp.square(self.mean)
