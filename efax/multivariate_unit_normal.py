@@ -8,8 +8,7 @@ from tjax import RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
 from .exponential_family import NaturalParametrization
-from .multivariate_normal import MultivariateNormalNP
-from .normal import NormalNP
+from .isotropic_normal import IsotropicNormalNP
 
 __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
@@ -62,14 +61,9 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP]):
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + num_parameters)
 
     # Overridden methods ---------------------------------------------------------------------------
-    def conjugate_prior_distribution(self, n: RealArray) -> NormalNP:
-        num_parameters = self.mean.shape[-1]
-        negative_half_precision = -0.5 * n * jnp.eye(num_parameters)
-        negative_half_precision = jnp.expand_dims(negative_half_precision,
-                                                  tuple(range(len(self.shape()))))
-        negative_half_precision = jnp.broadcast_to(negative_half_precision,
-                                                   self.shape() + (num_parameters, num_parameters))
-        return MultivariateNormalNP(n * self.mean, negative_half_precision)
+    def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
+        negative_half_precision = -0.5 * n * jnp.ones(self.shape())
+        return IsotropicNormalNP(n * self.mean, negative_half_precision)
 
     def conjugate_prior_observation(self) -> RealArray:
         return self.mean

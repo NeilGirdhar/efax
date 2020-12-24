@@ -9,7 +9,8 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 
-from .create_info import ComplexNormalInfo, LogarithmicInfo, VonMisesFisherInfo
+from .create_info import (ComplexNormalInfo, LogarithmicInfo, MultivariateNormalInfo,
+                          VonMisesFisherInfo)
 from .distribution_info import DistributionInfo
 
 
@@ -60,7 +61,7 @@ def test_maximum_likelihood_estimation(generator, distribution_info):
     if isinstance(distribution_info, LogarithmicInfo):
         return
     rtol = (8e-2
-            if isinstance(distribution_info, ComplexNormalInfo)
+            if isinstance(distribution_info, (ComplexNormalInfo, MultivariateNormalInfo))
             else 2e-2)
     some_nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())

@@ -7,11 +7,11 @@ from tjax import Shape
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiSquareEP, ChiSquareNP,
                   ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP,
-                  ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, LogarithmicEP,
-                  LogarithmicNP, MultivariateNormalEP, MultivariateUnitNormalEP,
-                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
-                  NormalNP, PoissonEP, PoissonNP, ScipyComplexNormal, ScipyDirichlet,
-                  VonMisesFisherEP, VonMisesFisherNP)
+                  ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP,
+                  IsotropicNormalNP, LogarithmicEP, LogarithmicNP, MultivariateNormalEP,
+                  MultivariateUnitNormalEP, MultivariateUnitNormalNP, NegativeBinomialEP,
+                  NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, ScipyComplexNormal,
+                  ScipyDirichlet, VonMisesFisherEP, VonMisesFisherNP)
 
 from .distribution_info import DistributionInfo
 
@@ -78,7 +78,8 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP]):
         return NormalEP(mean, mean ** 2 + variance)
 
 
-class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP, MultivariateUnitNormalEP]):
+class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
+                                                  MultivariateUnitNormalEP]):
     def __init__(self, num_parameters: int):
         self.num_parameters = num_parameters
 
@@ -89,6 +90,25 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Mult
         if shape != ():
             raise ValueError
         return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.num_parameters)))
+
+    def supports_shape(self) -> bool:
+        return False
+
+
+class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP]):
+    def __init__(self, num_parameters: int):
+        self.num_parameters = num_parameters
+
+    def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
+        print(p.mean, np.eye(self.num_parameters) * p.variance(), p)
+        return ss.multivariate_normal(mean=p.mean, cov=np.eye(self.num_parameters) * p.variance())
+
+    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> IsotropicNormalEP:
+        if shape != ():
+            raise ValueError
+        mean = rng.normal(size=(*shape, self.num_parameters))
+        total_variance = self.num_parameters * rng.exponential(size=shape)
+        return IsotropicNormalEP(mean, np.sum(np.square(mean)) + total_variance)
 
     def supports_shape(self) -> bool:
         return False
@@ -180,7 +200,7 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP]):
 
 class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP]):
     def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
-        return ss.vonmises(*q.nat_to_kappa_angle())
+        return ss.vonmises(*q.to_kappa_angle())
 
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> VonMisesFisherNP:
         if shape != ():
@@ -216,7 +236,8 @@ def create_infos() -> List[DistributionInfo]:
 
     # Continuous
     normal = NormalInfo()
-    multivariate_normal = MultivariateNormalInfo(num_parameters=2)
+    isotropic_normal = IsotropicNormalInfo(num_parameters=4)
+    multivariate_normal = MultivariateNormalInfo(num_parameters=4)
     multivariate_unit_normal = MultivariateUnitNormalInfo(num_parameters=5)
     complex_normal = ComplexNormalInfo()
     exponential = ExponentialInfo()
@@ -227,5 +248,5 @@ def create_infos() -> List[DistributionInfo]:
     chi_square = ChiSquareInfo()
 
     return [bernoulli, beta, chi_square, complex_normal, dirichlet, exponential, gamma, geometric,
-            logarithmic, multivariate_normal, multivariate_unit_normal, negative_binomial,
-            normal, poisson, von_mises]
+            isotropic_normal, logarithmic, multivariate_normal, multivariate_unit_normal,
+            negative_binomial, normal, poisson, von_mises]

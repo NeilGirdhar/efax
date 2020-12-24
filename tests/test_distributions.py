@@ -1,3 +1,5 @@
+from typing import Any
+
 from jax import grad, jit, jvp
 from jax import numpy as jnp
 from jax import vjp
@@ -12,7 +14,7 @@ from .distribution_info import DistributionInfo
 # TODO: Block VonMises until https://github.com/google/jax/issues/2466 is resolved.
 
 
-def test_conversion(generator: Generator, distribution_info: DistributionInfo) -> None:
+def test_conversion(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
     """
     Test that the conversion between the different parametrizations are consistent.
     """
@@ -24,10 +26,15 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo) -
         original_ep = distribution_info.exp_parameter_generator(generator, shape=shape)
         intermediate_np = original_ep.to_nat()
         final_ep = intermediate_np.to_exp()
-        assert_jax_allclose(original_ep, final_ep, rtol=1e-4)
+        try:
+            assert_jax_allclose(original_ep, final_ep, rtol=1e-4)
+        except AssertionError:
+            print(original_ep, intermediate_np, final_ep)
+            raise
 
 
-def test_gradient_log_normalizer(generator: Generator, distribution_info: DistributionInfo) -> None:
+def test_gradient_log_normalizer(generator: Generator,
+                                 distribution_info: DistributionInfo[Any, Any]) -> None:
     """
     Tests that the gradient log-normalizer evaluates to the same as the gradient of the
     log-normalizer.

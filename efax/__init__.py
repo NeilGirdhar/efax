@@ -7,6 +7,7 @@ from .dirichlet import *
 from .exponential import *
 from .exponential_family import *
 from .gamma import *
+from .isotropic_normal import *
 from .logarithmic import *
 from .multinomial import *
 from .multivariate_normal import *
