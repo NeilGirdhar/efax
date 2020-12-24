@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable, Optional
+from typing import Optional
 
 from chex import Array
 from jax import numpy as jnp
@@ -10,13 +10,14 @@ from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .exponential_family import NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['LogarithmicNP', 'LogarithmicEP']
 
 
 @dataclass
 class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
-    log_probability: RealArray
+    log_probability: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -38,14 +39,10 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
     def sufficient_statistics(self, x: RealArray) -> LogarithmicEP:
         return LogarithmicEP(x)
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 0
-
 
 @dataclass
 class LogarithmicEP(ExpToNat[LogarithmicNP]):
-    chi: RealArray  # - odds / log(1-p)
+    chi: RealArray = distribution_parameter(axes=0)  # - odds / log(1-p)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

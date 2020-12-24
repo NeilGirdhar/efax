@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
@@ -9,13 +7,14 @@ from tjax import RealArray, Shape, dataclass
 from .conjugate_prior import HasConjugatePrior
 from .exponential_family import NaturalParametrization
 from .gamma import GammaNP
+from .parameter import distribution_parameter
 
 __all__ = ['PoissonNP', 'PoissonEP']
 
 
 @dataclass
 class PoissonNP(NaturalParametrization['PoissonEP']):
-    log_mean: RealArray
+    log_mean: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -33,14 +32,10 @@ class PoissonNP(NaturalParametrization['PoissonEP']):
     def sufficient_statistics(self, x: RealArray) -> PoissonEP:
         return PoissonEP(x)
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 0
-
 
 @dataclass
 class PoissonEP(HasConjugatePrior[PoissonNP]):
-    mean: RealArray
+    mean: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

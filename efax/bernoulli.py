@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 import numpy as np
 from jax import numpy as jnp
 from jax.scipy import special as jss
@@ -10,14 +8,14 @@ from tjax import RealArray, Shape, dataclass
 from .beta import BetaNP
 from .conjugate_prior import HasConjugatePrior
 from .exponential_family import NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['BernoulliNP', 'BernoulliEP']
 
 
 @dataclass
 class BernoulliNP(NaturalParametrization['BernoulliEP']):
-
-    log_odds: RealArray
+    log_odds: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -35,10 +33,6 @@ class BernoulliNP(NaturalParametrization['BernoulliEP']):
     def sufficient_statistics(self, x: RealArray) -> BernoulliEP:
         return BernoulliEP(x)
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 0
-
     # New methods ----------------------------------------------------------------------------------
     def nat_to_probability(self) -> RealArray:
         p = jss.expit(self.log_odds)
@@ -52,8 +46,7 @@ class BernoulliNP(NaturalParametrization['BernoulliEP']):
 
 @dataclass
 class BernoulliEP(HasConjugatePrior[BernoulliNP]):
-
-    probability: RealArray
+    probability: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

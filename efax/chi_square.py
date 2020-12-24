@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from tjax import Array, RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .exponential_family import NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
@@ -18,7 +17,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
     The chi-square distribution with k degrees of freedom is the gamma distribution with shape k/2
     and rate 1/2.
     """
-    k_over_two_minus_one: RealArray
+    k_over_two_minus_one: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -38,14 +37,10 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
     def sufficient_statistics(self, x: RealArray) -> ChiSquareEP:
         return ChiSquareEP(jnp.log(x))
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 0
-
 
 @dataclass
 class ChiSquareEP(ExpToNat[ChiSquareNP]):
-    mean_log: RealArray
+    mean_log: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

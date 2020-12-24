@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
 
 from jax import numpy as jnp
 from tjax import Array, ComplexArray, RealArray, Shape, dataclass
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 
 @dataclass
 class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
-    mean_times_precision: ComplexArray
-    precision: ComplexArray
-    pseudo_precision: ComplexArray
+    mean_times_precision: ComplexArray = distribution_parameter(axes=0)
+    precision: ComplexArray = distribution_parameter(axes=0)
+    pseudo_precision: ComplexArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -57,18 +57,12 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
     def sufficient_statistics(self, x: Array) -> ComplexNormalEP:
         return ComplexNormalEP(x, jnp.conj(x) * x, jnp.square(x))
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 0
-        yield 0
-        yield 0
-
 
 @dataclass
 class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
-    mean: ComplexArray
-    second_moment: RealArray
-    pseudo_second_moment: ComplexArray
+    mean: ComplexArray = distribution_parameter(axes=0)
+    second_moment: RealArray = distribution_parameter(axes=0)
+    pseudo_second_moment: ComplexArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def to_nat(self) -> ComplexNormalNP:

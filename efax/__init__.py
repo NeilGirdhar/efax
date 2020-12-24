@@ -14,6 +14,7 @@ from .multivariate_normal import *
 from .multivariate_unit_normal import *
 from .negative_binomial import *
 from .normal import *
+from .parameter import *
 from .poisson import *
 from .scipy_replacement import *
 from .von_mises import *

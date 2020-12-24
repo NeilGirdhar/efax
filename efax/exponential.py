@@ -1,20 +1,19 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
 from .exponential_family import NaturalParametrization
 from .gamma import GammaNP
+from .parameter import distribution_parameter
 
 __all__ = ['ExponentialNP', 'ExponentialEP']
 
 
 @dataclass
 class ExponentialNP(NaturalParametrization['ExponentialEP']):
-    negative_rate: RealArray
+    negative_rate: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -32,14 +31,10 @@ class ExponentialNP(NaturalParametrization['ExponentialEP']):
     def sufficient_statistics(self, x: RealArray) -> ExponentialEP:
         return ExponentialEP(x)
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 0
-
 
 @dataclass
 class ExponentialEP(HasConjugatePrior[ExponentialNP]):
-    mean: RealArray
+    mean: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 import numpy as np
 from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['MultivariateNormalNP', 'MultivariateNormalEP']
 
@@ -17,8 +16,8 @@ def _broadcasted_outer(x: RealArray) -> RealArray:
 
 @dataclass
 class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
-    mean_times_precision: RealArray
-    negative_half_precision: RealArray
+    mean_times_precision: RealArray = distribution_parameter(axes=1)
+    negative_half_precision: RealArray = distribution_parameter(axes=2)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -45,16 +44,11 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
     def sufficient_statistics(self, x: RealArray) -> MultivariateNormalEP:
         return MultivariateNormalEP(x, _broadcasted_outer(x))
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 1
-        yield 2
-
 
 @dataclass
 class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP]):
-    mean: RealArray
-    second_moment: RealArray
+    mean: RealArray = distribution_parameter(axes=1)
+    second_moment: RealArray = distribution_parameter(axes=2)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

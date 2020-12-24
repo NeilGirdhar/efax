@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 from chex import Array
 from jax import numpy as jnp
 from jax.nn import softplus
@@ -10,14 +8,14 @@ from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .exponential_family import NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['DirichletNP', 'DirichletEP']
 
 
 @dataclass
 class DirichletNP(NaturalParametrization['DirichletEP']):
-
-    alpha_minus_one: RealArray
+    alpha_minus_one: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -42,10 +40,6 @@ class DirichletNP(NaturalParametrization['DirichletEP']):
         one_minus_total_x = 1.0 - jnp.sum(x, axis=-1, keepdims=True)
         return DirichletEP(jnp.append(jnp.log(x), jnp.log(one_minus_total_x), axis=-1))
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 1
-
     # New methods ----------------------------------------------------------------------------------
     def observation_shape(self) -> Shape:
         if self.alpha_minus_one.shape[-1] <= 1:
@@ -57,8 +51,7 @@ class DirichletNP(NaturalParametrization['DirichletEP']):
 
 @dataclass
 class DirichletEP(ExpToNat[DirichletNP]):
-
-    mean_log_probability: RealArray  # digamma(alpha_i) - digamma(sum_i alpha_i)
+    mean_log_probability: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

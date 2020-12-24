@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 import numpy as np
 from jax import numpy as jnp
 from jax.scipy import special as jss
@@ -10,14 +8,14 @@ from tjax import RealArray, Shape, dataclass
 from .conjugate_prior import HasConjugatePrior
 from .dirichlet import DirichletNP
 from .exponential_family import NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
 class MultinomialNP(NaturalParametrization['MultinomialEP']):
-
-    log_odds: RealArray
+    log_odds: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -41,10 +39,6 @@ class MultinomialNP(NaturalParametrization['MultinomialEP']):
     def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
         return MultinomialEP(x)
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 1
-
     # New methods ----------------------------------------------------------------------------------
     def nat_to_probability(self) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
@@ -61,8 +55,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP']):
 
 @dataclass
 class MultinomialEP(HasConjugatePrior[MultinomialNP]):
-
-    probability: RealArray
+    probability: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

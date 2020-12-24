@@ -5,7 +5,7 @@ from typing import Any, Generic, Iterable, Tuple, Type, TypeVar, final, get_type
 
 from chex import Array
 from jax import numpy as jnp
-from tjax import RealArray, Shape, custom_jvp, field_values, jit
+from tjax import RealArray, Shape, custom_jvp, field_names_values_metadata, field_values, jit
 
 __all__ = ['NaturalParametrization', 'ExpectationParametrization']
 
@@ -69,9 +69,11 @@ def dot_final(x: Array, y: Array, n_axes: int) -> RealArray:
 
 def tree_dot_final(x: NaturalParametrization[Any], y: Any) -> RealArray:
     def dotted_fields() -> Iterable[Array]:
-        for xf, yf, n_axes in zip(field_values(x, static=False),
-                                  field_values(y, static=False),
-                                  x.field_axes()):
+        for (_, xf, m), yf in zip(field_names_values_metadata(x, static=False),
+                                  field_values(y, static=False)):
+            n_axes = m['axes']
+            if not isinstance(n_axes, int):
+                raise TypeError
             yield dot_final(xf, yf, n_axes)
     return reduce(jnp.add, dotted_fields())
 
@@ -102,10 +104,6 @@ class NaturalParametrization(JitMethods, Generic[EP]):
             x: The sample.
         Returns: The corresponding carrier measure, which is typically jnp.zeros(x.shape[:-1]).
         """
-        raise NotImplementedError
-
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
         raise NotImplementedError
 
     # Abstract class methods -----------------------------------------------------------------------

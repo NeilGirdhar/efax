@@ -151,7 +151,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP]):
         variance = rng.exponential(size=shape)
         second_moment = mean.conjugate() * mean + variance
         pseudo_variance = (variance * rng.beta(2, 2, size=shape)
-                            * np.exp(1j * rng.uniform(0, 2 * np.pi, size=shape)))
+                           * np.exp(1j * rng.uniform(0, 2 * np.pi, size=shape)))
         pseudo_second_moment = np.square(mean) + pseudo_variance
         return ComplexNormalEP(mean, second_moment, pseudo_second_moment)
 

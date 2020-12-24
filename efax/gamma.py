@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
 
 import numpy as np
 import scipy
@@ -11,14 +10,15 @@ from scipy.special import polygamma
 from tjax import RealArray, Shape, dataclass
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['GammaNP', 'GammaEP']
 
 
 @dataclass
 class GammaNP(NaturalParametrization['GammaEP']):
-    negative_rate: RealArray
-    shape_minus_one: RealArray
+    negative_rate: RealArray = distribution_parameter(axes=0)
+    shape_minus_one: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -39,16 +39,11 @@ class GammaNP(NaturalParametrization['GammaEP']):
     def sufficient_statistics(self, x: RealArray) -> GammaEP:
         return GammaEP(x, jnp.log(x))
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 0
-        yield 0
-
 
 @dataclass
 class GammaEP(ExpectationParametrization[GammaNP]):
-    mean: RealArray
-    mean_log: RealArray  # digamma(k) - log(rate)
+    mean: RealArray = distribution_parameter(axes=0)
+    mean_log: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

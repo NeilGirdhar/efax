@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
 
 from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
@@ -9,6 +8,7 @@ from tjax import RealArray, Shape, dataclass
 from .conjugate_prior import HasConjugatePrior
 from .exponential_family import NaturalParametrization
 from .isotropic_normal import IsotropicNormalNP
+from .parameter import distribution_parameter
 
 __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
@@ -18,7 +18,7 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
     """
     The multivariate normal distribution with unit variance.  This is a curved exponential family.
     """
-    mean: RealArray
+    mean: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -39,14 +39,10 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
     def sufficient_statistics(self, x: RealArray) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 1
-
 
 @dataclass
 class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP]):
-    mean: RealArray
+    mean: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from typing import Iterable
-
 from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['IsotropicNormalNP', 'IsotropicNormalEP']
 
 
 @dataclass
 class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP']):
-    mean_times_precision: RealArray
-    negative_half_precision: RealArray
+    mean_times_precision: RealArray = distribution_parameter(axes=1)
+    negative_half_precision: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -39,16 +38,11 @@ class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP']):
     def sufficient_statistics(self, x: RealArray) -> IsotropicNormalEP:
         return IsotropicNormalEP(x, jnp.sum(jnp.square(x), axis=-1))
 
-    @classmethod
-    def field_axes(cls) -> Iterable[int]:
-        yield 1
-        yield 0
-
 
 @dataclass
 class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP]):
-    mean: RealArray
-    total_second_moment: RealArray
+    mean: RealArray = distribution_parameter(axes=1)
+    total_second_moment: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

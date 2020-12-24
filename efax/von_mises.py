@@ -12,13 +12,14 @@ from scipy.special import iv
 from tjax import RealArray, Shape, dataclass
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .parameter import distribution_parameter
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 
 @dataclass
 class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
-    mean_times_concentration: RealArray
+    mean_times_concentration: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -59,7 +60,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
 
 @dataclass
 class VonMisesFisherEP(ExpectationParametrization[VonMisesFisherNP]):
-    mean: RealArray
+    mean: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def to_nat(self) -> VonMisesFisherNP:
