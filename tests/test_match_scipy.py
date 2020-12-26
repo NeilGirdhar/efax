@@ -2,6 +2,7 @@
 These tests ensure that our distributions match scipy's.
 """
 from functools import partial
+from typing import Any
 
 import numpy as np
 from jax.tree_util import tree_map
@@ -14,7 +15,7 @@ from .create_info import (ComplexNormalInfo, LogarithmicInfo, MultivariateNormal
 from .distribution_info import DistributionInfo
 
 
-def test_entropy(generator, distribution_info):
+def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
     """
     Test that the entropy calculation matches scipy's.
     """
@@ -32,7 +33,7 @@ def test_entropy(generator, distribution_info):
         pass
 
 
-def test_pdf(generator: Generator, distribution_info: DistributionInfo):
+def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
     """
     Test that the density/mass function calculation matches scipy's.
     """
@@ -54,12 +55,13 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo):
         assert_allclose(nat_parameters.pdf(my_x), density, rtol=1e-4)
 
 
-def test_maximum_likelihood_estimation(generator, distribution_info):
+def test_maximum_likelihood_estimation(generator: Generator,
+                                       distribution_info: DistributionInfo[Any, Any]) -> None:
     """
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
-    if isinstance(distribution_info, LogarithmicInfo):
+    if isinstance(distribution_info, (LogarithmicInfo, VonMisesFisherInfo)):
         return
     rtol = (8e-2
             if isinstance(distribution_info, (ComplexNormalInfo, MultivariateNormalInfo))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterable, Type, Union, Tuple
+from typing import TYPE_CHECKING, Any, Iterable, Tuple, Type, Union
 
 from tjax import Array, field, field_names_values_metadata, fields
 

@@ -177,18 +177,11 @@ scipy = ["scipy"]
 
 [[package]]
 name = "numpy"
-version = "1.21.0.dev0+271.gf7bc51218"
+version = "1.20.0rc2"
 description = "NumPy is the fundamental package for array computing with Python."
 category = "main"
 optional = false
 python-versions = ">=3.7"
-develop = false
-
-[package.source]
-type = "git"
-url = "https://github.com/numpy/numpy.git"
-reference = "master"
-resolved_reference = "f7bc512184a1de3992b0d154e6244a7a0d9a574f"
 
 [[package]]
 name = "opt-einsum"
@@ -354,7 +347,7 @@ python-versions = ">=3.5"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "b7f718aa5a3cf723652dc32f713ada0565a5f002d2e36ca8975af5474d3f1721"
+content-hash = "0d06bba73c7bd2a5f5a9be1bb147c4c1f637ca106a995f2cbb35670117c3e049"
 
 [metadata.files]
 absl-py = [
@@ -475,7 +468,32 @@ networkx = [
     {file = "networkx-2.5-py3-none-any.whl", hash = "sha256:8c5812e9f798d37c50570d15c4a69d5710a18d77bafc903ee9c5fba7454c616c"},
     {file = "networkx-2.5.tar.gz", hash = "sha256:7978955423fbc9639c10498878be59caf99b44dc304c2286162fd24b458c1602"},
 ]
-numpy = []
+numpy = [
+    {file = "numpy-1.20.0rc2-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:ab9bd6e3e8ce1ce62e3db02462df37ca708d24e8536c71857ad78e4e7d68b024"},
+    {file = "numpy-1.20.0rc2-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:3526a1c1e2456c67fc5f2a67d27ffa42b1bdfc640b0e0d07652799a9259a5f89"},
+    {file = "numpy-1.20.0rc2-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:e039cb9e37a651047cb164c7fa2760c502d9e216d24ddd50928e61a02039cb77"},
+    {file = "numpy-1.20.0rc2-cp37-cp37m-manylinux2010_i686.whl", hash = "sha256:adfd6f6900af0c3d550d8d2c48e060f710f61b781eabc983f7f10c9b85a227ed"},
+    {file = "numpy-1.20.0rc2-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:73ab3ab1a34abfa4034b9d85be62c6f39c87b47232bf72c9c900ff67d92212b7"},
+    {file = "numpy-1.20.0rc2-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:747e2ecd3cf70159a969e267f434f03d949a740645ce74b42476ff33c2037d86"},
+    {file = "numpy-1.20.0rc2-cp37-cp37m-win32.whl", hash = "sha256:ac6cd3bee3e2906102f62a9cdec6477d5c5933624ff21f02c2c7da5ace6d865a"},
+    {file = "numpy-1.20.0rc2-cp37-cp37m-win_amd64.whl", hash = "sha256:0b2298db632958edd25e1edef5a24010bcb01752077b92567bb43c56fcf96578"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:d15ce00b4e49fbf946541291bdfc7b673cd08137da8ff6492cd34aa6b612b8eb"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-manylinux1_i686.whl", hash = "sha256:f7f3fdaef950dc00bed782b78f970a9d7b496287c6c2494ead8ab98f38477bb0"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:47e8f866e0342c98a36339264b03e534425d89b18721f1d06565976d31a01071"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-manylinux2010_i686.whl", hash = "sha256:cd4941e3a8dccc572c0f0ed02ab1c8c75d7c47091eccecf9173c92d10b8eeaf5"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:d239f8391667f2a4bf913d6bed7b9960ccfb76da5253d16de6553120b1ca393d"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:677d968f9e0d4640a143615780925fd18dba128ef2753e847a94989a51bf5715"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-win32.whl", hash = "sha256:faa99af9fbd914e33b8322efd04a13e23c6b032d1dc5cc62bf5294a2ce59212e"},
+    {file = "numpy-1.20.0rc2-cp38-cp38-win_amd64.whl", hash = "sha256:5ab1a6bda6ded04fc1261bf0d7ef382e814afcd83e478b545dad2094d4f2798e"},
+    {file = "numpy-1.20.0rc2-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:bd36b4e61b4b850bf45d6a079b4b6eb3937442a6c273d2bac1e4377f196632b9"},
+    {file = "numpy-1.20.0rc2-cp39-cp39-manylinux2010_i686.whl", hash = "sha256:d5740196e9cf6874108dc78995ef3e2bf2dd2e338e41b5a0083527d178364053"},
+    {file = "numpy-1.20.0rc2-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:f45b9d4b1dea1c60339ab06503eaec6c6cb7b7bc66e9939c825544b385581a3b"},
+    {file = "numpy-1.20.0rc2-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:9e0eb4674f9d6980125415fc1802b59fbc9eed32db0ff4689957710b7ee5b55a"},
+    {file = "numpy-1.20.0rc2-cp39-cp39-win32.whl", hash = "sha256:06995885846f701bddeb7fa289dde6798e5613208bc7a74a7ae165cb3a043d97"},
+    {file = "numpy-1.20.0rc2-cp39-cp39-win_amd64.whl", hash = "sha256:9a9ad522f98331668913675ecf611204c74173663edf87f323df7f873bf9d2f8"},
+    {file = "numpy-1.20.0rc2-pp37-pypy37_pp73-manylinux2010_x86_64.whl", hash = "sha256:d8f20a52dd98f8e404c6825fc835934dba3ad71d90ced92069061025fb9c2598"},
+    {file = "numpy-1.20.0rc2.zip", hash = "sha256:793383d52f79c785ad2e7cf24b064f8ff5041ee0e44cef34368918c1b89e9d58"},
+]
 opt-einsum = [
     {file = "opt_einsum-3.3.0-py3-none-any.whl", hash = "sha256:2455e59e3947d3c275477df7f5205b30635e266fe6dc300e3d9f9646bfcea147"},
     {file = "opt_einsum-3.3.0.tar.gz", hash = "sha256:59f6475f77bbc37dcf7cd748519c0ec60722e91e63ca114e68821c0c54a46549"},

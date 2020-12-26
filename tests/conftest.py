@@ -26,5 +26,5 @@ def configure_numpy() -> Generator[None, None, None]:
 
 @pytest.fixture(scope='session',
                 params=create_infos())
-def distribution_info(request: Any) -> List[DistributionInfo]:
+def distribution_info(request: Any) -> List[DistributionInfo[Any, Any]]:
     return request.param

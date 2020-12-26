@@ -1,24 +1,28 @@
 # pylint: disable=protected-access
+from typing import Iterable
+
 import numpy as np
 import pytest
+from numpy.random import Generator
 from numpy.testing import assert_allclose
 from scipy.stats import multivariate_normal
+from tjax import Shape
 
 from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 
 @pytest.fixture(scope='module')
-def set_numpy_state():
+def set_numpy_state() -> Iterable[None]:
     with np.printoptions(precision=4, suppress=True):
         yield
 
 
-def random_complex(generator):
-    return sum(x ** 0.5 * generator.normal()
+def random_complex(generator: Generator) -> float:
+    return sum(x * generator.normal()
                for x in [0.5, 0.5j])
 
 
-def build_uvcn(generator):
+def build_uvcn(generator: Generator) -> ScipyComplexNormal:
     mean = random_complex(generator)
     variance = generator.exponential()
     pseudo_variance = (variance
@@ -27,18 +31,22 @@ def build_uvcn(generator):
     return ScipyComplexNormal(mean, variance, pseudo_variance)
 
 
-def build_mvcn(generator, size=2, polarization=0.98, regularization=0.01):
+def build_mvcn(generator: Generator,
+               size: int = 2,
+               polarization: float = 0.98,
+               regularization: float = 0.01) -> ScipyComplexMultivariateNormal:
     DIRECTIONS = 3
 
-    def random_vector(number_of_vectors=()):
-        return sum(x * generator.multivariate_normal(
-            np.zeros(size),
-            cov=np.eye(size),
-            size=number_of_vectors)
-            for x in [1, 1j])
+    def random_vector(number_of_vectors: Shape = ()) -> np.ndarray:
+        retval = sum(x * generator.multivariate_normal(np.zeros(size),
+                                                       cov=np.eye(size),
+                                                       size=number_of_vectors)
+                     for x in [1, 1j])
+        assert isinstance(retval, np.ndarray)
+        return retval
 
     mean = random_vector()
-    z = random_vector(DIRECTIONS)
+    z = random_vector((DIRECTIONS,))
     weights = np.array(range(DIRECTIONS)) + 1.5
 
     variance = (np.average(z.conj()[:, np.newaxis, :] * z[..., np.newaxis],
@@ -54,7 +62,7 @@ def build_mvcn(generator, size=2, polarization=0.98, regularization=0.01):
         mean, variance, pseudo_variance)
 
 
-def test_univariate_pdf(generator) -> None:
+def test_univariate_pdf(generator: Generator) -> None:
     dist = build_uvcn(generator)
     mvn = multivariate_normal(mean=dist._multivariate_normal_mean(),
                               cov=dist._multivariate_normal_cov())
@@ -63,7 +71,7 @@ def test_univariate_pdf(generator) -> None:
                     mvn.pdf(np.array([x.real, x.imag])))
 
 
-def test_univariate_rvs(generator) -> None:
+def test_univariate_rvs(generator: Generator) -> None:
     dist = build_uvcn(generator)
 
     size = (200, 100)
@@ -85,7 +93,7 @@ def test_univariate_rvs(generator) -> None:
                     rtol=1e-2, atol=1e-2)
 
 
-def test_multivariate_rvs(generator) -> None:
+def test_multivariate_rvs(generator: Generator) -> None:
     dist = build_mvcn(generator)
 
     size = (1800, 1700)
@@ -115,7 +123,7 @@ def test_multivariate_rvs(generator) -> None:
 
 
 @pytest.mark.parametrize('polarization', [0.5, 1.0])
-def test_p_hermitian(generator, polarization) -> None:
+def test_p_hermitian(generator: Generator, polarization: float) -> None:
     dist = build_mvcn(generator, polarization=polarization)
     _, p_c = dist._r_and_p_c()
     assert_allclose(p_c, p_c.T.conj(), rtol=1e-2, atol=1e-2)
@@ -124,7 +132,7 @@ def test_p_hermitian(generator, polarization) -> None:
     assert_allclose(eigenvalues.imag, 0.0, atol=1e-5)
 
 
-def test_multivariate_conversion(generator) -> None:
+def test_multivariate_conversion(generator: Generator) -> None:
     dist = build_mvcn(generator, polarization=0.5)
 
     eta, precision, pseudo_precision = dist.natural_parameters()
@@ -136,7 +144,7 @@ def test_multivariate_conversion(generator) -> None:
 
 
 @pytest.mark.parametrize('n', [1, 2, 3, 4])
-def test_multivariate_pdf(generator, n) -> None:
+def test_multivariate_pdf(generator: Generator, n: int) -> None:
     dist = build_mvcn(generator, polarization=0.5, size=n)
     mvn = multivariate_normal(mean=dist._multivariate_normal_mean(),
                               cov=dist._multivariate_normal_cov())
@@ -157,7 +165,7 @@ def test_multivariate_pdf(generator, n) -> None:
     assert_allclose(dist.pdf(x), mvn.pdf(xx))
 
 
-def test_univariate_multivariate_consistency(generator) -> None:
+def test_univariate_multivariate_consistency(generator: Generator) -> None:
     mv = build_mvcn(generator, size=1, polarization=0.5)
     uv = ScipyComplexNormal(mv.mean[0],
                             mv.variance[0, 0].real,

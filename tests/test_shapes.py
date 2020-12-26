@@ -3,13 +3,13 @@ from typing import Any
 import numpy as np
 from numpy.random import Generator
 
-from efax import NaturalParametrization, parameter_names_values_axes
+from efax import parameter_names_values_axes
 
 from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 
-def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> None:
+def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
     """
     Test that the methods produce the correct shapes.
     """
@@ -23,12 +23,12 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     scipy_x = scipy_dist.rvs()
     x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
-    def check(np: NaturalParametrization, z: Any) -> None:
+    def check(z: Any) -> None:
         for _, xf, n_axes in parameter_names_values_axes(z):
             assert xf.shape[:len(xf.shape) - n_axes] == shape
 
-    check(q, q)
-    check(q, p)
+    check(p)
+    check(q)
 
     assert q.log_normalizer().shape == shape
     try:
@@ -47,6 +47,8 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     assert q.pdf(x).shape == shape
 
 
-def test_types(distribution_info: DistributionInfo) -> None:
+def test_types(distribution_info: DistributionInfo[Any, Any]) -> None:
+    if isinstance(distribution_info, VonMisesFisherInfo):
+        return
     if isinstance(distribution_info.exp_parameter_generator(np.random.default_rng(), ()), tuple):
         raise TypeError("This should return a number or an ndarray")
