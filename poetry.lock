@@ -312,7 +312,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "tjax"
-version = "0.7.5"
+version = "0.7.6"
 description = "Tools for JAX."
 category = "main"
 optional = false
@@ -325,7 +325,7 @@ jax = ">=0.2,<0.3"
 jaxlib = ">=0.1.55,<0.2.0"
 matplotlib = ">=3.3,<4.0"
 networkx = ">=2.4,<3.0"
-numpy = ">=1.19,<2.0"
+numpy = ">=1.20.0rc2,<1.21"
 optax = ">=0,<1"
 
 [[package]]
@@ -347,7 +347,7 @@ python-versions = ">=3.5"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "0d06bba73c7bd2a5f5a9be1bb147c4c1f637ca106a995f2cbb35670117c3e049"
+content-hash = "a4aa10fb7378bb166c3587b5de520164b57b510c2ec90131073f6f3a9fe33210"
 
 [metadata.files]
 absl-py = [
@@ -588,8 +588,8 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 tjax = [
-    {file = "tjax-0.7.5-py3-none-any.whl", hash = "sha256:8842f03ff146c8d57b35ae5d35857720d8e02804e34ac5d9e34a413ed7e7118f"},
-    {file = "tjax-0.7.5.tar.gz", hash = "sha256:ccc4d3d282abcb094899d4a354362073a42df0d920ad2b77891cf534b3b0368c"},
+    {file = "tjax-0.7.6-py3-none-any.whl", hash = "sha256:c021bc849075adf7a9b03156f8232ede7ae3395e2919b90234f39b0eeef9f13f"},
+    {file = "tjax-0.7.6.tar.gz", hash = "sha256:f1206048c33f247084a98ab8641338475b236fbe774297de6f3086b5528ad2de"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
