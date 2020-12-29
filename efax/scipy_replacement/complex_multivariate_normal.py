@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from math import log, pi
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import numpy as np
 from numpy.linalg import det, inv
@@ -39,8 +41,8 @@ class ScipyComplexMultivariateNormal:
         _, precision, pseudo_precision = self.natural_parameters()
         det_s = det(self.variance).real
         det_h = det(-precision).real
-        return (-mu.conj().dot(precision.dot(mu)).real
-                - mu.dot(pseudo_precision.dot(mu)).real
+        return ((-mu.conj() @ precision @ mu).real
+                - (mu @ pseudo_precision @ mu).real
                 + 0.5 * log(det_s)
                 - 0.5 * log(det_h)
                 + self.size * log(pi)).real
@@ -50,8 +52,8 @@ class ScipyComplexMultivariateNormal:
         p_inv_c = inv(p_c)
         precision = -p_inv_c
         pseudo_precision = r.T @ p_inv_c
-        eta = -2.0 * (precision.T.dot(self.mean.conj())
-                      + pseudo_precision.dot(self.mean))
+        eta = -2.0 * ((precision.T @ self.mean.conj())
+                      + pseudo_precision @ self.mean)
         return (eta, precision, pseudo_precision)
 
     def natural_to_sample(self,
@@ -64,18 +66,16 @@ class ScipyComplexMultivariateNormal:
         s = inv(r.conj() @ r - np.eye(self.size)) @ inv_precision
         u = (r @ s).conj()
         k = inv_precision.T @ pseudo_precision
-        l_eta = 0.5 * inv(k @ k.conj()
-                          - np.eye(self.size)).dot(inv_precision.T.dot(eta))
-        mu = (l_eta.conj()
-              - (inv_precision.T @ pseudo_precision).conj().dot(l_eta))
+        l_eta = 0.5 * inv(k @ k.conj() - np.eye(self.size)) @ inv_precision.T @ eta
+        mu = l_eta.conj() - (inv_precision.T @ pseudo_precision).conj() @ l_eta
         return mu, s, u
 
-    def pdf(self, z: np.ndarray, out: None = None) -> np.ndarray:
+    def pdf(self, z: np.ndarray, out: None = None) -> np.number[Any]:
         log_normalizer = self.log_normalizer()
         eta, precision, pseudo_precision = self.natural_parameters()
-        return np.exp((eta.dot(z)
-                       + z.conj().dot(precision).dot(z)
-                       + z.dot(pseudo_precision).dot(z)).real
+        return np.exp((eta @ z
+                       + z.conj() @ precision @ z
+                       + z @ pseudo_precision @ z).real
                       - log_normalizer)
 
     def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> np.ndarray:
