@@ -12,21 +12,78 @@ EFAX: Exponential Families in JAX
 
 This library provides a set of tools for working with *exponential family distributions* in the differential programming library `JAX <https://github.com/google/jax/>`_.
 The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
-For an explaination of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
+For an explanation of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
+
+Framework
+=========
+Representation
+--------------
+EFAX has a single base class for its objects: :python:`Parametrization` that encodes the distribution family, and the parameters of the distribution.
+Each such object has a shape, and so it can store any number of distributions.
+When operating on such objects, NumPy's broadcasting rules apply.
+This is unlike SciPy where each distribution is represented by a single object, and so a thousand distributions need a thousand objects.
+
+All parametrization objects are dataclasses using :python:`tjax.dataclass`.  These dataclasses are
+a modification of Python's dataclasses to support JAX's type registration.  This allows easy marking
+of static attributes.  In JAX, a static attribute is one that induces recompilation of a function
+when it changes, and consequently there is more flexibility about what can be done with such an
+attribute.  An example of a static attribute in EFAX is the failure number of the negative binomial
+distribution.
+
+Each non-static attribute in an EFAX distribution is marked with a number of axes.  Zero axes means
+that the attribute is a scalar.  One is a vector, and two is a square matrix.  For example:
+
+.. code:: python
+
+    @dataclass
+    class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
+        mean_times_precision: RealArray = distribution_parameter(axes=1)
+        negative_half_precision: RealArray = distribution_parameter(axes=2)
+
+In this case, we see that there are two natural parameters for the multivariate normal distribution.
+If such an object :python:`x` has shape :python:`s`, then the shape of
+:python:`x.negative_half_precision` is :python:`(*s, n, n)`.
+
+Parametrizations
+----------------
+Each exponential family distribution has two special parametrizations: the natural and the expectation parametrization.  (These are described in the overview pdf.)
+Consequently, every distribution has two base classes, one inheriting from
+:python:`NaturalParametrization` and one from :python:`ExpectationParametrization`.
+
+The motivation for the natural parametrization is combining and scaling independent predictive
+evidence.  In the natural parametrization, these operations correspond to scaling and addition.
+
+The motivation for the expectation parametrization is combining independent and identically
+distributed observations into the maximum likelihood distribution.  In the expectation
+parametrization, this is an expected value.
+
+EFAX provides conversions between the two parametrizations through the
+:python:`NaturalParametrization.to_exp` and :python:`ExpectationParametrization.to_nat` methods.
+Converting from expectation parameters to natural ones sometimes requires numerical optimization.
+
+Important methods
+-----------------
+Every :python:`Parametrization` has methods to flatten and unflatten the parameters into a single
+array: :python:`flattened` and :python:`unflattened`.
+
+Every :python:`NaturalParametrization` has methods:
+
+- :python:`sufficient_statistics` to produce expected parameters given an observation,
+- :python:`pdf`, which is the density,
+- :python:`fisher_information`, which is the Fischer information matrix, and
+- :python:`entropy`, which is the Shannon entropy.
+
+
+Every :python:`ExpectationParametrization` has a :python:`cross_entropy` method that has an
+efficient, numerically optimized custom JAX gradient.  This is possible because the gradient of the
+cross entropy is the difference of expectation parameters (when the expected carrier measure is
+zero).
 
 Usage
 =====
-In SciPy, a distribution is represented by a single object, so a thousand distributions need a thousand objects.  Each object encodes the distribution family, and the parameters of the distribution.  EFAX distribution objects use broadcasting to represent any number of distributions in a single object.
-
-Each exponential family distribution has two special parametrizations: the natural and the
-expectation parametrization.  (These are described in the overview pdf.)  Consequently, each
-distribution has two objects, one inheriting from :python:`NaturalParametrization` and one from :python:`ExpectationParametrization`.
-
-EFAX provides conversions between the two parametrizations, although it sometimes requires numerical
-optimization to convert from expectation parameters to natural ones.  JAX doesn't have numerical
-optimization yet, so this is done in scipy for now.
-
-Maximum likelihood estimation is just expectation over expectation parameters.  Models that combine independent predictors just sum natural parameters.  When we want to optimize such models, we just want to take the gradient of cross entropy with respect to predictions.  For example,
+Basic usage
+-----------
+A basic use of the two parametrizations:
 
 .. code:: python
 
@@ -54,7 +111,9 @@ Maximum likelihood estimation is just expectation over expectation parameters.  
     # A Bernoulli distribution with probability 0.3 predicts a Bernoulli observation with probability
     # 0.4 better than the other observations.
 
-Thanks to JAX, any gradient of the cross entropy will automatically be as accurate and numerically stable as possible.  This is because the gradient of the cross entropy involves the gradient of the log-normalizer, which typically has a very nice form.  For example,
+Optimization
+------------
+Using the cross entropy to iteratively optimize a prediction is simple:
 
 .. code:: python
 
