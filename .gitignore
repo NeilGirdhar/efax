@@ -5,6 +5,10 @@ dist/
 *.egg-info/
 setup.py
 
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
 # my[py]
 .mypy_cache/
 
