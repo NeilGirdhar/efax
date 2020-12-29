@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from functools import partial, reduce
-from typing import Any, Callable, Generic, Iterable, Type, TypeVar, final, get_type_hints
+from typing import Any, Callable, Generic, Iterable, Tuple, Type, TypeVar, final, get_type_hints
 
 from chex import Array
 from jax import grad, jacfwd
 from jax import numpy as jnp
-from jax import vmap
+from jax import vjp, vmap
 from tjax import RealArray, field_values, jit
 
 from .parameter import parameter_names_values_axes
@@ -107,6 +107,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
             * A scalar if trace is true.
             * An array of the same shape as self if diagonal is true.
             * Otherwise, a NaturalParametrization object whose fields are arrays.
+        See also: apply_fisher_information
         """
         fisher_information = self._fisher_helper(len(self.shape()))
 
@@ -118,6 +119,20 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         for name, value, axes in parameter_names_values_axes(fisher_information):
             kwargs[name] = transform(f, getattr(value, name), axes)
         return fisher_information.replace(**kwargs)
+
+    @jit
+    @final
+    def apply_fisher_information(self: T, vector: EP) -> Tuple[EP, T]:
+        """
+        Args:
+            vector: Some set of expectation parameters.
+        Returns:
+            The expectation parameters corresponding to self.
+            The Fisher information of self applied to the inputted vector.
+        """
+        expectation_parameters: EP
+        expectation_parameters, f_vjp = vjp(type(self).to_exp, self)
+        return expectation_parameters, f_vjp(vector)
 
     # Private methods ------------------------------------------------------------------------------
     @partial(jit, static_argnums=1)
