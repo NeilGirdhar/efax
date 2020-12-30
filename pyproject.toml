@@ -28,6 +28,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = '>=3.10,<3.13'
 jax = '>=0.4.20'
+jaxopt = '>=0.8.3'
 numpy = '>=1.23'
 scipy = '>=1.10'
 tensorflow_probability = '>=0.15'

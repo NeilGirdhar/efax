@@ -35,7 +35,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         if hasattr(super(), '__post_init__'):
             super().__post_init__()  # pyright: ignore
         if self.minimizer is None:
-            from .iterated_function import default_minimizer  # noqa: PLC0415
+            from .jaxopt import default_minimizer  # noqa: PLC0415
             object.__setattr__(self, 'minimizer', default_minimizer)
 
     @jit
