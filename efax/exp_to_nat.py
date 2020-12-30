@@ -1,11 +1,12 @@
-from functools import partial
+from __future__ import annotations
+
 from typing import Any, Generic, List, Optional, Tuple, TypeVar
 
-import numpy as np
-import scipy
 from chex import Array
-from jax import jacfwd, jit
-from jax.tree_util import tree_map, tree_reduce
+from jax import numpy as jnp
+from jax.tree_util import tree_multimap
+from tjax import field_names_and_values, dataclass
+from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
 
@@ -23,68 +24,68 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
 
     # Implemented methods --------------------------------------------------------------------------
     def to_nat(self) -> NP:
-        q = self.initial_flattened_natural()
-        i: Tuple[int, ...]
-        for i in np.ndindex(self.shape()):
-            this_p = tree_map(lambda x, i=i: x[i], self)  # type: ignore
-            this_q = this_p.to_nat_early_out()
-            if this_q is None:
-                flattened_expectation_p = this_p.flatten_expectation()
-                flattened_natural_q = this_p.initial_flattened_natural()
-
-                bound_f = partial(type(self)._to_nat_helper, flattened_expectation_p)
-                bound_jf = partial(type(self)._to_nat_jacobian, flattened_expectation_p)
-
-                solution = scipy.optimize.root(bound_f, flattened_natural_q, tol=1e-5,
-                                               jac=bound_jf)
-                if not solution.success:
-                    raise ValueError("Failed to find natural parmaeters for "
-                                     f"{this_p} because {solution.message}.")
-                this_q = solution.x
-            q[i] = this_q
-        return self.unflatten_natural(q)
+        iterated_function = ExpToNatIteratedFunction[NP](minimum_iterations=1000,
+                                                         maximum_iterations=1000)
+        state = iterated_function.find_fixed_point(self, self.initial_natural()).current_state
+        return self.transform_natural_for_iteration(state)
 
     # Non-final methods ----------------------------------------------------------------------------
-    def to_nat_early_out(self) -> Optional[Array]:
-        """
-        Args:
-            p: The expectation parameters passed to exp_to_nat.
-        Returns: The corresponding flattened natural parameters if there's an easy answer to to_nat,
-            otherwise None.
-        """
-        return None
-
-    def initial_flattened_natural(self) -> Array:
+    def initial_natural(self) -> NP:
         """
         Returns: A form of the natural parameters that Newton's method will run on.
         """
-        return tree_reduce(np.concatenate, tree_map(np.zeros_like, self))
+        kwargs = dict(field_names_and_values(self, static=True))
+        cls = type(self).natural_parametrization_cls()
+        return cls.unflattened(jnp.zeros_like(self.flattened()), **kwargs)
 
     @classmethod
-    def unflatten_natural(cls, flattened_natural: Array) -> NP:
+    def transform_natural_for_iteration(cls, iteration_natural: NP) -> NP:
         """
         Args:
-            flattened_natural: A form of the natural parameters that Newton's method will run on.
+            iteration_natural: A form of the natural parameters that Newton's method will run on.
         Returns: The corresponding natural parametrization.
         """
         raise NotImplementedError
 
-    def flatten_expectation(self) -> Array:
-        """
-        Returns: A form of the expectation parameters that Newton's method will run on.
-        """
-        raise NotImplementedError
 
-    # Private methods ------------------------------------------------------------------------------
-    @classmethod
-    @partial(jit, static_argnums=(0,))
-    def _to_nat_helper(cls, flattened_expectation_p: Array, flattened_natural_q: Array) -> Array:
-        natural_q = cls.unflatten_natural(flattened_natural_q)
-        expectation_q = natural_q.to_exp()
-        flattened_expectation_q = expectation_q.flatten_expectation()
-        return flattened_expectation_q - flattened_expectation_p
+@dataclass
+class ExpToNatIteratedFunction(
+        # The generic parameters are: Parameters, State, Comparand, Differentiand, Trajectory.
+        ComparingIteratedFunctionWithCombinator[ExpToNat[NP],
+                                                NP,
+                                                ExpToNat[NP],
+                                                NP,
+                                                NP],
+        Generic[NP]):
 
-    @classmethod
-    @partial(jit, static_argnums=(0,))
-    def _to_nat_jacobian(cls, flattened_expectation_p: Array, flattened_natural_q: Array) -> Array:
-        return jacfwd(cls._to_nat_helper, argnums=1)(flattened_expectation_p, flattened_natural_q)
+    def sampled_state(self, theta: ExpToNat[NP], state: NP) -> NP:
+        def scaled_difference(target: Array, guess: Array) -> Array:
+            return 1e-1 * (guess - target)
+
+        def delta(theta: ExpToNat[NP], state: NP) -> NP:
+            natural_parameters = theta.transform_natural_for_iteration(state)
+            expectation_parameters = natural_parameters.to_exp()
+            exp_difference = tree_multimap(scaled_difference, theta, expectation_parameters)
+            nat_cls = type(state)
+            return nat_cls.unflattened(exp_difference.flattened())
+        # TODO: use jacobian
+
+        # Adjust state in the direction of delta.
+        the_delta = delta(theta, state)
+        return tree_multimap(jnp.subtract, state, the_delta)
+
+    def sampled_state_trajectory(self,
+                                 theta: ExpToNat[NP],
+                                 augmented: ComparingState[NP, ExpToNat[NP]]) -> Tuple[NP, NP]:
+        sampled_state = self.sampled_state(theta, augmented.current_state)
+        trajectory = sampled_state
+        return sampled_state, trajectory
+
+    def extract_comparand(self, state: NP) -> ExpToNat[NP]:
+        return state.to_exp()
+
+    def extract_differentiand(self, state: NP) -> NP:
+        return state
+
+    def implant_differentiand(self, state: NP, differentiand: NP) -> NP:
+        return differentiand

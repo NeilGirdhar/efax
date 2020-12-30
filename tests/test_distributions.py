@@ -6,7 +6,7 @@ from jax import vjp
 from jax.tree_util import tree_map
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_jax_allclose, field_values
+from tjax import assert_jax_allclose, field_names_and_values, field_values
 
 from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
@@ -28,6 +28,9 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo[An
         final_ep = intermediate_np.to_exp()
         try:
             assert_jax_allclose(original_ep, final_ep, rtol=1e-4)
+            assert (list(field_names_and_values(original_ep, static=True))
+                    == list(field_names_and_values(intermediate_np, static=True))
+                    == list(field_names_and_values(final_ep, static=True)))
         except AssertionError:
             print(original_ep, intermediate_np, final_ep)
             raise

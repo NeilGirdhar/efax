@@ -32,6 +32,7 @@ scipy = "^1.4"
 tjax = ">=0.7.6,<1.0"
 
 [tool.poetry.dev-dependencies]
+pylint = "^2.6"
 pytest = "^6"
 
 [tool.isort]

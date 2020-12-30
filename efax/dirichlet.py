@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from chex import Array
 from jax import numpy as jnp
 from jax.nn import softplus
 from jax.scipy import special as jss
@@ -54,17 +53,17 @@ class DirichletEP(ExpToNat[DirichletNP]):
     mean_log_probability: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[DirichletNP]:
+        return DirichletNP
+
     def shape(self) -> Shape:
         return self.mean_log_probability.shape[:-1]
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
 
-    # Overridden methods ---------------------------------------------------------------------------
     @classmethod
-    def unflatten_natural(cls, flattened_natural: Array) -> DirichletNP:
+    def transform_natural_for_iteration(cls, iteration_natural: DirichletNP) -> DirichletNP:
         # Run Newton's method on the whole real line.
-        return DirichletNP(softplus(flattened_natural) - 1.0)
-
-    def flatten_expectation(self) -> Array:
-        return self.mean_log_probability
+        return DirichletNP(softplus(iteration_natural.alpha_minus_one) - 1.0)
