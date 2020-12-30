@@ -31,3 +31,13 @@ class BetaEP(DirichletEP):
     # Overridden methods ---------------------------------------------------------------------------
     def to_nat(self) -> BetaNP:
         return BetaNP(super().to_nat().alpha_minus_one)
+
+    def initial_natural(self) -> BetaNP:
+        """
+        Returns: A form of the natural parameters that Newton's method will run on.
+        """
+        return BetaNP(super().initial_natural().alpha_minus_one)
+
+    @classmethod
+    def transform_natural_for_iteration(cls, iteration_natural: BetaNP) -> BetaNP:
+        return BetaNP(super().transform_natural_for_iteration(iteration_natural).alpha_minus_one)

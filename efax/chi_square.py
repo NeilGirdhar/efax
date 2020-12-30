@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from jax import numpy as jnp
 from jax.scipy import special as jss
-from tjax import Array, RealArray, Shape, dataclass
+from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .exponential_family import NaturalParametrization
@@ -43,6 +43,10 @@ class ChiSquareEP(ExpToNat[ChiSquareNP]):
     mean_log: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[ChiSquareNP]:
+        return ChiSquareNP
+
     def shape(self) -> Shape:
         return self.mean_log.shape
 
@@ -50,8 +54,5 @@ class ChiSquareEP(ExpToNat[ChiSquareNP]):
     # function.
 
     @classmethod
-    def unflatten_natural(cls, flattened_natural: Array) -> ChiSquareNP:
-        return ChiSquareNP(flattened_natural)
-
-    def flatten_expectation(self) -> RealArray:
-        return self.mean_log
+    def transform_natural_for_iteration(cls, iteration_natural: ChiSquareNP) -> ChiSquareNP:
+        return iteration_natural

@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-import math
-from typing import Optional
-
-from chex import Array
 from jax import numpy as jnp
 from jax.nn import softplus
 from tjax import RealArray, Shape, dataclass
@@ -45,23 +41,25 @@ class LogarithmicEP(ExpToNat[LogarithmicNP]):
     chi: RealArray = distribution_parameter(axes=0)  # - odds / log(1-p)
 
     # Implemented methods --------------------------------------------------------------------------
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[LogarithmicNP]:
+        return LogarithmicNP
+
     def shape(self) -> Shape:
         return self.chi.shape
 
     # The expected_carrier_measure is unknown.
 
-    # Overridden methods ---------------------------------------------------------------------------
-    def to_nat_early_out(self) -> Optional[Array]:
-        if self.chi < 1.0:
-            raise ValueError
-        if self.chi == 1.0:
-            return math.inf
-        return None
-
     @classmethod
-    def unflatten_natural(cls, flattened_natural: Array) -> LogarithmicNP:
+    def transform_natural_for_iteration(cls, iteration_natural: LogarithmicNP) -> LogarithmicNP:
         # Run Newton's method on the whole real line.
-        return LogarithmicNP(-softplus(flattened_natural))
+        return LogarithmicNP(-softplus(-iteration_natural.log_probability))
 
-    def flatten_expectation(self) -> Array:
-        return self.chi
+    # Overridden methods ---------------------------------------------------------------------------
+    def to_nat(self) -> NP:
+        z = super().to_nat()
+        return LogarithmicNP(jnp.where(self.chi < 1.0,
+                                       jnp.nan,
+                                       jnp.where(self.chi == 1.0,
+                                                 jnp.inf,
+                                                 z.log_probability)))

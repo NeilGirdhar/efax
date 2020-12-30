@@ -1,11 +1,13 @@
-from functools import partial
-from typing import Any, Generic, List, Optional, Tuple, TypeVar
+from __future__ import annotations
 
-import numpy as np
-import scipy
-from chex import Array
-from jax import jacfwd, jit
-from jax.tree_util import tree_map, tree_reduce
+from typing import Any, Generic, List, Tuple, TypeVar
+
+from jax import jit
+from jax import numpy as jnp
+from jax.tree_util import tree_multimap
+from tjax import dataclass, field_names_and_values
+from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
+from tjax.gradient import GradientTransformation, adam
 
 from .exponential_family import ExpectationParametrization, NaturalParametrization
 
@@ -22,69 +24,82 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
     """
 
     # Implemented methods --------------------------------------------------------------------------
+    @jit
     def to_nat(self) -> NP:
-        q = self.initial_flattened_natural()
-        i: Tuple[int, ...]
-        for i in np.ndindex(self.shape()):
-            this_p = tree_map(lambda x, i=i: x[i], self)  # type: ignore
-            this_q = this_p.to_nat_early_out()
-            if this_q is None:
-                flattened_expectation_p = this_p.flatten_expectation()
-                flattened_natural_q = this_p.initial_flattened_natural()
-
-                bound_f = partial(type(self)._to_nat_helper, flattened_expectation_p)
-                bound_jf = partial(type(self)._to_nat_jacobian, flattened_expectation_p)
-
-                solution = scipy.optimize.root(bound_f, flattened_natural_q, tol=1e-5,
-                                               jac=bound_jf)
-                if not solution.success:
-                    raise ValueError("Failed to find natural parmaeters for "
-                                     f"{this_p} because {solution.message}.")
-                this_q = solution.x
-            q[i] = this_q
-        return self.unflatten_natural(q)
+        iterated_function = ExpToNatIteratedFunction[NP](minimum_iterations=1000,
+                                                         maximum_iterations=1000,
+                                                         transform=adam(1e-1))
+        initial_natural = self.initial_natural()
+        initial_gt_state = iterated_function.transform.init(initial_natural)
+        initial_state = initial_gt_state, initial_natural
+        final_state = iterated_function.find_fixed_point(self, initial_state).current_state
+        _, final_natural = final_state
+        return self.transform_natural_for_iteration(final_natural)
 
     # Non-final methods ----------------------------------------------------------------------------
-    def to_nat_early_out(self) -> Optional[Array]:
-        """
-        Args:
-            p: The expectation parameters passed to exp_to_nat.
-        Returns: The corresponding flattened natural parameters if there's an easy answer to to_nat,
-            otherwise None.
-        """
-        return None
-
-    def initial_flattened_natural(self) -> Array:
+    def initial_natural(self) -> NP:
         """
         Returns: A form of the natural parameters that Newton's method will run on.
         """
-        return tree_reduce(np.concatenate, tree_map(np.zeros_like, self))
+        kwargs = dict(field_names_and_values(self, static=True))
+        cls = type(self).natural_parametrization_cls()
+        return cls.unflattened(jnp.zeros_like(self.flattened()), **kwargs)
 
     @classmethod
-    def unflatten_natural(cls, flattened_natural: Array) -> NP:
+    def transform_natural_for_iteration(cls, iteration_natural: NP) -> NP:
         """
         Args:
-            flattened_natural: A form of the natural parameters that Newton's method will run on.
+            iteration_natural: A form of the natural parameters that Newton's method will run on.
         Returns: The corresponding natural parametrization.
         """
         raise NotImplementedError
 
-    def flatten_expectation(self) -> Array:
-        """
-        Returns: A form of the expectation parameters that Newton's method will run on.
-        """
-        raise NotImplementedError
 
-    # Private methods ------------------------------------------------------------------------------
-    @classmethod
-    @partial(jit, static_argnums=(0,))
-    def _to_nat_helper(cls, flattened_expectation_p: Array, flattened_natural_q: Array) -> Array:
-        natural_q = cls.unflatten_natural(flattened_natural_q)
-        expectation_q = natural_q.to_exp()
-        flattened_expectation_q = expectation_q.flatten_expectation()
-        return flattened_expectation_q - flattened_expectation_p
+@dataclass
+class ExpToNatIteratedFunction(
+        # The generic parameters are: Parameters, State, Comparand, Differentiand, Trajectory.
+        ComparingIteratedFunctionWithCombinator[ExpToNat[NP],
+                                                Tuple[Any, NP],
+                                                ExpToNat[NP],
+                                                NP,
+                                                NP],
+        Generic[NP]):
 
-    @classmethod
-    @partial(jit, static_argnums=(0,))
-    def _to_nat_jacobian(cls, flattened_expectation_p: Array, flattened_natural_q: Array) -> Array:
-        return jacfwd(cls._to_nat_helper, argnums=1)(flattened_expectation_p, flattened_natural_q)
+    transform: GradientTransformation[Any, NP]
+
+    def sampled_state(self, theta: ExpToNat[NP], state: Tuple[Any, NP]) -> Tuple[Any, NP]:
+        current_gt_state, untransformed_natural_parameters = state
+        natural_parameters = theta.transform_natural_for_iteration(untransformed_natural_parameters)
+        expectation_parameters = natural_parameters.to_exp()
+        exp_difference = tree_multimap(jnp.subtract, theta, expectation_parameters)
+        gradient = type(natural_parameters).unflattened(-exp_difference.flattened())
+
+        ##gradient = id_print(gradient, what="G")
+        transformed_gradient, new_gt_state = self.transform.update(gradient, current_gt_state,
+                                                                   untransformed_natural_parameters)
+        #transformed_gradient = id_print(transformed_gradient, what="T")
+        new_untransformed_natural_parameters = tree_multimap(jnp.add,
+                                                             untransformed_natural_parameters,
+                                                             transformed_gradient)
+        return new_gt_state, new_untransformed_natural_parameters
+
+    def sampled_state_trajectory(self,
+                                 theta: ExpToNat[NP],
+                                 augmented: ComparingState[NP, ExpToNat[NP]]) -> Tuple[NP, NP]:
+        sampled_state = self.sampled_state(theta, augmented.current_state)
+        trajectory = sampled_state
+        return sampled_state, trajectory
+
+    def extract_comparand(self, state: Tuple[Any, NP]) -> ExpToNat[NP]:
+        _, untransformed_natural_parameters = state
+        return untransformed_natural_parameters.to_exp()
+
+    def extract_differentiand(self, state: Tuple[Any, NP]) -> NP:
+        _, untransformed_natural_parameters = state
+        return untransformed_natural_parameters
+
+    def implant_differentiand(self,
+                              state: Tuple[Any, NP],
+                              differentiand: NP) -> NP:
+        current_gt_state, _ = state
+        return current_gt_state, differentiand
