@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Type
+
 from jax import numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass

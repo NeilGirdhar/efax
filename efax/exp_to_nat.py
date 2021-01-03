@@ -83,11 +83,12 @@ class ExpToNatIteratedFunction(
                                                              transformed_gradient)
         return new_gt_state, new_untransformed_natural_parameters
 
-    def sampled_state_trajectory(self,
-                                 theta: ExpToNat[NP],
-                                 augmented: ComparingState[NP, ExpToNat[NP]]) -> Tuple[NP, NP]:
+    def sampled_state_trajectory(
+            self,
+            theta: ExpToNat[NP],
+            augmented: ComparingState[Tuple[Any, NP], ExpToNat[NP]]) -> Tuple[Tuple[Any, NP], NP]:
         sampled_state = self.sampled_state(theta, augmented.current_state)
-        trajectory = sampled_state
+        _, trajectory = sampled_state
         return sampled_state, trajectory
 
     def extract_comparand(self, state: Tuple[Any, NP]) -> ExpToNat[NP]:
@@ -100,6 +101,6 @@ class ExpToNatIteratedFunction(
 
     def implant_differentiand(self,
                               state: Tuple[Any, NP],
-                              differentiand: NP) -> NP:
+                              differentiand: NP) -> Tuple[Any, NP]:
         current_gt_state, _ = state
         return current_gt_state, differentiand

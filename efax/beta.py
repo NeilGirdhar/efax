@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+from typing import Type
+
+from jax import numpy as jnp
 from tjax import RealArray, dataclass
 
-from .dirichlet import DirichletEP, DirichletNP
+from .dirichlet import DirichletCommonEP, DirichletCommonNP
 
 __all__ = ['BetaNP', 'BetaEP']
 
 
 @dataclass
-class BetaNP(DirichletNP):
+class BetaNP(DirichletCommonNP['BetaEP']):
     """
     The Beta distribution.
 
@@ -19,25 +22,23 @@ class BetaNP(DirichletNP):
 
     # Overridden methods ---------------------------------------------------------------------------
     def to_exp(self) -> BetaEP:
-        return BetaEP(super().to_exp().mean_log_probability)
+        return BetaEP(self._exp_helper())
 
     def sufficient_statistics(self, x: RealArray) -> BetaEP:
-        return BetaEP(super().sufficient_statistics(x).mean_log_probability)
+        return BetaEP(jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1))
+
+    def carrier_measure(self, x: RealArray) -> RealArray:
+        return jnp.zeros(x.shape)
 
 
 @dataclass
-class BetaEP(DirichletEP):
+class BetaEP(DirichletCommonEP[BetaNP]):
 
-    # Overridden methods ---------------------------------------------------------------------------
-    def to_nat(self) -> BetaNP:
-        return BetaNP(super().to_nat().alpha_minus_one)
-
-    def initial_natural(self) -> BetaNP:
-        """
-        Returns: A form of the natural parameters that Newton's method will run on.
-        """
-        return BetaNP(super().initial_natural().alpha_minus_one)
+    # Implemented methods --------------------------------------------------------------------------
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[BetaNP]:
+        return BetaNP
 
     @classmethod
     def transform_natural_for_iteration(cls, iteration_natural: BetaNP) -> BetaNP:
-        return BetaNP(super().transform_natural_for_iteration(iteration_natural).alpha_minus_one)
+        return BetaNP(cls._transform_nat_helper(iteration_natural))

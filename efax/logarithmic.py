@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Type
+
 from jax import numpy as jnp
 from jax.nn import softplus
 from tjax import RealArray, Shape, dataclass
@@ -56,7 +58,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP]):
         return LogarithmicNP(-softplus(-iteration_natural.log_probability))
 
     # Overridden methods ---------------------------------------------------------------------------
-    def to_nat(self) -> NP:
+    def to_nat(self) -> LogarithmicNP:
         z = super().to_nat()
         return LogarithmicNP(jnp.where(self.chi < 1.0,
                                        jnp.nan,
