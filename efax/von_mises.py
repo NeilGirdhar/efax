@@ -4,16 +4,15 @@ import math
 from typing import Tuple
 
 import numpy as np
-import scipy.optimize
-from chex import Array
 from jax import numpy as jnp
 from jax.nn import softplus
 from scipy.special import iv
 from tjax import RealArray, Shape, dataclass
 
-from .expectation_parametrization import ExpectationParametrization
+from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
+from .tools import inverse_softplus
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
@@ -60,47 +59,36 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
 
 
 @dataclass
-class VonMisesFisherEP(ExpectationParametrization[VonMisesFisherNP]):
+class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
     mean: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
-    def to_nat(self) -> VonMisesFisherNP:
-        p = self.mean
-        k = p.shape[-1]
-        mu = jnp.linalg.norm(p, 2, axis=-1)
-        q = np.empty_like(p)
-        for i in np.ndindex(p.shape[: -1]):
-            this_p = p[i]
-            this_mu = mu[i]
-            kappa = VonMisesFisherEP._find_kappa(k, this_mu)
-            q[i] = this_p * (kappa / this_mu)
-        return VonMisesFisherNP(q)
+    def shape(self) -> Shape:
+        return self.mean.shape
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
 
-    # Private methods ------------------------------------------------------------------------------
-    @staticmethod
-    def _find_kappa(k: RealArray, mu: RealArray) -> RealArray:
-        assert 0 <= mu <= 1.0
-        if mu == 0.0:
-            return 0.0
-        initial_solution = (mu * k - mu ** 3) / (1.0 - mu ** 2)
+    def initial_search_parameters(self) -> RealArray:
+        k = self.mean.shape[-1]
+        mu = jnp.linalg.norm(self.mean, 2, axis=-1)
+        # 0 <= mu <= 1.0
+        initial_kappa = jnp.where(mu == 1.0,
+                                  jnp.inf,
+                                  (mu * k - mu ** 3) / (1.0 - mu ** 2))
+        return inverse_softplus(initial_kappa)
 
-        def f(isp_kappa: RealArray) -> RealArray:
-            return _a_k(k, softplus(isp_kappa)) - mu
-        solution = scipy.optimize.root(f,
-                                       inverse_softplus(initial_solution),
-                                       tol=1e-5)
-        if not solution.success:
-            raise ValueError(f"Failed to find kappa because {solution.message}.")
-        return softplus(solution.x)
+    def search_to_natural(self, search_parameters: RealArray) -> VonMisesFisherNP:
+        kappa = softplus(search_parameters)
+        mu = jnp.linalg.norm(self.mean, 2, axis=-1)
+        q = self.mean * (kappa / mu)
+        return VonMisesFisherNP(q)
 
-
-def inverse_softplus(y: Array) -> Array:
-    return jnp.where(y > 80.0,
-                     y,
-                     jnp.log(jnp.expm1(y)))
+    def search_gradient(self, search_parameters: RealArray) -> RealArray:
+        k = self.mean.shape[-1]
+        kappa = softplus(search_parameters)
+        mu = jnp.linalg.norm(self.mean, 2, axis=-1)
+        return _a_k(k, kappa) - mu
 
 
 # Private functions --------------------------------------------------------------------------------

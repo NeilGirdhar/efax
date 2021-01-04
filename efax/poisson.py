@@ -44,7 +44,8 @@ class PoissonEP(HasConjugatePrior[PoissonNP]):
     def to_nat(self) -> PoissonNP:
         return PoissonNP(jnp.log(self.mean))
 
-    # The expected_carrier_measure is unknown.
+    # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of
+    #   lambda ** k * log(k!) / k! = lambda ** k * log Gamma(k+1) / Gamma(k+1)
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> GammaNP:

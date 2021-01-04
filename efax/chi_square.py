@@ -42,7 +42,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
 
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
-class ChiSquareEP(ExpToNat[ChiSquareNP]):
+class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
     mean_log: RealArray = distribution_parameter(axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
@@ -58,6 +58,11 @@ class ChiSquareEP(ExpToNat[ChiSquareNP]):
         k_over_two = q.k_over_two_minus_one + 1.0
         return -k_over_two
 
-    @classmethod
-    def transform_natural_for_iteration(cls, iteration_natural: ChiSquareNP) -> ChiSquareNP:
-        return iteration_natural
+    def initial_search_parameters(self) -> RealArray:
+        return ChiSquareNP(jnp.zeros(self.mean_log.shape))
+
+    def search_to_natural(self, search_parameters: ChiSquareNP) -> ChiSquareNP:
+        return search_parameters
+
+    def search_gradient(self, search_parameters: ChiSquareNP) -> ChiSquareNP:
+        return self._natural_gradient(search_parameters)

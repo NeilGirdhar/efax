@@ -8,6 +8,7 @@ from tjax import RealArray, Shape, dataclass
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
+from .tools import inverse_softplus
 
 __all__ = ['GammaNP', 'GammaEP']
 
@@ -38,7 +39,7 @@ class GammaNP(NaturalParametrization['GammaEP']):
 
 
 @dataclass
-class GammaEP(ExpToNat[GammaNP]):
+class GammaEP(ExpToNat[GammaNP, RealArray]):
     mean: RealArray = distribution_parameter(axes=0)
     mean_log: RealArray = distribution_parameter(axes=0)
 
@@ -49,18 +50,23 @@ class GammaEP(ExpToNat[GammaNP]):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
 
-    @classmethod
-    def transform_natural_for_iteration(cls, iteration_natural: GammaNP) -> GammaNP:
-        negative_rate = -softplus(-iteration_natural.negative_rate)
-        shape_minus_one = softplus(iteration_natural.shape_minus_one) - 1.0
-        return GammaNP(negative_rate, shape_minus_one)
+    def search_to_natural(self, search_parameters: RealArray) -> GammaNP:
+        shape = softplus(search_parameters)
+        rate = shape / self.mean
+        return GammaNP(-rate, shape - 1.0)
+
+    def search_gradient(self, search_parameters: RealArray) -> RealArray:
+        shape = softplus(search_parameters)
+        log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
+        return log_mean_minus_mean_log - jnp.log(shape) + jss.digamma(shape)
+        # gradient is 1.0 / shape - jss.polygamma(1, shape)
+        # where polygamma(1) is trigamma
 
     # Overridden methods ---------------------------------------------------------------------------
-    def initial_natural(self) -> GammaNP:
+    def initial_search_parameters(self) -> RealArray:
         log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
         initial_shape = (
             (3.0 - log_mean_minus_mean_log
              + jnp.sqrt((log_mean_minus_mean_log - 3.0) ** 2 + 24.0 * log_mean_minus_mean_log))
             / (12.0 * log_mean_minus_mean_log))
-        initial_rate = initial_shape / self.mean
-        return GammaNP(-initial_rate, initial_shape - 1.0)
+        return inverse_softplus(initial_shape)

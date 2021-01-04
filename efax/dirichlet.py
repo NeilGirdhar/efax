@@ -31,6 +31,5 @@ class DirichletEP(DirichletCommonEP[DirichletNP]):
     def natural_parametrization_cls(cls) -> Type[DirichletNP]:
         return DirichletNP
 
-    @classmethod
-    def transform_natural_for_iteration(cls, iteration_natural: DirichletNP) -> DirichletNP:
-        return DirichletNP(cls._transform_nat_helper(iteration_natural))
+    def search_to_natural(self, search_parameters: RealArray) -> DirichletNP:
+        return DirichletNP(self._transform_nat_helper(search_parameters))

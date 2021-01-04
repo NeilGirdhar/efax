@@ -28,5 +28,11 @@ def tree_dot_final(x: NaturalParametrization[Any], y: Any) -> RealArray:
     return reduce(jnp.add, dotted_fields())
 
 
+def inverse_softplus(y: RealArray) -> RealArray:
+    return jnp.where(y > 80.0,
+                     y,
+                     jnp.log(jnp.expm1(y)))
+
+
 if TYPE_CHECKING:
     from .natural_parametrization import NaturalParametrization

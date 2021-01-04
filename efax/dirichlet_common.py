@@ -41,7 +41,7 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 
 @dataclass
-class DirichletCommonEP(ExpToNat[NP], Generic[NP]):
+class DirichletCommonEP(ExpToNat[NP, RealArray], Generic[NP]):
     mean_log_probability: RealArray = distribution_parameter(axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
@@ -51,8 +51,14 @@ class DirichletCommonEP(ExpToNat[NP], Generic[NP]):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
 
+    def initial_search_parameters(self) -> RealArray:
+        return jnp.zeros(self.mean_log_probability.shape)
+
+    def search_gradient(self, search_parameters: RealArray) -> RealArray:
+        return self._natural_gradient(self.search_to_natural(search_parameters)).alpha_minus_one
+
     # Private methods ------------------------------------------------------------------------------
     @classmethod
-    def _transform_nat_helper(cls, iteration_natural: NP) -> RealArray:
+    def _transform_nat_helper(cls, search_parameters: RealArray) -> RealArray:
         # Run Newton's method on the whole real hyperspace.
-        return softplus(iteration_natural.alpha_minus_one) - 1.0
+        return softplus(search_parameters) - 1.0

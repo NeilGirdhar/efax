@@ -39,7 +39,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
 
 
 @dataclass
-class LogarithmicEP(ExpToNat[LogarithmicNP]):
+class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
     chi: RealArray = distribution_parameter(axes=0)  # - odds / log(1-p)
 
     # Implemented methods --------------------------------------------------------------------------
@@ -52,10 +52,15 @@ class LogarithmicEP(ExpToNat[LogarithmicNP]):
 
     # The expected_carrier_measure is unknown.
 
-    @classmethod
-    def transform_natural_for_iteration(cls, iteration_natural: LogarithmicNP) -> LogarithmicNP:
+    def initial_search_parameters(self) -> RealArray:
+        return jnp.zeros(self.chi.shape)
+
+    def search_to_natural(self, search_parameters: RealArray) -> LogarithmicNP:
         # Run Newton's method on the whole real line.
-        return LogarithmicNP(-softplus(-iteration_natural.log_probability))
+        return LogarithmicNP(-softplus(-search_parameters))
+
+    def search_gradient(self, search_parameters: RealArray) -> RealArray:
+        return self._natural_gradient(self.search_to_natural(search_parameters)).log_probability
 
     # Overridden methods ---------------------------------------------------------------------------
     def to_nat(self) -> LogarithmicNP:

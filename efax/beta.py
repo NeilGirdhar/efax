@@ -19,7 +19,6 @@ class BetaNP(DirichletCommonNP['BetaEP']):
     [0, 1] represents the Bernoulli probability that outcome 0 (out of {0, 1}) is realized.  In this
     way, the Beta class coincides with a special case of the Dirichlet class.
     """
-
     # Overridden methods ---------------------------------------------------------------------------
     def to_exp(self) -> BetaEP:
         return BetaEP(self._exp_helper())
@@ -33,12 +32,10 @@ class BetaNP(DirichletCommonNP['BetaEP']):
 
 @dataclass
 class BetaEP(DirichletCommonEP[BetaNP]):
-
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
     def natural_parametrization_cls(cls) -> Type[BetaNP]:
         return BetaNP
 
-    @classmethod
-    def transform_natural_for_iteration(cls, iteration_natural: BetaNP) -> BetaNP:
-        return BetaNP(cls._transform_nat_helper(iteration_natural))
+    def search_to_natural(self, search_parameters: RealArray) -> BetaNP:
+        return BetaNP(self._transform_nat_helper(search_parameters))
