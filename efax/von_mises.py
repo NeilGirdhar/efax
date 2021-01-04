@@ -11,7 +11,8 @@ from jax.nn import softplus
 from scipy.special import iv
 from tjax import RealArray, Shape, dataclass
 
-from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .expectation_parametrization import ExpectationParametrization
+from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']

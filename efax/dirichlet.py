@@ -8,7 +8,7 @@ from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
-from .exponential_family import EP, NaturalParametrization
+from .natural_parametrization import EP, NaturalParametrization
 from .parameter import distribution_parameter
 
 __all__ = ['DirichletNP', 'DirichletEP']

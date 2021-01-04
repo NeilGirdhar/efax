@@ -6,8 +6,8 @@ from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
-from .exponential_family import NaturalParametrization
 from .isotropic_normal import IsotropicNormalNP
+from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
 
 __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']

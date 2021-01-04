@@ -6,7 +6,8 @@ from jax import numpy as jnp
 from jax.scipy.special import gammaln
 from tjax import RealArray, Shape, dataclass, field
 
-from .exponential_family import EP, NP, ExpectationParametrization, NaturalParametrization
+from .expectation_parametrization import NP, ExpectationParametrization
+from .natural_parametrization import EP, NaturalParametrization
 from .parameter import distribution_parameter
 
 __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP', 'GeometricNP', 'GeometricEP']
@@ -61,6 +62,7 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
     failures: int = field(static=True)
     log_not_p: RealArray = distribution_parameter(axes=0)
 
+    # Implemented methods --------------------------------------------------------------------------
     def to_exp(self) -> NegativeBinomialEP:
         return NegativeBinomialEP(self.failures, self._mean())
 
@@ -73,6 +75,7 @@ class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
     failures: int = field(static=True)
     mean: RealArray = distribution_parameter(axes=0)
 
+    # Implemented methods --------------------------------------------------------------------------
     def to_nat(self) -> NegativeBinomialNP:
         return NegativeBinomialNP(self.failures, self._log_not_p())
 
@@ -82,6 +85,7 @@ class GeometricNP(NBCommonNP['GeometricEP']):
     log_not_p: RealArray = distribution_parameter(axes=0)
     failures = 1
 
+    # Implemented methods --------------------------------------------------------------------------
     def to_exp(self) -> GeometricEP:
         return GeometricEP(self._mean())
 
@@ -94,5 +98,6 @@ class GeometricEP(NBCommonEP[GeometricNP]):
     mean: RealArray = distribution_parameter(axes=0)
     failures = 1
 
+    # Implemented methods --------------------------------------------------------------------------
     def to_nat(self) -> GeometricNP:
         return GeometricNP(self._log_not_p())

@@ -68,9 +68,9 @@ array: :python:`flattened` and :python:`unflattened`.
 
 Every :python:`NaturalParametrization` has methods:
 
-- :python:`sufficient_statistics` to produce expected parameters given an observation,
+- :python:`sufficient_statistics` to produce the sufficient statistics given an observation,
 - :python:`pdf`, which is the density,
-- :python:`fisher_information`, which is the Fischer information matrix, and
+- :python:`fisher_information`, which is the Fisher information matrix, and
 - :python:`entropy`, which is the Shannon entropy.
 
 
@@ -81,6 +81,28 @@ zero).
 
 Usage
 =====
+Distributions
+-------------
+EFAX supports the following distributions:
+
+- Bernoulli
+- beta
+- chi-square
+- complex normal
+- Dirichlet
+- exponential
+- gamma
+- geometric
+- isotropic normal (multivariate normal with isotropic variance)
+- logarithmic
+- multinomial
+- multivariate normal
+- multivariate unit normal (multivariate normal with isotropic unit variance)
+- negative binomial
+- normal
+- Poisson
+- von Mises-Fisher
+
 Basic usage
 -----------
 A basic use of the two parametrizations:

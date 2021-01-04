@@ -7,7 +7,7 @@ from tjax import RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
 from .dirichlet import DirichletNP
-from .exponential_family import NaturalParametrization
+from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
 
 __all__ = ['MultinomialNP', 'MultinomialEP']

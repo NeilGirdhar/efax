@@ -29,4 +29,4 @@ def parameter_names_axes(x: Union[Type[Parametrization], Parametrization]) -> It
 
 
 if TYPE_CHECKING:
-    from .exponential_family import Parametrization
+    from .expectation_parametrization import Parametrization

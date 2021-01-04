@@ -9,7 +9,8 @@ from tjax import dataclass, field_names_and_values
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import GradientTransformation, adam
 
-from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .expectation_parametrization import ExpectationParametrization
+from .natural_parametrization import NaturalParametrization
 
 __all__: List[str] = []
 

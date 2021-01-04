@@ -2,7 +2,8 @@ from typing import Any, Generic
 
 from tjax import Array, RealArray
 
-from .exponential_family import NP, ExpectationParametrization, NaturalParametrization
+from .expectation_parametrization import NP, ExpectationParametrization
+from .natural_parametrization import NaturalParametrization
 
 __all__ = ['HasConjugatePrior']
 

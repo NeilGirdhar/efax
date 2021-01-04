@@ -10,6 +10,7 @@ from jax.tree_util import tree_map, tree_reduce
 from tjax import RealArray, Shape, custom_jvp, jit
 
 from .parameter import parameter_names_axes
+from .tools import tree_dot_final
 
 __all__ = ['Parametrization']
 
@@ -23,8 +24,6 @@ class Parametrization:
         super().__init_subclass__()
         if cls.__name__ in ['VonMisesFisher']:
             return
-
-        from .exponential_family import tree_dot_final  # pylint: disable=import-outside-toplevel
 
         # Apply jit.
         for name in ['log_normalizer',
@@ -104,4 +103,4 @@ class Parametrization:
 
 
 if TYPE_CHECKING:
-    from .exponential_family import NaturalParametrization
+    from .natural_parametrization import NaturalParametrization

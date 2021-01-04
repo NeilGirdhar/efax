@@ -4,8 +4,8 @@ from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
-from .exponential_family import NaturalParametrization
 from .gamma import GammaNP
+from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
 
 __all__ = ['ExponentialNP', 'ExponentialEP']

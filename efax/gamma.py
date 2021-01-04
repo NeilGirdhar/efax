@@ -9,7 +9,8 @@ from jax.scipy import special as jss
 from scipy.special import polygamma
 from tjax import RealArray, Shape, dataclass
 
-from .exponential_family import ExpectationParametrization, NaturalParametrization
+from .expectation_parametrization import ExpectationParametrization
+from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
 
 __all__ = ['GammaNP', 'GammaEP']
