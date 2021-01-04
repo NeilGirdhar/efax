@@ -8,7 +8,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose, field_names_and_values, field_values
 
-from .create_info import BetaInfo, DirichletInfo, VonMisesFisherInfo
+from .create_info import BetaInfo, DirichletInfo, GammaInfo, VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 # TODO: Block VonMises until https://github.com/google/jax/issues/2466 is resolved.
@@ -22,7 +22,7 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo[An
         return
 
     atol = (5e-3
-            if isinstance(distribution_info, BetaInfo)
+            if isinstance(distribution_info, (GammaInfo, BetaInfo))
             else 2e-2
             if isinstance(distribution_info, DirichletInfo)
             else 1e-4)

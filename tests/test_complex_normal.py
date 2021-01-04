@@ -1,5 +1,4 @@
 # pylint: disable=protected-access
-from typing import Iterable
 
 import numpy as np
 import pytest
@@ -9,12 +8,6 @@ from scipy.stats import multivariate_normal
 from tjax import Shape
 
 from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
-
-
-@pytest.fixture(scope='module')
-def set_numpy_state() -> Iterable[None]:
-    with np.printoptions(precision=4, suppress=True):
-        yield
 
 
 def random_complex(generator: Generator) -> float:

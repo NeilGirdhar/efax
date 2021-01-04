@@ -46,6 +46,7 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
         cls = type(self).natural_parametrization_cls()
         return cls.unflattened(jnp.zeros_like(self.flattened()), **kwargs)
 
+    # Abstract methods -----------------------------------------------------------------------------
     @classmethod
     def transform_natural_for_iteration(cls, iteration_natural: NP) -> NP:
         """
@@ -75,13 +76,14 @@ class ExpToNatIteratedFunction(
         exp_difference = tree_multimap(jnp.subtract, theta, expectation_parameters)
         gradient = type(natural_parameters).unflattened(-exp_difference.flattened())
 
-        ##gradient = id_print(gradient, what="G")
+        # id_print(gradient, what="G")
         transformed_gradient, new_gt_state = self.transform.update(gradient, current_gt_state,
                                                                    untransformed_natural_parameters)
-        #transformed_gradient = id_print(transformed_gradient, what="T")
+        # id_print(transformed_gradient, what="T")
         new_untransformed_natural_parameters = tree_multimap(jnp.add,
                                                              untransformed_natural_parameters,
                                                              transformed_gradient)
+        # id_print(new_untransformed_natural_parameters, what="P")
         return new_gt_state, new_untransformed_natural_parameters
 
     def sampled_state_trajectory(

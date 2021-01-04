@@ -173,8 +173,9 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP]):
 
 
 class GammaInfo(DistributionInfo[GammaNP, GammaEP]):
-    def exp_to_scipy_distribution(self, p: GammaEP) -> Any:
-        shape, scale = p.solve_for_shape_and_scale()
+    def nat_to_scipy_distribution(self, q: GammaNP) -> Any:
+        shape = q.shape_minus_one + 1.0
+        scale = -1.0 / q.negative_rate
         return ss.gamma(shape, scale=scale)
 
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> GammaNP:
