@@ -59,7 +59,6 @@ parametrization, this is an expected value.
 
 EFAX provides conversions between the two parametrizations through the
 :python:`NaturalParametrization.to_exp` and :python:`ExpectationParametrization.to_nat` methods.
-Converting from expectation parameters to natural ones sometimes requires numerical optimization.
 
 Important methods
 -----------------
@@ -78,6 +77,12 @@ Every :python:`ExpectationParametrization` has a :python:`cross_entropy` method 
 efficient, numerically optimized custom JAX gradient.  This is possible because the gradient of the
 cross entropy is the difference of expectation parameters (when the expected carrier measure is
 zero).
+
+Numerical optimization
+----------------------
+Because of the nature of the log-normalizer and carrier measure, some methods for some distributions
+require numerical optimization.  These are the conversion from expectation parameters to natural
+ones, the entropy, and the cross entropy.
 
 Usage
 =====

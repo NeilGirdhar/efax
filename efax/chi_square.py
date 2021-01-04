@@ -40,6 +40,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
         return ChiSquareEP(jnp.log(x))
 
 
+# The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
 class ChiSquareEP(ExpToNat[ChiSquareNP]):
     mean_log: RealArray = distribution_parameter(axes=0)
@@ -52,8 +53,10 @@ class ChiSquareEP(ExpToNat[ChiSquareNP]):
     def shape(self) -> Shape:
         return self.mean_log.shape
 
-    # The expected_carrier_measure should return k/2, which requires the inverse of the digamma
-    # function.
+    def expected_carrier_measure(self) -> RealArray:
+        q = self.to_nat()
+        k_over_two = q.k_over_two_minus_one + 1.0
+        return -k_over_two
 
     @classmethod
     def transform_natural_for_iteration(cls, iteration_natural: ChiSquareNP) -> ChiSquareNP:
