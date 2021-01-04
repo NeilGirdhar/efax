@@ -5,7 +5,7 @@ from typing import Type
 from jax import numpy as jnp
 from tjax import RealArray, dataclass
 
-from .dirichlet import DirichletCommonEP, DirichletCommonNP
+from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 __all__ = ['BetaNP', 'BetaEP']
 

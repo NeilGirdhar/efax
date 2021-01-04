@@ -142,6 +142,7 @@ def _summarize_fisher_information(f: Callable[..., Array], array: Array, axes: i
 
 if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
+
     # Prevent autoflake from removing imports.
     # pylint: disable=pointless-statement
     ExpectationParametrization, Any
