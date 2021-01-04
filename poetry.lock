@@ -467,13 +467,9 @@ jax = [
     {file = "jax-0.2.7.tar.gz", hash = "sha256:51f55ddab1518a52f43131dabb8f5ffc3e68b5f536b945e8cb8fca7c0d3d4b23"},
 ]
 jaxlib = [
-    {file = "jaxlib-0.1.57-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:47d4bf94f38ab9a437a69c19be6a3e1d235811d6da70922a3ff6502c33361504"},
     {file = "jaxlib-0.1.57-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:669427a85df109995cf2689945c995fd36abce80d7dbc0ad1833fa9966fa935e"},
-    {file = "jaxlib-0.1.57-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:048596b2ba458b01eb0c5680936df851f2083f6135ec9cd984f2f5ea45ad619d"},
     {file = "jaxlib-0.1.57-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:2bc945849553dbc31eba737ca81546fb47ec1e7c3340872d9b7dd329006f51a7"},
-    {file = "jaxlib-0.1.57-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:0fd3a836ec91d96a2944b5fa610780c46166c9c501629446921bd406bc83fcd0"},
     {file = "jaxlib-0.1.57-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:252e2b0043dc655e889da4363af9bc22c22d4c9728b9b2b685eac763d3a4de30"},
-    {file = "jaxlib-0.1.57-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:4e449261a7a4b08525b88dda49636eae55b9c2be464f4683dd4fd25e96134dce"},
     {file = "jaxlib-0.1.57-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:2c07605172118ab3a5a62d639a62059e4c8d67cc44de655af6606c50afa1d8c9"},
 ]
 kiwisolver = [
