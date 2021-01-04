@@ -26,10 +26,11 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
 
     def to_exp(self) -> LogarithmicEP:
         probability = jnp.exp(self.log_probability)
-        return LogarithmicEP(jnp.where(self.log_probability < -100,
-                                       1.0,
-                                       probability / (jnp.expm1(self.log_probability)
-                                                      * jnp.log1p(-probability))))
+        chi = jnp.where(self.log_probability < -50.0, 1.0,
+                        jnp.where(self.log_probability > -1e-7, jnp.inf,
+                                  probability / (jnp.expm1(self.log_probability)
+                                                 * jnp.log1p(-probability))))
+        return LogarithmicEP(chi)
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         return -jnp.log(x)
