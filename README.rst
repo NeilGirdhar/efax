@@ -10,18 +10,23 @@ EFAX: Exponential Families in JAX
 .. role:: python(code)
    :language: python
 
-This library provides a set of tools for working with *exponential family distributions* in the differential programming library `JAX <https://github.com/google/jax/>`_.
-The *exponential families* are an important class of probability distributions that include the normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
-For an explanation of the fundamental ideas behind this library, see our `overview on exponential families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
+This library provides a set of tools for working with *exponential family distributions* in the
+differential programming library `JAX <https://github.com/google/jax/>`_.
+The *exponential families* are an important class of probability distributions that include the
+normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
+For an explanation of the fundamental ideas behind this library, see our `overview on exponential
+families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
 
 Framework
 =========
 Representation
 --------------
-EFAX has a single base class for its objects: :python:`Parametrization` that encodes the distribution family, and the parameters of the distribution.
+EFAX has a single base class for its objects: :python:`Parametrization` that encodes the
+distribution family, and the parameters of the distribution.
 Each such object has a shape, and so it can store any number of distributions.
 When operating on such objects, NumPy's broadcasting rules apply.
-This is unlike SciPy where each distribution is represented by a single object, and so a thousand distributions need a thousand objects.
+This is unlike SciPy where each distribution is represented by a single object, and so a thousand
+distributions need a thousand objects.
 
 All parametrization objects are dataclasses using :python:`tjax.dataclass`.  These dataclasses are
 a modification of Python's dataclasses to support JAX's type registration.  This allows easy marking
@@ -46,16 +51,17 @@ If such an object :python:`x` has shape :python:`s`, then the shape of
 
 Parametrizations
 ----------------
-Each exponential family distribution has two special parametrizations: the natural and the expectation parametrization.  (These are described in the overview pdf.)
+Each exponential family distribution has two special parametrizations: the natural and the
+expectation parametrization.  (These are described in the overview pdf.)
 Consequently, every distribution has two base classes, one inheriting from
 :python:`NaturalParametrization` and one from :python:`ExpectationParametrization`.
 
 The motivation for the natural parametrization is combining and scaling independent predictive
 evidence.  In the natural parametrization, these operations correspond to scaling and addition.
 
-The motivation for the expectation parametrization is combining independent and identically
-distributed observations into the maximum likelihood distribution.  In the expectation
-parametrization, this is an expected value.
+The motivation for the expectation parametrization is combining independent observations into the
+maximum likelihood distribution that could have produced them.  In the expectation parametrization,
+this is an expected value.
 
 EFAX provides conversions between the two parametrizations through the
 :python:`NaturalParametrization.to_exp` and :python:`ExpectationParametrization.to_nat` methods.
@@ -84,10 +90,8 @@ Because of the nature of the log-normalizer and carrier measure, some methods fo
 require numerical optimization.  These are the conversion from expectation parameters to natural
 ones, the entropy, and the cross entropy.
 
-Usage
-=====
 Distributions
--------------
+=============
 EFAX supports the following distributions:
 
 - Bernoulli
@@ -108,6 +112,8 @@ EFAX supports the following distributions:
 - Poisson
 - von Mises-Fisher
 
+Usage
+=====
 Basic usage
 -----------
 A basic use of the two parametrizations:
@@ -183,13 +189,27 @@ Using the cross entropy to iteratively optimize a prediction is simple:
 Contribution guidelines
 =======================
 
-- Conventions: PEP8.
+Contributions are welcome!
 
-- How to run tests: :bash:`pytest .`
+If you want to add a new distribution, the steps are
 
-- How to clean the source:
+- Create an issue for the new distribution.
 
-  - :bash:`isort .`
-  - :bash:`pylint efax`
-  - :bash:`flake8 efax`
-  - :bash:`mypy efax`
+- Solve for or research the equations needed to fill the blanks in the overview pdf, and put them in
+  the issue.  I'll add them to the pdf for you.
+
+- Implement the natural and expectation parametrizations.
+
+- Add the new distribution to the tests.
+
+Implementation should respect PEP8.
+The tests can be run using :bash:`pytest .`
+There are a few tools to clean and check the source:
+
+- :bash:`isort .`
+
+- :bash:`pylint efax`
+
+- :bash:`flake8 efax`
+
+- :bash:`mypy efax`
