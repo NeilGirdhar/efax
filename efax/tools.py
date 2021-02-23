@@ -35,6 +35,9 @@ def inverse_softplus(y: RealArray) -> RealArray:
                      jnp.log(jnp.expm1(y)))
 
 
+ive = tfp.math.bessel_ive
+
+
 def iv(v: Array, z: Array) -> Array:
     return tfp.math.bessel_ive(v, z) / jnp.exp(-jnp.abs(z))
 
