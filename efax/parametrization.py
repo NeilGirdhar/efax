@@ -22,8 +22,6 @@ class Parametrization:
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
-        if cls.__name__ in ['VonMisesFisher']:
-            return
 
         # Apply jit.
         for name in ['log_normalizer',

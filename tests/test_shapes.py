@@ -5,7 +5,6 @@ from numpy.random import Generator
 
 from efax import parameter_names_values_axes
 
-from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 
@@ -13,8 +12,6 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
     """
     Test that the methods produce the correct shapes.
     """
-    if isinstance(distribution_info, VonMisesFisherInfo):
-        return
     shape = (3, 4) if distribution_info.supports_shape() else ()
 
     p = distribution_info.exp_parameter_generator(generator, shape=shape)
@@ -26,6 +23,9 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
     def check(z: Any) -> None:
         for _, xf, n_axes in parameter_names_values_axes(z):
             assert xf.shape[:len(xf.shape) - n_axes] == shape
+
+    assert p.shape() == shape
+    assert q.shape() == shape
 
     check(p)
     check(q)
@@ -48,7 +48,5 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
 
 
 def test_types(distribution_info: DistributionInfo[Any, Any]) -> None:
-    if isinstance(distribution_info, VonMisesFisherInfo):
-        return
     if isinstance(distribution_info.exp_parameter_generator(np.random.default_rng(), ()), tuple):
         raise TypeError("This should return a number or an ndarray")

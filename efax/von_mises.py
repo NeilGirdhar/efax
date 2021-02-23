@@ -3,16 +3,14 @@ from __future__ import annotations
 import math
 from typing import Tuple
 
-import numpy as np
 from jax import numpy as jnp
 from jax.nn import softplus
-from scipy.special import iv
 from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
 from .parameter import distribution_parameter
-from .tools import inverse_softplus
+from .tools import inverse_softplus, iv
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
@@ -28,6 +26,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
     def log_normalizer(self) -> RealArray:
         half_k = self.mean_times_concentration.shape[-1] * 0.5
         kappa = jnp.linalg.norm(self.mean_times_concentration, 2, axis=-1)
+        print(half_k, kappa)
         return -jnp.log(kappa ** (half_k - 1.0)
                         / ((2.0 * math.pi) ** half_k
                            * iv(half_k - 1.0, kappa)))
@@ -50,11 +49,11 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
     def to_kappa_angle(self) -> Tuple[RealArray, RealArray]:
         if self.mean_times_concentration.shape[-1] != 2:
             raise ValueError
-        kappa = np.linalg.norm(self.mean_times_concentration, axis=-1)
-        angle = np.where(kappa == 0.0,
-                         0.0,
-                         np.arctan2(self.mean_times_concentration[..., 1],
-                                    self.mean_times_concentration[..., 0]))
+        kappa = jnp.linalg.norm(self.mean_times_concentration, axis=-1)
+        angle = jnp.where(kappa == 0.0,
+                          0.0,
+                          jnp.arctan2(self.mean_times_concentration[..., 1],
+                                      self.mean_times_concentration[..., 0]))
         return kappa, angle
 
 

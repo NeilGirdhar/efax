@@ -18,9 +18,6 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo[An
     """
     Test that the conversion between the different parametrizations are consistent.
     """
-    if isinstance(distribution_info, VonMisesFisherInfo):
-        return
-
     atol = (5e-3
             if isinstance(distribution_info, (GammaInfo, BetaInfo))
             else 2e-2
@@ -48,6 +45,7 @@ def test_gradient_log_normalizer(generator: Generator,
     Tests that the gradient log-normalizer evaluates to the same as the gradient of the
     log-normalizer.
     """
+    # TODO: Remove when https://github.com/tensorflow/probability/issues/1247 is resolved.
     if isinstance(distribution_info, VonMisesFisherInfo):
         return
 

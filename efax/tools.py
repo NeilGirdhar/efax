@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Iterable, List
 
 from chex import Array
 from jax import numpy as jnp
+from tensorflow_probability.substrates import jax as tfp
 from tjax import RealArray, field_values
 
 from .parameter import parameter_names_values_axes
@@ -32,6 +33,10 @@ def inverse_softplus(y: RealArray) -> RealArray:
     return jnp.where(y > 80.0,
                      y,
                      jnp.log(jnp.expm1(y)))
+
+
+def iv(v: Array, z: Array) -> Array:
+    return tfp.math.bessel_ive(v, z) / jnp.exp(-jnp.abs(z))
 
 
 if TYPE_CHECKING:

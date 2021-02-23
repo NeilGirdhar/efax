@@ -9,7 +9,6 @@ from tjax import assert_jax_allclose
 
 from efax import HasConjugatePrior
 
-from .create_info import VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
 
@@ -18,9 +17,6 @@ def test_conjugate_prior(generator: Generator,
     """
     Test that the conjugate prior actually matches the distribution.
     """
-    if isinstance(distribution_info, VonMisesFisherInfo):
-        return
-
     shape = (4, 3) if distribution_info.supports_shape() else ()
     n = 100 * jnp.ones(shape)
 

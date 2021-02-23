@@ -10,8 +10,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 
-from .create_info import (ComplexNormalInfo, LogarithmicInfo, MultivariateNormalInfo,
-                          VonMisesFisherInfo)
+from .create_info import ComplexNormalInfo, MultivariateNormalInfo
 from .distribution_info import DistributionInfo
 
 
@@ -19,8 +18,6 @@ def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, 
     """
     Test that the entropy calculation matches scipy's.
     """
-    if isinstance(distribution_info, (LogarithmicInfo, VonMisesFisherInfo)):
-        return
     shape = (3, 2) if distribution_info.supports_shape() else ()
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
@@ -37,8 +34,6 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any]
     """
     Test that the density/mass function calculation matches scipy's.
     """
-    if isinstance(distribution_info, (LogarithmicInfo, VonMisesFisherInfo)):
-        return
     for _ in range(10):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
@@ -61,8 +56,6 @@ def test_maximum_likelihood_estimation(generator: Generator,
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
-    if isinstance(distribution_info, (LogarithmicInfo, VonMisesFisherInfo)):
-        return
     rtol = (8e-2
             if isinstance(distribution_info, (ComplexNormalInfo, MultivariateNormalInfo))
             else 2e-2)
