@@ -1,5 +1,5 @@
+import jax.numpy as jnp
 from jax import grad, jit, lax
-from jax import numpy as jnp
 
 from efax import BernoulliEP, BernoulliNP
 

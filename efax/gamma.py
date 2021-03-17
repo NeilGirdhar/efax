@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from jax.nn import softplus
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 from .tools import inverse_softplus
 
 __all__ = ['GammaNP', 'GammaEP']
@@ -15,8 +15,8 @@ __all__ = ['GammaNP', 'GammaEP']
 
 @dataclass
 class GammaNP(NaturalParametrization['GammaEP']):
-    negative_rate: RealArray = distribution_parameter(axes=0)
-    shape_minus_one: RealArray = distribution_parameter(axes=0)
+    negative_rate: RealArray = distribution_parameter(ScalarSupport())
+    shape_minus_one: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -40,8 +40,8 @@ class GammaNP(NaturalParametrization['GammaEP']):
 
 @dataclass
 class GammaEP(ExpToNat[GammaNP, RealArray]):
-    mean: RealArray = distribution_parameter(axes=0)
-    mean_log: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(ScalarSupport())
+    mean_log: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

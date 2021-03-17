@@ -1,21 +1,21 @@
 from __future__ import annotations
 
+import jax.numpy as jnp
 import numpy as np
-from jax import numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
 
 from .beta import BetaNP
 from .conjugate_prior import HasConjugatePrior
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['BernoulliNP', 'BernoulliEP']
 
 
 @dataclass
 class BernoulliNP(NaturalParametrization['BernoulliEP']):
-    log_odds: RealArray = distribution_parameter(axes=0)
+    log_odds: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -46,7 +46,7 @@ class BernoulliNP(NaturalParametrization['BernoulliEP']):
 
 @dataclass
 class BernoulliEP(HasConjugatePrior[BernoulliNP]):
-    probability: RealArray = distribution_parameter(axes=0)
+    probability: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

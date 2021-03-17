@@ -1,4 +1,4 @@
-from jax import numpy as jnp
+import jax.numpy as jnp
 from tjax import assert_jax_allclose
 
 from efax import MultivariateNormalNP

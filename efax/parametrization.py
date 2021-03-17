@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from functools import partial
+from functools import partial, reduce
+from itertools import count
 from typing import TYPE_CHECKING, Any, Tuple, Type, TypeVar
 
-import numpy as np
+import jax.numpy as jnp
 from chex import Array
-from jax import numpy as jnp
-from jax.tree_util import tree_map, tree_reduce
 from tjax import RealArray, Shape, custom_jvp, jit
 
-from .parameter import parameter_names_axes
+from .parameter import parameter_names_support, parameter_names_values_support
 from .tools import tree_dot_final
 
 __all__ = ['Parametrization']
@@ -60,37 +59,30 @@ class Parametrization:
 
     # New methods ----------------------------------------------------------------------------------
     def flattened(self) -> Array:
-        def flatten_parameter(x: Array) -> Array:
-            return jnp.reshape(x, (*self.shape(), -1))
-        return tree_reduce(partial(jnp.append, axis=-1), tree_map(flatten_parameter, self))
+        return reduce(partial(jnp.append, axis=-1),
+                      (support.flattened(value)
+                       for name, value, support in parameter_names_values_support(self)))
 
     @classmethod
     def unflattened(cls: Type[T], flattened: Array, **kwargs: Any) -> T:
-        # Count the fields with 0, 1, and 2 axes.  Subtract the shape of flattened from the 0 count.
-        totals = np.zeros(3, dtype=np.int_)
-        totals[0] -= flattened.shape[-1]
-        for _, n_axes in parameter_names_axes(cls):
-            if not 0 <= n_axes <= 2:
-                raise ValueError
-            totals[n_axes] += 1
+        # Solve for dimensions.
+        def total_elements(dimensions: int) -> int:
+            return sum(support.num_elements(dimensions)
+                       for _, support in parameter_names_support(cls))
 
-        # Solve the quadratic equation and select the largest positive root.
-        roots = np.roots(list(reversed(list(totals))))
-        roots = list(roots)
-        if not roots:
-            root = 1
-        else:
-            root = int(max(roots))
-        if root < 0:
-            raise ValueError
+        target = flattened.shape[-1]
+        for dimensions in count():
+            te = total_elements(dimensions)
+            if te == target:
+                break
+            if te > target:
+                raise ValueError
 
         # Unflatten.
-        shape = flattened.shape[:-1]
         consumed = 0
-        for name, n_axes in parameter_names_axes(cls):
-            k = root ** n_axes
-            kwargs[name] = np.reshape(flattened[..., consumed: consumed + k],
-                                      shape + (root,) * n_axes)
+        for name, support in parameter_names_support(cls):
+            k = support.num_elements(dimensions)
+            kwargs[name] = support.unflattened(flattened[..., consumed: consumed + k], dimensions)
             consumed += k
 
         return cls(**kwargs)  # type: ignore

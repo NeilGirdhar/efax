@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
 from .gamma import GammaNP
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['ExponentialNP', 'ExponentialEP']
 
 
 @dataclass
 class ExponentialNP(NaturalParametrization['ExponentialEP']):
-    negative_rate: RealArray = distribution_parameter(axes=0)
+    negative_rate: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -34,7 +34,7 @@ class ExponentialNP(NaturalParametrization['ExponentialEP']):
 
 @dataclass
 class ExponentialEP(HasConjugatePrior[ExponentialNP]):
-    mean: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

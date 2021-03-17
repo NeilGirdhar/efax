@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from typing import Type
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from jax.nn import softplus
 from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['LogarithmicNP', 'LogarithmicEP']
 
 
 @dataclass
 class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
-    log_probability: RealArray = distribution_parameter(axes=0)
+    log_probability: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -41,7 +41,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
 
 @dataclass
 class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
-    chi: RealArray = distribution_parameter(axes=0)  # - odds / log(1-p)
+    chi: RealArray = distribution_parameter(ScalarSupport())  # - odds / log(1-p)
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod

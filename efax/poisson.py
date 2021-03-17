@@ -1,20 +1,20 @@
 from __future__ import annotations
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
 from .gamma import GammaNP
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['PoissonNP', 'PoissonEP']
 
 
 @dataclass
 class PoissonNP(NaturalParametrization['PoissonEP']):
-    log_mean: RealArray = distribution_parameter(axes=0)
+    log_mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -35,7 +35,7 @@ class PoissonNP(NaturalParametrization['PoissonEP']):
 
 @dataclass
 class PoissonEP(HasConjugatePrior[PoissonNP]):
-    mean: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

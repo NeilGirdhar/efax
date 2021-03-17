@@ -1,20 +1,20 @@
 from __future__ import annotations
 
+import jax.numpy as jnp
 import numpy as np
-from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['NormalNP', 'NormalEP']
 
 
 @dataclass
 class NormalNP(NaturalParametrization['NormalEP']):
-    mean_times_precision: RealArray = distribution_parameter(axes=0)
-    negative_half_precision: RealArray = distribution_parameter(axes=0)
+    mean_times_precision: RealArray = distribution_parameter(ScalarSupport())
+    negative_half_precision: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -38,8 +38,8 @@ class NormalNP(NaturalParametrization['NormalEP']):
 
 @dataclass
 class NormalEP(ExpectationParametrization[NormalNP]):
-    mean: RealArray = distribution_parameter(axes=0)
-    second_moment: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(ScalarSupport())
+    second_moment: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

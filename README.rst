@@ -35,15 +35,14 @@ when it changes, and consequently there is more flexibility about what can be do
 attribute.  An example of a static attribute in EFAX is the failure number of the negative binomial
 distribution.
 
-Each non-static attribute in an EFAX distribution is marked with a number of axes.  Zero axes means
-that the attribute is a scalar.  One is a vector, and two is a square matrix.  For example:
+Each non-static attribute in an EFAX distribution is marked with a support.  For example:
 
 .. code:: python
 
     @dataclass
     class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
-        mean_times_precision: RealArray = distribution_parameter(axes=1)
-        negative_half_precision: RealArray = distribution_parameter(axes=2)
+        mean_times_precision: RealArray = distribution_parameter(VectorSupport())
+        negative_half_precision: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
 In this case, we see that there are two natural parameters for the multivariate normal distribution.
 If such an object :python:`x` has shape :python:`s`, then the shape of

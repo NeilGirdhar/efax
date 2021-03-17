@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Type
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
@@ -19,7 +19,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
     The chi-square distribution with k degrees of freedom is the gamma distribution with shape k/2
     and rate 1/2.
     """
-    k_over_two_minus_one: RealArray = distribution_parameter(axes=0)
+    k_over_two_minus_one: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -43,7 +43,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
 class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
-    mean_log: RealArray = distribution_parameter(axes=0)
+    mean_log: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod

@@ -3,13 +3,13 @@ from __future__ import annotations
 import math
 from typing import Tuple
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from jax.nn import softplus
 from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import VectorSupport, distribution_parameter
 from .tools import inverse_softplus, ive
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
@@ -17,7 +17,7 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 @dataclass
 class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
-    mean_times_concentration: RealArray = distribution_parameter(axes=1)
+    mean_times_concentration: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -57,7 +57,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
 
 @dataclass
 class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
-    mean: RealArray = distribution_parameter(axes=1)
+    mean: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

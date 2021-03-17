@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import jax.numpy as jnp
 import numpy as np
-from jax import numpy as jnp
 from tjax import RealArray, Shape, dataclass
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
 
 __all__ = ['MultivariateNormalNP', 'MultivariateNormalEP']
 
@@ -17,8 +17,8 @@ def _broadcasted_outer(x: RealArray) -> RealArray:
 
 @dataclass
 class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
-    mean_times_precision: RealArray = distribution_parameter(axes=1)
-    negative_half_precision: RealArray = distribution_parameter(axes=2)
+    mean_times_precision: RealArray = distribution_parameter(VectorSupport())
+    negative_half_precision: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -48,8 +48,8 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
 
 @dataclass
 class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP]):
-    mean: RealArray = distribution_parameter(axes=1)
-    second_moment: RealArray = distribution_parameter(axes=2)
+    mean: RealArray = distribution_parameter(VectorSupport())
+    second_moment: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

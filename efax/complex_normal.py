@@ -2,21 +2,21 @@ from __future__ import annotations
 
 import math
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from tjax import Array, ComplexArray, RealArray, Shape, dataclass
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 
 @dataclass
 class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
-    mean_times_precision: ComplexArray = distribution_parameter(axes=0)
-    precision: ComplexArray = distribution_parameter(axes=0)
-    pseudo_precision: ComplexArray = distribution_parameter(axes=0)
+    mean_times_precision: ComplexArray = distribution_parameter(ScalarSupport())
+    precision: ComplexArray = distribution_parameter(ScalarSupport())
+    pseudo_precision: ComplexArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -61,9 +61,9 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
 
 @dataclass
 class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
-    mean: ComplexArray = distribution_parameter(axes=0)
-    second_moment: RealArray = distribution_parameter(axes=0)
-    pseudo_second_moment: ComplexArray = distribution_parameter(axes=0)
+    mean: ComplexArray = distribution_parameter(ScalarSupport())
+    second_moment: RealArray = distribution_parameter(ScalarSupport())
+    pseudo_second_moment: ComplexArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

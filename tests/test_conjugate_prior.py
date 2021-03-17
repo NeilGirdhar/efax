@@ -1,8 +1,7 @@
 from typing import Any
 
-from jax import grad
-from jax import numpy as jnp
-from jax import vmap
+import jax.numpy as jnp
+from jax import grad, vmap
 from jax.tree_util import tree_map
 from numpy.random import Generator
 from tjax import assert_jax_allclose

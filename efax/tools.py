@@ -3,12 +3,12 @@ from __future__ import annotations
 from functools import reduce
 from typing import TYPE_CHECKING, Any, Iterable, List
 
+import jax.numpy as jnp
 from chex import Array
-from jax import numpy as jnp
 from tensorflow_probability.substrates import jax as tfp
 from tjax import RealArray, field_values
 
-from .parameter import parameter_names_values_axes
+from .parameter import parameter_names_values_support
 
 __all__: List[str] = []
 
@@ -23,9 +23,9 @@ def dot_final(x: Array, y: Array, n_axes: int) -> RealArray:
 
 def tree_dot_final(x: NaturalParametrization[Any], y: Any) -> RealArray:
     def dotted_fields() -> Iterable[Array]:
-        for (_, xf, n_axes), yf in zip(parameter_names_values_axes(x),
-                                       field_values(y, static=False)):
-            yield dot_final(xf, yf, n_axes)
+        for (_, xf, support), yf in zip(parameter_names_values_support(x),
+                                        field_values(y, static=False)):
+            yield dot_final(xf, yf, support.axes())
     return reduce(jnp.add, dotted_fields())
 
 

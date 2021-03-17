@@ -4,13 +4,12 @@ from functools import partial
 from typing import (TYPE_CHECKING, Any, Callable, Generic, Tuple, Type, TypeVar, final,
                     get_type_hints)
 
+import jax.numpy as jnp
 from chex import Array
-from jax import grad, jacfwd
-from jax import numpy as jnp
-from jax import vjp, vmap
+from jax import grad, jacfwd, vjp, vmap
 from tjax import RealArray, jit
 
-from .parameter import parameter_names_values_axes
+from .parameter import parameter_names_values_support
 from .parametrization import Parametrization
 from .tools import tree_dot_final
 
@@ -103,8 +102,8 @@ class NaturalParametrization(Parametrization, Generic[EP]):
 
         kwargs = {}
         f = jnp.trace if trace else jnp.diagonal
-        for name, value, axes in parameter_names_values_axes(fisher_information):
-            kwargs[name] = _summarize_fisher_information(f, getattr(value, name), axes)
+        for name, value, support in parameter_names_values_support(fisher_information):
+            kwargs[name] = _summarize_fisher_information(f, getattr(value, name), support.axes())
         return fisher_information.replace(**kwargs)
 
     @jit

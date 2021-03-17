@@ -3,7 +3,7 @@ from __future__ import annotations
 from tjax import RealArray, dataclass, field
 
 from .negative_binomial_common import NBCommonEP, NBCommonNP
-from .parameter import distribution_parameter
+from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP', 'GeometricNP', 'GeometricEP']
 
@@ -11,7 +11,7 @@ __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP', 'GeometricNP', 'Geometric
 @dataclass
 class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
     failures: int = field(static=True)
-    log_not_p: RealArray = distribution_parameter(axes=0)
+    log_not_p: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def to_exp(self) -> NegativeBinomialEP:
@@ -24,7 +24,7 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
 @dataclass
 class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
     failures: int = field(static=True)
-    mean: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def to_nat(self) -> NegativeBinomialNP:
@@ -33,7 +33,7 @@ class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
 
 @dataclass
 class GeometricNP(NBCommonNP['GeometricEP']):
-    log_not_p: RealArray = distribution_parameter(axes=0)
+    log_not_p: RealArray = distribution_parameter(ScalarSupport())
     failures = 1
 
     # Implemented methods --------------------------------------------------------------------------
@@ -46,7 +46,7 @@ class GeometricNP(NBCommonNP['GeometricEP']):
 
 @dataclass
 class GeometricEP(NBCommonEP[GeometricNP]):
-    mean: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(ScalarSupport())
     failures = 1
 
     # Implemented methods --------------------------------------------------------------------------

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Any, Generic, List, TypeVar
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from jax.nn import softplus
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import EP, NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import VectorSupport, distribution_parameter
 
 __all__: List[str] = []
 
@@ -20,7 +20,7 @@ __all__: List[str] = []
 
 @dataclass
 class DirichletCommonNP(NaturalParametrization[EP], Generic[EP]):
-    alpha_minus_one: RealArray = distribution_parameter(axes=1)
+    alpha_minus_one: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -42,7 +42,7 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 @dataclass
 class DirichletCommonEP(ExpToNat[NP, RealArray], Generic[NP]):
-    mean_log_probability: RealArray = distribution_parameter(axes=1)
+    mean_log_probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

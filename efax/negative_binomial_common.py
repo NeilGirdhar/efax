@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, List, TypeVar
 
-from jax import numpy as jnp
+import jax.numpy as jnp
 from jax.scipy.special import gammaln
 from tjax import RealArray, Shape
 

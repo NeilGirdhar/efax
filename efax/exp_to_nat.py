@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Generic, List, Tuple, TypeVar
 
+import jax.numpy as jnp
 from jax import jit
-from jax import numpy as jnp
 from jax.tree_util import tree_multimap
 from tjax import dataclass, field_names_and_values
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
