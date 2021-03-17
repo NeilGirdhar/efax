@@ -9,7 +9,7 @@ from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import CircularBoundedSupport, distribution_parameter, real_support
 from .tools import inverse_softplus, ive
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
@@ -17,7 +17,7 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 @dataclass
 class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
-    mean_times_concentration: RealArray = distribution_parameter(axes=1)
+    mean_times_concentration: RealArray = distribution_parameter(real_support, axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -32,10 +32,9 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
     def to_exp(self) -> VonMisesFisherEP:
         q = self.mean_times_concentration
         kappa = jnp.linalg.norm(q, 2, axis=-1, keepdims=True)
-        return VonMisesFisherEP(
-            jnp.where(kappa == 0.0,
-                      q,
-                      q * (_a_k(q.shape[-1], kappa) / kappa)))
+        return VonMisesFisherEP(jnp.where(kappa == 0.0,
+                                          q,
+                                          q * (_a_k(q.shape[-1], kappa) / kappa)))
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         return jnp.zeros(self.shape())
@@ -57,7 +56,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
 
 @dataclass
 class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
-    mean: RealArray = distribution_parameter(axes=1)
+    mean: RealArray = distribution_parameter(CircularBoundedSupport(1.0), axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

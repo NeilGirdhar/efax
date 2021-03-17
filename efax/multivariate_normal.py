@@ -17,7 +17,7 @@ def _broadcasted_outer(x: RealArray) -> RealArray:
 
 @dataclass
 class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
-    mean_times_precision: RealArray = distribution_parameter(axes=1)
+    mean_times_precision: RealArray = distribution_parameter(real_support, axes=1)
     negative_half_precision: RealArray = distribution_parameter(axes=2)
 
     # Implemented methods --------------------------------------------------------------------------
@@ -48,7 +48,7 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
 
 @dataclass
 class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP]):
-    mean: RealArray = distribution_parameter(axes=1)
+    mean: RealArray = distribution_parameter(real_support, axes=1)
     second_moment: RealArray = distribution_parameter(axes=2)
 
     # Implemented methods --------------------------------------------------------------------------

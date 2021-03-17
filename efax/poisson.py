@@ -7,14 +7,14 @@ from tjax import RealArray, Shape, dataclass
 from .conjugate_prior import HasConjugatePrior
 from .gamma import GammaNP
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import distribution_parameter, positive_support, real_support
 
 __all__ = ['PoissonNP', 'PoissonEP']
 
 
 @dataclass
 class PoissonNP(NaturalParametrization['PoissonEP']):
-    log_mean: RealArray = distribution_parameter(axes=0)
+    log_mean: RealArray = distribution_parameter(real_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -35,7 +35,7 @@ class PoissonNP(NaturalParametrization['PoissonEP']):
 
 @dataclass
 class PoissonEP(HasConjugatePrior[PoissonNP]):
-    mean: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(positive_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

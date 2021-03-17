@@ -7,16 +7,16 @@ from tjax import Array, ComplexArray, RealArray, Shape, dataclass
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import complex_support, distribution_parameter, real_support
 
 __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 
 @dataclass
 class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
-    mean_times_precision: ComplexArray = distribution_parameter(axes=0)
-    precision: ComplexArray = distribution_parameter(axes=0)
-    pseudo_precision: ComplexArray = distribution_parameter(axes=0)
+    mean_times_precision: ComplexArray = distribution_parameter(complex_support, axes=0)
+    precision: RealArray = distribution_parameter(real_support, axes=0)
+    pseudo_precision: ComplexArray = distribution_parameter(complex_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -61,9 +61,9 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
 
 @dataclass
 class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
-    mean: ComplexArray = distribution_parameter(axes=0)
-    second_moment: RealArray = distribution_parameter(axes=0)
-    pseudo_second_moment: ComplexArray = distribution_parameter(axes=0)
+    mean: ComplexArray = distribution_parameter(complex_support, axes=0)
+    second_moment: RealArray = distribution_parameter(real_support, axes=0)
+    pseudo_second_moment: ComplexArray = distribution_parameter(complex_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

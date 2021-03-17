@@ -6,15 +6,15 @@ from tjax import RealArray, Shape, dataclass
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import distribution_parameter, negative_support, positive_support, real_support
 
 __all__ = ['NormalNP', 'NormalEP']
 
 
 @dataclass
 class NormalNP(NaturalParametrization['NormalEP']):
-    mean_times_precision: RealArray = distribution_parameter(axes=0)
-    negative_half_precision: RealArray = distribution_parameter(axes=0)
+    mean_times_precision: RealArray = distribution_parameter(real_support, axes=0)
+    negative_half_precision: RealArray = distribution_parameter(negative_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -38,8 +38,8 @@ class NormalNP(NaturalParametrization['NormalEP']):
 
 @dataclass
 class NormalEP(ExpectationParametrization[NormalNP]):
-    mean: RealArray = distribution_parameter(axes=0)
-    second_moment: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(real_support, axes=0)
+    second_moment: RealArray = distribution_parameter(positive_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

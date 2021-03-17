@@ -8,14 +8,14 @@ from tjax import RealArray, Shape, dataclass
 from .beta import BetaNP
 from .conjugate_prior import HasConjugatePrior
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import BoundedRealSupport, distribution_parameter, real_support
 
 __all__ = ['BernoulliNP', 'BernoulliEP']
 
 
 @dataclass
 class BernoulliNP(NaturalParametrization['BernoulliEP']):
-    log_odds: RealArray = distribution_parameter(axes=0)
+    log_odds: RealArray = distribution_parameter(real_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -46,7 +46,7 @@ class BernoulliNP(NaturalParametrization['BernoulliEP']):
 
 @dataclass
 class BernoulliEP(HasConjugatePrior[BernoulliNP]):
-    probability: RealArray = distribution_parameter(axes=0)
+    probability: RealArray = distribution_parameter(BoundedRealSupport(0.0, 1.0), axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

@@ -6,14 +6,14 @@ from tjax import RealArray, Shape, dataclass
 from .conjugate_prior import HasConjugatePrior
 from .gamma import GammaNP
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import distribution_parameter, negative_support, positive_support
 
 __all__ = ['ExponentialNP', 'ExponentialEP']
 
 
 @dataclass
 class ExponentialNP(NaturalParametrization['ExponentialEP']):
-    negative_rate: RealArray = distribution_parameter(axes=0)
+    negative_rate: RealArray = distribution_parameter(negative_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -34,7 +34,7 @@ class ExponentialNP(NaturalParametrization['ExponentialEP']):
 
 @dataclass
 class ExponentialEP(HasConjugatePrior[ExponentialNP]):
-    mean: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(positive_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

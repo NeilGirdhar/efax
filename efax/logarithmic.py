@@ -8,14 +8,14 @@ from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import BoundedBelowRealSupport, distribution_parameter, negative_support
 
 __all__ = ['LogarithmicNP', 'LogarithmicEP']
 
 
 @dataclass
 class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
-    log_probability: RealArray = distribution_parameter(axes=0)
+    log_probability: RealArray = distribution_parameter(negative_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -41,7 +41,8 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
 
 @dataclass
 class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
-    chi: RealArray = distribution_parameter(axes=0)  # - odds / log(1-p)
+    # The expectation parameter chi is: -odds / log(1-p).
+    chi: RealArray = distribution_parameter(BoundedBelowRealSupport(1.0), axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod

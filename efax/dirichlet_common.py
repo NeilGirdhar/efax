@@ -9,7 +9,7 @@ from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import EP, NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import BoundedBelowRealSupport, distribution_parameter, negative_support
 
 __all__: List[str] = []
 
@@ -20,7 +20,7 @@ __all__: List[str] = []
 
 @dataclass
 class DirichletCommonNP(NaturalParametrization[EP], Generic[EP]):
-    alpha_minus_one: RealArray = distribution_parameter(axes=1)
+    alpha_minus_one: RealArray = distribution_parameter(BoundedBelowRealSupport(-1.0), axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -42,7 +42,7 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 @dataclass
 class DirichletCommonEP(ExpToNat[NP, RealArray], Generic[NP]):
-    mean_log_probability: RealArray = distribution_parameter(axes=1)
+    mean_log_probability: RealArray = distribution_parameter(negative_support, axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

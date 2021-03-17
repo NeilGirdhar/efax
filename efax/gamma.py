@@ -7,7 +7,8 @@ from tjax import RealArray, Shape, dataclass
 
 from .exp_to_nat import ExpToNat
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import (BoundedBelowRealSupport, distribution_parameter, negative_support,
+                        positive_support, real_support)
 from .tools import inverse_softplus
 
 __all__ = ['GammaNP', 'GammaEP']
@@ -15,8 +16,8 @@ __all__ = ['GammaNP', 'GammaEP']
 
 @dataclass
 class GammaNP(NaturalParametrization['GammaEP']):
-    negative_rate: RealArray = distribution_parameter(axes=0)
-    shape_minus_one: RealArray = distribution_parameter(axes=0)
+    negative_rate: RealArray = distribution_parameter(negative_support, axes=0)
+    shape_minus_one: RealArray = distribution_parameter(BoundedBelowRealSupport(-1.0), axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -40,8 +41,8 @@ class GammaNP(NaturalParametrization['GammaEP']):
 
 @dataclass
 class GammaEP(ExpToNat[GammaNP, RealArray]):
-    mean: RealArray = distribution_parameter(axes=0)
-    mean_log: RealArray = distribution_parameter(axes=0)
+    mean: RealArray = distribution_parameter(positive_support, axes=0)
+    mean_log: RealArray = distribution_parameter(real_support, axes=0)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:

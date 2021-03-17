@@ -9,7 +9,7 @@ from jax import numpy as jnp
 from jax.tree_util import tree_map, tree_reduce
 from tjax import RealArray, Shape, custom_jvp, jit
 
-from .parameter import parameter_names_axes
+from .parameter import parameter_names_axes_support
 from .tools import tree_dot_final
 
 __all__ = ['Parametrization']
@@ -65,11 +65,18 @@ class Parametrization:
         return tree_reduce(partial(jnp.append, axis=-1), tree_map(flatten_parameter, self))
 
     @classmethod
-    def unflattened(cls: Type[T], flattened: Array, **kwargs: Any) -> T:
+    def unflattened(cls: Type[T], flattened: Array, soft_clip: bool = False, **kwargs: Any) -> T:
+        """
+        Args:
+            flattened: The flattened array, which will be unflattened into a Parametrization object.
+            soft_clip: If true, the values are softly clipped to the support.  This makes
+                unflattened not the inverse operation of flattened.
+            kwargs: Additional keyword arguments are static arguments of the Parametrization object.
+        """
         # Count the fields with 0, 1, and 2 axes.  Subtract the shape of flattened from the 0 count.
         totals = np.zeros(3, dtype=np.int_)
         totals[0] -= flattened.shape[-1]
-        for _, n_axes in parameter_names_axes(cls):
+        for _, n_axes, _ in parameter_names_axes_support(cls):
             if not 0 <= n_axes <= 2:
                 raise ValueError
             totals[n_axes] += 1
@@ -87,10 +94,13 @@ class Parametrization:
         # Unflatten.
         shape = flattened.shape[:-1]
         consumed = 0
-        for name, n_axes in parameter_names_axes(cls):
+        for name, n_axes, support in parameter_names_axes_support(cls):
             k = root ** n_axes
-            kwargs[name] = np.reshape(flattened[..., consumed: consumed + k],
-                                      shape + (root,) * n_axes)
+            value = np.reshape(flattened[..., consumed: consumed + k],
+                               shape + (root,) * n_axes)
+            if soft_clip:
+                value = support.soft_clip(value)
+            kwargs[name] = value
             consumed += k
 
         return cls(**kwargs)  # type: ignore

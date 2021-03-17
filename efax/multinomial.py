@@ -8,14 +8,14 @@ from tjax import RealArray, Shape, dataclass
 from .conjugate_prior import HasConjugatePrior
 from .dirichlet import DirichletNP
 from .natural_parametrization import NaturalParametrization
-from .parameter import distribution_parameter
+from .parameter import BoundedRealSupport, distribution_parameter, real_support
 
 __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
 class MultinomialNP(NaturalParametrization['MultinomialEP']):
-    log_odds: RealArray = distribution_parameter(axes=1)
+    log_odds: RealArray = distribution_parameter(real_support, axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
@@ -55,7 +55,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP']):
 
 @dataclass
 class MultinomialEP(HasConjugatePrior[MultinomialNP]):
-    probability: RealArray = distribution_parameter(axes=1)
+    probability: RealArray = distribution_parameter(BoundedRealSupport(0.0, 1.0), axes=1)
 
     # Implemented methods --------------------------------------------------------------------------
     def shape(self) -> Shape:
