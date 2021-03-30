@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import Type
+from typing import Optional, Type
 
+import jax
 import jax.numpy as jnp
-from tjax import RealArray, dataclass
+from tjax import Generator, RealArray, Shape, dataclass
 
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
@@ -28,6 +29,14 @@ class BetaNP(DirichletCommonNP['BetaEP']):
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         return jnp.zeros(x.shape)
+
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+        if shape is not None:
+            shape += self.shape()
+        return jax.random.beta(rng.key,
+                               1.0 + self.alpha_minus_one[..., 0],
+                               1.0 + self.alpha_minus_one[..., 1],
+                               shape)
 
 
 @dataclass

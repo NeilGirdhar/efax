@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from typing import Optional
+
+import jax
 import jax.numpy as jnp
 import numpy as np
 from jax.scipy import special as jss
-from tjax import RealArray, Shape, dataclass
+from tjax import Array, Generator, RealArray, Shape, dataclass
 
 from .beta import BetaNP
 from .conjugate_prior import HasConjugatePrior
 from .natural_parametrization import NaturalParametrization
 from .parameter import ScalarSupport, distribution_parameter
+from .samplable import Samplable
 
 __all__ = ['BernoulliNP', 'BernoulliEP']
 
@@ -45,7 +49,7 @@ class BernoulliNP(NaturalParametrization['BernoulliEP']):
 
 
 @dataclass
-class BernoulliEP(HasConjugatePrior[BernoulliNP]):
+class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
     probability: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -57,6 +61,11 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP]):
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
+
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> Array:
+        if shape is not None:
+            shape += self.shape()
+        return jax.random.bernoulli(rng.key, self.probability, shape)
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> BetaNP:

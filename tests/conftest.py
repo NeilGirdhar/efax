@@ -4,6 +4,7 @@ from typing import Any, Generator, List
 import numpy as np
 import pytest
 from numpy.random import Generator as NumpyGenerator
+from tjax import Generator as TjaxGenerator
 
 from .create_info import create_infos
 from .distribution_info import DistributionInfo
@@ -12,6 +13,11 @@ from .distribution_info import DistributionInfo
 @pytest.fixture
 def generator() -> NumpyGenerator:
     return np.random.default_rng(123)
+
+
+@pytest.fixture
+def rng() -> TjaxGenerator:
+    return TjaxGenerator.from_seed(123)
 
 
 @pytest.fixture(scope='session')

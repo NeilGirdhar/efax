@@ -17,6 +17,7 @@ from .negative_binomial import *
 from .normal import *
 from .parameter import *
 from .poisson import *
+from .samplable import *
 from .scipy_replacement import *
 from .tools import *
 from .von_mises import *

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import Optional
+
+import jax
 import jax.numpy as jnp
 import numpy as np
-from tjax import RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape, dataclass
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
 from .parameter import ScalarSupport, distribution_parameter
+from .samplable import Samplable
 
 __all__ = ['NormalNP', 'NormalEP']
 
@@ -37,7 +41,7 @@ class NormalNP(NaturalParametrization['NormalEP']):
 
 
 @dataclass
-class NormalEP(ExpectationParametrization[NormalNP]):
+class NormalEP(ExpectationParametrization[NormalNP], Samplable):
     mean: RealArray = distribution_parameter(ScalarSupport())
     second_moment: RealArray = distribution_parameter(ScalarSupport())
 
@@ -50,6 +54,14 @@ class NormalEP(ExpectationParametrization[NormalNP]):
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
+
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+        if shape is not None:
+            shape += self.shape()
+        else:
+            shape = self.shape()
+        deviation = jnp.sqrt(self.variance())
+        return jax.random.normal(rng.key, shape) * deviation + self.mean
 
     # New methods ----------------------------------------------------------------------------------
     def variance(self) -> RealArray:

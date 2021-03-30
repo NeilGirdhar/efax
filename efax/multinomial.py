@@ -1,20 +1,25 @@
 from __future__ import annotations
 
+from typing import Optional
+
+import jax
 import jax.numpy as jnp
 import numpy as np
+from jax.nn import one_hot
 from jax.scipy import special as jss
-from tjax import RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
 from .dirichlet import DirichletNP
 from .natural_parametrization import NaturalParametrization
 from .parameter import VectorSupport, distribution_parameter
+from .samplable import Samplable
 
 __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
-class MultinomialNP(NaturalParametrization['MultinomialEP']):
+class MultinomialNP(NaturalParametrization['MultinomialEP'], Samplable):
     log_odds: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -38,6 +43,12 @@ class MultinomialNP(NaturalParametrization['MultinomialEP']):
 
     def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
         return MultinomialEP(x)
+
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+        if shape is not None:
+            shape += self.shape()
+        return one_hot(jax.random.categorical(rng.key, self.log_odds, shape=shape),
+                       self.log_odds.shape[-1])
 
     # New methods ----------------------------------------------------------------------------------
     def nat_to_probability(self) -> RealArray:

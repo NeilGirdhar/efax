@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from typing import Optional
+
+import jax
 import jax.numpy as jnp
 import numpy as np
-from tjax import RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape, dataclass
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
 from .parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
+from .samplable import Samplable
 
-__all__ = ['MultivariateNormalNP', 'MultivariateNormalEP']
+__all__ = ['MultivariateNormalNP', 'MultivariateNormalEP', 'MultivariateNormalVP']
 
 
 def _broadcasted_outer(x: RealArray) -> RealArray:
@@ -47,7 +51,7 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
 
 
 @dataclass
-class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP]):
+class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Samplable):
     mean: RealArray = distribution_parameter(VectorSupport())
     second_moment: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
@@ -63,6 +67,34 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP]):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
 
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+        return self.to_variance_parametrization().sample(rng, shape)
+
     # New methods ----------------------------------------------------------------------------------
     def variance(self) -> RealArray:
         return self.second_moment - _broadcasted_outer(self.mean)
+
+    def to_variance_parametrization(self) -> MultivariateNormalVP:
+        return MultivariateNormalVP(self.mean, self.variance())
+
+
+@dataclass
+class MultivariateNormalVP(Samplable):
+    mean: RealArray = distribution_parameter(VectorSupport())
+    variance: RealArray = distribution_parameter(SymmetricMatrixSupport())
+
+    # Implemented methods --------------------------------------------------------------------------
+    def shape(self) -> Shape:
+        return self.mean.shape[:-1]
+
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+        if shape is not None:
+            shape += self.shape()
+        else:
+            shape = self.shape()
+        return jax.random.multivariate_normal(rng.key, self.mean, self.variance, shape)
+
+    # New methods ----------------------------------------------------------------------------------
+    def to_exp(self) -> MultivariateNormalEP:
+        second_moment = self.variance + _broadcasted_outer(self.mean)
+        return MultivariateNormalEP(self.mean, second_moment)

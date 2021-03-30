@@ -1,20 +1,23 @@
 from __future__ import annotations
 
 import math
+from typing import Optional
 
+import jax
 import jax.numpy as jnp
-from tjax import RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape, dataclass
 
 from .conjugate_prior import HasConjugatePrior
 from .isotropic_normal import IsotropicNormalNP
 from .natural_parametrization import NaturalParametrization
 from .parameter import VectorSupport, distribution_parameter
+from .samplable import Samplable
 
 __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 
 @dataclass
-class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP']):
+class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'], Samplable):
     """
     The multivariate normal distribution with unit variance.  This is a curved exponential family.
     """
@@ -39,9 +42,16 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
     def sufficient_statistics(self, x: RealArray) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+        if shape is not None:
+            shape += self.shape()
+        else:
+            shape = self.shape()
+        return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
+
 
 @dataclass
-class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP]):
+class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samplable):
     mean: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -55,6 +65,13 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP]):
         num_parameters = self.mean.shape[-1]
         # The second moment of a normal distribution with the given mean.
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + num_parameters)
+
+    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+        if shape is not None:
+            shape += self.shape()
+        else:
+            shape = self.shape()
+        return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
