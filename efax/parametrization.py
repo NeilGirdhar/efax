@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from functools import partial, reduce
 from itertools import count
-from typing import TYPE_CHECKING, Any, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Tuple, Type, TypeVar
 
 import jax.numpy as jnp
 from chex import Array
 from tjax import RealArray, Shape, custom_jvp, jit
 
-from .parameter import parameter_names_support, parameter_names_values_support
+from .parameter import (field_names_values_metadata, parameter_names_support,
+                        parameter_names_values_support)
 from .tools import tree_dot_final
 
 __all__ = ['Parametrization']
@@ -58,6 +59,17 @@ class Parametrization:
             setattr(cls, name, method_jvp)
 
     # New methods ----------------------------------------------------------------------------------
+    def __getitem__(self: T, key: Any) -> T:
+        uk = self.unflattened_kwargs()
+        sliced_parameters = {name: value[key]
+                             for name, value, _ in parameter_names_values_support(self)}
+        return type(self)(**sliced_parameters, **uk)  # type: ignore
+
+    def unflattened_kwargs(self) -> Dict[Any, Any]:
+        return {name: value
+                for name, value, metadata in field_names_values_metadata(self)
+                if 'support' not in metadata}
+
     def flattened(self) -> Array:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
