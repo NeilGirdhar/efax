@@ -51,6 +51,9 @@ class MultinomialNP(NaturalParametrization['MultinomialEP'], Samplable):
                        self.log_odds.shape[-1])
 
     # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.log_odds.shape[-1]
+
     def nat_to_probability(self) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
@@ -78,6 +81,10 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape())
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.probability.shape[-1]
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> DirichletNP:

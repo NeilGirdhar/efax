@@ -49,6 +49,10 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
     def sufficient_statistics(self, x: RealArray) -> MultivariateNormalEP:
         return MultivariateNormalEP(x, _broadcasted_outer(x))
 
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean_times_precision.shape[-1]
+
 
 @dataclass
 class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Samplable):
@@ -71,6 +75,9 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Sam
         return self.to_variance_parametrization().sample(rng, shape)
 
     # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]
+
     def variance(self) -> RealArray:
         return self.second_moment - _broadcasted_outer(self.mean)
 
@@ -95,6 +102,9 @@ class MultivariateNormalVP(Samplable):
         return jax.random.multivariate_normal(rng.key, self.mean, self.variance, shape)
 
     # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]
+
     def to_exp(self) -> MultivariateNormalEP:
         second_moment = self.variance + _broadcasted_outer(self.mean)
         return MultivariateNormalEP(self.mean, second_moment)

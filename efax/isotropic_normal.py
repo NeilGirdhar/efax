@@ -43,6 +43,10 @@ class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP']):
     def sufficient_statistics(self, x: RealArray) -> IsotropicNormalEP:
         return IsotropicNormalEP(x, jnp.sum(jnp.square(x), axis=-1))
 
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean_times_precision.shape[-1]
+
 
 @dataclass
 class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable):
@@ -74,3 +78,6 @@ class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable
     def variance(self) -> RealArray:
         num_parameters = self.mean.shape[-1]
         return (self.total_second_moment - jnp.sum(jnp.square(self.mean), axis=-1)) / num_parameters
+
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]

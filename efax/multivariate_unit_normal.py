@@ -49,6 +49,10 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
             shape = self.shape()
         return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
 
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]
+
 
 @dataclass
 class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samplable):
@@ -72,6 +76,10 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
         else:
             shape = self.shape()
         return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:

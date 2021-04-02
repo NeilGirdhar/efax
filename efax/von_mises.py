@@ -44,6 +44,9 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
         return VonMisesFisherEP(x)
 
     # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean_times_concentration.shape[-1]
+
     def to_kappa_angle(self) -> Tuple[RealArray, RealArray]:
         if self.mean_times_concentration.shape[-1] != 2:
             raise ValueError
@@ -86,6 +89,10 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
         kappa = softplus(search_parameters)
         mu = jnp.linalg.norm(self.mean, 2, axis=-1)
         return _a_k(k, kappa) - mu
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]
 
 
 # Private functions --------------------------------------------------------------------------------

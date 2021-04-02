@@ -38,6 +38,10 @@ class DirichletCommonNP(NaturalParametrization[EP], Samplable, Generic[EP]):
             shape += self.shape()
         return jax.random.dirichlet(rng.key, 1.0 + self.alpha_minus_one, shape)[...,:-1]
 
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.alpha_minus_one.shape[-1]
+
     # Private methods ------------------------------------------------------------------------------
     def _exp_helper(self) -> RealArray:
         q = self.alpha_minus_one
@@ -63,6 +67,10 @@ class DirichletCommonEP(ExpToNat[NP, RealArray], Generic[NP]):
 
     def search_gradient(self, search_parameters: RealArray) -> RealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).alpha_minus_one
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean_log_probability.shape[-1]
 
     # Private methods ------------------------------------------------------------------------------
     @classmethod
