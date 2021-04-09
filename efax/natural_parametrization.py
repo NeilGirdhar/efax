@@ -9,9 +9,9 @@ from chex import Array
 from jax import grad, jacfwd, vjp, vmap
 from tjax import RealArray, jit
 
-from .parameter import parameter_names_values_support
+from .parameter import parameters_name_value_support
 from .parametrization import Parametrization
-from .tools import tree_dot_final
+from .tools import parameters_dot_product
 
 __all__ = ['NaturalParametrization']
 
@@ -80,7 +80,8 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         Returns: The distribution's density or mass function at x.
         """
         tx = self.sufficient_statistics(x)
-        return jnp.exp(tree_dot_final(self, tx) - self.log_normalizer() + self.carrier_measure(x))
+        return jnp.exp(parameters_dot_product(self, tx) - self.log_normalizer()
+                       + self.carrier_measure(x))
 
     @final
     def fisher_information(self: T, diagonal: bool = False, trace: bool = False) -> T:
@@ -102,7 +103,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
 
         kwargs = {}
         f = jnp.trace if trace else jnp.diagonal
-        for name, value, support in parameter_names_values_support(fisher_information):
+        for name, value, support in parameters_name_value_support(fisher_information):
             kwargs[name] = _summarize_fisher_information(f, getattr(value, name), support.axes())
         return fisher_information.replace(**kwargs)
 

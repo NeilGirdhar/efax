@@ -7,8 +7,9 @@ import jax.numpy as jnp
 from jax.ops import index_update
 from tjax import Array, Shape, field, field_names_values_metadata, fields
 
-__all__ = ['parameter_names_values_support', 'parameter_names_support', 'Support', 'ScalarSupport',
-           'VectorSupport', 'SymmetricMatrixSupport', 'SquareMatrixSupport']
+__all__ = ['parameters_value_support', 'parameters_name_value_support', 'parameters_name_support',
+           'Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',
+           'SquareMatrixSupport']
 
 
 class Support:
@@ -121,7 +122,15 @@ def distribution_parameter(support: Support) -> Any:
     return field(metadata={'support': support})
 
 
-def parameter_names_values_support(x: Parametrization) -> Iterable[Tuple[str, Array, Support]]:
+def parameters_value_support(x: Parametrization) -> Iterable[Tuple[Array, Support]]:
+    for _, value, metadata in field_names_values_metadata(x, static=False):
+        support = metadata['support']
+        if not isinstance(support, Support):
+            raise TypeError
+        yield value, support
+
+
+def parameters_name_value_support(x: Parametrization) -> Iterable[Tuple[str, Array, Support]]:
     for name, value, metadata in field_names_values_metadata(x, static=False):
         support = metadata['support']
         if not isinstance(support, Support):
@@ -129,7 +138,7 @@ def parameter_names_values_support(x: Parametrization) -> Iterable[Tuple[str, Ar
         yield name, value, support
 
 
-def parameter_names_support(x: Union[Type[Parametrization], Parametrization]) -> (
+def parameters_name_support(x: Union[Type[Parametrization], Parametrization]) -> (
         Iterable[Tuple[str, Support]]):
     for this_field in fields(x, static=False):
         support = this_field.metadata['support']

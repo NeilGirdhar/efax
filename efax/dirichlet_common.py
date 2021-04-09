@@ -16,7 +16,7 @@ from .samplable import Samplable
 __all__: List[str] = []
 
 
-# TODO: Uncomment this when mypy stop crashing on it.
+# https://github.com/python/mypy/issues/10140
 # EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
 
 

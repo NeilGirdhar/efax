@@ -3,7 +3,7 @@ from typing import Any
 import numpy as np
 from numpy.random import Generator
 
-from efax import parameter_names_values_support
+from efax import parameters_name_value_support
 
 from .distribution_info import DistributionInfo
 
@@ -21,7 +21,7 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
     x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
     def check(z: Any) -> None:
-        for _, xf, support in parameter_names_values_support(z):
+        for _, xf, support in parameters_name_value_support(z):
             assert xf.shape[:len(xf.shape) - support.axes()] == shape
 
     assert p.shape() == shape

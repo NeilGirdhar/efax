@@ -6,7 +6,7 @@ from tjax import RealArray, jit
 
 from .natural_parametrization import NaturalParametrization
 from .parametrization import Parametrization
-from .tools import tree_dot_final
+from .tools import parameters_dot_product
 
 __all__ = ['ExpectationParametrization']
 
@@ -52,6 +52,6 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         Returns:
             The cross entropy.
         """
-        return (-tree_dot_final(q, self)
+        return (-parameters_dot_product(q, self)
                 + q.log_normalizer()
                 - self.expected_carrier_measure())

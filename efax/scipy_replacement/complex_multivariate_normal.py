@@ -70,6 +70,8 @@ class ScipyComplexMultivariateNormal:
         mu = l_eta.conj() - (inv_precision.T @ pseudo_precision).conj() @ l_eta
         return mu, s, u
 
+    # https://github.com/PyCQA/pylint/issues/4326
+    # pylint: disable=unsubscriptable-object
     def pdf(self, z: np.ndarray, out: None = None) -> np.number[Any]:
         log_normalizer = self.log_normalizer()
         eta, precision, pseudo_precision = self.natural_parameters()

@@ -8,9 +8,9 @@ import jax.numpy as jnp
 from chex import Array
 from tjax import RealArray, Shape, custom_jvp, jit
 
-from .parameter import (field_names_values_metadata, parameter_names_support,
-                        parameter_names_values_support)
-from .tools import tree_dot_final
+from .parameter import (field_names_values_metadata, parameters_name_support,
+                        parameters_name_value_support)
+from .tools import parameters_dot_product
 
 __all__ = ['Parametrization']
 
@@ -51,7 +51,7 @@ class Parametrization:
                 q_dot, = tangents
                 y = q.log_normalizer()
                 p = q.to_exp()
-                y_dot = tree_dot_final(q_dot, p)
+                y_dot = parameters_dot_product(q_dot, p)
                 return y, y_dot
 
             method_jvp.defjvp(ln_jvp)
@@ -62,7 +62,7 @@ class Parametrization:
     def __getitem__(self: T, key: Any) -> T:
         uk = self.unflattened_kwargs()
         sliced_parameters = {name: value[key]
-                             for name, value, _ in parameter_names_values_support(self)}
+                             for name, value, _ in parameters_name_value_support(self)}
         return type(self)(**sliced_parameters, **uk)  # type: ignore
 
     def unflattened_kwargs(self) -> Dict[Any, Any]:
@@ -73,16 +73,17 @@ class Parametrization:
     def flattened(self) -> Array:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
-                       for name, value, support in parameter_names_values_support(self)))
+                       for name, value, support in parameters_name_value_support(self)))
 
     @classmethod
     def unflattened(cls: Type[T], flattened: Array, **kwargs: Any) -> T:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
-                       for _, support in parameter_names_support(cls))
+                       for _, support in parameters_name_support(cls))
 
         target = flattened.shape[-1]
+        dimensions = 0
         for dimensions in count():
             te = total_elements(dimensions)
             if te == target:
@@ -92,7 +93,7 @@ class Parametrization:
 
         # Unflatten.
         consumed = 0
-        for name, support in parameter_names_support(cls):
+        for name, support in parameters_name_support(cls):
             k = support.num_elements(dimensions)
             kwargs[name] = support.unflattened(flattened[..., consumed: consumed + k], dimensions)
             consumed += k
