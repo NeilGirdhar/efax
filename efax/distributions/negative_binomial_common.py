@@ -6,8 +6,8 @@ import jax.numpy as jnp
 from jax.scipy.special import gammaln
 from tjax import RealArray, Shape
 
-from .expectation_parametrization import ExpectationParametrization
-from .natural_parametrization import NaturalParametrization
+from ..expectation_parametrization import ExpectationParametrization
+from ..natural_parametrization import NaturalParametrization
 
 __all__: List[str] = []
 

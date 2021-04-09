@@ -5,9 +5,9 @@ import math
 import jax.numpy as jnp
 from tjax import Array, ComplexArray, RealArray, Shape, dataclass
 
-from .expectation_parametrization import ExpectationParametrization
-from .natural_parametrization import NaturalParametrization
-from .parameter import ScalarSupport, distribution_parameter
+from ..expectation_parametrization import ExpectationParametrization
+from ..natural_parametrization import NaturalParametrization
+from ..parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 

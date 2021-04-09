@@ -6,9 +6,9 @@ import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape, dataclass
 
-from .exp_to_nat import ExpToNat
-from .natural_parametrization import NaturalParametrization
-from .parameter import ScalarSupport, distribution_parameter
+from ..exp_to_nat import ExpToNat
+from ..natural_parametrization import NaturalParametrization
+from ..parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['ChiSquareNP', 'ChiSquareEP']
 

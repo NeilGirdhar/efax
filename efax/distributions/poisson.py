@@ -7,11 +7,11 @@ import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import Generator, RealArray, Shape, dataclass
 
-from .conjugate_prior import HasConjugatePrior
+from ..conjugate_prior import HasConjugatePrior
+from ..natural_parametrization import NaturalParametrization
+from ..parameter import ScalarSupport, distribution_parameter
+from ..samplable import Samplable
 from .gamma import GammaNP
-from .natural_parametrization import NaturalParametrization
-from .parameter import ScalarSupport, distribution_parameter
-from .samplable import Samplable
 
 __all__ = ['PoissonNP', 'PoissonEP']
 

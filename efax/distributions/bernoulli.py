@@ -8,11 +8,11 @@ import numpy as np
 from jax.scipy import special as jss
 from tjax import Array, Generator, RealArray, Shape, dataclass
 
+from ..conjugate_prior import HasConjugatePrior
+from ..natural_parametrization import NaturalParametrization
+from ..parameter import ScalarSupport, distribution_parameter
+from ..samplable import Samplable
 from .beta import BetaNP
-from .conjugate_prior import HasConjugatePrior
-from .natural_parametrization import NaturalParametrization
-from .parameter import ScalarSupport, distribution_parameter
-from .samplable import Samplable
 
 __all__ = ['BernoulliNP', 'BernoulliEP']
 

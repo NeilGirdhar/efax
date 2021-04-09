@@ -8,10 +8,10 @@ from jax.nn import softplus
 from jax.scipy import special as jss
 from tjax import Generator, RealArray, Shape, dataclass
 
-from .exp_to_nat import ExpToNat
-from .natural_parametrization import EP, NaturalParametrization
-from .parameter import VectorSupport, distribution_parameter
-from .samplable import Samplable
+from ..exp_to_nat import ExpToNat
+from ..natural_parametrization import EP, NaturalParametrization
+from ..parameter import VectorSupport, distribution_parameter
+from ..samplable import Samplable
 
 __all__: List[str] = []
 
@@ -36,7 +36,7 @@ class DirichletCommonNP(NaturalParametrization[EP], Samplable, Generic[EP]):
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
             shape += self.shape()
-        return jax.random.dirichlet(rng.key, 1.0 + self.alpha_minus_one, shape)[...,:-1]
+        return jax.random.dirichlet(rng.key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:

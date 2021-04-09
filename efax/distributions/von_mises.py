@@ -7,10 +7,10 @@ import jax.numpy as jnp
 from jax.nn import softplus
 from tjax import RealArray, Shape, dataclass
 
-from .exp_to_nat import ExpToNat
-from .natural_parametrization import NaturalParametrization
-from .parameter import VectorSupport, distribution_parameter
-from .tools import inverse_softplus, ive
+from ..exp_to_nat import ExpToNat
+from ..natural_parametrization import NaturalParametrization
+from ..parameter import VectorSupport, distribution_parameter
+from ..tools import inverse_softplus, ive
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 

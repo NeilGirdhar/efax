@@ -9,11 +9,11 @@ from jax.nn import one_hot
 from jax.scipy import special as jss
 from tjax import Generator, RealArray, Shape, dataclass
 
-from .conjugate_prior import HasConjugatePrior
+from ..conjugate_prior import HasConjugatePrior
+from ..natural_parametrization import NaturalParametrization
+from ..parameter import VectorSupport, distribution_parameter
+from ..samplable import Samplable
 from .dirichlet import DirichletNP
-from .natural_parametrization import NaturalParametrization
-from .parameter import VectorSupport, distribution_parameter
-from .samplable import Samplable
 
 __all__ = ['MultinomialNP', 'MultinomialEP']
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from tjax import RealArray, dataclass, field
 
+from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP
-from .parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP', 'GeometricNP', 'GeometricEP']
 

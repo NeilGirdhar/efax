@@ -7,11 +7,11 @@ import jax
 import jax.numpy as jnp
 from tjax import Generator, RealArray, Shape, dataclass
 
-from .conjugate_prior import HasConjugatePrior
+from ..conjugate_prior import HasConjugatePrior
+from ..natural_parametrization import NaturalParametrization
+from ..parameter import VectorSupport, distribution_parameter
+from ..samplable import Samplable
 from .isotropic_normal import IsotropicNormalNP
-from .natural_parametrization import NaturalParametrization
-from .parameter import VectorSupport, distribution_parameter
-from .samplable import Samplable
 
 __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
