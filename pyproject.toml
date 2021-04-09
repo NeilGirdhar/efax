@@ -44,3 +44,21 @@ known_third_party = ["jax"]
 [tool.pycodestyle]
 max-line-length = 100
 exclude = ["__init__.py", "__pycache__"]
+
+[tool.pylint.messages_control]
+disable = [
+    "abstract-method",
+    "arguments-differ",
+    "cyclic-import",  # https://github.com/PyCQA/pylint/issues/3525
+    "invalid-name",
+    "invalid-unary-operand-type",
+    "missing-docstring",
+    "no-member",
+    "no-self-use",
+    "unused-argument"]
+
+[tool.pylint.reports]
+output-format = "colorized"
+
+[tool.pylint.similarities]
+min-similarity-lines = 10
