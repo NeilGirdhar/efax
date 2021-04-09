@@ -148,4 +148,4 @@ def parameters_name_support(x: Union[Type[Parametrization], Parametrization]) ->
 
 
 if TYPE_CHECKING:
-    from .expectation_parametrization import Parametrization
+    from .parametrization import Parametrization

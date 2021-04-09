@@ -5,7 +5,7 @@ from numpy.random import Generator
 from scipy import stats as ss
 from tjax import Shape
 
-from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiSquareEP, ChiSquareNP,
+from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP,
                   ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP,
                   IsotropicNormalNP, LogarithmicEP, LogarithmicNP, MultivariateNormalEP,
@@ -226,6 +226,15 @@ class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP]):
         return ChiSquareNP(rng.exponential(size=shape))
 
 
+class ChiInfo(DistributionInfo[ChiNP, ChiEP]):
+    def nat_to_scipy_distribution(self, q: ChiNP) -> Any:
+        return ss.chi((q.k_over_two_minus_one + 1.0) * 2.0)
+
+    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> ChiNP:
+        return ChiNP(rng.exponential(size=shape))
+
+
+
 def create_infos() -> List[DistributionInfo[Any, Any]]:
     # Discrete
     bernoulli = BernoulliInfo()
@@ -246,7 +255,8 @@ def create_infos() -> List[DistributionInfo[Any, Any]]:
     dirichlet = DirichletInfo(5)
     von_mises = VonMisesFisherInfo()
     chi_square = ChiSquareInfo()
+    chi = ChiInfo()
 
-    return [bernoulli, beta, chi_square, complex_normal, dirichlet, exponential, gamma, geometric,
-            isotropic_normal, logarithmic, multivariate_normal, multivariate_unit_normal,
+    return [bernoulli, beta, chi, chi_square, complex_normal, dirichlet, exponential, gamma,
+            geometric, isotropic_normal, logarithmic, multivariate_normal, multivariate_unit_normal,
             negative_binomial, normal, poisson, von_mises]

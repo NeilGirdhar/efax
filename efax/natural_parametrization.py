@@ -48,7 +48,6 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         """
         raise NotImplementedError
 
-    # Abstract class methods -----------------------------------------------------------------------
     def sufficient_statistics(self, x: Array) -> EP:
         """
         Args:

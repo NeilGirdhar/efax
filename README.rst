@@ -95,6 +95,7 @@ EFAX supports the following distributions:
 
 - Bernoulli
 - beta
+- chi
 - chi-square
 - complex normal
 - Dirichlet
