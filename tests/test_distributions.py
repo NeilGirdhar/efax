@@ -5,7 +5,7 @@ from jax import grad, jit, jvp, vjp
 from jax.tree_util import tree_map
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_jax_allclose, field_names_and_values, field_values
+from tjax import assert_jax_allclose, field_names_and_values
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, VonMisesFisherInfo
 from .distribution_info import DistributionInfo
@@ -51,29 +51,37 @@ def test_gradient_log_normalizer(generator: Generator,
     # pylint: disable=protected-access
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
     original_f = cls._original_log_normalizer
-    f = cls.log_normalizer
     original_gln = jit(grad(cls._original_log_normalizer))
-    gln = jit(grad(f))
+    optimized_gln = jit(grad(cls.log_normalizer))
 
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
-
-        exp_parameters = nat_parameters.to_exp()
+        kw_nat_parameters = nat_parameters.unflattened_kwargs()
+        exp_parameters = nat_parameters.to_exp()  # Regular transformation.
         ep_cls = type(exp_parameters)
-        original_gln_x = ep_cls(*field_values(original_gln(nat_parameters)))
-        gln_x = ep_cls(*field_values(gln(nat_parameters)))
+
+        # Original GLN.
+        original_nat_parameters = original_gln(nat_parameters)
+        f_original_nat_parameters = original_nat_parameters.flattened()
+        original_exp_parameters = ep_cls.unflattened(f_original_nat_parameters, **kw_nat_parameters)
+
+        # Optimized GLN.
+        optimized_nat_parameters = optimized_gln(nat_parameters)
+        f_optimized_nat_parameters = optimized_nat_parameters.flattened()
+        optimized_exp_parameters = ep_cls.unflattened(f_optimized_nat_parameters,
+                                                      **kw_nat_parameters)
 
         # Test primal evaluation.
-        assert_jax_allclose(exp_parameters, original_gln_x, rtol=1e-5)
-        assert_jax_allclose(exp_parameters, gln_x, rtol=1e-5)
+        assert_jax_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)
+        assert_jax_allclose(exp_parameters, optimized_exp_parameters, rtol=1e-5)
 
         # Test JVP.
         ones_like_nat_parameters = tree_map(jnp.ones_like, nat_parameters)
         original_gradients = jvp(original_f, (nat_parameters,), (ones_like_nat_parameters,))
-        gradients = jvp(f, (nat_parameters,), (ones_like_nat_parameters,))
+        gradients = jvp(cls.log_normalizer, (nat_parameters,), (ones_like_nat_parameters,))
         assert_allclose(original_gradients, gradients, rtol=1e-5)
 
         # Test VJP.
         _, original_g = vjp(original_f, nat_parameters)
-        _, g = vjp(f, nat_parameters)
+        _, g = vjp(cls.log_normalizer, nat_parameters)
         assert_jax_allclose(original_g(1.0)[0], g(1.0)[0], rtol=1e-5)
