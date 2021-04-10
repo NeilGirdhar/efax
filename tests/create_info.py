@@ -10,8 +10,9 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP,
                   IsotropicNormalNP, LogarithmicEP, LogarithmicNP, MultivariateNormalEP,
                   MultivariateUnitNormalEP, MultivariateUnitNormalNP, NegativeBinomialEP,
-                  NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, ScipyComplexNormal,
-                  ScipyDirichlet, VonMisesFisherEP, VonMisesFisherNP)
+                  NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP,
+                  RayleighNP, ScipyComplexNormal, ScipyDirichlet, VonMisesFisherEP,
+                  VonMisesFisherNP)
 
 from .distribution_info import DistributionInfo
 
@@ -163,6 +164,14 @@ class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP]):
         return ExponentialEP(rng.exponential(size=shape))
 
 
+class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP]):
+    def exp_to_scipy_distribution(self, p: RayleighEP) -> Any:
+        return ss.rayleigh(scale=np.sqrt(p.chi / 2.0))
+
+    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> RayleighEP:
+        return RayleighEP(rng.exponential(size=shape))
+
+
 class BetaInfo(DistributionInfo[BetaNP, BetaEP]):
     def nat_to_scipy_distribution(self, q: BetaNP) -> Any:
         n1 = q.alpha_minus_one + 1.0
@@ -250,6 +259,7 @@ def create_infos() -> List[DistributionInfo[Any, Any]]:
     multivariate_unit_normal = MultivariateUnitNormalInfo(num_parameters=5)
     complex_normal = ComplexNormalInfo()
     exponential = ExponentialInfo()
+    rayleigh = RayleighInfo()
     gamma = GammaInfo()
     beta = BetaInfo()
     dirichlet = DirichletInfo(5)
@@ -259,4 +269,4 @@ def create_infos() -> List[DistributionInfo[Any, Any]]:
 
     return [bernoulli, beta, chi, chi_square, complex_normal, dirichlet, exponential, gamma,
             geometric, isotropic_normal, logarithmic, multivariate_normal, multivariate_unit_normal,
-            negative_binomial, normal, poisson, von_mises]
+            negative_binomial, normal, poisson, rayleigh, von_mises]

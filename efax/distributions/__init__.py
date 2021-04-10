@@ -14,4 +14,5 @@ from .multivariate_unit_normal import *
 from .negative_binomial import *
 from .normal import *
 from .poisson import *
+from .rayleigh import *
 from .von_mises import *

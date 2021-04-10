@@ -110,6 +110,7 @@ EFAX supports the following distributions:
 - negative binomial
 - normal
 - Poisson
+- Rayleigh
 - von Mises-Fisher
 
 Usage
