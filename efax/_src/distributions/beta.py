@@ -4,7 +4,8 @@ from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
-from tjax import Generator, RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 

@@ -6,7 +6,8 @@ import jax
 import jax.numpy as jnp
 from jax.nn import softplus
 from jax.scipy import special as jss
-from tjax import Generator, RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import EP, NaturalParametrization

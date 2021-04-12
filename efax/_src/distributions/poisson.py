@@ -5,7 +5,8 @@ from typing import Optional
 import jax
 import jax.numpy as jnp
 from jax.scipy import special as jss
-from tjax import Generator, RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasConjugatePrior
 from ..natural_parametrization import NaturalParametrization

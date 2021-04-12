@@ -7,7 +7,8 @@ import jax.numpy as jnp
 import numpy as np
 from jax.nn import one_hot
 from jax.scipy import special as jss
-from tjax import Generator, RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasConjugatePrior
 from ..natural_parametrization import NaturalParametrization

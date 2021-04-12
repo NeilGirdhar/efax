@@ -6,7 +6,8 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from jax.scipy import special as jss
-from tjax import Array, Generator, RealArray, Shape, dataclass
+from tjax import Array, Generator, RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasConjugatePrior
 from ..natural_parametrization import NaturalParametrization

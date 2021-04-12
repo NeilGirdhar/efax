@@ -5,7 +5,8 @@ from typing import Tuple
 
 import jax.numpy as jnp
 from jax.nn import softplus
-from tjax import RealArray, Shape, dataclass
+from tjax import RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization

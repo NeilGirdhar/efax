@@ -3,7 +3,8 @@ from __future__ import annotations
 import math
 
 import jax.numpy as jnp
-from tjax import Array, ComplexArray, RealArray, Shape, dataclass
+from tjax import Array, ComplexArray, RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization

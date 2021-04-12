@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, Any, Iterable, Tuple, Type, Union
 
 import jax.numpy as jnp
 from jax.ops import index_update
-from tjax import Array, Shape, field, field_names_values_metadata, fields
+from tjax import Array, Shape
+from tjax.dataclasses import field, field_names_values_metadata, fields
 
 __all__ = ['parameters_value_support', 'parameters_name_value_support', 'parameters_name_support',
            'Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',

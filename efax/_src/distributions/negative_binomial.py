@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from tjax import RealArray, dataclass, field
+from tjax import RealArray
+from tjax.dataclasses import dataclass, field
 
 from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP

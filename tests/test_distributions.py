@@ -5,7 +5,8 @@ from jax import grad, jit, jvp, vjp
 from jax.tree_util import tree_map
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_jax_allclose, field_names_and_values
+from tjax import assert_jax_allclose
+from tjax.dataclasses import field_names_and_values
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, VonMisesFisherInfo
 from .distribution_info import DistributionInfo

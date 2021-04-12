@@ -1,7 +1,8 @@
 from typing import Any
 
 from numpy.random import Generator
-from tjax import assert_jax_allclose, field_names_and_values
+from tjax import assert_jax_allclose
+from tjax.dataclasses import field_names_and_values
 
 from .distribution_info import DistributionInfo
 

@@ -4,7 +4,8 @@ from typing import Optional
 
 import jax
 import jax.numpy as jnp
-from tjax import Generator, RealArray, Shape, dataclass
+from tjax import Generator, RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization

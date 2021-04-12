@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import jax.numpy as jnp
 from jax.scipy import special as jss
-from tjax import Array, RealArray, dataclass
+from tjax import Array, RealArray
+from tjax.dataclasses import dataclass
 
 from ..parameter import ScalarSupport, distribution_parameter
 from ..transformed_parametrization import (TransformedExpectationParametrization,

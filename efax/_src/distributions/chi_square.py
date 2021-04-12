@@ -4,7 +4,8 @@ from typing import Type
 
 import jax.numpy as jnp
 from jax.scipy import special as jss
-from tjax import RealArray, Shape, dataclass
+from tjax import RealArray, Shape
+from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
