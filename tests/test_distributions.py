@@ -2,11 +2,12 @@ from typing import Any
 
 import jax.numpy as jnp
 from jax import grad, jit, jvp, vjp
-from jax.tree_util import tree_map
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 from tjax.dataclasses import field_names_and_values
+
+from efax import parameters_name_value
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, VonMisesFisherInfo
 from .distribution_info import DistributionInfo
@@ -51,14 +52,16 @@ def test_gradient_log_normalizer(generator: Generator,
 
     # pylint: disable=protected-access
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
-    original_f = cls._original_log_normalizer
+    original_ln = cls._original_log_normalizer
     original_gln = jit(grad(cls._original_log_normalizer))
-    optimized_gln = jit(grad(cls.log_normalizer))
+    optimized_ln = cls.log_normalizer
+    optimized_gln = jit(grad(optimized_ln))
 
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         kw_nat_parameters = nat_parameters.unflattened_kwargs()
         exp_parameters = nat_parameters.to_exp()  # Regular transformation.
+        nat_cls = type(nat_parameters)
         ep_cls = type(exp_parameters)
 
         # Original GLN.
@@ -77,12 +80,21 @@ def test_gradient_log_normalizer(generator: Generator,
         assert_jax_allclose(exp_parameters, optimized_exp_parameters, rtol=1e-5)
 
         # Test JVP.
-        ones_like_nat_parameters = tree_map(jnp.ones_like, nat_parameters)
-        original_gradients = jvp(original_f, (nat_parameters,), (ones_like_nat_parameters,))
-        gradients = jvp(cls.log_normalizer, (nat_parameters,), (ones_like_nat_parameters,))
-        assert_allclose(original_gradients, gradients, rtol=1e-5)
+        ones_like_nat_parameters = nat_cls(
+            **{name: jnp.zeros_like(value)
+               for name, value in nat_parameters.unflattened_kwargs().items()},
+            **{name: jnp.ones_like(value)
+               for name, value in parameters_name_value(nat_parameters)})
+        original_gradients = jvp(original_ln, (nat_parameters,), (ones_like_nat_parameters,))
+        optimized_gradients = jvp(optimized_ln, (nat_parameters,), (ones_like_nat_parameters,))
+        assert_allclose(original_gradients, optimized_gradients, rtol=1e-5)
 
         # Test VJP.
-        _, original_g = vjp(original_f, nat_parameters)
-        _, g = vjp(cls.log_normalizer, nat_parameters)
-        assert_jax_allclose(original_g(1.0)[0], g(1.0)[0], rtol=1e-5)
+        original_ln_of_nat, original_vjp = vjp(original_ln, nat_parameters)
+        original_gln_of_nat, = original_vjp(1.0)
+        optimized_ln_of_nat, optimized_vjp = vjp(optimized_ln, nat_parameters)
+        optimized_gln_of_nat, = optimized_vjp(1.0)
+        assert_jax_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1e-5)
+        for name, original_value in parameters_name_value(original_gln_of_nat):
+            optimized_value = getattr(optimized_gln_of_nat, name)
+            assert_jax_allclose(original_value, optimized_value, rtol=1e-5)
