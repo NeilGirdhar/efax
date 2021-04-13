@@ -46,7 +46,7 @@ class GeometricNP(NBCommonNP['GeometricEP']):
         return GeometricEP(x)
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.mean.shape)
+        return jnp.zeros(self.log_not_p.shape)
 
 
 @dataclass
