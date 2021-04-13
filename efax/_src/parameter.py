@@ -9,8 +9,8 @@ from tjax import Array, Shape
 from tjax.dataclasses import field, field_names_values_metadata, fields
 
 __all__ = ['parameters_value_support', 'parameters_name_value_support', 'parameters_name_support',
-           'Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',
-           'SquareMatrixSupport']
+           'parameters_name_value', 'Support', 'ScalarSupport', 'VectorSupport',
+           'SymmetricMatrixSupport', 'SquareMatrixSupport']
 
 
 class Support:
@@ -129,6 +129,11 @@ def parameters_value_support(x: Parametrization) -> Iterable[Tuple[Array, Suppor
         if not isinstance(support, Support):
             raise TypeError
         yield value, support
+
+
+def parameters_name_value(x: Parametrization) -> Iterable[Tuple[str, Array]]:
+    for name, value, metadata in field_names_values_metadata(x, static=False):
+        yield name, value
 
 
 def parameters_name_value_support(x: Parametrization) -> Iterable[Tuple[str, Array, Support]]:
