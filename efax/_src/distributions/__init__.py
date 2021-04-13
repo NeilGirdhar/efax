@@ -9,6 +9,7 @@ from .exponential import *
 from .gamma import *
 from .gen_dirichlet import *
 from .geometric import *
+from .inverse_gamma import *
 from .logarithmic import *
 from .multinomial import *
 from .multivariate_normal import *

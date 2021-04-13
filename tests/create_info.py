@@ -14,13 +14,14 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP, ComplexNormalEP,
                   ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
                   GammaNP, GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
-                  IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP, LogarithmicNP,
-                  MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
-                  MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
-                  MultivariateNormalEP, MultivariateUnitNormalEP, MultivariateUnitNormalNP,
-                  NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP,
-                  RayleighEP, RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal,
-                  ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises,
+                  InverseGammaEP, InverseGammaNP, IsotropicNormalEP, IsotropicNormalNP,
+                  LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
+                  MultivariateDiagonalNormalNP, MultivariateFixedVarianceNormalEP,
+                  MultivariateFixedVarianceNormalNP, MultivariateNormalEP, MultivariateUnitNormalEP,
+                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
+                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
+                  ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
+                  ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises,
                   VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vectorized_triu
 
@@ -374,6 +375,20 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
         return x[..., : -1]
 
 
+class InverseGammaInfo(DistributionInfo[InverseGammaNP, InverseGammaEP, NumpyRealArray]):
+    @override
+    def nat_to_scipy_distribution(self, q: InverseGammaNP) -> Any:
+        shape = -q.negative_shape_minus_one - 1.0
+        scale = -q.negative_scale
+        return ss.invgamma(shape, scale=scale)
+
+    @override
+    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> InverseGammaNP:
+        gamma_shape = jnp.asarray(rng.exponential(size=shape))
+        scale = jnp.asarray(rng.exponential(size=shape))
+        return InverseGammaNP(-scale, -gamma_shape - 1.0)
+
+
 class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, GeneralizedDirichletEP,
                                                 NumpyRealArray]):
     @override
@@ -466,6 +481,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     exponential = ExponentialInfo()
     rayleigh = RayleighInfo()
     gamma = GammaInfo()
+    invgamma = InverseGammaInfo()
     beta = BetaInfo()
     dirichlet = DirichletInfo(5)
     gen_dirichlet = GeneralizedDirichletInfo(5)
@@ -474,8 +490,8 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     chi = ChiInfo()
     weibull = WeibullInfo()
     continuous: list[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn_unit, cmvn_cs,
-                                                         exponential, rayleigh, gamma, beta,
-                                                         dirichlet, gen_dirichlet, von_mises,
+                                                         exponential, rayleigh, gamma, invgamma,
+                                                         beta, dirichlet, gen_dirichlet, von_mises,
                                                          chi_square, chi, weibull]
 
     # Multivariate normal
