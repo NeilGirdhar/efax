@@ -16,3 +16,4 @@ from .normal import *
 from .poisson import *
 from .rayleigh import *
 from .von_mises import *
+from .weibull import *

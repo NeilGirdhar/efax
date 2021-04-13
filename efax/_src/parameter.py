@@ -119,12 +119,14 @@ class SquareMatrixSupport(Support):
         return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 
 
-def distribution_parameter(support: Support) -> Any:
-    return field(metadata={'support': support})
+def distribution_parameter(support: Support, fixed: bool = False) -> Any:
+    return field(metadata={'support': support, 'fixed': fixed})
 
 
 def parameters_value_support(x: Parametrization) -> Iterable[Tuple[Array, Support]]:
     for _, value, metadata in field_names_values_metadata(x, static=False):
+        if metadata['fixed']:
+            continue
         support = metadata['support']
         if not isinstance(support, Support):
             raise TypeError
@@ -133,11 +135,15 @@ def parameters_value_support(x: Parametrization) -> Iterable[Tuple[Array, Suppor
 
 def parameters_name_value(x: Parametrization) -> Iterable[Tuple[str, Array]]:
     for name, value, metadata in field_names_values_metadata(x, static=False):
+        if metadata['fixed']:
+            continue
         yield name, value
 
 
 def parameters_name_value_support(x: Parametrization) -> Iterable[Tuple[str, Array, Support]]:
     for name, value, metadata in field_names_values_metadata(x, static=False):
+        if metadata['fixed']:
+            continue
         support = metadata['support']
         if not isinstance(support, Support):
             raise TypeError
@@ -147,6 +153,8 @@ def parameters_name_value_support(x: Parametrization) -> Iterable[Tuple[str, Arr
 def parameters_name_support(x: Union[Type[Parametrization], Parametrization]) -> (
         Iterable[Tuple[str, Support]]):
     for this_field in fields(x, static=False):
+        if this_field.metadata['fixed']:
+            continue
         support = this_field.metadata['support']
         if not isinstance(support, Support):
             raise TypeError

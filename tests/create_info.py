@@ -12,7 +12,7 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   MultivariateUnitNormalEP, MultivariateUnitNormalNP, NegativeBinomialEP,
                   NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP,
                   RayleighNP, ScipyComplexNormal, ScipyDirichlet, VonMisesFisherEP,
-                  VonMisesFisherNP)
+                  VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -58,7 +58,7 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
         return ss.nbinom(self.r, 1.0 / (1.0 + p.mean / p.failures))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NegativeBinomialEP:
-        return NegativeBinomialEP(self.r, rng.exponential(size=shape))
+        return NegativeBinomialEP(self.r * np.ones(shape), rng.exponential(size=shape))
 
 
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP]):
@@ -243,6 +243,19 @@ class ChiInfo(DistributionInfo[ChiNP, ChiEP]):
         return ChiNP(rng.exponential(size=shape))
 
 
+class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP]):
+    def exp_to_scipy_distribution(self, p: WeibullEP) -> Any:
+        scale = p.chi ** (1.0 / p.concentration)
+        return ss.weibull_min(p.concentration, scale=scale)
+
+    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> WeibullNP:
+        equal_fixed_parameters = True
+        concentration = (np.broadcast_to(rng.exponential(), shape)
+                         if equal_fixed_parameters
+                         else rng.exponential(size=shape)) + 1.0
+        return WeibullNP(concentration, -rng.exponential(size=shape) - 1.0)
+
+
 
 def create_infos() -> List[DistributionInfo[Any, Any]]:
     # Discrete
@@ -266,7 +279,8 @@ def create_infos() -> List[DistributionInfo[Any, Any]]:
     von_mises = VonMisesFisherInfo()
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
+    weibull = WeibullInfo()
 
     return [bernoulli, beta, chi, chi_square, complex_normal, dirichlet, exponential, gamma,
             geometric, isotropic_normal, logarithmic, multivariate_normal, multivariate_unit_normal,
-            negative_binomial, normal, poisson, rayleigh, von_mises]
+            negative_binomial, normal, poisson, rayleigh, von_mises, weibull]

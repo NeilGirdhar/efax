@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from tjax import RealArray
-from tjax.dataclasses import dataclass, field
+import jax.numpy as jnp
+from tjax import IntegerArray, RealArray
+from tjax.dataclasses import dataclass
 
 from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP
@@ -11,7 +12,7 @@ __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP', 'GeometricNP', 'Geometric
 
 @dataclass
 class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
-    failures: int = field(static=True)
+    failures: IntegerArray = distribution_parameter(ScalarSupport(), fixed=True)
     log_not_p: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -19,12 +20,12 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
         return NegativeBinomialEP(self.failures, self._mean())
 
     def sufficient_statistics(self, x: RealArray) -> NegativeBinomialEP:
-        return NegativeBinomialEP(self.failures, x)
+        return NegativeBinomialEP(jnp.broadcast_to(self.failures, x.shape), x)
 
 
 @dataclass
 class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
-    failures: int = field(static=True)
+    failures: IntegerArray = distribution_parameter(ScalarSupport(), fixed=True)
     mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -43,6 +44,9 @@ class GeometricNP(NBCommonNP['GeometricEP']):
 
     def sufficient_statistics(self, x: RealArray) -> GeometricEP:
         return GeometricEP(x)
+
+    def expected_carrier_measure(self) -> RealArray:
+        return jnp.zeros(self.mean.shape)
 
 
 @dataclass

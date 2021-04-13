@@ -68,7 +68,7 @@ class Parametrization:
     def unflattened_kwargs(self) -> Dict[Any, Any]:
         return {name: value
                 for name, value, metadata in field_names_values_metadata(self)
-                if 'support' not in metadata}
+                if 'support' not in metadata or metadata['fixed']}
 
     def flattened(self) -> Array:
         return reduce(partial(jnp.append, axis=-1),

@@ -112,6 +112,7 @@ EFAX supports the following distributions:
 - Poisson
 - Rayleigh
 - von Mises-Fisher
+- Weibull
 
 Usage
 =====
