@@ -9,7 +9,6 @@ from chex import Array
 from jax import grad, jacfwd, vjp, vmap
 from tjax import RealArray, jit
 
-from .parameter import parameters_name_value_support
 from .parametrization import Parametrization
 from .tools import parameters_dot_product
 
@@ -102,7 +101,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
 
         kwargs = {}
         f = jnp.trace if trace else jnp.diagonal
-        for name, value, support in parameters_name_value_support(fisher_information):
+        for name, value, support in fisher_information.parameters_name_value_support():
             kwargs[name] = _summarize_fisher_information(f, getattr(value, name), support.axes())
         return fisher_information.replace(**kwargs)
 

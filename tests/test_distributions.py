@@ -7,8 +7,6 @@ from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 from tjax.dataclasses import field_names_and_values
 
-from efax import parameters_name_value
-
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, VonMisesFisherInfo
 from .distribution_info import DistributionInfo
 
@@ -84,7 +82,7 @@ def test_gradient_log_normalizer(generator: Generator,
             **{name: jnp.zeros_like(value)
                for name, value in nat_parameters.unflattened_kwargs().items()},
             **{name: jnp.ones_like(value)
-               for name, value in parameters_name_value(nat_parameters)})
+               for name, value in nat_parameters.parameters_name_value()})
         original_gradients = jvp(original_ln, (nat_parameters,), (ones_like_nat_parameters,))
         optimized_gradients = jvp(optimized_ln, (nat_parameters,), (ones_like_nat_parameters,))
         assert_allclose(original_gradients, optimized_gradients, rtol=1e-5)
@@ -95,6 +93,6 @@ def test_gradient_log_normalizer(generator: Generator,
         optimized_ln_of_nat, optimized_vjp = vjp(optimized_ln, nat_parameters)
         optimized_gln_of_nat, = optimized_vjp(1.0)
         assert_jax_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1e-5)
-        for name, original_value in parameters_name_value(original_gln_of_nat):
+        for name, original_value in original_gln_of_nat.parameters_name_value():
             optimized_value = getattr(optimized_gln_of_nat, name)
             assert_jax_allclose(original_value, optimized_value, rtol=1e-5)

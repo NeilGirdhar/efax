@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from functools import partial, reduce
 from itertools import count
-from typing import TYPE_CHECKING, Any, Dict, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Tuple, Type, TypeVar
 
 import jax.numpy as jnp
 from chex import Array
 from tjax import RealArray, Shape, custom_jvp, jit
+from tjax.dataclasses import field_names_values_metadata, fields
 
-from .parameter import (field_names_values_metadata, parameters_name_support,
-                        parameters_name_value_support)
+from .parameter import Support
 from .tools import parameters_dot_product
 
 __all__ = ['Parametrization']
@@ -62,7 +62,7 @@ class Parametrization:
     def __getitem__(self: T, key: Any) -> T:
         uk = self.unflattened_kwargs()
         sliced_parameters = {name: value[key]
-                             for name, value, _ in parameters_name_value_support(self)}
+                             for name, value, _ in self.parameters_name_value_support()}
         return type(self)(**sliced_parameters, **uk)  # type: ignore
 
     def unflattened_kwargs(self) -> Dict[Any, Any]:
@@ -73,14 +73,14 @@ class Parametrization:
     def flattened(self) -> Array:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
-                       for name, value, support in parameters_name_value_support(self)))
+                       for name, value, support in self.parameters_name_value_support()))
 
     @classmethod
     def unflattened(cls: Type[T], flattened: Array, **kwargs: Any) -> T:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
-                       for _, support in parameters_name_support(cls))
+                       for _, support in cls.parameters_name_support())
 
         target = flattened.shape[-1]
         dimensions = 0
@@ -93,12 +93,46 @@ class Parametrization:
 
         # Unflatten.
         consumed = 0
-        for name, support in parameters_name_support(cls):
+        for name, support in cls.parameters_name_support():
             k = support.num_elements(dimensions)
             kwargs[name] = support.unflattened(flattened[..., consumed: consumed + k], dimensions)
             consumed += k
 
         return cls(**kwargs)  # type: ignore
+
+    def parameters_value_support(self) -> Iterable[Tuple[Array, Support]]:
+        for _, value, metadata in field_names_values_metadata(self, static=False):
+            if metadata['fixed']:
+                continue
+            support = metadata['support']
+            if not isinstance(support, Support):
+                raise TypeError
+            yield value, support
+
+    def parameters_name_value(self) -> Iterable[Tuple[str, Array]]:
+        for name, value, metadata in field_names_values_metadata(self, static=False):
+            if metadata['fixed']:
+                continue
+            yield name, value
+
+    def parameters_name_value_support(self) -> Iterable[Tuple[str, Array, Support]]:
+        for name, value, metadata in field_names_values_metadata(self, static=False):
+            if metadata['fixed']:
+                continue
+            support = metadata['support']
+            if not isinstance(support, Support):
+                raise TypeError
+            yield name, value, support
+
+    @classmethod
+    def parameters_name_support(cls) -> Iterable[Tuple[str, Support]]:
+        for this_field in fields(cls, static=False):
+            if this_field.metadata['fixed']:
+                continue
+            support = this_field.metadata['support']
+            if not isinstance(support, Support):
+                raise TypeError
+            yield this_field.name, support
 
     # Abstract methods -----------------------------------------------------------------------------
     def shape(self) -> Shape:

@@ -8,15 +8,13 @@ from chex import Array
 from tensorflow_probability.substrates import jax as tfp
 from tjax import RealArray
 
-from .parameter import parameters_value_support
-
 __all__: List[str] = []
 
 
 def parameters_dot_product(x: NaturalParametrization[Any], y: Any) -> RealArray:
     def dotted_fields() -> Iterable[Array]:
-        for (x_value, x_support), (y_value, y_support) in zip(parameters_value_support(x),
-                                                              parameters_value_support(y)):
+        for (x_value, x_support), (y_value, y_support) in zip(x.parameters_value_support(),
+                                                              y.parameters_value_support()):
             axes = x_support.axes()
             assert y_support.axes() == axes
             yield _parameter_dot_product(x_value, y_value, axes)

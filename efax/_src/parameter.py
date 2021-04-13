@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from math import comb, sqrt
-from typing import TYPE_CHECKING, Any, Iterable, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
 from jax.ops import index_update
 from tjax import Array, Shape
-from tjax.dataclasses import field, field_names_values_metadata, fields
+from tjax.dataclasses import field
 
-__all__ = ['parameters_value_support', 'parameters_name_value_support', 'parameters_name_support',
-           'parameters_name_value', 'Support', 'ScalarSupport', 'VectorSupport',
-           'SymmetricMatrixSupport', 'SquareMatrixSupport']
+__all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',
+           'SquareMatrixSupport']
 
 
 class Support:
@@ -123,43 +122,5 @@ def distribution_parameter(support: Support, fixed: bool = False) -> Any:
     return field(metadata={'support': support, 'fixed': fixed})
 
 
-def parameters_value_support(x: Parametrization) -> Iterable[Tuple[Array, Support]]:
-    for _, value, metadata in field_names_values_metadata(x, static=False):
-        if metadata['fixed']:
-            continue
-        support = metadata['support']
-        if not isinstance(support, Support):
-            raise TypeError
-        yield value, support
-
-
-def parameters_name_value(x: Parametrization) -> Iterable[Tuple[str, Array]]:
-    for name, value, metadata in field_names_values_metadata(x, static=False):
-        if metadata['fixed']:
-            continue
-        yield name, value
-
-
-def parameters_name_value_support(x: Parametrization) -> Iterable[Tuple[str, Array, Support]]:
-    for name, value, metadata in field_names_values_metadata(x, static=False):
-        if metadata['fixed']:
-            continue
-        support = metadata['support']
-        if not isinstance(support, Support):
-            raise TypeError
-        yield name, value, support
-
-
-def parameters_name_support(x: Union[Type[Parametrization], Parametrization]) -> (
-        Iterable[Tuple[str, Support]]):
-    for this_field in fields(x, static=False):
-        if this_field.metadata['fixed']:
-            continue
-        support = this_field.metadata['support']
-        if not isinstance(support, Support):
-            raise TypeError
-        yield this_field.name, support
-
-
 if TYPE_CHECKING:
-    from .parametrization import Parametrization
+    pass
