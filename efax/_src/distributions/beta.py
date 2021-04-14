@@ -7,13 +7,14 @@ import jax.numpy as jnp
 from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
+from ..samplable import Samplable
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 __all__ = ['BetaNP', 'BetaEP']
 
 
 @dataclass
-class BetaNP(DirichletCommonNP['BetaEP']):
+class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
     """
     The Beta distribution.
 
