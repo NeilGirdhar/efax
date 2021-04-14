@@ -26,6 +26,7 @@ class DirichletCommonNP(NaturalParametrization[EP], Samplable, Generic[EP]):
     alpha_minus_one: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.alpha_minus_one.shape[:-1]
 
@@ -36,7 +37,7 @@ class DirichletCommonNP(NaturalParametrization[EP], Samplable, Generic[EP]):
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         return jax.random.dirichlet(rng.key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
 
     # New methods ----------------------------------------------------------------------------------
@@ -57,11 +58,12 @@ class DirichletCommonEP(ExpToNat[NP, RealArray], Generic[NP]):
     mean_log_probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean_log_probability.shape[:-1]
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def initial_search_parameters(self) -> RealArray:
         return jnp.zeros(self.mean_log_probability.shape)

@@ -24,6 +24,7 @@ class GammaNP(NaturalParametrization['GammaEP'], Samplable):
     shape_minus_one: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.negative_rate.shape
 
@@ -44,7 +45,7 @@ class GammaNP(NaturalParametrization['GammaEP'], Samplable):
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         return -jax.random.gamma(rng.key, self.shape_minus_one + 1.0, shape) / self.negative_rate
 
 
@@ -54,11 +55,12 @@ class GammaEP(ExpToNat[GammaNP, RealArray]):
     mean_log: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def search_to_natural(self, search_parameters: RealArray) -> GammaNP:
         shape = softplus(search_parameters)

@@ -20,6 +20,7 @@ class NBCommonNP(NaturalParametrization[EP], Generic[EP]):
     log_not_p: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.log_not_p.shape
 
@@ -44,6 +45,7 @@ class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
     mean: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape
 

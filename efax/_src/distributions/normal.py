@@ -22,6 +22,7 @@ class NormalNP(NaturalParametrization['NormalEP']):
     negative_half_precision: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
@@ -47,6 +48,7 @@ class NormalEP(ExpectationParametrization[NormalNP], Samplable):
     second_moment: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape
 
@@ -54,13 +56,13 @@ class NormalEP(ExpectationParametrization[NormalNP], Samplable):
         return NormalNP(self.mean / self.variance(), -0.5 / self.variance())
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         deviation = jnp.sqrt(self.variance())
         return jax.random.normal(rng.key, shape) * deviation + self.mean
 

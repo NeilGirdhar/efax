@@ -23,6 +23,7 @@ class BernoulliNP(NaturalParametrization['BernoulliEP']):
     log_odds: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.log_odds.shape
 
@@ -54,6 +55,7 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
     probability: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.probability.shape
 
@@ -61,11 +63,11 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
         return BernoulliNP(jss.logit(self.probability))
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> Array:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         return jax.random.bernoulli(rng.key, self.probability, shape)
 
     # Overridden methods ---------------------------------------------------------------------------

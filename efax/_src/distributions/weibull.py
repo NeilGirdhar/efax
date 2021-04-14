@@ -23,6 +23,7 @@ class WeibullNP(NaturalParametrization['WeibullEP']):
     eta: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.eta.shape
 
@@ -46,6 +47,7 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
     chi: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.chi.shape
 
@@ -59,8 +61,8 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         lambda_ = self.chi ** (1.0 / self.concentration)
         return jax.random.weibull_min(rng.key, lambda_, self.concentration, shape)

@@ -22,6 +22,7 @@ class PoissonNP(NaturalParametrization['PoissonEP']):
     log_mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.log_mean.shape
 
@@ -43,6 +44,7 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
     mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape
 
@@ -54,9 +56,9 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         return jax.random.poisson(rng.key, self.mean, shape)
 
     # Overridden methods ---------------------------------------------------------------------------

@@ -135,6 +135,7 @@ class Parametrization:
             yield this_field.name, support
 
     # Abstract methods -----------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         raise NotImplementedError
 

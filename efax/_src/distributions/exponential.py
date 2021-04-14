@@ -21,6 +21,7 @@ class ExponentialNP(NaturalParametrization['ExponentialEP'], Samplable):
     negative_rate: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.negative_rate.shape
 
@@ -38,9 +39,9 @@ class ExponentialNP(NaturalParametrization['ExponentialEP'], Samplable):
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         return -jax.random.exponential(rng.key, shape) / self.negative_rate
 
 
@@ -49,6 +50,7 @@ class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
     mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape
 
@@ -56,13 +58,13 @@ class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
         return ExponentialNP(-1.0 / self.mean)
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         return jax.random.exponential(rng.key, shape) * self.mean
 
     # Overridden methods ---------------------------------------------------------------------------

@@ -22,8 +22,8 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
         for _, xf, support in z.parameters_name_value_support():
             assert xf.shape[:len(xf.shape) - support.axes()] == shape
 
-    assert p.shape() == shape
-    assert q.shape() == shape
+    assert p.shape == shape
+    assert q.shape == shape
 
     check(p)
     check(q)

@@ -25,6 +25,7 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
     mean: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
@@ -45,9 +46,9 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
 
     # New methods ----------------------------------------------------------------------------------
@@ -60,6 +61,7 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
     mean: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
@@ -73,9 +75,9 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
 
     # New methods ----------------------------------------------------------------------------------
@@ -84,7 +86,7 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
-        negative_half_precision = -0.5 * n * jnp.ones(self.shape())
+        negative_half_precision = -0.5 * n * jnp.ones(self.shape)
         return IsotropicNormalNP(n * self.mean, negative_half_precision)
 
     def conjugate_prior_observation(self) -> RealArray:

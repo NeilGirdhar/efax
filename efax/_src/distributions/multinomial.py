@@ -24,6 +24,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP'], Samplable):
     log_odds: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.log_odds.shape[:-1]
 
@@ -47,7 +48,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP'], Samplable):
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         return one_hot(jax.random.categorical(rng.key, self.log_odds, shape=shape),
                        self.log_odds.shape[-1])
 
@@ -73,6 +74,7 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
     probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.probability.shape[:-1]
 
@@ -81,7 +83,7 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
         return MultinomialNP(jnp.log(self.probability / p_k))
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:

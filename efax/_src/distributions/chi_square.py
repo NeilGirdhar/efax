@@ -23,6 +23,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
     k_over_two_minus_one: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.k_over_two_minus_one.shape
 
@@ -51,6 +52,7 @@ class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
     def natural_parametrization_cls(cls) -> Type[ChiSquareNP]:
         return ChiSquareNP
 
+    @property
     def shape(self) -> Shape:
         return self.mean_log.shape
 

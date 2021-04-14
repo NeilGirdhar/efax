@@ -26,6 +26,7 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
     negative_half_precision: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean_times_precision.shape[:-1]
 
@@ -61,6 +62,7 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Sam
     second_moment: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
@@ -70,7 +72,7 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Sam
         return MultivariateNormalNP(mean_times_precision, -0.5 * precision)
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         return self.to_variance_parametrization().sample(rng, shape)
@@ -92,14 +94,15 @@ class MultivariateNormalVP(Samplable):
     variance: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         return jax.random.multivariate_normal(rng.key, self.mean, self.variance, shape)
 
     # New methods ----------------------------------------------------------------------------------

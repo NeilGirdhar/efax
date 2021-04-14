@@ -19,6 +19,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
     log_probability: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.log_probability.shape
 
@@ -49,6 +50,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
     def natural_parametrization_cls(cls) -> Type[LogarithmicNP]:
         return LogarithmicNP
 
+    @property
     def shape(self) -> Shape:
         return self.chi.shape
 

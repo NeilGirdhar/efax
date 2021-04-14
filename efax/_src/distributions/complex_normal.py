@@ -20,6 +20,7 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
     pseudo_precision: ComplexArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
@@ -67,6 +68,7 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
     pseudo_second_moment: ComplexArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape
 
@@ -84,4 +86,4 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
         return ComplexNormalNP(mean_times_precision, precision, pseudo_precision)
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)

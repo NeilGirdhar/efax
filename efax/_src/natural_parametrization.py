@@ -94,7 +94,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
             * Otherwise, a NaturalParametrization object whose fields are arrays.
         See also: apply_fisher_information
         """
-        fisher_information = self._calculate_fisher_information(len(self.shape()))
+        fisher_information = self._calculate_fisher_information(len(self.shape))
 
         if not trace and not diagonal:
             return fisher_information

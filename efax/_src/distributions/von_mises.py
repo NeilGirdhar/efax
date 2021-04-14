@@ -21,6 +21,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
     mean_times_concentration: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean_times_concentration.shape[:-1]
 
@@ -39,7 +40,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
                       q * (_a_k(q.shape[-1], kappa) / kappa)))
 
     def carrier_measure(self, x: RealArray) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def sufficient_statistics(self, x: RealArray) -> VonMisesFisherEP:
         return VonMisesFisherEP(x)
@@ -64,11 +65,12 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
     mean: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def initial_search_parameters(self) -> RealArray:
         k = self.mean.shape[-1]

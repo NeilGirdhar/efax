@@ -30,8 +30,9 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP], Generic[NP,
         raise NotImplementedError
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
-        return self.base_distribution().shape()
+        return self.base_distribution().shape
 
     def log_normalizer(self) -> Array:
         """
@@ -65,8 +66,9 @@ class TransformedExpectationParametrization(ExpectationParametrization[TNP], Gen
         raise NotImplementedError
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
-        return self.base_distribution().shape()
+        return self.base_distribution().shape
 
     def to_nat(self) -> TNP:
         """

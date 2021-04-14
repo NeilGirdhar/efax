@@ -21,6 +21,7 @@ class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP']):
     negative_half_precision: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.negative_half_precision.shape
 
@@ -55,6 +56,7 @@ class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable
     total_second_moment: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
@@ -65,13 +67,13 @@ class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable
         return IsotropicNormalNP(mean_times_precision, negative_half_precision)
 
     def expected_carrier_measure(self) -> RealArray:
-        return jnp.zeros(self.shape())
+        return jnp.zeros(self.shape)
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape()
+            shape += self.shape
         else:
-            shape = self.shape()
+            shape = self.shape
         deviation = jnp.sqrt(self.variance())
         return jax.random.normal(rng.key, shape)[..., jnp.newaxis] * deviation + self.mean
 

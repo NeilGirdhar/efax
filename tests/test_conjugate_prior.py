@@ -28,7 +28,7 @@ def test_conjugate_prior(generator: Generator,
     # Find its conjugate prior at that point with many observations.
     cp_q = p.conjugate_prior_distribution(n)
 
-    assert cp_q.shape() == p.shape()
+    assert cp_q.shape == p.shape
 
     # Produce a copy of p that matches the conjugate prior distribution.
     cp_x = p.conjugate_prior_observation()
