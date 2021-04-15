@@ -12,30 +12,40 @@ EFAX: Exponential Families in JAX
 
 This library provides a set of tools for working with *exponential family distributions* in the
 differential programming library `JAX <https://github.com/google/jax/>`_.
+
 The *exponential families* are an important class of probability distributions that include the
 normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
 For an explanation of the fundamental ideas behind this library, see our `overview on exponential
 families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
 
+The main motivation for using EFAX over a library like tensorflow-probability or the basic functions
+in JAX is that EFAX provides the two most important parametrizations for each exponential family—the
+natural and expectation parametrizations—and a uniform interface to efficient implementations of the
+main functions used in machine learning.  An example of why this matters is that the most efficient
+way to implement cross entropy between X and Y relies on X being in the expectation parametrization
+and Y in the natural parametrization.
+
 Framework
 =========
 Representation
 --------------
-EFAX has a single base class for its objects: :python:`Parametrization` that encodes the
-distribution family, and the parameters of the distribution.
-Each such object has a shape, and so it can store any number of distributions.
+EFAX has a single base class for its objects: :python:`Parametrization` whose type encodes the
+distribution family.
+
+Each parametrization object has a shape, and so it can store any number of distributions.
 When operating on such objects, NumPy's broadcasting rules apply.
 This is unlike SciPy where each distribution is represented by a single object, and so a thousand
 distributions need a thousand objects.
 
 All parametrization objects are dataclasses using :python:`tjax.dataclass`.  These dataclasses are
-a modification of Python's dataclasses to support JAX's type registration.  This allows easy marking
-of static attributes.  In JAX, a static attribute is one that induces recompilation of a function
-when it changes, and consequently there is more flexibility about what can be done with such an
-attribute.  An example of a static attribute in EFAX is the failure number of the negative binomial
+a modification of Python's dataclasses to support JAX's “PyTree” type registration.
+
+Each of the fields of a parametrization object stores a parameter over a specified support.
+Some parameters are marked as “fixed”, which means that they are fixed with respect to the
+exponential family.  An example of a fixed parameter is the failure number of the negative binomial
 distribution.
 
-Each non-static attribute in an EFAX distribution is marked with a support.  For example:
+For example:
 
 .. code:: python
 
@@ -45,14 +55,16 @@ Each non-static attribute in an EFAX distribution is marked with a support.  For
         negative_half_precision: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
 In this case, we see that there are two natural parameters for the multivariate normal distribution.
-If such an object :python:`x` has shape :python:`s`, then the shape of
+Objects of this type can hold any number of distributions:  if such an object :python:`x` has shape
+:python:`s`, then the shape of
+:python:`x.mean_times_precision` is :python:`(*s, n)` and the shape of
 :python:`x.negative_half_precision` is :python:`(*s, n, n)`.
 
 Parametrizations
 ----------------
 Each exponential family distribution has two special parametrizations: the natural and the
 expectation parametrization.  (These are described in the overview pdf.)
-Consequently, every distribution has two base classes, one inheriting from
+Consequently, every distribution has at least two base classes, one inheriting from
 :python:`NaturalParametrization` and one from :python:`ExpectationParametrization`.
 
 The motivation for the natural parametrization is combining and scaling independent predictive
@@ -67,21 +79,26 @@ EFAX provides conversions between the two parametrizations through the
 
 Important methods
 -----------------
+EFAX aims to provide the main methods used in machine learning.
+
 Every :python:`Parametrization` has methods to flatten and unflatten the parameters into a single
-array: :python:`flattened` and :python:`unflattened`.
+array: :python:`flattened` and :python:`unflattened`.  Typically, array-valued signals in a machine
+learning model would be unflattened into a distribution object, operated on, and then flattened
+before being sent back to the model.  Flattening is careful with distributions with symmetric (or Hermitian) matrix-valued parameters.  It only stores the upper triangular elements.
 
 Every :python:`NaturalParametrization` has methods:
 
-- :python:`sufficient_statistics` to produce the sufficient statistics given an observation,
-- :python:`pdf`, which is the density,
+- :python:`sufficient_statistics` to produce the sufficient statistics given an observation (used in
+  maximum likelihood estimation),
+- :python:`pdf`, which is the density or mass function,
 - :python:`fisher_information`, which is the Fisher information matrix, and
 - :python:`entropy`, which is the Shannon entropy.
 
+Every :python:`ExpectationParametrization` has methods:
 
-Every :python:`ExpectationParametrization` has a :python:`cross_entropy` method that has an
-efficient, numerically optimized custom JAX gradient.  This is possible because the gradient of the
-cross entropy is the difference of expectation parameters (when the expected carrier measure is
-zero).
+- :python:`cross_entropy` that is an efficient cross entropy armed with a numerically optimized
+  custom JAX gradient.  This is possible because the gradient of the cross entropy is the difference
+  of expectation parameters plus the expected carrier measure.
 
 Numerical optimization
 ----------------------
@@ -196,16 +213,19 @@ Contribution guidelines
 
 Contributions are welcome!
 
-If you want to add a new distribution, the steps are
+It's not hard to add a new distribution.  The steps are:
 
 - Create an issue for the new distribution.
 
 - Solve for or research the equations needed to fill the blanks in the overview pdf, and put them in
   the issue.  I'll add them to the pdf for you.
 
-- Implement the natural and expectation parametrizations.
+- Implement the natural and expectation parametrizations.  This can either be done directly like in
+  the Bernoulli distribution, or as a transformation of an existing exponential family like the
+  Rayleigh distribution.  If the conversion from the expectation to the natural parametrization has
+  no analytical solution, then there's a mixin that implements a numerical solution, which was used in the Dirichlet distribution.
 
-- Add the new distribution to the tests.
+- Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.)
 
 Implementation should respect PEP8.
 The tests can be run using :bash:`pytest .`
