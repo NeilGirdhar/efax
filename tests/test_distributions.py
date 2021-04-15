@@ -57,7 +57,7 @@ def test_gradient_log_normalizer(generator: Generator,
 
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
-        kw_nat_parameters = nat_parameters.unflattened_kwargs()
+        kw_nat_parameters = nat_parameters.fixed_parameters_mapping()
         exp_parameters = nat_parameters.to_exp()  # Regular transformation.
         nat_cls = type(nat_parameters)
         ep_cls = type(exp_parameters)
@@ -80,7 +80,7 @@ def test_gradient_log_normalizer(generator: Generator,
         # Test JVP.
         ones_like_nat_parameters = nat_cls(
             **{name: jnp.zeros_like(value)
-               for name, value in nat_parameters.unflattened_kwargs().items()},
+               for name, value in nat_parameters.fixed_parameters_mapping().items()},
             **{name: jnp.ones_like(value)
                for name, value in nat_parameters.parameters_name_value()})
         original_gradients = jvp(original_ln, (nat_parameters,), (ones_like_nat_parameters,))

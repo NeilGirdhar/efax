@@ -118,8 +118,10 @@ class SquareMatrixSupport(Support):
         return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 
 
-def distribution_parameter(support: Support, fixed: bool = False) -> Any:
-    return field(metadata={'support': support, 'fixed': fixed})
+def distribution_parameter(support: Support, fixed: bool = False, static: bool = False) -> Any:
+    if static and not fixed:
+        raise ValueError
+    return field(static=static, metadata={'support': support, 'fixed': fixed})
 
 
 if TYPE_CHECKING:

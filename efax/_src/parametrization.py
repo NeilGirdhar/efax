@@ -60,15 +60,10 @@ class Parametrization:
 
     # New methods ----------------------------------------------------------------------------------
     def __getitem__(self: T, key: Any) -> T:
-        uk = self.unflattened_kwargs()
+        fixed_parameters = self.fixed_parameters_mapping()
         sliced_parameters = {name: value[key]
                              for name, value, _ in self.parameters_name_value_support()}
-        return type(self)(**sliced_parameters, **uk)  # type: ignore
-
-    def unflattened_kwargs(self) -> Dict[Any, Any]:
-        return {name: value
-                for name, value, metadata in field_names_values_metadata(self)
-                if 'support' not in metadata or metadata['fixed']}
+        return type(self)(**sliced_parameters, **fixed_parameters)  # type: ignore
 
     def flattened(self) -> Array:
         return reduce(partial(jnp.append, axis=-1),
@@ -100,8 +95,16 @@ class Parametrization:
 
         return cls(**kwargs)  # type: ignore
 
+    def fixed_parameters_mapping(self) -> Dict[str, Any]:
+        return {name: value
+                for name, value, metadata in field_names_values_metadata(self)
+                if metadata['fixed']}
+
     def parameters_value_support(self) -> Iterable[Tuple[Array, Support]]:
-        for _, value, metadata in field_names_values_metadata(self, static=False):
+        """
+        Returns: The value and support of each variable parameter.
+        """
+        for _, value, metadata in field_names_values_metadata(self):
             if metadata['fixed']:
                 continue
             support = metadata['support']
@@ -110,13 +113,19 @@ class Parametrization:
             yield value, support
 
     def parameters_name_value(self) -> Iterable[Tuple[str, Array]]:
-        for name, value, metadata in field_names_values_metadata(self, static=False):
+        """
+        Returns: The name and value of each variable parameter.
+        """
+        for name, value, metadata in field_names_values_metadata(self):
             if metadata['fixed']:
                 continue
             yield name, value
 
     def parameters_name_value_support(self) -> Iterable[Tuple[str, Array, Support]]:
-        for name, value, metadata in field_names_values_metadata(self, static=False):
+        """
+        Returns: The name, value, and support of each variable parameter.
+        """
+        for name, value, metadata in field_names_values_metadata(self):
             if metadata['fixed']:
                 continue
             support = metadata['support']
@@ -126,7 +135,10 @@ class Parametrization:
 
     @classmethod
     def parameters_name_support(cls) -> Iterable[Tuple[str, Support]]:
-        for this_field in fields(cls, static=False):
+        """
+        Returns: The name and support of each variable parameter.
+        """
+        for this_field in fields(cls):
             if this_field.metadata['fixed']:
                 continue
             support = this_field.metadata['support']

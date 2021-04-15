@@ -15,8 +15,8 @@ def test_flatten(generator: Generator, distribution_info: DistributionInfo[Any, 
     p = distribution_info.exp_parameter_generator(generator, shape=shape)
     q = distribution_info.nat_parameter_generator(generator, shape=shape)
 
-    p_kwargs = p.unflattened_kwargs()
-    q_kwargs = q.unflattened_kwargs()
+    p_kwargs = p.fixed_parameters_mapping()
+    q_kwargs = q.fixed_parameters_mapping()
 
     assert_jax_allclose(type(p).unflattened(p.flattened(), **p_kwargs), p)
     assert_jax_allclose(type(q).unflattened(q.flattened(), **q_kwargs), q)
