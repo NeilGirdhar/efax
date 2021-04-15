@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "efax"
-version = "1.2.7"
+version = "1.2.12"
 description = "Exponential families for JAX"
 license = "MIT"
 authors = ["Neil Girdhar <mistersheik@gmail.com>"]
