@@ -31,7 +31,7 @@ class NormalNP(NaturalParametrization['NormalEP']):
                 + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
 
     def to_exp(self) -> NormalEP:
-        mean = -self.mean_times_precision / (2 * self.negative_half_precision)
+        mean = -self.mean_times_precision / (2.0 * self.negative_half_precision)
         second_moment = jnp.square(mean) - 0.5 / self.negative_half_precision
         return NormalEP(mean, second_moment)
 

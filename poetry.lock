@@ -11,7 +11,7 @@ six = "*"
 
 [[package]]
 name = "astroid"
-version = "2.5.2"
+version = "2.5.3"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
@@ -99,15 +99,15 @@ six = "*"
 
 [[package]]
 name = "decorator"
-version = "5.0.3"
+version = "4.4.2"
 description = "Decorators for Humans"
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 
 [[package]]
 name = "dm-tree"
-version = "0.1.5"
+version = "0.1.6"
 description = "Tree is a library for working with nested data structures."
 category = "main"
 optional = false
@@ -177,7 +177,7 @@ minimum-jaxlib = ["jaxlib (==0.1.64)"]
 
 [[package]]
 name = "jaxlib"
-version = "0.1.64"
+version = "0.1.65"
 description = "XLA library for JAX"
 category = "main"
 optional = false
@@ -231,14 +231,14 @@ python-versions = "*"
 
 [[package]]
 name = "networkx"
-version = "2.5"
+version = "2.5.1"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-decorator = ">=4.3.0"
+decorator = ">=4.3,<5"
 
 [package.extras]
 all = ["numpy", "scipy", "pandas", "matplotlib", "pygraphviz", "pydot", "pyyaml", "lxml", "pytest"]
@@ -357,7 +357,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "pytest"
-version = "6.2.2"
+version = "6.2.3"
 description = "pytest: simple powerful testing with Python"
 category = "dev"
 optional = false
@@ -408,7 +408,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "tensorflow-probability"
-version = "0.12.1"
+version = "0.12.2"
 description = "Probabilistic modeling and statistical inference in TensorFlow"
 category = "main"
 optional = false
@@ -423,12 +423,12 @@ numpy = ">=1.13.3"
 six = ">=1.10.0"
 
 [package.extras]
-jax = ["jax", "jaxlib"]
+jax = ["jax (<=0.2.11)", "jaxlib (<=0.1.64)"]
 tfds = ["tensorflow-datasets (>=2.2.0)"]
 
 [[package]]
 name = "tjax"
-version = "0.8.4"
+version = "0.9.0"
 description = "Tools for JAX."
 category = "main"
 optional = false
@@ -471,7 +471,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "c2c588ff960f68e1e967b4839e5f1b3cdf1bc3ccb49e0d36d44614bbc4755c33"
+content-hash = "9c1b02765bf74d3251e61ec6788890d278e5e63ac2681a09fe10ee117ac93769"
 
 [metadata.files]
 absl-py = [
@@ -479,8 +479,8 @@ absl-py = [
     {file = "absl_py-0.12.0-py3-none-any.whl", hash = "sha256:afe94e3c751ff81aad55d33ab6e630390da32780110b5af72ae81ecff8418d9e"},
 ]
 astroid = [
-    {file = "astroid-2.5.2-py3-none-any.whl", hash = "sha256:cd80bf957c49765dce6d92c43163ff9d2abc43132ce64d4b1b47717c6d2522df"},
-    {file = "astroid-2.5.2.tar.gz", hash = "sha256:6b0ed1af831570e500e2437625979eaa3b36011f66ddfc4ce930128610258ca9"},
+    {file = "astroid-2.5.3-py3-none-any.whl", hash = "sha256:bea3f32799fbb8581f58431c12591bc20ce11cbc90ad82e2ea5717d94f2080d5"},
+    {file = "astroid-2.5.3.tar.gz", hash = "sha256:ad63b8552c70939568966811a088ef0bc880f99a24a00834abd0e3681b514f91"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
@@ -511,26 +511,27 @@ cycler = [
     {file = "cycler-0.10.0.tar.gz", hash = "sha256:cd7b2d1018258d7247a71425e9f26463dfb444d411c39569972f4ce586b0c9d8"},
 ]
 decorator = [
-    {file = "decorator-5.0.3-py3-none-any.whl", hash = "sha256:e3f6d0eb6f1bf4580f872cb4313cb9a2067183e92bb1fbc4e5309285342d3420"},
-    {file = "decorator-5.0.3.tar.gz", hash = "sha256:566f7d4563486f27d3c9fd201fd6f6f95eaf7cf4ad6f6ebbcffe82563b7bf06c"},
+    {file = "decorator-4.4.2-py2.py3-none-any.whl", hash = "sha256:41fa54c2a0cc4ba648be4fd43cff00aedf5b9465c9bf18d64325bc225f08f760"},
+    {file = "decorator-4.4.2.tar.gz", hash = "sha256:e3a62f0520172440ca0dcc823749319382e377f37f140a0b99ef45fecb84bfe7"},
 ]
 dm-tree = [
-    {file = "dm-tree-0.1.5.tar.gz", hash = "sha256:a951d2239111dfcc468071bc8ff792c7b1e3192cab5a3c94d33a8b2bda3127fa"},
-    {file = "dm_tree-0.1.5-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:39a2c12d86b9df7bcb64c3473957744bc1af812dd7bf27c01108f17ed688644b"},
-    {file = "dm_tree-0.1.5-cp27-cp27m-win_amd64.whl", hash = "sha256:e4314cd65c5d2218fe580c265e005b334d609e51c33746fedd4014006fca7fa2"},
-    {file = "dm_tree-0.1.5-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:9699c10c3c58bcc8d221445c7864ff9e3e738e629f1943efdb818c4fd4083326"},
-    {file = "dm_tree-0.1.5-cp35-cp35m-macosx_10_9_intel.whl", hash = "sha256:3f7d29c6130f8cb41ee862c96f752dd37c35e6c4cdbf3aaa0db9a3c8516892e2"},
-    {file = "dm_tree-0.1.5-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:21775e6a4d5afafa65514db435dba71637edccb145ec8fd7f144355e9d14d6e2"},
-    {file = "dm_tree-0.1.5-cp35-cp35m-win_amd64.whl", hash = "sha256:4992e3517a6d5f6211b8240784ec0006927945fbf9feb56c37c8068a80e211af"},
-    {file = "dm_tree-0.1.5-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:90706db66bd8dd4b71c00dfd883d83bca6be238093e2db3d46331085b3a12214"},
-    {file = "dm_tree-0.1.5-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:12e662dadd3f0d3e729cbc5a8a8aef88606339d056c95dc83c1e467e6330ba9a"},
-    {file = "dm_tree-0.1.5-cp36-cp36m-win_amd64.whl", hash = "sha256:a13ebfdce7b47310ba02e14005971de12d7d30e082e17f3a73f3f309a53b926e"},
-    {file = "dm_tree-0.1.5-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:6caa5308f139aeef22c64c55cf6bb7e6882a4119eac48c7cc572e2388d379598"},
-    {file = "dm_tree-0.1.5-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:be6e8173eb8e0f3d03a93abadf6eae6581219b6b408fa835e2eac04e775f0969"},
-    {file = "dm_tree-0.1.5-cp37-cp37m-win_amd64.whl", hash = "sha256:23707e6d4c2ee4567f341429b7b358c3108cf5130f0897bdee54b3aa890de220"},
-    {file = "dm_tree-0.1.5-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:669c8a7929d350db2ba7354e030d8b7318ba94d4cc5702858beed2219f0566be"},
-    {file = "dm_tree-0.1.5-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:134b58263e09a6e552c05c85c630f424446b75600bd38ff1838329eb0cbe0e50"},
-    {file = "dm_tree-0.1.5-cp38-cp38-win_amd64.whl", hash = "sha256:3ed4a2c3328603fa06c2104921b31faf3e831e9828ed625bb0e0813dc2c8a17f"},
+    {file = "dm-tree-0.1.6.tar.gz", hash = "sha256:6776404b23b4522c01012ffb314632aba092c9541577004ab153321e87da439a"},
+    {file = "dm_tree-0.1.6-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:a8814a5c838f79e9db22a51369c74f4d92e7f1485ec55d7f665ae4d98478cb4f"},
+    {file = "dm_tree-0.1.6-cp36-cp36m-manylinux2014_x86_64.whl", hash = "sha256:e28ba91d3d97230b831716db401ce116ae5c7dcd025161ac16ecb8bd5c870a85"},
+    {file = "dm_tree-0.1.6-cp36-cp36m-manylinux_2_24_x86_64.whl", hash = "sha256:603392f1a7818a4f43a7033c2061ae7c2085a4a728171b0bbca76bd107fcdfb0"},
+    {file = "dm_tree-0.1.6-cp36-cp36m-win_amd64.whl", hash = "sha256:2c91e472aab5c5e083c12d0a9396bbd7695031348721f709a9c6f2449e53dab6"},
+    {file = "dm_tree-0.1.6-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:889eae86e0d2d4b8da8eb2edc7186b45a5f92e00c8dd77f2a5c8422f03db18f4"},
+    {file = "dm_tree-0.1.6-cp37-cp37m-manylinux2014_x86_64.whl", hash = "sha256:2fa9c6e56cbd22cdffec42dc8b20464872b07c4535d8effc537fe0d31930b084"},
+    {file = "dm_tree-0.1.6-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:c4e8d868fc9a75cbdb67e78069b33e62a4c69bc182c1d2adc29ab08e283912d8"},
+    {file = "dm_tree-0.1.6-cp37-cp37m-win_amd64.whl", hash = "sha256:6d5f64d89f657b11f429e13b1378c8cfbe4baef50e7ab31f3689bfe0cf4a2508"},
+    {file = "dm_tree-0.1.6-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:8d59c5098456667b28c607110537c86c25cbd0ee455f21d033c60ef2d7f48d81"},
+    {file = "dm_tree-0.1.6-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:f3bec40e658fe7546c3a56849c743ac9a498e620b3236e82e171801938a56679"},
+    {file = "dm_tree-0.1.6-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:e87d06478356a2d92c3940dedebcd92a14ad37fba10ebb1839c8140693b83c0a"},
+    {file = "dm_tree-0.1.6-cp38-cp38-win_amd64.whl", hash = "sha256:02ffa673f20b1756dcf085ef2c354bc59416d843b384c7b71c421f873ffc36c0"},
+    {file = "dm_tree-0.1.6-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:affc7a6d29442a143c60efb2f03bcb95424d4fe6168f3d31de892c1e601fa0e6"},
+    {file = "dm_tree-0.1.6-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:bd347c74254ba320d57b0e102558c1189e3b4ae1bae952f9aef156b5914567c8"},
+    {file = "dm_tree-0.1.6-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:8425454192e954692d9a1e0f7b374b3b7030916b17b6055951dc17d58b6fe1b8"},
+    {file = "dm_tree-0.1.6-cp39-cp39-win_amd64.whl", hash = "sha256:5269183f80f1ae37543a2a30a8f78e4b0460d5da74fb5ac42dc8a476ef8d707e"},
 ]
 flatbuffers = [
     {file = "flatbuffers-1.12-py2.py3-none-any.whl", hash = "sha256:9e9ef47fa92625c4721036e7c4124182668dc6021d9e7c73704edd395648deb9"},
@@ -552,14 +553,14 @@ jax = [
     {file = "jax-0.2.12.tar.gz", hash = "sha256:3a435f7f1f8e6312c3e69fdcf2de5de0f40bf832afb8645c6877e8317dc8410c"},
 ]
 jaxlib = [
-    {file = "jaxlib-0.1.64-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:b2a7cd42032c3eefd6b03bbfb026f7f76ac290c520bc6d7e040ae83f0f84e4f6"},
-    {file = "jaxlib-0.1.64-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:4f60212d926d721b44898599dba88290f21a2bfb5512d14df4a7a81bf0ec06c9"},
-    {file = "jaxlib-0.1.64-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:72099ac6940728b9e9f76cc81bb547454d8bcbeba1a082a2abb6f0dc201ead70"},
-    {file = "jaxlib-0.1.64-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:362f05b82934669f817eb2dff0b5a807ab513dc0b2387cb58280664839118b81"},
-    {file = "jaxlib-0.1.64-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:824a784a770e0a2d1f71322f52a560b4da8dad8009950df1438e3b6f070eb343"},
-    {file = "jaxlib-0.1.64-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:6993ac9b0a985f473b75e142651dafad7186a98dd39e5ad3663addb74c6b9317"},
-    {file = "jaxlib-0.1.64-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:d960b06d1865073228a1e9c11968be4bcd5e383b6d25c02aea014507b2426a73"},
-    {file = "jaxlib-0.1.64-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:d7674c89980230299caafbccaf8b29c122a4d2f9240eee39d2f4a3e3fadc1e83"},
+    {file = "jaxlib-0.1.65-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:7a8321fd12b917fe9b9ee21bc6d503739a089f72f45e86137adb21d436bf76d6"},
+    {file = "jaxlib-0.1.65-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:b66c870083dfddff29c929bcd0c09c9f7e059cffe7c87f2e88508974a7a30c5d"},
+    {file = "jaxlib-0.1.65-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:465542b15b30509eef912c75f39c8e51efe815e5f339df91130eb48143432c62"},
+    {file = "jaxlib-0.1.65-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:1080ba936fa3126419966eb93c983b96aa14f149b9fc86928c5583f378d72fb6"},
+    {file = "jaxlib-0.1.65-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:d0e8bf61cdd532e7d4eafa5963d62f15459e4e4f3e46b01f9181f7e9241f7e67"},
+    {file = "jaxlib-0.1.65-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:0b02ac78b3c5b8d8cad6224024539e69e35263b2aa45ec591690fccb729e15a6"},
+    {file = "jaxlib-0.1.65-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:bb73198e6d6b4f9e9d9132f604923c86ce9828af2933476b3c9ee66ce35ab6d6"},
+    {file = "jaxlib-0.1.65-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:33b744366e039f9420bf9e73cb3367e820ee9702131413bed4b729b2602dc79b"},
 ]
 kiwisolver = [
     {file = "kiwisolver-1.3.1-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:fd34fbbfbc40628200730bc1febe30631347103fc8d3d4fa012c21ab9c11eca9"},
@@ -645,8 +646,8 @@ mccabe = [
     {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
 networkx = [
-    {file = "networkx-2.5-py3-none-any.whl", hash = "sha256:8c5812e9f798d37c50570d15c4a69d5710a18d77bafc903ee9c5fba7454c616c"},
-    {file = "networkx-2.5.tar.gz", hash = "sha256:7978955423fbc9639c10498878be59caf99b44dc304c2286162fd24b458c1602"},
+    {file = "networkx-2.5.1-py3-none-any.whl", hash = "sha256:0635858ed7e989f4c574c2328380b452df892ae85084144c73d8cd819f0c4e06"},
+    {file = "networkx-2.5.1.tar.gz", hash = "sha256:109cd585cac41297f71103c3c42ac6ef7379f29788eb54cb751be5a663bb235a"},
 ]
 numpy = [
     {file = "numpy-1.20.2-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:e9459f40244bb02b2f14f6af0cd0732791d72232bbb0dc4bab57ef88e75f6935"},
@@ -738,8 +739,8 @@ pyparsing = [
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
 ]
 pytest = [
-    {file = "pytest-6.2.2-py3-none-any.whl", hash = "sha256:b574b57423e818210672e07ca1fa90aaf194a4f63f3ab909a2c67ebb22913839"},
-    {file = "pytest-6.2.2.tar.gz", hash = "sha256:9d1edf9e7d0b84d72ea3dbcdfd22b35fb543a5e8f2a60092dd578936bf63d7f9"},
+    {file = "pytest-6.2.3-py3-none-any.whl", hash = "sha256:6ad9c7bdf517a808242b998ac20063c41532a570d088d77eec1ee12b0b5574bc"},
+    {file = "pytest-6.2.3.tar.gz", hash = "sha256:671238a46e4df0f3498d1c3270e5deb9b32d25134c99b7d75370a68cfbe9b634"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
@@ -771,11 +772,11 @@ six = [
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
 tensorflow-probability = [
-    {file = "tensorflow_probability-0.12.1-py2.py3-none-any.whl", hash = "sha256:f148a876671f132c931275e60156892326dcf148c7a0ea2959e7714776788fb0"},
+    {file = "tensorflow_probability-0.12.2-py2.py3-none-any.whl", hash = "sha256:b14b27c276284231c2c093bedfeaebf584b688e8c522e5800bed3005263cc76c"},
 ]
 tjax = [
-    {file = "tjax-0.8.4-py3-none-any.whl", hash = "sha256:262e917608ea8aa5905f90e80a51c1d9b851901b18cab07bd4db5b46f8cfb7ce"},
-    {file = "tjax-0.8.4.tar.gz", hash = "sha256:639195219531646daaef00935925a9535206067e88236048b625625392a0e726"},
+    {file = "tjax-0.9.0-py3-none-any.whl", hash = "sha256:b2aa661fb53d7cced4481d8db8ad28bf5deab4095dc253045cedc347a15ac1a8"},
+    {file = "tjax-0.9.0.tar.gz", hash = "sha256:38249196145c6d9f6302e5b6b0085282c90c8a5ca1bee282dbd496665b5c0a15"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

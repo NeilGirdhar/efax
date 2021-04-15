@@ -8,10 +8,10 @@ import numpy as np
 from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
-from ..samplable import Samplable
+from ...expectation_parametrization import ExpectationParametrization
+from ...natural_parametrization import NaturalParametrization
+from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
+from ...samplable import Samplable
 
 __all__ = ['MultivariateNormalNP', 'MultivariateNormalEP', 'MultivariateNormalVP']
 

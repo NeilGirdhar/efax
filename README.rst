@@ -102,11 +102,14 @@ EFAX supports the following distributions:
 - exponential
 - gamma
 - geometric
-- isotropic normal (multivariate normal with isotropic variance)
 - logarithmic
 - multinomial
 - multivariate normal
-- multivariate unit normal (multivariate normal with isotropic unit variance)
+
+  - with arbitrary variance
+  - with diagonal variance
+  - with isotropic variance
+  - with unit variance
 - negative binomial
 - normal
 - Poisson

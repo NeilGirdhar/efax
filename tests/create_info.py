@@ -8,11 +8,11 @@ from tjax import Shape
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP,
                   ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP,
-                  IsotropicNormalNP, LogarithmicEP, LogarithmicNP, MultivariateNormalEP,
-                  MultivariateUnitNormalEP, MultivariateUnitNormalNP, NegativeBinomialEP,
-                  NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP,
-                  RayleighNP, ScipyComplexNormal, ScipyDirichlet, VonMisesFisherEP,
-                  VonMisesFisherNP, WeibullEP, WeibullNP)
+                  IsotropicNormalNP, LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
+                  MultivariateDiagonalNormalNP, MultivariateNormalEP, MultivariateUnitNormalEP,
+                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
+                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP, ScipyComplexNormal,
+                  ScipyDirichlet, VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -81,8 +81,8 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP]):
 
 class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
                                                   MultivariateUnitNormalEP]):
-    def __init__(self, num_parameters: int):
-        self.num_parameters = num_parameters
+    def __init__(self, dimensions: int):
+        self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
         return ss.multivariate_normal(mean=p.mean)
@@ -90,33 +90,53 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateUnitNormalEP:
         if shape != ():
             raise ValueError
-        return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.num_parameters)))
+        return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.dimensions)))
 
     def supports_shape(self) -> bool:
         return False
 
 
 class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP]):
-    def __init__(self, num_parameters: int):
-        self.num_parameters = num_parameters
+    def __init__(self, dimensions: int):
+        self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
-        return ss.multivariate_normal(mean=p.mean, cov=np.eye(self.num_parameters) * p.variance())
+        return ss.multivariate_normal(mean=p.mean, cov=np.eye(self.dimensions) * p.variance())
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> IsotropicNormalEP:
         if shape != ():
             raise ValueError
-        mean = rng.normal(size=(*shape, self.num_parameters))
-        total_variance = self.num_parameters * rng.exponential(size=shape)
+        mean = rng.normal(size=(*shape, self.dimensions))
+        total_variance = self.dimensions * rng.exponential(size=shape)
         return IsotropicNormalEP(mean, np.sum(np.square(mean)) + total_variance)
 
     def supports_shape(self) -> bool:
         return False
 
 
+class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormalNP,
+                                                      MultivariateDiagonalNormalEP]):
+    def __init__(self, dimensions: int):
+        self.dimensions = dimensions
+
+    def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
+        return ss.multivariate_normal(mean=p.mean, cov=np.diag(p.variance()))
+
+    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateDiagonalNormalEP:
+        if shape != ():
+            raise ValueError
+        dist_shape = (*shape, self.dimensions)
+        mean = rng.normal(size=dist_shape)
+        variance = rng.exponential(size=dist_shape)
+        return MultivariateDiagonalNormalEP(mean, np.square(mean) + variance)
+
+    def supports_shape(self) -> bool:
+        return False
+
+
 class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, MultivariateNormalEP]):
-    def __init__(self, num_parameters: int):
-        self.num_parameters = num_parameters
+    def __init__(self, dimensions: int):
+        self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
         # Correct numerical errors introduced by various conversions.
@@ -126,13 +146,13 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateNormalEP:
         if shape != ():
             raise ValueError
-        if self.num_parameters == 1:
+        if self.dimensions == 1:
             covariance = rng.exponential()
         else:
-            eigenvalues = rng.exponential(size=self.num_parameters) + 1.0
+            eigenvalues = rng.exponential(size=self.dimensions) + 1.0
             eigenvalues /= np.mean(eigenvalues)
             covariance = ss.random_correlation.rvs(eigenvalues, random_state=rng)
-        mean = rng.normal(size=(*shape, self.num_parameters))
+        mean = rng.normal(size=(*shape, self.dimensions))
         second_moment = covariance + np.multiply.outer(mean, mean)
         return MultivariateNormalEP(mean, second_moment)
 
@@ -194,14 +214,14 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP]):
 
 
 class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP]):
-    def __init__(self, num_parameters: int):
-        self.num_parameters = num_parameters
+    def __init__(self, dimensions: int):
+        self.dimensions = dimensions
 
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:
         return ScipyDirichlet(q.alpha_minus_one + 1.0)
 
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> DirichletNP:
-        return DirichletNP(dirichlet_parameter_generator(self.num_parameters, rng, shape))
+        return DirichletNP(dirichlet_parameter_generator(self.dimensions, rng, shape))
 
     def scipy_to_exp_family_observation(self, x: np.ndarray) -> np.ndarray:
         return x[..., : -1]
@@ -256,7 +276,6 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP]):
         return WeibullNP(concentration, -rng.exponential(size=shape) - 1.0)
 
 
-
 def create_infos() -> List[DistributionInfo[Any, Any]]:
     # Discrete
     bernoulli = BernoulliInfo()
@@ -264,12 +283,11 @@ def create_infos() -> List[DistributionInfo[Any, Any]]:
     poisson = PoissonInfo()
     negative_binomial = NegativeBinomialInfo(3)
     logarithmic = LogarithmicInfo()
+    discrete: List[DistributionInfo[Any, Any]] = [bernoulli, geometric, poisson, negative_binomial,
+                                                  logarithmic]
 
     # Continuous
     normal = NormalInfo()
-    isotropic_normal = IsotropicNormalInfo(num_parameters=4)
-    multivariate_normal = MultivariateNormalInfo(num_parameters=4)
-    multivariate_unit_normal = MultivariateUnitNormalInfo(num_parameters=5)
     complex_normal = ComplexNormalInfo()
     exponential = ExponentialInfo()
     rayleigh = RayleighInfo()
@@ -280,7 +298,16 @@ def create_infos() -> List[DistributionInfo[Any, Any]]:
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
     weibull = WeibullInfo()
+    continuous: List[DistributionInfo[Any, Any]] = [normal, complex_normal, exponential, rayleigh,
+                                                    gamma, beta, dirichlet, von_mises, chi_square,
+                                                    chi, weibull]
 
-    return [bernoulli, beta, chi, chi_square, complex_normal, dirichlet, exponential, gamma,
-            geometric, isotropic_normal, logarithmic, multivariate_normal, multivariate_unit_normal,
-            negative_binomial, normal, poisson, rayleigh, von_mises, weibull]
+    # Multivariate normal
+    multivariate_unit_normal = MultivariateUnitNormalInfo(dimensions=5)
+    isotropic_normal = IsotropicNormalInfo(dimensions=4)
+    diagonal_normal = MultivariateDiagonalNormalInfo(dimensions=4)
+    multivariate_normal = MultivariateNormalInfo(dimensions=4)
+    mvn: List[DistributionInfo[Any, Any]] = [multivariate_unit_normal, isotropic_normal,
+                                             diagonal_normal, multivariate_normal]
+
+    return discrete + continuous + mvn
