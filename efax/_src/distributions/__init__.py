@@ -6,6 +6,7 @@ from .complex_normal import *
 from .dirichlet import *
 from .exponential import *
 from .gamma import *
+from .geometric import *
 from .logarithmic import *
 from .multinomial import *
 from .multivariate_normal import *
