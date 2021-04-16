@@ -5,7 +5,7 @@ from typing import Any, Generic, List, Tuple, TypeVar
 import jax.numpy as jnp
 from jax import jit
 from jax.tree_util import tree_multimap
-from tjax.dataclasses import dataclass, field_names_and_values
+from tjax.dataclasses import dataclass
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import GradientTransformation, adam
 
@@ -41,9 +41,9 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
     # Non-final methods ----------------------------------------------------------------------------
     def _zero_natural_parameters(self) -> NP:
         "A convenience method for implementing initial_search_parameters"
-        kwargs = dict(field_names_and_values(self, static=True))
+        fixed_parameters = self.fixed_parameters_mapping()
         cls = type(self).natural_parametrization_cls()
-        return cls.unflattened(jnp.zeros_like(self.flattened()), **kwargs)
+        return cls.unflattened(jnp.zeros_like(self.flattened()), **fixed_parameters)
 
     # Abstract methods -----------------------------------------------------------------------------
     def initial_search_parameters(self) -> SP:
