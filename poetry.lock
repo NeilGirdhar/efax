@@ -428,14 +428,13 @@ tfds = ["tensorflow-datasets (>=2.2.0)"]
 
 [[package]]
 name = "tjax"
-version = "0.9.0"
+version = "0.10.0"
 description = "Tools for JAX."
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-chex = ">=0,<1"
 colorful = ">=0.5.4,<0.6.0"
 jax = ">=0.2,<0.3"
 jaxlib = ">=0.1.55,<0.2.0"
@@ -471,7 +470,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9c1b02765bf74d3251e61ec6788890d278e5e63ac2681a09fe10ee117ac93769"
+content-hash = "7590d538d7918a716f7237cf493f9a838a41cf16ce4a60d509af17b62de84f7c"
 
 [metadata.files]
 absl-py = [
@@ -775,8 +774,8 @@ tensorflow-probability = [
     {file = "tensorflow_probability-0.12.2-py2.py3-none-any.whl", hash = "sha256:b14b27c276284231c2c093bedfeaebf584b688e8c522e5800bed3005263cc76c"},
 ]
 tjax = [
-    {file = "tjax-0.9.0-py3-none-any.whl", hash = "sha256:b2aa661fb53d7cced4481d8db8ad28bf5deab4095dc253045cedc347a15ac1a8"},
-    {file = "tjax-0.9.0.tar.gz", hash = "sha256:38249196145c6d9f6302e5b6b0085282c90c8a5ca1bee282dbd496665b5c0a15"},
+    {file = "tjax-0.10.0-py3-none-any.whl", hash = "sha256:a8b1adf0672d0af5a91dd3d7cadf89f71fc658cc6b9866360d6465dc53788739"},
+    {file = "tjax-0.10.0.tar.gz", hash = "sha256:e7ecb6530cc890eb1a8607c8ec6fc0358bc3efe4c08df5d847d8218098077038"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

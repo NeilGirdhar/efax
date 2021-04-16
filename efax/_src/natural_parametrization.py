@@ -5,9 +5,8 @@ from typing import (TYPE_CHECKING, Any, Callable, Generic, Tuple, Type, TypeVar,
                     get_type_hints)
 
 import jax.numpy as jnp
-from chex import Array
 from jax import grad, jacfwd, vjp, vmap
-from tjax import RealArray, jit
+from tjax import ComplexArray, RealArray, jit
 
 from .parametrization import Parametrization
 from .tools import parameters_dot_product
@@ -39,7 +38,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         """
         raise NotImplementedError
 
-    def carrier_measure(self, x: Array) -> RealArray:
+    def carrier_measure(self, x: ComplexArray) -> RealArray:
         """
         Args:
             x: The sample.
@@ -47,7 +46,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         """
         raise NotImplementedError
 
-    def sufficient_statistics(self, x: Array) -> EP:
+    def sufficient_statistics(self, x: ComplexArray) -> EP:
         """
         Args:
             x: The sample.
@@ -71,7 +70,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
 
     @jit
     @final
-    def pdf(self, x: Array) -> RealArray:
+    def pdf(self, x: ComplexArray) -> RealArray:
         """
         Args:
             x: The sample.
@@ -128,7 +127,8 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         return fisher_info_f(self)
 
 
-def _summarize_fisher_information(f: Callable[..., Array], array: Array, axes: int) -> Array:
+def _summarize_fisher_information(f: Callable[..., ComplexArray],
+                                  array: ComplexArray, axes: int) -> ComplexArray:
     if axes == 0:
         return array
     if axes == 1:

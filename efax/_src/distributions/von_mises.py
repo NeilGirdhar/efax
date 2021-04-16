@@ -5,7 +5,7 @@ from typing import Tuple
 
 import jax.numpy as jnp
 from jax.nn import softplus
-from tjax import RealArray, Shape
+from tjax import RealArray, RealNumeric, Shape
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
@@ -99,6 +99,6 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
 
 
 # Private functions --------------------------------------------------------------------------------
-def _a_k(k: RealArray, kappa: RealArray) -> RealArray:
+def _a_k(k: RealNumeric, kappa: RealNumeric) -> RealNumeric:
     half_k = k * 0.5
     return ive(half_k, kappa) / ive(half_k - 1.0, kappa)

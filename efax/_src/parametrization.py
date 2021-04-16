@@ -5,8 +5,7 @@ from itertools import count
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Tuple, Type, TypeVar
 
 import jax.numpy as jnp
-from chex import Array
-from tjax import RealArray, Shape, custom_jvp, jit
+from tjax import ComplexArray, RealArray, Shape, custom_jvp, jit
 from tjax.dataclasses import field_names_values_metadata, fields
 
 from .parameter import Support
@@ -65,13 +64,13 @@ class Parametrization:
                              for name, value, _ in self.parameters_name_value_support()}
         return type(self)(**sliced_parameters, **fixed_parameters)  # type: ignore
 
-    def flattened(self) -> Array:
+    def flattened(self) -> ComplexArray:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
                        for name, value, support in self.parameters_name_value_support()))
 
     @classmethod
-    def unflattened(cls: Type[T], flattened: Array, **kwargs: Any) -> T:
+    def unflattened(cls: Type[T], flattened: ComplexArray, **kwargs: Any) -> T:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
@@ -100,7 +99,7 @@ class Parametrization:
                 for name, value, metadata in field_names_values_metadata(self)
                 if metadata['fixed']}
 
-    def parameters_value_support(self) -> Iterable[Tuple[Array, Support]]:
+    def parameters_value_support(self) -> Iterable[Tuple[ComplexArray, Support]]:
         """
         Returns: The value and support of each variable parameter.
         """
@@ -112,7 +111,7 @@ class Parametrization:
                 raise TypeError
             yield value, support
 
-    def parameters_name_value(self) -> Iterable[Tuple[str, Array]]:
+    def parameters_name_value(self) -> Iterable[Tuple[str, ComplexArray]]:
         """
         Returns: The name and value of each variable parameter.
         """
@@ -121,7 +120,7 @@ class Parametrization:
                 continue
             yield name, value
 
-    def parameters_name_value_support(self) -> Iterable[Tuple[str, Array, Support]]:
+    def parameters_name_value_support(self) -> Iterable[Tuple[str, ComplexArray, Support]]:
         """
         Returns: The name, value, and support of each variable parameter.
         """

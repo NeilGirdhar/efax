@@ -4,7 +4,6 @@ from typing import Optional
 
 import jax
 import jax.numpy as jnp
-from chex import Numeric
 from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
@@ -18,7 +17,7 @@ __all__ = ['WeibullNP', 'WeibullEP']
 
 @dataclass
 class WeibullNP(NaturalParametrization['WeibullEP']):
-    concentration: Numeric = distribution_parameter(ScalarSupport(), fixed=True)
+    concentration: RealArray = distribution_parameter(ScalarSupport(), fixed=True)
     # eta = -scale^-concentration
     eta: RealArray = distribution_parameter(ScalarSupport())
 
@@ -42,7 +41,7 @@ class WeibullNP(NaturalParametrization['WeibullEP']):
 
 @dataclass
 class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
-    concentration: Numeric = distribution_parameter(ScalarSupport(), fixed=True)
+    concentration: RealArray = distribution_parameter(ScalarSupport(), fixed=True)
     # chi = scale^concentration
     chi: RealArray = distribution_parameter(ScalarSupport())
 

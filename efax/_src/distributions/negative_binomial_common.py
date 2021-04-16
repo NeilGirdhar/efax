@@ -4,7 +4,7 @@ from typing import Any, Generic, List, TypeVar
 
 import jax.numpy as jnp
 from jax.scipy.special import gammaln
-from tjax import IntegerArray, RealArray, Shape
+from tjax import IntegralNumeric, RealArray, Shape
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
@@ -16,7 +16,7 @@ EP = TypeVar('EP', bound='NBCommonEP[Any]')
 
 
 class NBCommonNP(NaturalParametrization[EP], Generic[EP]):
-    failures: IntegerArray
+    failures: IntegralNumeric
     log_not_p: RealArray
 
     # Implemented methods --------------------------------------------------------------------------
@@ -41,7 +41,7 @@ NP = TypeVar('NP', bound=NBCommonNP[Any])
 
 
 class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
-    failures: IntegerArray
+    failures: IntegralNumeric
     mean: RealArray
 
     # Implemented methods --------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from tjax import IntegerArray, RealArray
+from tjax import IntegralArray, RealArray
 from tjax.dataclasses import dataclass
 
 from ..parameter import ScalarSupport, distribution_parameter
@@ -12,7 +12,7 @@ __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP']
 
 @dataclass
 class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
-    failures: IntegerArray = distribution_parameter(ScalarSupport(), fixed=True)
+    failures: IntegralArray = distribution_parameter(ScalarSupport(), fixed=True)
     log_not_p: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -25,7 +25,7 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
 
 @dataclass
 class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
-    failures: IntegerArray = distribution_parameter(ScalarSupport(), fixed=True)
+    failures: IntegralArray = distribution_parameter(ScalarSupport(), fixed=True)
     mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

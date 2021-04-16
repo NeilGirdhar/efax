@@ -4,15 +4,14 @@ from functools import reduce
 from typing import TYPE_CHECKING, Any, Iterable, List
 
 import jax.numpy as jnp
-from chex import Array
 from tensorflow_probability.substrates import jax as tfp
-from tjax import RealArray
+from tjax import ComplexArray, RealArray, RealNumeric
 
 __all__: List[str] = []
 
 
 def parameters_dot_product(x: NaturalParametrization[Any], y: Any) -> RealArray:
-    def dotted_fields() -> Iterable[Array]:
+    def dotted_fields() -> Iterable[ComplexArray]:
         for (x_value, x_support), (y_value, y_support) in zip(x.parameters_value_support(),
                                                               y.parameters_value_support()):
             axes = x_support.axes()
@@ -30,12 +29,12 @@ def inverse_softplus(y: RealArray) -> RealArray:
 ive = tfp.math.bessel_ive
 
 
-def iv(v: Array, z: Array) -> Array:
+def iv(v: RealNumeric, z: RealNumeric) -> RealNumeric:
     return tfp.math.bessel_ive(v, z) / jnp.exp(-jnp.abs(z))
 
 
 # Private functions --------------------------------------------------------------------------------
-def _parameter_dot_product(x: Array, y: Array, n_axes: int) -> RealArray:
+def _parameter_dot_product(x: ComplexArray, y: ComplexArray, n_axes: int) -> RealArray:
     """
     Returns the real component of the dot product of the final n_axes axes of two arrays.
     """

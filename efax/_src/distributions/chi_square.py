@@ -61,7 +61,7 @@ class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
         k_over_two = q.k_over_two_minus_one + 1.0
         return -k_over_two
 
-    def initial_search_parameters(self) -> RealArray:
+    def initial_search_parameters(self) -> ChiSquareNP:
         return ChiSquareNP(jnp.zeros(self.mean_log.shape))
 
     def search_to_natural(self, search_parameters: ChiSquareNP) -> ChiSquareNP:
