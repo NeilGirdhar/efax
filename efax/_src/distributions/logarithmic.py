@@ -46,13 +46,13 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
     chi: RealArray = distribution_parameter(ScalarSupport())  # - odds / log(1-p)
 
     # Implemented methods --------------------------------------------------------------------------
-    @classmethod
-    def natural_parametrization_cls(cls) -> Type[LogarithmicNP]:
-        return LogarithmicNP
-
     @property
     def shape(self) -> Shape:
         return self.chi.shape
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[LogarithmicNP]:
+        return LogarithmicNP
 
     # The expected_carrier_measure is unknown.
 

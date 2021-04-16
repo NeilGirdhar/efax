@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Tuple
+from typing import Tuple, Type
 
 import jax.numpy as jnp
 from jax.nn import softplus
@@ -68,6 +68,10 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
     @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[VonMisesFisherNP]:
+        return VonMisesFisherNP
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)

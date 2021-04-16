@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -77,6 +77,10 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
     @property
     def shape(self) -> Shape:
         return self.probability.shape[:-1]
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[MultinomialNP]:
+        return MultinomialNP
 
     def to_nat(self) -> MultinomialNP:
         p_k = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)

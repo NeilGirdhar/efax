@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, Type, TypeVar, final, get_type_hints
+from typing import Any, Generic, Type, TypeVar, final
 
 from tjax import RealArray, jit
 
@@ -24,6 +24,10 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
     parametrization, this is an expected value.
     """
     # Abstract methods -----------------------------------------------------------------------------
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[NP]:
+        raise NotImplementedError
+
     def to_nat(self) -> NP:
         """
         Returns: The corresponding natural parameters.
@@ -39,10 +43,6 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         raise NotImplementedError
 
     # Final methods --------------------------------------------------------------------------------
-    @classmethod
-    def natural_parametrization_cls(cls) -> Type[NP]:
-        return get_type_hints(cls.to_nat)['return']
-
     @jit
     @final
     def cross_entropy(self, q: NP) -> RealArray:

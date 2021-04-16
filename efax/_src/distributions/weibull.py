@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -49,6 +49,10 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
     @property
     def shape(self) -> Shape:
         return self.chi.shape
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[WeibullNP]:
+        return WeibullNP
 
     def to_nat(self) -> WeibullNP:
         return WeibullNP(self.concentration, -1.0 / self.chi)

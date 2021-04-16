@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -58,6 +58,10 @@ class GammaEP(ExpToNat[GammaNP, RealArray]):
     @property
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[GammaNP]:
+        return GammaNP
 
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)

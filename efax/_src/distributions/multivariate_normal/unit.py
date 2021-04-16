@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -64,6 +64,10 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
     @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[MultivariateUnitNormalNP]:
+        return MultivariateUnitNormalNP
 
     def to_nat(self) -> MultivariateUnitNormalNP:
         return MultivariateUnitNormalNP(self.mean)

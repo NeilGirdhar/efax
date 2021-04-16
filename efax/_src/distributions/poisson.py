@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -47,6 +47,10 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
     @property
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[PoissonNP]:
+        return PoissonNP
 
     def to_nat(self) -> PoissonNP:
         return PoissonNP(jnp.log(self.mean))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -53,6 +53,10 @@ class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
     @property
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[ExponentialNP]:
+        return ExponentialNP
 
     def to_nat(self) -> ExponentialNP:
         return ExponentialNP(-1.0 / self.mean)

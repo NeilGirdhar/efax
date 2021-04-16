@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Type
 
 import jax.numpy as jnp
 from tjax import Array, ComplexArray, RealArray, Shape
@@ -71,6 +72,10 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
     @property
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[ComplexNormalNP]:
+        return ComplexNormalNP
 
     def to_nat(self) -> ComplexNormalNP:
         variance = self.second_moment - jnp.conj(self.mean) * self.mean

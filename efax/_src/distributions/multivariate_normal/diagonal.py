@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -58,6 +58,10 @@ class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagon
     @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[MultivariateDiagonalNormalNP]:
+        return MultivariateDiagonalNormalNP
 
     def to_nat(self) -> MultivariateDiagonalNormalNP:
         return MultivariateDiagonalNormalNP(self.mean / self.variance(), -0.5 / self.variance())

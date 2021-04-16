@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -97,6 +97,10 @@ class MultivariateNormalVP(Samplable):
     @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[MultivariateNormalNP]:
+        return MultivariateNormalNP
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:

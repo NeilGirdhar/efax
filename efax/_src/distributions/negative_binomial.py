@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Type
+
 import jax.numpy as jnp
 from tjax import IntegralArray, RealArray
 from tjax.dataclasses import dataclass
@@ -29,5 +31,9 @@ class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
     mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
+    @classmethod
+    def natural_parametrization_cls(cls) -> Type[NegativeBinomialNP]:
+        return NegativeBinomialNP
+
     def to_nat(self) -> NegativeBinomialNP:
         return NegativeBinomialNP(self.failures, self._log_not_p())
