@@ -25,14 +25,17 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 jax = "^0.2"
-tensorflow-probability = "^0.12"
+tensorflow-probability = {extras = ["jax"], version = "^0.12.2"}
 jaxlib = "^0.1.55"
 numpy = ">=1.20,<1.21"
 scipy = "^1.4"
 tjax = ">=0.10,<1.0"
 
 [tool.poetry.dev-dependencies]
-pylint = "^2.6"
+flake8 = ">=3.9"
+isort = ">=5.8"
+mypy = ">=0.812"
+pylint = ">=2.8"
 pytest = "^6"
 
 [tool.isort]
