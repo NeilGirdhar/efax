@@ -29,9 +29,13 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo[An
         final_ep = intermediate_np.to_exp()
         try:
             assert_jax_allclose(final_ep, original_ep, atol=atol, rtol=1e-4)
-            assert (original_ep.fixed_parameters_mapping()
-                    == intermediate_np.fixed_parameters_mapping()
-                    == final_ep.fixed_parameters_mapping())
+            original_fixed = original_ep.fixed_parameters_mapping()
+            intermediate_fixed = intermediate_np.fixed_parameters_mapping()
+            final_fixed = final_ep.fixed_parameters_mapping()
+            assert original_fixed.keys() == intermediate_fixed.keys() == final_fixed.keys()
+            for name, value in original_fixed.items():
+                assert_allclose(value, intermediate_fixed[name])
+                assert_allclose(value, final_fixed[name])
         except AssertionError:
             print(original_ep, intermediate_np, final_ep)
             raise
