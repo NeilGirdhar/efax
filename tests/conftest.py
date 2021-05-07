@@ -1,5 +1,5 @@
 import subprocess
-from typing import Any, Generator, List
+from typing import Any, Generator, Optional
 
 import numpy as np
 import pytest
@@ -8,6 +8,10 @@ from tjax import Generator as TjaxGenerator
 
 from .create_info import create_infos
 from .distribution_info import DistributionInfo
+
+
+def pytest_addoption(parser: Any) -> None:
+    parser.addoption('--distribution', action='store', default=None)
 
 
 @pytest.fixture
@@ -30,7 +34,11 @@ def configure_numpy() -> Generator[None, None, None]:
             yield
 
 
-@pytest.fixture(scope='session',
-                params=create_infos())
-def distribution_info(request: Any) -> List[DistributionInfo[Any, Any]]:
-    return request.param
+@pytest.fixture(scope='session', params=create_infos())
+def distribution_info(request: Any) -> Optional[DistributionInfo[Any, Any]]:
+    distribution_name: Optional[str] = request.config.getoption('--distribution')
+    info_name = type(request.param).__name__[:-4]
+    if distribution_name is None or info_name == distribution_name:
+        return request.param
+    pytest.skip(f"Deselected {info_name}")
+    return None
