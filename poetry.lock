@@ -31,17 +31,17 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "attrs"
-version = "20.3.0"
+version = "21.2.0"
 description = "Classes Without Boilerplate"
 category = "dev"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [package.extras]
-dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface", "furo", "sphinx", "pre-commit"]
-docs = ["furo", "sphinx", "zope.interface"]
-tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
-tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
+dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface", "furo", "sphinx", "sphinx-notfound-page", "pre-commit"]
+docs = ["furo", "sphinx", "zope.interface", "sphinx-notfound-page"]
+tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface"]
+tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins"]
 
 [[package]]
 name = "chex"
@@ -99,11 +99,11 @@ six = "*"
 
 [[package]]
 name = "decorator"
-version = "5.0.7"
+version = "4.4.2"
 description = "Decorators for Humans"
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=2.6, !=3.0.*, !=3.1.*"
 
 [[package]]
 name = "dm-tree"
@@ -168,7 +168,7 @@ colors = ["colorama (>=0.4.3,<0.5.0)"]
 
 [[package]]
 name = "jax"
-version = "0.2.11"
+version = "0.2.13"
 description = "Differentiate, compile, and transform Numpy code."
 category = "main"
 optional = false
@@ -180,17 +180,17 @@ numpy = ">=1.12"
 opt_einsum = "*"
 
 [package.extras]
-cpu = ["jaxlib (>=0.1.62)"]
-cuda-101 = ["jaxlib (==0.1.64+cuda101)"]
-cuda-102 = ["jaxlib (==0.1.64+cuda102)"]
-cuda-110 = ["jaxlib (==0.1.64+cuda110)"]
-cuda-111 = ["jaxlib (==0.1.64+cuda111)"]
-cuda-112 = ["jaxlib (==0.1.64+cuda112)"]
-minimum-jaxlib = ["jaxlib (==0.1.62)"]
+cpu = ["jaxlib (>=0.1.65)"]
+cuda101 = ["jaxlib (==0.1.65+cuda101)"]
+cuda102 = ["jaxlib (==0.1.65+cuda102)"]
+cuda110 = ["jaxlib (==0.1.65+cuda110)"]
+cuda111 = ["jaxlib (==0.1.65+cuda111)"]
+cuda112 = ["jaxlib (==0.1.65+cuda112)"]
+minimum-jaxlib = ["jaxlib (==0.1.65)"]
 
 [[package]]
 name = "jaxlib"
-version = "0.1.64"
+version = "0.1.65"
 description = "XLA library for JAX"
 category = "main"
 optional = false
@@ -268,14 +268,14 @@ python-versions = "*"
 
 [[package]]
 name = "networkx"
-version = "2.5"
+version = "2.5.1"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-decorator = ">=4.3.0"
+decorator = ">=4.3,<5"
 
 [package.extras]
 all = ["numpy", "scipy", "pandas", "matplotlib", "pygraphviz", "pydot", "pyyaml", "lxml", "pytest"]
@@ -407,7 +407,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "pytest"
-version = "6.2.3"
+version = "6.2.4"
 description = "pytest: simple powerful testing with Python"
 category = "dev"
 optional = false
@@ -450,15 +450,15 @@ numpy = ">=1.16.5"
 
 [[package]]
 name = "six"
-version = "1.15.0"
+version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
-name = "tensorflow-probability"
-version = "0.12.2"
+name = "tfp-nightly"
+version = "0.13.0.dev20210507"
 description = "Probabilistic modeling and statistical inference in TensorFlow"
 category = "main"
 optional = false
@@ -469,14 +469,12 @@ cloudpickle = ">=1.3"
 decorator = "*"
 dm-tree = "*"
 gast = ">=0.3.2"
-jax = {version = "<=0.2.11", optional = true, markers = "extra == \"jax\""}
-jaxlib = {version = "<=0.1.64", optional = true, markers = "extra == \"jax\""}
 numpy = ">=1.13.3"
 six = ">=1.10.0"
 
 [package.extras]
-jax = ["jax (<=0.2.11)", "jaxlib (<=0.1.64)"]
-tfds = ["tensorflow-datasets (>=2.2.0)"]
+jax = ["jax", "jaxlib"]
+tfds = ["tfds-nightly"]
 
 [[package]]
 name = "tjax"
@@ -538,7 +536,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "3d2c9c93b314a72da785ea8e82ae447fff1a4f2a3e809deaf2f95296ca0294f9"
+content-hash = "8040938fd321f18086929cb3ca0205d929c3d3415f37bf4d1860fd4a5300873e"
 
 [metadata.files]
 absl-py = [
@@ -554,8 +552,8 @@ atomicwrites = [
     {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
 ]
 attrs = [
-    {file = "attrs-20.3.0-py2.py3-none-any.whl", hash = "sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6"},
-    {file = "attrs-20.3.0.tar.gz", hash = "sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700"},
+    {file = "attrs-21.2.0-py2.py3-none-any.whl", hash = "sha256:149e90d6d8ac20db7a955ad60cf0e6881a3f20d37096140088356da6c716b0b1"},
+    {file = "attrs-21.2.0.tar.gz", hash = "sha256:ef6aaac3ca6cd92904cdd0d83f629a15f18053ec84e6432106f7a4d04ae4f5fb"},
 ]
 chex = [
     {file = "chex-0.0.7-py3-none-any.whl", hash = "sha256:f7be9365c651dd8bf770d0e1fe936d22717811be307a64c0c39da2a1f8e20bfd"},
@@ -578,8 +576,8 @@ cycler = [
     {file = "cycler-0.10.0.tar.gz", hash = "sha256:cd7b2d1018258d7247a71425e9f26463dfb444d411c39569972f4ce586b0c9d8"},
 ]
 decorator = [
-    {file = "decorator-5.0.7-py3-none-any.whl", hash = "sha256:945d84890bb20cc4a2f4a31fc4311c0c473af65ea318617f13a7257c9a58bc98"},
-    {file = "decorator-5.0.7.tar.gz", hash = "sha256:6f201a6c4dac3d187352661f508b9364ec8091217442c9478f1f83c003a0f060"},
+    {file = "decorator-4.4.2-py2.py3-none-any.whl", hash = "sha256:41fa54c2a0cc4ba648be4fd43cff00aedf5b9465c9bf18d64325bc225f08f760"},
+    {file = "decorator-4.4.2.tar.gz", hash = "sha256:e3a62f0520172440ca0dcc823749319382e377f37f140a0b99ef45fecb84bfe7"},
 ]
 dm-tree = [
     {file = "dm-tree-0.1.6.tar.gz", hash = "sha256:6776404b23b4522c01012ffb314632aba092c9541577004ab153321e87da439a"},
@@ -621,17 +619,17 @@ isort = [
     {file = "isort-5.8.0.tar.gz", hash = "sha256:0a943902919f65c5684ac4e0154b1ad4fac6dcaa5d9f3426b732f1c8b5419be6"},
 ]
 jax = [
-    {file = "jax-0.2.11.tar.gz", hash = "sha256:702ea67ce2c06f8dd868559c51c7cdf93e7f77aec239537922d716ab91dffc63"},
+    {file = "jax-0.2.13.tar.gz", hash = "sha256:800dba0fe35fb8b6ac36ecd5bd399663b7df109e901987113c16c8281ecde2a8"},
 ]
 jaxlib = [
-    {file = "jaxlib-0.1.64-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:b2a7cd42032c3eefd6b03bbfb026f7f76ac290c520bc6d7e040ae83f0f84e4f6"},
-    {file = "jaxlib-0.1.64-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:4f60212d926d721b44898599dba88290f21a2bfb5512d14df4a7a81bf0ec06c9"},
-    {file = "jaxlib-0.1.64-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:72099ac6940728b9e9f76cc81bb547454d8bcbeba1a082a2abb6f0dc201ead70"},
-    {file = "jaxlib-0.1.64-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:362f05b82934669f817eb2dff0b5a807ab513dc0b2387cb58280664839118b81"},
-    {file = "jaxlib-0.1.64-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:824a784a770e0a2d1f71322f52a560b4da8dad8009950df1438e3b6f070eb343"},
-    {file = "jaxlib-0.1.64-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:6993ac9b0a985f473b75e142651dafad7186a98dd39e5ad3663addb74c6b9317"},
-    {file = "jaxlib-0.1.64-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:d960b06d1865073228a1e9c11968be4bcd5e383b6d25c02aea014507b2426a73"},
-    {file = "jaxlib-0.1.64-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:d7674c89980230299caafbccaf8b29c122a4d2f9240eee39d2f4a3e3fadc1e83"},
+    {file = "jaxlib-0.1.65-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:7a8321fd12b917fe9b9ee21bc6d503739a089f72f45e86137adb21d436bf76d6"},
+    {file = "jaxlib-0.1.65-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:b66c870083dfddff29c929bcd0c09c9f7e059cffe7c87f2e88508974a7a30c5d"},
+    {file = "jaxlib-0.1.65-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:465542b15b30509eef912c75f39c8e51efe815e5f339df91130eb48143432c62"},
+    {file = "jaxlib-0.1.65-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:1080ba936fa3126419966eb93c983b96aa14f149b9fc86928c5583f378d72fb6"},
+    {file = "jaxlib-0.1.65-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:d0e8bf61cdd532e7d4eafa5963d62f15459e4e4f3e46b01f9181f7e9241f7e67"},
+    {file = "jaxlib-0.1.65-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:0b02ac78b3c5b8d8cad6224024539e69e35263b2aa45ec591690fccb729e15a6"},
+    {file = "jaxlib-0.1.65-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:bb73198e6d6b4f9e9d9132f604923c86ce9828af2933476b3c9ee66ce35ab6d6"},
+    {file = "jaxlib-0.1.65-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:33b744366e039f9420bf9e73cb3367e820ee9702131413bed4b729b2602dc79b"},
 ]
 kiwisolver = [
     {file = "kiwisolver-1.3.1-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:fd34fbbfbc40628200730bc1febe30631347103fc8d3d4fa012c21ab9c11eca9"},
@@ -745,8 +743,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 networkx = [
-    {file = "networkx-2.5-py3-none-any.whl", hash = "sha256:8c5812e9f798d37c50570d15c4a69d5710a18d77bafc903ee9c5fba7454c616c"},
-    {file = "networkx-2.5.tar.gz", hash = "sha256:7978955423fbc9639c10498878be59caf99b44dc304c2286162fd24b458c1602"},
+    {file = "networkx-2.5.1-py3-none-any.whl", hash = "sha256:0635858ed7e989f4c574c2328380b452df892ae85084144c73d8cd819f0c4e06"},
+    {file = "networkx-2.5.1.tar.gz", hash = "sha256:109cd585cac41297f71103c3c42ac6ef7379f29788eb54cb751be5a663bb235a"},
 ]
 numpy = [
     {file = "numpy-1.20.2-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:e9459f40244bb02b2f14f6af0cd0732791d72232bbb0dc4bab57ef88e75f6935"},
@@ -846,8 +844,8 @@ pyparsing = [
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
 ]
 pytest = [
-    {file = "pytest-6.2.3-py3-none-any.whl", hash = "sha256:6ad9c7bdf517a808242b998ac20063c41532a570d088d77eec1ee12b0b5574bc"},
-    {file = "pytest-6.2.3.tar.gz", hash = "sha256:671238a46e4df0f3498d1c3270e5deb9b32d25134c99b7d75370a68cfbe9b634"},
+    {file = "pytest-6.2.4-py3-none-any.whl", hash = "sha256:91ef2131a9bd6be8f76f1f08eac5c5317221d6ad1e143ae03894b862e8976890"},
+    {file = "pytest-6.2.4.tar.gz", hash = "sha256:50bcad0a0b9c5a72c8e4e7c9855a3ad496ca6a881a3641b4260605450772c54b"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
@@ -875,11 +873,11 @@ scipy = [
     {file = "scipy-1.6.1.tar.gz", hash = "sha256:c4fceb864890b6168e79b0e714c585dbe2fd4222768ee90bc1aa0f8218691b11"},
 ]
 six = [
-    {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
-    {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
+    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
+    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
-tensorflow-probability = [
-    {file = "tensorflow_probability-0.12.2-py2.py3-none-any.whl", hash = "sha256:b14b27c276284231c2c093bedfeaebf584b688e8c522e5800bed3005263cc76c"},
+tfp-nightly = [
+    {file = "tfp_nightly-0.13.0.dev20210507-py2.py3-none-any.whl", hash = "sha256:c6cec8f047b7536014ea7d38a34f0a42ce47a335bcf7cab66eb61eec5287320b"},
 ]
 tjax = [
     {file = "tjax-0.10.4-py3-none-any.whl", hash = "sha256:6708fd38fd810d3dbf2f6c8a1f7e81cfa451dd5c6402e42d9452ca8e284fc0bd"},

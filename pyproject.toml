@@ -25,10 +25,10 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 jax = "^0.2"
-tensorflow-probability = {extras = ["jax"], version = "^0.12.2"}
 jaxlib = "^0.1.55"
 numpy = ">=1.20,<1.21"
 scipy = "^1.4"
+tfp-nightly = "^0.13.0-alpha.20210506"
 tjax = ">=0.10,<1.0"
 
 [tool.poetry.dev-dependencies]
