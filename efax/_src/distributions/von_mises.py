@@ -11,7 +11,7 @@ from tjax.dataclasses import dataclass
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
-from ..tools import inverse_softplus, ive
+from ..tools import inverse_softplus, ive, log_ive
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
@@ -28,8 +28,10 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
     def log_normalizer(self) -> RealArray:
         half_k = self.mean_times_concentration.shape[-1] * 0.5
         kappa = jnp.linalg.norm(self.mean_times_concentration, 2, axis=-1)
-        return kappa - jnp.log(kappa ** (half_k - 1.0)
-                               / ((2.0 * math.pi) ** half_k * ive(half_k - 1.0, kappa)))
+        return (kappa
+                - (half_k - 1.0) * jnp.log(kappa)
+                + half_k * jnp.log(2.0 * math.pi)
+                + log_ive(half_k - 1.0, kappa))
 
     def to_exp(self) -> VonMisesFisherEP:
         q = self.mean_times_concentration
