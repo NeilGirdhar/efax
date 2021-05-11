@@ -30,6 +30,7 @@ numpy = ">=1.20,<1.21"
 scipy = "^1.4"
 tfp-nightly = "^0.13.0-alpha.20210506"
 tjax = ">=0.10,<1.0"
+pytest-xdist = {version = "^2", extras = ["psutil"]}
 
 [tool.poetry.dev-dependencies]
 flake8 = ">=3.9"

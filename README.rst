@@ -228,7 +228,7 @@ It's not hard to add a new distribution.  The steps are:
 - Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.)
 
 Implementation should respect PEP8.
-The tests can be run using :bash:`pytest .`
+The tests can be run using :bash:`pytest . -n auto`.
 There are a few tools to clean and check the source:
 
 - :bash:`isort .`
