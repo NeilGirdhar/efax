@@ -6,10 +6,8 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 
-from .create_info import BetaInfo, DirichletInfo, GammaInfo, VonMisesFisherInfo
+from .create_info import BetaInfo, DirichletInfo, GammaInfo
 from .distribution_info import DistributionInfo
-
-# TODO: Block VonMises until https://github.com/google/jax/issues/2466 is resolved.
 
 
 def test_conversion(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
@@ -47,11 +45,7 @@ def test_gradient_log_normalizer(generator: Generator,
     Tests that the gradient log-normalizer evaluates to the same as the gradient of the
     log-normalizer.
     """
-    # TODO: Remove when https://github.com/tensorflow/probability/issues/1247 is resolved.
-    if isinstance(distribution_info, VonMisesFisherInfo):
-        return
-
-    # pylint: disable=protected-access
+    # pylint: disable=too-many-locals, disable=protected-access
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
     original_ln = cls._original_log_normalizer
     original_gln = jit(grad(cls._original_log_normalizer))

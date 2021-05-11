@@ -277,6 +277,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP]):
 
 
 def create_infos() -> List[DistributionInfo[Any, Any]]:
+    # pylint: disable=too-many-locals
     # Discrete
     bernoulli = BernoulliInfo()
     geometric = GeometricInfo()
