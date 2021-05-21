@@ -212,7 +212,7 @@ minimum-jaxlib = ["jaxlib (==0.1.65)"]
 
 [[package]]
 name = "jaxlib"
-version = "0.1.65"
+version = "0.1.67"
 description = "XLA library for JAX"
 category = "main"
 optional = false
@@ -220,7 +220,7 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 absl-py = "*"
-flatbuffers = "*"
+flatbuffers = ">=1.12,<3.0"
 numpy = ">=1.16"
 scipy = "*"
 
@@ -521,7 +521,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "tfp-nightly"
-version = "0.13.0.dev20210511"
+version = "0.13.0.dev20210514"
 description = "Probabilistic modeling and statistical inference in TensorFlow"
 category = "main"
 optional = false
@@ -541,7 +541,7 @@ tfds = ["tfds-nightly"]
 
 [[package]]
 name = "tjax"
-version = "0.10.5"
+version = "0.11.0"
 description = "Tools for JAX."
 category = "main"
 optional = false
@@ -693,14 +693,14 @@ jax = [
     {file = "jax-0.2.13.tar.gz", hash = "sha256:800dba0fe35fb8b6ac36ecd5bd399663b7df109e901987113c16c8281ecde2a8"},
 ]
 jaxlib = [
-    {file = "jaxlib-0.1.65-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:7a8321fd12b917fe9b9ee21bc6d503739a089f72f45e86137adb21d436bf76d6"},
-    {file = "jaxlib-0.1.65-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:b66c870083dfddff29c929bcd0c09c9f7e059cffe7c87f2e88508974a7a30c5d"},
-    {file = "jaxlib-0.1.65-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:465542b15b30509eef912c75f39c8e51efe815e5f339df91130eb48143432c62"},
-    {file = "jaxlib-0.1.65-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:1080ba936fa3126419966eb93c983b96aa14f149b9fc86928c5583f378d72fb6"},
-    {file = "jaxlib-0.1.65-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:d0e8bf61cdd532e7d4eafa5963d62f15459e4e4f3e46b01f9181f7e9241f7e67"},
-    {file = "jaxlib-0.1.65-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:0b02ac78b3c5b8d8cad6224024539e69e35263b2aa45ec591690fccb729e15a6"},
-    {file = "jaxlib-0.1.65-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:bb73198e6d6b4f9e9d9132f604923c86ce9828af2933476b3c9ee66ce35ab6d6"},
-    {file = "jaxlib-0.1.65-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:33b744366e039f9420bf9e73cb3367e820ee9702131413bed4b729b2602dc79b"},
+    {file = "jaxlib-0.1.67-cp36-none-macosx_10_9_x86_64.whl", hash = "sha256:13420851cb5245ed59f355d2b3f058f4725a421f7f4459e15eed549eafc16064"},
+    {file = "jaxlib-0.1.67-cp36-none-manylinux2010_x86_64.whl", hash = "sha256:0f83f307f3d5864a05dca7a70a667c4c7e7de3cdd5c116b1ec78fc18b6da57cc"},
+    {file = "jaxlib-0.1.67-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:84b2d19d36d6b55e4a8a22a8be7e8e3b67592e808d181485b04f0ce9b27bd2a1"},
+    {file = "jaxlib-0.1.67-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:35db3764e6d897ebf4206f904a7febfa2a867e824e219d5e9b16da07192e2ace"},
+    {file = "jaxlib-0.1.67-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:94317ffc3df58a27917232119e9103badc90140a40335cebda20a58d8952e76b"},
+    {file = "jaxlib-0.1.67-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:961d058fd2e63b093f732575272fa4bcb1a933806a1b03faf7e340e9462fa680"},
+    {file = "jaxlib-0.1.67-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:fa38b0a5824c230b77f7cd5322e85a59f7822d80b76d751b5c8df4e179e5a701"},
+    {file = "jaxlib-0.1.67-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:aef419f9fb7a02c5892ac0c3f8883fbca6cef480f6836b557943e9b75763d811"},
 ]
 kiwisolver = [
     {file = "kiwisolver-1.3.1-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:fd34fbbfbc40628200730bc1febe30631347103fc8d3d4fa012c21ab9c11eca9"},
@@ -986,11 +986,11 @@ six = [
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
 tfp-nightly = [
-    {file = "tfp_nightly-0.13.0.dev20210511-py2.py3-none-any.whl", hash = "sha256:1e2244b4fec7663f7d2d047bd54049d741c5d85bb97621e5b09dab3fa00f26cf"},
+    {file = "tfp_nightly-0.13.0.dev20210514-py2.py3-none-any.whl", hash = "sha256:f43ec6b448af3bca56b382563107d3d87aff5380f02dfa4fa51188fbc9d18249"},
 ]
 tjax = [
-    {file = "tjax-0.10.5-py3-none-any.whl", hash = "sha256:de033ee973b9e45228320ffdf452134836acc71a3046c7359124fcbada6e709d"},
-    {file = "tjax-0.10.5.tar.gz", hash = "sha256:f7e1e9425788bb9f0865a3924e36d9c6d219baf91e12224ec46dc45a5a8810df"},
+    {file = "tjax-0.11.0-py3-none-any.whl", hash = "sha256:de6df6083ca49df90e22a758d71dfaca7334e0fb2d18354f64a9cf7812bd5692"},
+    {file = "tjax-0.11.0.tar.gz", hash = "sha256:8b98ec8742d6689c9481a9354d714b61be32c047094ebd33c073c5c8bde0db6c"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

@@ -4,7 +4,6 @@ from math import comb, sqrt
 from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
-from jax.ops import index_update
 from tjax import Array, Shape
 from tjax.dataclasses import field
 
@@ -95,10 +94,10 @@ class SymmetricMatrixSupport(Support):
         dimensions = (i_sqrt_discriminant - 1) // 2
         index = (..., *jnp.triu_indices(dimensions))
         empty = jnp.empty(x.shape[:-1] + (dimensions, dimensions))
-        lower_diagonal = index_update(empty, index, x).T
+        lower_diagonal = empty.at[index].set(x).T
         if self.hermitian:
             lower_diagonal = jnp.conjugate(lower_diagonal)
-        return index_update(lower_diagonal, index, x)
+        return lower_diagonal.at[index].set(x)
 
 
 class SquareMatrixSupport(Support):
