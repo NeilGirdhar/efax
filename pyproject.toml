@@ -35,7 +35,7 @@ pytest-xdist = {version = "^2", extras = ["psutil"]}
 [tool.poetry.dev-dependencies]
 flake8 = ">=3.9"
 isort = ">=5.8"
-mypy = ">=0.812"
+mypy = ">=0.900"
 pylint = ">=2.8"
 pytest = "^6"
 
@@ -65,3 +65,16 @@ output-format = "colorized"
 
 [tool.pylint.similarities]
 min-similarity-lines = 10
+
+[tool.mypy]
+plugins = 'tjax.mypy_plugin'
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_generics = true
+disallow_untyped_decorators = true
+
+[[tool.mypy.overrides]]
+module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
+       'tensorflow_probability.substrates']
+ignore_missing_imports = true
