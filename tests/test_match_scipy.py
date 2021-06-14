@@ -10,7 +10,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 
-from .create_info import ComplexNormalInfo, MultivariateNormalInfo
+from .create_info import ComplexNormalInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo
 from .distribution_info import DistributionInfo
 
 
@@ -48,7 +48,10 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any]
         except NotImplementedError:
             continue
 
-        assert_allclose(my_density, density, rtol=1e-4)
+        rtol = (3e-4
+                if isinstance(distribution_info, MultivariateDiagonalNormalInfo)
+                else 1e-4)
+        assert_allclose(my_density, density, rtol=rtol)
 
 
 def test_maximum_likelihood_estimation(generator: Generator,

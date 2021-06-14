@@ -66,6 +66,9 @@ output-format = "colorized"
 [tool.pylint.similarities]
 min-similarity-lines = 10
 
+[tool.pytest.ini_options]
+addopts = '-n auto'
+
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'
 disallow_untyped_calls = true
