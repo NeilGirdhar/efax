@@ -48,23 +48,31 @@ known_third_party = ["jax"]
 max-line-length = 100
 exclude = ["__init__.py", "__pycache__"]
 
+[tool.pylint.master]
+jobs = 0
+
 [tool.pylint.messages_control]
 disable = [
     "abstract-method",
     "arguments-differ",
     "cyclic-import",  # https://github.com/PyCQA/pylint/issues/3525
+    'duplicate-code',
     "invalid-name",
     "invalid-unary-operand-type",
     "missing-docstring",
     "no-member",
     "no-self-use",
     "unused-argument"]
+enable= [
+    'useless-suppression',
+    'use-symbolic-message-instead']
 
 [tool.pylint.reports]
 output-format = "colorized"
 
 [tool.pylint.similarities]
 min-similarity-lines = 10
+ignore-imports = 'yes'
 
 [tool.pytest.ini_options]
 addopts = '-n auto'

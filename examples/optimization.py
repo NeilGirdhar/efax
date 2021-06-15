@@ -1,21 +1,22 @@
 import jax.numpy as jnp
 from jax import grad, jit, lax
+from tjax import BooleanNumeric, RealNumeric
 
 from efax import BernoulliEP, BernoulliNP
 
 
-def cross_entropy_loss(p, q):
+def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> RealNumeric:
     return p.cross_entropy(q)
 
 
 gce = jit(grad(cross_entropy_loss, 1))
 
 
-def body_fun(q):
+def body_fun(q: BernoulliNP) -> BernoulliNP:
     return BernoulliNP(q.log_odds - gce(some_p, q).log_odds * 1e-4)
 
 
-def cond_fun(q):
+def cond_fun(q: BernoulliNP) -> BooleanNumeric:
     return jnp.sum(gce(some_p, q).log_odds ** 2) > 1e-7
 
 
