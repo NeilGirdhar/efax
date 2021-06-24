@@ -18,7 +18,8 @@ __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 
 @dataclass
-class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'], Samplable):
+class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP', RealArray],
+                               Samplable):
     """
     The multivariate normal distribution with unit variance.  This is a curved exponential family.
     """

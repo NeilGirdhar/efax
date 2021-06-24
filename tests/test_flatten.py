@@ -6,7 +6,7 @@ from tjax import assert_jax_allclose
 from .distribution_info import DistributionInfo
 
 
-def test_flatten(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
+def test_flatten(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that the methods produce the correct shapes.
     """

@@ -18,7 +18,7 @@ __all__ = ['PoissonNP', 'PoissonEP']
 
 
 @dataclass
-class PoissonNP(NaturalParametrization['PoissonEP']):
+class PoissonNP(NaturalParametrization['PoissonEP', RealArray]):
     log_mean: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

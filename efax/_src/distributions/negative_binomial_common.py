@@ -15,7 +15,7 @@ __all__: List[str] = []
 EP = TypeVar('EP', bound='NBCommonEP[Any]')
 
 
-class NBCommonNP(NaturalParametrization[EP], Generic[EP]):
+class NBCommonNP(NaturalParametrization[EP, RealArray], Generic[EP]):
     failures: IntegralNumeric
     log_not_p: RealArray
 

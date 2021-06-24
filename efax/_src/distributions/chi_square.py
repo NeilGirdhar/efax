@@ -15,7 +15,7 @@ __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
 
 @dataclass
-class ChiSquareNP(NaturalParametrization['ChiSquareEP']):
+class ChiSquareNP(NaturalParametrization['ChiSquareEP', RealArray]):
     """
     The chi-square distribution with k degrees of freedom is the gamma distribution with shape k/2
     and rate 1/2.

@@ -22,7 +22,7 @@ __all__: List[str] = []
 
 
 @dataclass
-class DirichletCommonNP(NaturalParametrization[EP], Samplable, Generic[EP]):
+class DirichletCommonNP(NaturalParametrization[EP, RealArray], Samplable, Generic[EP]):
     alpha_minus_one: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------

@@ -17,7 +17,7 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 
 @dataclass
-class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP']):
+class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
     mean_times_concentration: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------

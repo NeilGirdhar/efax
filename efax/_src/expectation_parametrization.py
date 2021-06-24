@@ -11,7 +11,7 @@ from .tools import parameters_dot_product
 __all__ = ['ExpectationParametrization']
 
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 
 
 class ExpectationParametrization(Parametrization, Generic[NP]):

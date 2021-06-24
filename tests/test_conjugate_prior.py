@@ -12,7 +12,7 @@ from .distribution_info import DistributionInfo
 
 
 def test_conjugate_prior(generator: Generator,
-                         distribution_info: DistributionInfo[Any, Any]) -> None:
+                         distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that the conjugate prior actually matches the distribution.
     """

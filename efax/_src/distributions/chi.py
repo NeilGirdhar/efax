@@ -16,7 +16,7 @@ __all__ = ['ChiNP', 'ChiEP']
 
 
 @dataclass
-class ChiNP(TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP']):
+class ChiNP(TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', RealArray]):
     k_over_two_minus_one: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

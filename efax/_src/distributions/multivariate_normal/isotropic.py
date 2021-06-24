@@ -16,7 +16,7 @@ __all__ = ['IsotropicNormalNP', 'IsotropicNormalEP']
 
 
 @dataclass
-class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP']):
+class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP', RealArray]):
     mean_times_precision: RealArray = distribution_parameter(VectorSupport())
     negative_half_precision: RealArray = distribution_parameter(ScalarSupport())
 

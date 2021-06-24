@@ -15,7 +15,8 @@ __all__ = ['RayleighNP', 'RayleighEP']
 
 
 @dataclass
-class RayleighNP(TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP']):
+class RayleighNP(TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP',
+                                                   RealArray]):
     # eta = -1 / (2 * sigma^2)
     eta: RealArray = distribution_parameter(ScalarSupport())
 

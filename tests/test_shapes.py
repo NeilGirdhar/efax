@@ -6,7 +6,7 @@ from numpy.random import Generator
 from .distribution_info import DistributionInfo
 
 
-def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
+def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that the methods produce the correct shapes.
     """
@@ -45,6 +45,6 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
     assert q.pdf(x).shape == shape
 
 
-def test_types(distribution_info: DistributionInfo[Any, Any]) -> None:
+def test_types(distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     if isinstance(distribution_info.exp_parameter_generator(np.random.default_rng(), ()), tuple):
         raise TypeError("This should return a number or an ndarray")

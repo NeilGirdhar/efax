@@ -17,7 +17,7 @@ __all__ = ['NormalNP', 'NormalEP']
 
 
 @dataclass
-class NormalNP(NaturalParametrization['NormalEP']):
+class NormalNP(NaturalParametrization['NormalEP', RealArray]):
     mean_times_precision: RealArray = distribution_parameter(ScalarSupport())
     negative_half_precision: RealArray = distribution_parameter(ScalarSupport())
 

@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 from numpy.random import Generator
 from scipy import stats as ss
-from tjax import Shape
+from tjax import RealArray, Shape
 
 __all__ = ['ScipyDirichlet']
 
@@ -11,11 +11,11 @@ __all__ = ['ScipyDirichlet']
 # pylint: disable=protected-access
 class ScipyDirichletFixShape(ss._multivariate.dirichlet_frozen):
 
-    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> np.ndarray:
+    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> RealArray:
         # This somehow fixes the behaviour of rvs.
         return super().rvs(size=size, random_state=random_state)
 
-    def pdf(self, x: np.ndarray) -> np.ndarray:
+    def pdf(self, x: RealArray) -> RealArray:
         if x.ndim == 2:
             return super().pdf(x.T)
         return super().pdf(x)
@@ -23,7 +23,7 @@ class ScipyDirichletFixShape(ss._multivariate.dirichlet_frozen):
 
 class ScipyDirichlet:
 
-    def __init__(self, parameters: np.ndarray):
+    def __init__(self, parameters: RealArray):
         self.parameters = parameters
         self.component_shape = (parameters.shape[-1],)
         self.shape = parameters[..., -1].shape
@@ -31,7 +31,7 @@ class ScipyDirichlet:
         for i in np.ndindex(self.shape):
             self.objects[i] = ScipyDirichletFixShape(parameters[i])
 
-    def rvs(self, size: Shape = None, random_state: Generator = None) -> np.ndarray:
+    def rvs(self, size: Shape = None, random_state: Generator = None) -> RealArray:
         if size is None:
             size = ()
         elif isinstance(size, int):
@@ -43,7 +43,7 @@ class ScipyDirichlet:
                                             random_state=random_state)
         return retval
 
-    def pdf(self, x: np.ndarray) -> np.ndarray:
+    def pdf(self, x: RealArray) -> RealArray:
         retval = np.empty(self.shape, dtype=self.parameters.dtype)
         for i in np.ndindex(self.shape):
             xi = x[i].astype(np.float64)
@@ -54,7 +54,7 @@ class ScipyDirichlet:
             retval[i] = self.objects[i].pdf(xi)
         return retval
 
-    def entropy(self) -> np.ndarray:
+    def entropy(self) -> RealArray:
         retval = np.empty(self.shape, dtype=self.parameters.dtype)
         for i in np.ndindex(self.shape):
             retval[i] = self.objects[i].entropy()

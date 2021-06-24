@@ -16,7 +16,7 @@ __all__ = ['WeibullNP', 'WeibullEP']
 
 
 @dataclass
-class WeibullNP(NaturalParametrization['WeibullEP']):
+class WeibullNP(NaturalParametrization['WeibullEP', RealArray]):
     concentration: RealArray = distribution_parameter(ScalarSupport(), fixed=True)
     # eta = -scale^-concentration
     eta: RealArray = distribution_parameter(ScalarSupport())

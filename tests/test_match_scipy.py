@@ -14,7 +14,7 @@ from .create_info import ComplexNormalInfo, MultivariateDiagonalNormalInfo, Mult
 from .distribution_info import DistributionInfo
 
 
-def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
+def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that the entropy calculation matches scipy's.
     """
@@ -30,7 +30,7 @@ def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, 
         pass
 
 
-def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
+def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that the density/mass function calculation matches scipy's.
     """
@@ -55,7 +55,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any]
 
 
 def test_maximum_likelihood_estimation(generator: Generator,
-                                       distribution_info: DistributionInfo[Any, Any]) -> None:
+                                       distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.

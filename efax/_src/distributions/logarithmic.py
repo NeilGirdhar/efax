@@ -15,7 +15,7 @@ __all__ = ['LogarithmicNP', 'LogarithmicEP']
 
 
 @dataclass
-class LogarithmicNP(NaturalParametrization['LogarithmicEP']):
+class LogarithmicNP(NaturalParametrization['LogarithmicEP', RealArray]):
     log_probability: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

@@ -44,8 +44,9 @@ class Parametrization:
 
             method_jvp: Any = custom_jvp(method)
 
-            def ln_jvp(primals: Tuple[NaturalParametrization[Any]],
-                       tangents: Tuple[NaturalParametrization[Any]]) -> Tuple[RealArray, RealArray]:
+            def ln_jvp(primals: Tuple[NaturalParametrization[Any, Any]],
+                       tangents: Tuple[NaturalParametrization[Any, Any]]) -> Tuple[RealArray,
+                                                                                   RealArray]:
                 q, = primals
                 q_dot, = tangents
                 y = q.log_normalizer()

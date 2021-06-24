@@ -15,7 +15,7 @@ from .natural_parametrization import NaturalParametrization
 __all__: List[str] = []
 
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 SP = TypeVar('SP', bound=Any)
 
 

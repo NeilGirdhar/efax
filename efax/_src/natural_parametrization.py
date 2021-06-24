@@ -14,16 +14,17 @@ from .tools import parameters_dot_product
 __all__ = ['NaturalParametrization']
 
 EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
+Domain = TypeVar('Domain', bound=ComplexArray)
 
 
-class NaturalParametrization(Parametrization, Generic[EP]):
+class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     """
     The natural parametrization of an exponential family distribution.
 
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
-    T = TypeVar('T', bound='NaturalParametrization[EP]')
+    T = TypeVar('T', bound='NaturalParametrization[EP, Domain]')
 
     # Abstract methods -----------------------------------------------------------------------------
     def log_normalizer(self) -> RealArray:
@@ -38,7 +39,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         """
         raise NotImplementedError
 
-    def carrier_measure(self, x: ComplexArray) -> RealArray:
+    def carrier_measure(self, x: Domain) -> RealArray:
         """
         Args:
             x: The sample.
@@ -46,7 +47,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         """
         raise NotImplementedError
 
-    def sufficient_statistics(self, x: ComplexArray) -> EP:
+    def sufficient_statistics(self, x: Domain) -> EP:
         """
         Args:
             x: The sample.
@@ -70,7 +71,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
 
     @jit
     @final
-    def pdf(self, x: ComplexArray) -> RealArray:
+    def pdf(self, x: Domain) -> RealArray:
         """
         Args:
             x: The sample.
@@ -127,8 +128,7 @@ class NaturalParametrization(Parametrization, Generic[EP]):
         return fisher_info_f(self)
 
 
-def _summarize_fisher_information(f: Callable[..., ComplexArray],
-                                  array: ComplexArray, axes: int) -> ComplexArray:
+def _summarize_fisher_information(f: Callable[..., Domain], array: Domain, axes: int) -> Domain:
     if axes == 0:
         return array
     if axes == 1:

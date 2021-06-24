@@ -1,9 +1,8 @@
 from typing import Optional
 
-import numpy as np
 from numpy.random import Generator
 from scipy import stats as ss
-from tjax import Shape
+from tjax import RealArray, Shape
 
 __all__ = ['ScipyMultivariateNormal']
 
@@ -13,7 +12,7 @@ class ScipyMultivariateNormal(ss._multivariate.multivariate_normal_frozen):
 
     def rvs(self,
             size: Optional[Shape] = None,
-            generator: Optional[Generator] = None) -> np.ndarray:
+            generator: Optional[Generator] = None) -> RealArray:
         retval = super().rvs(size=size, random_state=generator)
         if size == (1,):
             assert False

@@ -21,7 +21,7 @@ from .distribution_info import DistributionInfo
 @pytest.mark.parametrize('natural', [False, True])
 def test_maximum_likelihood_estimation(generator: NumpyGenerator,
                                        rng: TjaxGenerator,
-                                       distribution_info: DistributionInfo[Any, Any],
+                                       distribution_info: DistributionInfo[Any, Any, Any],
                                        natural: bool) -> None:
     """
     Test that maximum likelihood estimation from scipy-generated variates produce the same

@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import Any, Callable, Generic, TypeVar
 
-import numpy as np
 from jax.dtypes import canonicalize_dtype
 from jax.tree_util import tree_map
 from numpy.random import Generator
-from tjax import Shape
+from tjax import ComplexArray, Shape
 
 from efax import ExpectationParametrization, NaturalParametrization
 
@@ -15,12 +14,12 @@ def canonicalize_tree(tree: Any) -> Any:
     return tree_map(lambda array: array.astype(canonicalize_dtype(array.dtype)), tree)
 
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 EP = TypeVar('EP', bound=ExpectationParametrization[Any])
+Domain = TypeVar('Domain', bound=ComplexArray)
 
 
-class DistributionInfo(Generic[NP, EP]):
-
+class DistributionInfo(Generic[NP, EP, Domain]):
     # New methods ----------------------------------------------------------------------------------
     def exp_to_scipy_distribution(self, p: EP) -> Any:
         """
@@ -52,7 +51,7 @@ class DistributionInfo(Generic[NP, EP]):
         """
         return self.exp_parameter_generator(rng, shape).to_nat()
 
-    def scipy_to_exp_family_observation(self, x: np.ndarray) -> np.ndarray:
+    def scipy_to_exp_family_observation(self, x: Domain) -> Domain:
         """
         Args:
             x: The observation that's produced by the scipy distribution.
@@ -81,7 +80,7 @@ class DistributionInfo(Generic[NP, EP]):
 
             def new_method(*args: Any,
                            old_method: Callable[..., Any] = old_method,
-                           **kwargs: Any) -> np.ndarray:
+                           **kwargs: Any) -> Any:
                 return canonicalize_tree(old_method(*args, **kwargs))
 
             setattr(cls, method, new_method)

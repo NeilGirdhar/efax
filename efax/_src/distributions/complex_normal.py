@@ -4,7 +4,7 @@ import math
 from typing import Type
 
 import jax.numpy as jnp
-from tjax import Array, ComplexArray, RealArray, Shape
+from tjax import Array, ComplexArray, RealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -15,9 +15,9 @@ __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 
 @dataclass
-class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
+class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
     mean_times_precision: ComplexArray = distribution_parameter(ScalarSupport())
-    precision: ComplexArray = distribution_parameter(ScalarSupport())
+    precision: RealArray = distribution_parameter(ScalarSupport())
     pseudo_precision: ComplexArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
 
     def to_exp(self) -> ComplexNormalEP:
         r = -self.pseudo_precision / self.precision
-        s = 1.0 / ((jnp.conj(r) * r - 1.0) * self.precision)
+        s = 1.0 / ((abs_square(r) - 1.0) * self.precision)
         u = jnp.conj(r * s)
         k = self.pseudo_precision / self.precision
         l_eta = (0.5 * self.mean_times_precision
@@ -52,7 +52,7 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP']):
         mu = (jnp.conj(l_eta)
               - jnp.conj(self.pseudo_precision / self.precision) * l_eta)
         return ComplexNormalEP(mu,
-                               s + jnp.conj(mu) * mu,
+                               s + abs_square(mu),
                                u + jnp.square(mu))
 
     def carrier_measure(self, x: Array) -> RealArray:

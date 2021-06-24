@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, List, TypeVar
 
-from tjax import Array, Shape
+from tjax import ComplexArray, RealArray, Shape
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
@@ -12,10 +12,12 @@ __all__: List[str] = []
 
 TEP = TypeVar('TEP', bound='TransformedExpectationParametrization[Any, Any, Any]')
 EP = TypeVar('EP', bound=ExpectationParametrization[Any])
-NP = TypeVar('NP', bound=NaturalParametrization[Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+Domain = TypeVar('Domain', bound=ComplexArray)
 
 
-class TransformedNaturalParametrization(NaturalParametrization[TEP], Generic[NP, EP, TEP]):
+class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
+                                        Generic[NP, EP, TEP, Domain]):
     """
     Produce a NaturalParametrization by relating it to some base distrubtion NP.
     """
@@ -26,7 +28,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP], Generic[NP,
     def create_expectation(self, expectation_parametrization: EP) -> TEP:
         raise NotImplementedError
 
-    def sample_to_base_sample(self, x: Array) -> Array:
+    def sample_to_base_sample(self, x: Domain) -> Domain:
         raise NotImplementedError
 
     # Implemented methods --------------------------------------------------------------------------
@@ -34,7 +36,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP], Generic[NP,
     def shape(self) -> Shape:
         return self.base_distribution().shape
 
-    def log_normalizer(self) -> Array:
+    def log_normalizer(self) -> RealArray:
         """
         Returns: The log-normalizer.
         """
@@ -46,12 +48,12 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP], Generic[NP,
         """
         return self.create_expectation(self.base_distribution().to_exp())
 
-    def sufficient_statistics(self, x: Array) -> TEP:
+    def sufficient_statistics(self, x: Domain) -> TEP:
         y = self.sample_to_base_sample(x)
         return self.create_expectation(self.base_distribution().sufficient_statistics(y))
 
 
-TNP = TypeVar('TNP', bound=TransformedNaturalParametrization[Any, Any, Any])
+TNP = TypeVar('TNP', bound=TransformedNaturalParametrization[Any, Any, Any, Any])
 
 
 class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):

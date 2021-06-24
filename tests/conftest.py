@@ -35,7 +35,7 @@ def configure_numpy() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='session', params=create_infos())
-def distribution_info(request: Any) -> Optional[DistributionInfo[Any, Any]]:
+def distribution_info(request: Any) -> Optional[DistributionInfo[Any, Any, Any]]:
     distribution_name: Optional[str] = request.config.getoption('--distribution')
     info_name = type(request.param).__name__[:-4]
     if distribution_name is None or info_name == distribution_name:

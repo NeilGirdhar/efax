@@ -4,14 +4,19 @@ from functools import reduce
 from typing import TYPE_CHECKING, Any, Iterable, List
 
 import jax.numpy as jnp
+import numpy as np
 from tensorflow_probability.substrates import jax as tfp
-from tjax import ComplexArray, RealArray, RealNumeric
+from tjax import ComplexArray, ComplexNumeric, RealArray, RealNumeric
 
 __all__: List[str] = []
 
 
-def parameters_dot_product(x: NaturalParametrization[Any], y: Any) -> RealArray:
-    def dotted_fields() -> Iterable[ComplexArray]:
+def np_abs_square(x: ComplexNumeric) -> RealNumeric:
+    return np.square(x.real) + np.square(x.imag)
+
+
+def parameters_dot_product(x: NaturalParametrization[Any, Any], y: Any) -> RealArray:
+    def dotted_fields() -> Iterable[RealArray]:
         for (x_value, x_support), (y_value, y_support) in zip(x.parameters_value_support(),
                                                               y.parameters_value_support()):
             axes = x_support.axes()

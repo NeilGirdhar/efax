@@ -17,7 +17,7 @@ __all__ = ['ExponentialNP', 'ExponentialEP']
 
 
 @dataclass
-class ExponentialNP(NaturalParametrization['ExponentialEP'], Samplable):
+class ExponentialNP(NaturalParametrization['ExponentialEP', RealArray], Samplable):
     negative_rate: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

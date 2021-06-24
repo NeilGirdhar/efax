@@ -10,7 +10,8 @@ from .create_info import BetaInfo, DirichletInfo, GammaInfo
 from .distribution_info import DistributionInfo
 
 
-def test_conversion(generator: Generator, distribution_info: DistributionInfo[Any, Any]) -> None:
+def test_conversion(generator: Generator,
+                    distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that the conversion between the different parametrizations are consistent.
     """
@@ -40,7 +41,7 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo[An
 
 
 def test_gradient_log_normalizer(generator: Generator,
-                                 distribution_info: DistributionInfo[Any, Any]) -> None:
+                                 distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Tests that the gradient log-normalizer evaluates to the same as the gradient of the
     log-normalizer.

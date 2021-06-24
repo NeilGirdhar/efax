@@ -20,7 +20,7 @@ __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
-class MultinomialNP(NaturalParametrization['MultinomialEP'], Samplable):
+class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Samplable):
     log_odds: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------

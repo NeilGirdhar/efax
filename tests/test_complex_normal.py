@@ -5,12 +5,12 @@ import pytest
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 from scipy.stats import multivariate_normal
-from tjax import Shape
+from tjax import ComplexArray, Shape
 
 from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 
-def random_complex(generator: Generator) -> float:
+def random_complex(generator: Generator) -> complex:
     return sum(x * generator.normal()
                for x in [0.5, 0.5j])
 
@@ -30,12 +30,12 @@ def build_mvcn(generator: Generator,
                regularization: float = 0.01) -> ScipyComplexMultivariateNormal:
     DIRECTIONS = 3
 
-    def random_vector(number_of_vectors: Shape = ()) -> np.ndarray:
+    def random_vector(number_of_vectors: Shape = ()) -> ComplexArray:
         retval = sum(x * generator.multivariate_normal(np.zeros(size),
                                                        cov=np.eye(size),
                                                        size=number_of_vectors)
                      for x in [1, 1j])
-        assert isinstance(retval, np.ndarray)
+        assert isinstance(retval, np.ndarray)  # type: ignore
         return retval
 
     mean = random_vector()

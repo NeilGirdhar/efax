@@ -18,7 +18,8 @@ __all__ = ['MultivariateDiagonalNormalNP', 'MultivariateDiagonalNormalEP',
 
 
 @dataclass
-class MultivariateDiagonalNormalNP(NaturalParametrization['MultivariateDiagonalNormalEP']):
+class MultivariateDiagonalNormalNP(NaturalParametrization['MultivariateDiagonalNormalEP',
+                                                          RealArray]):
     mean_times_precision: RealArray = distribution_parameter(VectorSupport())
     negative_half_precision: RealArray = distribution_parameter(VectorSupport())
 

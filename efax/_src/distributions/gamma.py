@@ -19,7 +19,7 @@ __all__ = ['GammaNP', 'GammaEP']
 
 
 @dataclass
-class GammaNP(NaturalParametrization['GammaEP'], Samplable):
+class GammaNP(NaturalParametrization['GammaEP', RealArray], Samplable):
     negative_rate: RealArray = distribution_parameter(ScalarSupport())
     shape_minus_one: RealArray = distribution_parameter(ScalarSupport())
 

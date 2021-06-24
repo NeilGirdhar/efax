@@ -19,7 +19,7 @@ __all__ = ['BernoulliNP', 'BernoulliEP']
 
 
 @dataclass
-class BernoulliNP(NaturalParametrization['BernoulliEP']):
+class BernoulliNP(NaturalParametrization['BernoulliEP', RealArray]):
     log_odds: RealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
