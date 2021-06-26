@@ -6,14 +6,17 @@ from typing import Any, Optional, Tuple
 import numpy as np
 from numpy.linalg import det, inv
 from numpy.random import Generator
+from scipy.stats import multivariate_normal
 from tjax import ComplexArray, RealArray, Shape
 
 __all__ = ['ScipyComplexMultivariateNormal']
 
 
 class ScipyComplexMultivariateNormal:
-
-    def __init__(self, mean: ComplexArray, variance: RealArray, pseudo_variance: ComplexArray):
+    """
+    Represents a multivariate complex normal distribution.
+    """
+    def __init__(self, mean: ComplexArray, variance: ComplexArray, pseudo_variance: ComplexArray):
         self.size = mean.shape[0]
         self.mean = mean
         self.variance = variance
@@ -30,7 +33,7 @@ class ScipyComplexMultivariateNormal:
                              f"instead of {(self.size, self.size)}.")
         if not np.all(np.linalg.eigvals(variance) >= 0):  # type: ignore
             raise ValueError("The variance is not positive semidefinite.")
-        if not np.allclose(variance, variance.T.conj()):
+        if not np.allclose(variance, variance.T.conjugate()):
             raise ValueError("The variance is not Hermitian.")
         if not np.allclose(pseudo_variance, pseudo_variance.T):
             raise ValueError("The pseudo-variance is not symmetric.")
@@ -42,33 +45,34 @@ class ScipyComplexMultivariateNormal:
         det_s: RealArray = det(self.variance).real  # type: ignore
         det_h: RealArray = det(-precision).real  # type: ignore
         # https://github.com/numpy/numpy/issues/19318
-        return ((-mu.conj() @ precision @ mu).real
+        return ((-mu.conjugate() @ precision @ mu).real
                 - (mu @ pseudo_precision @ mu).real
                 + 0.5 * log(det_s)
                 - 0.5 * log(det_h)
                 + self.size * log(pi)).real  # type: ignore
 
-    def natural_parameters(self) -> Tuple[ComplexArray, RealArray, ComplexArray]:
+    def natural_parameters(self) -> Tuple[ComplexArray, ComplexArray, ComplexArray]:
         r, p_c = self._r_and_p_c()
-        p_inv_c = inv(p_c)  # type: ignore
+        p_inv_c: ComplexArray = inv(p_c)  # type: ignore
         precision = -p_inv_c
         pseudo_precision = r.T @ p_inv_c
-        eta = -2.0 * ((precision.T @ self.mean.conj())
+        eta = -2.0 * ((precision.T @ self.mean.conjugate())
                       + pseudo_precision @ self.mean)
         return (eta, precision, pseudo_precision)
 
     def natural_to_sample(self,
                           eta: ComplexArray,
-                          precision: RealArray,
+                          precision: ComplexArray,
                           pseudo_precision: ComplexArray) -> (
-                              Tuple[ComplexArray, RealArray, ComplexArray]):
+                              Tuple[ComplexArray, ComplexArray, ComplexArray]):
         inv_precision = inv(precision)  # type: ignore
         r = -(pseudo_precision @ inv_precision).T
-        s = inv(r.conj() @ r - np.eye(self.size)) @ inv_precision  # type: ignore
-        u = (r @ s).conj()
+        s = inv(r.conjugate() @ r - np.eye(self.size)) @ inv_precision  # type: ignore
+        u = (r @ s).conjugate()
         k = inv_precision.T @ pseudo_precision
-        l_eta = 0.5 * inv(k @ k.conj() - np.eye(self.size)) @ inv_precision.T @ eta  # type: ignore
-        mu = l_eta.conj() - (inv_precision.T @ pseudo_precision).conj() @ l_eta
+        l_eta = 0.5 * inv(k @ k.conjugate()  # type: ignore
+                          - np.eye(self.size)) @ inv_precision.T @ eta
+        mu = l_eta.conjugate() - (inv_precision.T @ pseudo_precision).conjugate() @ l_eta
         return mu, s, u
 
     # https://github.com/PyCQA/pylint/issues/4326
@@ -78,11 +82,11 @@ class ScipyComplexMultivariateNormal:
         eta, precision, pseudo_precision = self.natural_parameters()
         # https://github.com/numpy/numpy/issues/19318
         return np.exp((eta @ z).real
-                      + (z.conj() @ precision @ z).real
+                      + (z.conjugate() @ precision @ z).real
                       + (z @ pseudo_precision @ z).real
                       - log_normalizer)  # type: ignore
 
-    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> RealArray:
+    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> ComplexArray:
         if random_state is None:
             random_state = np.random.default_rng()
         xy_rvs = random_state.multivariate_normal(mean=self._multivariate_normal_mean(),
@@ -90,10 +94,16 @@ class ScipyComplexMultivariateNormal:
                                                   size=size)
         return xy_rvs[..., :self.size] + 1j * xy_rvs[..., self.size:]
 
+    def entropy(self) -> RealArray:
+        mv_mean = self._multivariate_normal_mean()
+        mv_cov = self._multivariate_normal_cov()
+        mvn = multivariate_normal(mean=mv_mean, cov=mv_cov)
+        return mvn.entropy()
+
     # Private methods ------------------------------------------------------------------------------
-    def _r_and_p_c(self) -> Tuple[ComplexArray, RealArray]:
-        r = self.pseudo_variance.conj().T @ inv(self.variance)  # type: ignore
-        p_c = self.variance - (r @ self.pseudo_variance).conj()
+    def _r_and_p_c(self) -> Tuple[ComplexArray, ComplexArray]:
+        r = self.pseudo_variance.conjugate().T @ inv(self.variance)  # type: ignore
+        p_c = self.variance - (r @ self.pseudo_variance).conjugate()
         return r, p_c
 
     def _multivariate_normal_mean(self) -> RealArray:

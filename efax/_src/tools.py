@@ -45,7 +45,7 @@ def _parameter_dot_product(x: ComplexArray, y: ComplexArray, n_axes: int) -> Rea
     Returns the real component of the dot product of the final n_axes axes of two arrays.
     """
     axes = tuple(range(-n_axes, 0))
-    return jnp.real(jnp.sum(x * y, axis=axes))
+    return jnp.sum(x * y, axis=axes).real
 
 
 if TYPE_CHECKING:

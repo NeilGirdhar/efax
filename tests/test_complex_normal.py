@@ -11,8 +11,7 @@ from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 
 def random_complex(generator: Generator) -> complex:
-    return sum(x * generator.normal()
-               for x in [0.5, 0.5j])
+    return sum(x * generator.normal() for x in [0.5, 0.5j])
 
 
 def build_uvcn(generator: Generator) -> ScipyComplexNormal:
@@ -31,8 +30,7 @@ def build_mvcn(generator: Generator,
     DIRECTIONS = 3
 
     def random_vector(number_of_vectors: Shape = ()) -> ComplexArray:
-        retval = sum(x * generator.multivariate_normal(np.zeros(size),
-                                                       cov=np.eye(size),
+        retval = sum(x * generator.multivariate_normal(np.zeros(size), cov=np.eye(size),
                                                        size=number_of_vectors)
                      for x in [1, 1j])
         assert isinstance(retval, np.ndarray)  # type: ignore
@@ -42,7 +40,7 @@ def build_mvcn(generator: Generator,
     z = random_vector((DIRECTIONS,))
     weights = np.array(range(DIRECTIONS)) + 1.5
 
-    variance = (np.average(z.conj()[:, np.newaxis, :] * z[..., np.newaxis],
+    variance = (np.average(z.conjugate()[:, np.newaxis, :] * z[..., np.newaxis],
                            weights=weights,
                            axis=0)
                 + regularization * np.eye(size))
@@ -51,8 +49,7 @@ def build_mvcn(generator: Generator,
                                   axis=0) * polarization
                        + regularization * np.eye(size))
 
-    return ScipyComplexMultivariateNormal(
-        mean, variance, pseudo_variance)
+    return ScipyComplexMultivariateNormal(mean, variance, pseudo_variance)
 
 
 def test_univariate_pdf(generator: Generator) -> None:
@@ -60,8 +57,7 @@ def test_univariate_pdf(generator: Generator) -> None:
     mvn = multivariate_normal(mean=dist._multivariate_normal_mean(),
                               cov=dist._multivariate_normal_cov())
     x = random_complex(generator)
-    assert_allclose(dist.pdf(x),
-                    mvn.pdf(np.array([x.real, x.imag])))
+    assert_allclose(dist.pdf(x), mvn.pdf(np.array([x.real, x.imag])))
 
 
 def test_univariate_rvs(generator: Generator) -> None:
@@ -76,14 +72,12 @@ def test_univariate_rvs(generator: Generator) -> None:
 
     centered_rvs = rvs - dist.mean
 
-    estimated_variance = np.average(
-        centered_rvs.conj() * centered_rvs).real
+    estimated_variance = np.average(centered_rvs.conjugate() * centered_rvs).real
     estimated_pseudo_variance = np.average(np.square(centered_rvs))
 
     assert_allclose(estimated_mean, dist.mean, rtol=0.0, atol=1e-2)
     assert_allclose(estimated_variance, dist.variance, rtol=1e-2, atol=5e-3)
-    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance,
-                    rtol=1e-2, atol=1e-2)
+    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=1e-2, atol=1e-2)
 
 
 def test_multivariate_rvs(generator: Generator) -> None:
@@ -100,26 +94,20 @@ def test_multivariate_rvs(generator: Generator) -> None:
     centered_rvs = rvs - dist.mean
 
     estimated_variance = np.average(
-        centered_rvs[..., np.newaxis]
-        * centered_rvs.conj()[..., np.newaxis, :],
-        axis=axis)
+        centered_rvs[..., np.newaxis] * centered_rvs.conjugate()[..., np.newaxis, :], axis=axis)
     estimated_pseudo_variance = np.average(
-        centered_rvs[..., np.newaxis]
-        * centered_rvs[..., np.newaxis, :],
-        axis=axis)
+        centered_rvs[..., np.newaxis] * centered_rvs[..., np.newaxis, :], axis=axis)
 
     assert_allclose(estimated_mean, dist.mean, rtol=1e-2, atol=1e-2)
-    assert_allclose(estimated_variance, dist.variance,
-                    rtol=2e-1, atol=1e-1)
-    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance,
-                    rtol=2e-1, atol=1e-1)
+    assert_allclose(estimated_variance, dist.variance, rtol=2e-1, atol=1e-1)
+    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=2e-1, atol=1e-1)
 
 
 @pytest.mark.parametrize('polarization', [0.5, 1.0])
 def test_p_hermitian(generator: Generator, polarization: float) -> None:
     dist = build_mvcn(generator, polarization=polarization)
     _, p_c = dist._r_and_p_c()
-    assert_allclose(p_c, p_c.T.conj(), rtol=1e-2, atol=1e-2)
+    assert_allclose(p_c, p_c.T.conjugate(), rtol=1e-2, atol=1e-2)
     eigenvalues = np.linalg.eigvals(p_c)
     assert np.all(eigenvalues.real >= 0)
     assert_allclose(eigenvalues.imag, 0.0, atol=1e-5)
@@ -141,28 +129,20 @@ def test_multivariate_pdf(generator: Generator, n: int) -> None:
     dist = build_mvcn(generator, polarization=0.5, size=n)
     mvn = multivariate_normal(mean=dist._multivariate_normal_mean(),
                               cov=dist._multivariate_normal_cov())
-    x = np.array([random_complex(generator)
-                  for _ in range(n)])
+    x = np.array([random_complex(generator) for _ in range(n)])
     xx = np.concatenate([x.real, x.imag], axis=-1)
-    assert_allclose(0.5 * (dist.variance + dist.pseudo_variance).real,
-                    mvn.cov[:n, :n])
-    assert_allclose(0.5 * (dist.variance - dist.pseudo_variance).real,
-                    mvn.cov[n:, n:])
-    assert_allclose(0.5 * (dist.variance + dist.pseudo_variance).imag,
-                    mvn.cov[n:, :n])
-    assert_allclose(0.5 * (-dist.variance + dist.pseudo_variance).imag,
-                    mvn.cov[:n, n:])
+    assert_allclose(0.5 * (dist.variance + dist.pseudo_variance).real, mvn.cov[:n, :n])
+    assert_allclose(0.5 * (dist.variance - dist.pseudo_variance).real, mvn.cov[n:, n:])
+    assert_allclose(0.5 * (dist.variance + dist.pseudo_variance).imag, mvn.cov[n:, :n])
+    assert_allclose(0.5 * (-dist.variance + dist.pseudo_variance).imag, mvn.cov[:n, n:])
 
-    assert_allclose(dist.pdf(np.zeros(n)), mvn.pdf(np.zeros(2 * n)),
-                    atol=1e-3)
+    assert_allclose(dist.pdf(np.zeros(n)), mvn.pdf(np.zeros(2 * n)), atol=1e-3)
     assert_allclose(dist.pdf(x), mvn.pdf(xx))
 
 
 def test_univariate_multivariate_consistency(generator: Generator) -> None:
     mv = build_mvcn(generator, size=1, polarization=0.5)
-    uv = ScipyComplexNormal(mv.mean[0],
-                            mv.variance[0, 0].real,
-                            mv.pseudo_variance[0, 0])
+    uv = ScipyComplexNormal(mv.mean[0], mv.variance[0, 0].real, mv.pseudo_variance[0, 0])
     m_eta, m_h, m_j = mv.natural_parameters()
     u_eta, u_h, u_j = uv.natural_parameters()
     assert_allclose(m_eta, u_eta)

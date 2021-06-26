@@ -83,7 +83,7 @@ def test_gradient_log_normalizer(generator: Generator,
                for name, value in nat_parameters.parameters_name_value()})
         original_gradients = jvp(original_ln, (nat_parameters,), (ones_like_nat_parameters,))
         optimized_gradients = jvp(optimized_ln, (nat_parameters,), (ones_like_nat_parameters,))
-        assert_allclose(original_gradients, optimized_gradients, rtol=1e-5)
+        assert_allclose(original_gradients, optimized_gradients, rtol=1.5e-5)
 
         # Test VJP.
         original_ln_of_nat, original_vjp = vjp(original_ln, nat_parameters)

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import math
-from typing import Type
+from typing import Tuple, Type
 
 import jax.numpy as jnp
-from tjax import Array, ComplexArray, RealArray, Shape, abs_square
+from tjax import ComplexArray, RealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -26,40 +26,33 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
         return self.mean_times_precision.shape
 
     def log_normalizer(self) -> RealArray:
-        r = -self.pseudo_precision / self.precision
-        s = 1.0 / ((jnp.conj(r) * r - 1.0) * self.precision)
-        k = self.pseudo_precision / self.precision
-        l_eta = (0.5 * self.mean_times_precision
-                 / ((k * jnp.conj(k) - 1.0) * self.precision))
-        mu = (jnp.conj(l_eta)
-              - jnp.conj(self.pseudo_precision / self.precision) * l_eta)
-
-        det_s = jnp.real(s)
-        det_h = jnp.real(-self.precision)
-        return (- jnp.real(jnp.conj(mu) * mu * self.precision)
-                - jnp.real(mu * mu * self.pseudo_precision)
+        _, s, mu = self._r_s_mu()
+        det_s = s.real
+        det_h = -self.precision.real
+        return (-abs_square(mu) * self.precision
+                - (jnp.square(mu) * self.pseudo_precision).real
                 + 0.5 * jnp.log(det_s)
                 - 0.5 * jnp.log(det_h)
                 + math.log(math.pi))
 
     def to_exp(self) -> ComplexNormalEP:
-        r = -self.pseudo_precision / self.precision
-        s = 1.0 / ((abs_square(r) - 1.0) * self.precision)
-        u = jnp.conj(r * s)
-        k = self.pseudo_precision / self.precision
-        l_eta = (0.5 * self.mean_times_precision
-                 / ((k * jnp.conj(k) - 1.0) * self.precision))
-        mu = (jnp.conj(l_eta)
-              - jnp.conj(self.pseudo_precision / self.precision) * l_eta)
-        return ComplexNormalEP(mu,
-                               s + abs_square(mu),
-                               u + jnp.square(mu))
+        r, s, mu = self._r_s_mu()
+        u = (r * s).conjugate()
+        return ComplexNormalEP(mu, s + abs_square(mu), u + jnp.square(mu))
 
-    def carrier_measure(self, x: Array) -> RealArray:
+    def carrier_measure(self, x: ComplexArray) -> RealArray:
         return jnp.zeros(x.shape)
 
-    def sufficient_statistics(self, x: Array) -> ComplexNormalEP:
-        return ComplexNormalEP(x, jnp.conj(x) * x, jnp.square(x))
+    def sufficient_statistics(self, x: ComplexArray) -> ComplexNormalEP:
+        return ComplexNormalEP(x, abs_square(x), jnp.square(x))
+
+    def _r_s_mu(self) -> Tuple[ComplexArray, RealArray, ComplexArray]:
+        r = -self.pseudo_precision / self.precision
+        s = 1.0 / ((abs_square(r) - 1.0) * self.precision)
+        k = self.pseudo_precision / self.precision
+        l_eta = 0.5 * self.mean_times_precision / ((abs_square(k) - 1.0) * self.precision)
+        mu = l_eta.conjugate() - (self.pseudo_precision / self.precision).conjugate() * l_eta
+        return r, s, mu
 
 
 @dataclass
@@ -78,7 +71,7 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
         return ComplexNormalNP
 
     def to_nat(self) -> ComplexNormalNP:
-        variance = self.second_moment - jnp.conj(self.mean) * self.mean
+        variance = self.second_moment - abs_square(self.mean)
         pseudo_variance = self.pseudo_second_moment - jnp.square(self.mean)
 
         r = pseudo_variance.conjugate() / variance

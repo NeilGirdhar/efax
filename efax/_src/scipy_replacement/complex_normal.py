@@ -15,11 +15,9 @@ __all__ = ['ScipyComplexNormal']
 
 
 class ScipyComplexNormal:
-
     """
     Represents an array of univariate complex normal distributions.
     """
-
     def __init__(self,
                  mean: ComplexNumeric,
                  variance: RealNumeric,
@@ -64,8 +62,7 @@ class ScipyComplexNormal:
         p_inv_c = 1.0 / p_c
         precision = -p_inv_c
         pseudo_precision = r * p_inv_c
-        return (-2.0 * (precision * self.mean.conjugate()
-                        + pseudo_precision * self.mean),
+        return (-2.0 * (precision * self.mean.conjugate() + pseudo_precision * self.mean),
                 precision,
                 pseudo_precision)
 
@@ -78,9 +75,8 @@ class ScipyComplexNormal:
         s = 1.0 / ((np_abs_square(r) - 1.0) * precision)
         u = (r * s).conjugate()
         k = pseudo_precision / precision
-        l_eta = 0.5 * eta / ((k * k.conjugate() - 1.0) * precision)
-        mu = (l_eta.conjugate()
-              - (pseudo_precision / precision).conjugate() * l_eta)
+        l_eta = 0.5 * eta / ((np_abs_square(k) - 1.0) * precision)
+        mu = l_eta.conjugate() - (pseudo_precision / precision).conjugate() * l_eta
         return mu, s, u
 
     def pdf(self, z: ComplexNumeric, out: None = None) -> RealNumeric:
@@ -91,7 +87,7 @@ class ScipyComplexNormal:
                       + (np.square(z) * pseudo_precision).real
                       - log_normalizer)
 
-    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> RealArray:
+    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> ComplexArray:
         if isinstance(size, int):
             size = (size,)
         if random_state is None:
@@ -123,10 +119,10 @@ class ScipyComplexNormal:
         p_c = self.variance - np_abs_square(self.pseudo_variance) / self.variance
         return r, p_c
 
-    def _multivariate_normal_mean(self) -> ComplexArray:
+    def _multivariate_normal_mean(self) -> RealArray:
         return np.stack([self.mean.real, self.mean.imag], axis=-1)
 
-    def _multivariate_normal_cov(self) -> ComplexArray:
+    def _multivariate_normal_cov(self) -> RealArray:
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
         xx = 0.5 * cov_sum.real
