@@ -75,11 +75,11 @@ class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape
+            shape += self.mean.shape
         else:
-            shape = self.shape
+            shape = self.mean.shape
         deviation = jnp.sqrt(self.variance())
-        return jax.random.normal(rng.key, shape)[..., jnp.newaxis] * deviation + self.mean
+        return jax.random.normal(rng.key, shape) * deviation + self.mean
 
     # New methods ----------------------------------------------------------------------------------
     def variance(self) -> RealArray:

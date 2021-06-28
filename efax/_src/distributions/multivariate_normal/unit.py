@@ -47,10 +47,10 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:
-            shape += self.shape
+            shape += self.mean.shape
         else:
-            shape = self.shape
-        return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
+            shape = self.mean.shape
+        return jax.random.normal(rng.key, shape) + self.mean
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
@@ -79,11 +79,7 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + num_parameters)
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
-        return jax.random.normal(rng.key, shape)[..., jnp.newaxis] + self.mean
+        return self.to_nat().sample(rng, shape)
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
