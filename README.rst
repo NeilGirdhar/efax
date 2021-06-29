@@ -135,6 +135,7 @@ EFAX supports the following distributions:
   - multivariate complex
 
     - with unit variance and zero pseudo-variance
+    - circularly symmetric
 - Poisson
 - Rayleigh
 - von Mises-Fisher

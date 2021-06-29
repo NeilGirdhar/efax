@@ -10,7 +10,8 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_jax_allclose
 
-from .create_info import ComplexNormalInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo
+from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
+                          MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
 
 
@@ -21,7 +22,11 @@ def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, 
     shape = (3, 2) if distribution_info.supports_shape() else ()
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
-    rtol = 4e-4 if isinstance(distribution_info, ComplexNormalInfo) else 2.0e-5
+    rtol = (1e-3
+            if isinstance(distribution_info, ComplexCircularlySymmetricNormalInfo)
+            else 4e-4
+            if isinstance(distribution_info, ComplexNormalInfo)
+            else 2.0e-5)
     try:
         my_entropy = nat_parameters.entropy()
         scipy_entropy = scipy_distribution.entropy()
@@ -48,10 +53,13 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         except NotImplementedError:
             continue
 
-        rtol = (3e-4
-                if isinstance(distribution_info, MultivariateDiagonalNormalInfo)
-                else 1e-4)
-        assert_allclose(my_density, density, rtol=rtol)
+        if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
+            atol = 1e-5
+            rtol = 3e-4
+        else:
+            atol = 1e-5
+            rtol = 1e-4
+        assert_allclose(my_density, density, rtol=rtol, atol=atol)
 
 
 def test_maximum_likelihood_estimation(generator: Generator,
@@ -60,7 +68,10 @@ def test_maximum_likelihood_estimation(generator: Generator,
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
-    if isinstance(distribution_info, (ComplexNormalInfo, MultivariateNormalInfo)):
+    if isinstance(distribution_info, ComplexCircularlySymmetricNormalInfo):
+        atol = 2e-2
+        rtol = 1e-3
+    elif isinstance(distribution_info, (ComplexNormalInfo, MultivariateNormalInfo)):
         atol = 1e-2
         rtol = 1e-3
     else:

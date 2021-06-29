@@ -6,6 +6,7 @@ from scipy import stats as ss
 from tjax import ComplexArray, RealArray, Shape
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
+                  ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,
                   ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP, ComplexNormalEP,
                   ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
                   GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP, IsotropicNormalNP,
@@ -31,6 +32,13 @@ def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
     eigenvalues = rng.exponential(size=dimensions) + 1.0
     eigenvalues /= np.mean(eigenvalues)
     return ss.random_correlation.rvs(eigenvalues, random_state=rng)
+
+
+def generate_complex_covariance(rng: Generator, dimensions: int) -> ComplexArray:
+    x = generate_real_covariance(rng, dimensions)
+    y = generate_real_covariance(rng, dimensions)
+    w = x + 1j * y
+    return w @ (w.conjugate().T)
 
 
 class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, RealArray]):
@@ -211,6 +219,31 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
         return False
 
 
+class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySymmetricNormalNP,
+                                                            ComplexCircularlySymmetricNormalEP,
+                                                            ComplexArray]):
+    def __init__(self, dimensions: int):
+        self.dimensions = dimensions
+
+    def exp_to_scipy_distribution(self, p: ComplexCircularlySymmetricNormalEP) -> Any:
+        if p.shape != ():
+            raise ValueError
+        mean = np.zeros(p.dimensions())
+        return ScipyComplexMultivariateNormal(mean=mean, variance=p.variance,
+                                              pseudo_variance=np.zeros_like(p.variance))
+
+    def exp_parameter_generator(self,
+                                rng: Generator,
+                                shape: Shape) -> ComplexCircularlySymmetricNormalEP:
+        if shape != ():
+            raise ValueError
+        variance = generate_complex_covariance(rng, self.dimensions)
+        return ComplexCircularlySymmetricNormalEP(variance)
+
+    def supports_shape(self) -> bool:
+        return False
+
+
 class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, RealArray]):
     def exp_to_scipy_distribution(self, p: ExponentialEP) -> Any:
         return ss.expon(0, p.mean)
@@ -325,7 +358,8 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     # Continuous
     normal = NormalInfo()
     complex_normal = ComplexNormalInfo()
-    cmvn = ComplexMultivariateUnitNormalInfo(dimensions=4)
+    cmvn_unit = ComplexMultivariateUnitNormalInfo(dimensions=4)
+    cmvn_cs = ComplexCircularlySymmetricNormalInfo(dimensions=4)
     exponential = ExponentialInfo()
     rayleigh = RayleighInfo()
     gamma = GammaInfo()
@@ -335,9 +369,10 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
     weibull = WeibullInfo()
-    continuous: List[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn, exponential,
-                                                         rayleigh, gamma, beta, dirichlet,
-                                                         von_mises, chi_square, chi, weibull]
+    continuous: List[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn_unit, cmvn_cs,
+                                                         exponential, rayleigh, gamma, beta,
+                                                         dirichlet, von_mises, chi_square, chi,
+                                                         weibull]
 
     # Multivariate normal
     multivariate_unit_normal = MultivariateUnitNormalInfo(dimensions=5)

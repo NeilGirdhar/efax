@@ -13,8 +13,9 @@ from tjax import assert_jax_allclose
 
 from efax import Samplable
 
-from .create_info import (ComplexNormalInfo, GammaInfo, MultivariateNormalInfo,
-                          MultivariateUnitNormalInfo)
+from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
+                          ComplexNormalInfo, GammaInfo, MultivariateNormalInfo,
+                          MultivariateUnitNormalInfo, PoissonInfo)
 from .distribution_info import DistributionInfo
 
 
@@ -28,15 +29,19 @@ def test_maximum_likelihood_estimation(generator: NumpyGenerator,
     distribution from which they were drawn.
     """
     distribution_shape = (4,) if distribution_info.supports_shape() else ()
-    sample_shape = (1000, 10)
+    sample_shape = (1024, 32)
     sample_axes = tuple(range(len(sample_shape)))
-    atol = (1e-2
-            if isinstance(distribution_info, (ComplexNormalInfo, MultivariateNormalInfo,
-                                              MultivariateUnitNormalInfo))
+    atol = (2e-1
+            if isinstance(distribution_info, ComplexCircularlySymmetricNormalInfo)
+            else 1e-1
+            if isinstance(distribution_info, (ComplexNormalInfo, ComplexMultivariateUnitNormalInfo,
+                                              MultivariateNormalInfo, MultivariateUnitNormalInfo))
+            else 1e-2
+            if isinstance(distribution_info, PoissonInfo)
             else 1e-6)
     rtol = (5e-2
             if isinstance(distribution_info, GammaInfo)
-            else 3e-2)
+            else 4e-2)
 
     if natural:
         nat_parameters = distribution_info.nat_parameter_generator(generator, distribution_shape)
@@ -53,4 +58,4 @@ def test_maximum_likelihood_estimation(generator: NumpyGenerator,
     # assert samples.shape == sample_shape TODO
     sampled_exp_parameters = nat_parameters.sufficient_statistics(samples)
     ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
-    assert_jax_allclose(exp_parameters, ml_exp_parameters, rtol=rtol, atol=atol)
+    assert_jax_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)
