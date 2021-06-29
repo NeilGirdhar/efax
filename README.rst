@@ -114,21 +114,27 @@ EFAX supports the following distributions:
 - beta
 - chi
 - chi-square
-- complex normal
 - Dirichlet
 - exponential
 - gamma
 - geometric
 - logarithmic
 - multinomial
-- multivariate normal
-
-  - with arbitrary variance
-  - with diagonal variance
-  - with isotropic variance
-  - with unit variance
 - negative binomial
 - normal
+
+  - univariate real
+  - univariate complex
+  - multivariate real
+
+    - with arbitrary variance
+    - with diagonal variance
+    - with isotropic variance
+    - with unit variance
+
+  - multivariate complex
+
+    - with unit variance and zero pseudo-variance
 - Poisson
 - Rayleigh
 - von Mises-Fisher

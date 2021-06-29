@@ -6,13 +6,15 @@ from scipy import stats as ss
 from tjax import ComplexArray, RealArray, Shape
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
-                  ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP,
-                  ExponentialNP, GammaEP, GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP,
-                  IsotropicNormalNP, LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
+                  ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP, ComplexNormalEP,
+                  ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
+                  GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP, IsotropicNormalNP,
+                  LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
                   MultivariateDiagonalNormalNP, MultivariateNormalEP, MultivariateUnitNormalEP,
                   MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
-                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP, ScipyComplexNormal,
-                  ScipyDirichlet, VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
+                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
+                  ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
+                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 from efax._src.tools import np_abs_square
 
 from .distribution_info import DistributionInfo
@@ -180,6 +182,30 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Compl
         return ComplexNormalEP(mean, second_moment, pseudo_second_moment)
 
 
+class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnitNormalNP,
+                                                         ComplexMultivariateUnitNormalEP,
+                                                         RealArray]):
+    def __init__(self, dimensions: int):
+        self.dimensions = dimensions
+
+    def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitNormalEP) -> Any:
+        eye = np.eye(p.dimensions())
+        z = np.zeros_like(eye)
+        return ScipyComplexMultivariateNormal(mean=p.mean, variance=eye, pseudo_variance=z)
+
+    def exp_parameter_generator(self,
+                                rng: Generator,
+                                shape: Shape) -> ComplexMultivariateUnitNormalEP:
+        if shape != ():
+            raise ValueError
+        a = rng.normal(size=(*shape, self.dimensions))
+        b = rng.normal(size=(*shape, self.dimensions))
+        return ComplexMultivariateUnitNormalEP(a + 1j * b)
+
+    def supports_shape(self) -> bool:
+        return False
+
+
 class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, RealArray]):
     def exp_to_scipy_distribution(self, p: ExponentialEP) -> Any:
         return ss.expon(0, p.mean)
@@ -294,6 +320,7 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     # Continuous
     normal = NormalInfo()
     complex_normal = ComplexNormalInfo()
+    cmvn = ComplexMultivariateUnitNormalInfo(dimensions=4)
     exponential = ExponentialInfo()
     rayleigh = RayleighInfo()
     gamma = GammaInfo()
@@ -303,7 +330,7 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
     weibull = WeibullInfo()
-    continuous: List[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, exponential,
+    continuous: List[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn, exponential,
                                                          rayleigh, gamma, beta, dirichlet,
                                                          von_mises, chi_square, chi, weibull]
 

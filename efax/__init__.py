@@ -2,7 +2,8 @@ from ._src import (ExpectationParametrization, HasConjugatePrior, NaturalParamet
                    ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
                    VectorSupport)
 from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP,
-                                 ChiSquareEP, ChiSquareNP, ComplexNormalEP, ComplexNormalNP,
+                                 ChiSquareEP, ChiSquareNP, ComplexMultivariateUnitNormalEP,
+                                 ComplexMultivariateUnitNormalNP, ComplexNormalEP, ComplexNormalNP,
                                  DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
                                  GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP,
                                  IsotropicNormalNP, LogarithmicEP, LogarithmicNP, MultinomialEP,

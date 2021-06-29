@@ -2,6 +2,7 @@ from .bernoulli import *
 from .beta import *
 from .chi import *
 from .chi_square import *
+from .cmvn import *
 from .complex_normal import *
 from .dirichlet import *
 from .exponential import *
