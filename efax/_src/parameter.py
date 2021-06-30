@@ -93,7 +93,7 @@ class SymmetricMatrixSupport(Support):
             raise ValueError
         dimensions = (i_sqrt_discriminant - 1) // 2
         index = (..., *jnp.triu_indices(dimensions))
-        empty = jnp.empty(x.shape[:-1] + (dimensions, dimensions))
+        empty = jnp.empty(x.shape[:-1] + (dimensions, dimensions), dtype=x.dtype)
         lower_diagonal = empty.at[index].set(x).T
         if self.hermitian:
             lower_diagonal = lower_diagonal.conjugate()
