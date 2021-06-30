@@ -25,6 +25,14 @@ def dirichlet_parameter_generator(n: int, rng: Generator, shape: Shape) -> RealA
     return rng.exponential(size=(*shape, n), scale=4.0) + 0.7
 
 
+def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
+    if dimensions == 1:
+        return np.array(rng.exponential())
+    eigenvalues = rng.exponential(size=dimensions) + 1.0
+    eigenvalues /= np.mean(eigenvalues)
+    return ss.random_correlation.rvs(eigenvalues, random_state=rng)
+
+
 class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, RealArray]):
     def exp_to_scipy_distribution(self, p: BernoulliEP) -> Any:
         return ss.bernoulli(p.probability)
@@ -152,12 +160,7 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateNormalEP:
         if shape != ():
             raise ValueError
-        if self.dimensions == 1:
-            covariance = rng.exponential()
-        else:
-            eigenvalues = rng.exponential(size=self.dimensions) + 1.0
-            eigenvalues /= np.mean(eigenvalues)
-            covariance = ss.random_correlation.rvs(eigenvalues, random_state=rng)
+        covariance = generate_real_covariance(rng, self.dimensions)
         mean = rng.normal(size=(*shape, self.dimensions))
         second_moment = covariance + np.multiply.outer(mean, mean)
         return MultivariateNormalEP(mean, second_moment)
@@ -184,11 +187,13 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Compl
 
 class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnitNormalNP,
                                                          ComplexMultivariateUnitNormalEP,
-                                                         RealArray]):
+                                                         ComplexArray]):
     def __init__(self, dimensions: int):
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitNormalEP) -> Any:
+        if p.shape != ():
+            raise ValueError
         eye = np.eye(p.dimensions())
         z = np.zeros_like(eye)
         return ScipyComplexMultivariateNormal(mean=p.mean, variance=eye, pseudo_variance=z)
