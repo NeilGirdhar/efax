@@ -28,7 +28,7 @@ def dirichlet_parameter_generator(n: int, rng: Generator, shape: Shape) -> RealA
 
 def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
     if dimensions == 1:
-        return np.array(rng.exponential())
+        return np.ones((1, 1)) * rng.exponential()
     eigenvalues = rng.exponential(size=dimensions) + 1.0
     eigenvalues /= np.mean(eigenvalues)
     return ss.random_correlation.rvs(eigenvalues, random_state=rng)
@@ -36,6 +36,8 @@ def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
 
 def generate_complex_covariance(rng: Generator, dimensions: int) -> ComplexArray:
     x = generate_real_covariance(rng, dimensions)
+    if dimensions == 1:
+        return x
     y = generate_real_covariance(rng, dimensions)
     w = x + 1j * y
     return w @ (w.conjugate().T)
@@ -359,7 +361,7 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     normal = NormalInfo()
     complex_normal = ComplexNormalInfo()
     cmvn_unit = ComplexMultivariateUnitNormalInfo(dimensions=4)
-    cmvn_cs = ComplexCircularlySymmetricNormalInfo(dimensions=4)
+    cmvn_cs = ComplexCircularlySymmetricNormalInfo(dimensions=3)
     exponential = ExponentialInfo()
     rayleigh = RayleighInfo()
     gamma = GammaInfo()
