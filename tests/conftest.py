@@ -3,11 +3,18 @@ from typing import Any, Generator, Optional
 
 import numpy as np
 import pytest
+from jax.experimental import enable_x64
 from numpy.random import Generator as NumpyGenerator
 from tjax import Generator as TjaxGenerator
 
 from .create_info import create_infos
 from .distribution_info import DistributionInfo
+
+
+@pytest.fixture(autouse=True)
+def _jax_enable64() -> Generator[None, None, None]:
+    with enable_x64():
+        yield
 
 
 def pytest_addoption(parser: Any) -> None:
