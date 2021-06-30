@@ -41,13 +41,13 @@ def test_maximum_likelihood_estimation(generator: NumpyGenerator,
     if natural:
         nat_parameters = distribution_info.nat_parameter_generator(generator, distribution_shape)
         if not isinstance(nat_parameters, Samplable):
-            return
+            pytest.skip("")
         exp_parameters = nat_parameters.to_exp()  # type: ignore
         samples = nat_parameters.sample(rng, sample_shape)
     else:
         exp_parameters = distribution_info.exp_parameter_generator(generator, distribution_shape)
         if not isinstance(exp_parameters, Samplable):
-            return
+            pytest.skip("")
         nat_parameters = exp_parameters.to_nat()  # type: ignore
         samples = exp_parameters.sample(rng, sample_shape)
     # assert samples.shape == sample_shape TODO

@@ -1,6 +1,7 @@
 from typing import Any
 
 import jax.numpy as jnp
+import pytest
 from jax import grad, vmap
 from jax.tree_util import tree_map
 from numpy.random import Generator
@@ -23,7 +24,7 @@ def test_conjugate_prior(generator: Generator,
     p = distribution_info.exp_parameter_generator(generator, shape=shape)
 
     if not isinstance(p, HasConjugatePrior):
-        return
+        pytest.skip("")
 
     # Find its conjugate prior at that point with many observations.
     cp_q = p.conjugate_prior_distribution(n)
