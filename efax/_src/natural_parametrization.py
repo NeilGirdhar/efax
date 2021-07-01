@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import (TYPE_CHECKING, Any, Callable, Generic, Tuple, Type, TypeVar, final,
-                    get_type_hints)
+from typing import TYPE_CHECKING, Any, Generic, Tuple, Type, TypeVar, final, get_type_hints
 
 import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
@@ -82,28 +81,42 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
                        + self.carrier_measure(x))
 
     @final
-    def fisher_information(self: T, diagonal: bool = False, trace: bool = False) -> T:
+    def fisher_information_diagonal(self: T) -> T:
         """
-        Args:
-            diagonal: If true, return only the diagonal elements of the Fisher information matrices.
-            trace: If true, return the trace of the Fisher information matrices.
-        Returns: The Fisher information stored in a NaturalParametrization object R whose fields
-            are:
-            * A scalar if trace is true.
-            * An array of the same shape as self if diagonal is true.
-            * Otherwise, a NaturalParametrization object whose fields are arrays.
+        Returns: The Fisher information stored in a NaturalParametrization object whose fields
+            are an array of the same shape as self.
         See also: apply_fisher_information
         """
-        fisher_information = self._calculate_fisher_information(len(self.shape))
+        fisher_matrix = self._fisher_information_matrix(len(self.shape))
+        fisher_diagonal = jnp.diagonal(fisher_matrix)
+        return type(self).unflattened(fisher_diagonal, **self.fixed_parameters_mapping())
 
-        if not trace and not diagonal:
-            return fisher_information
-
+    @final
+    def fisher_information_trace(self: T) -> T:
+        """
+        Returns: The Fisher information stored in a NaturalParametrization object whose fields
+            are scalar.
+        See also: apply_fisher_information
+        """
+        fisher_information_diagonal = self.fisher_information_diagonal()
         kwargs = {}
-        f = jnp.trace if trace else jnp.diagonal
-        for name, value, support in fisher_information.parameters_name_value_support():
-            kwargs[name] = _summarize_fisher_information(f, getattr(value, name), support.axes())
-        return fisher_information.replace(**kwargs)
+        for name, value, support in fisher_information_diagonal.parameters_name_value_support():
+            na = support.axes()
+            if na == 0:
+                new_value = value
+            elif na == 1:
+                new_value = jnp.sum(value, axis=-1)
+            elif na == 2:
+                new_value = jnp.sum(jnp.triu(value), axis=(-2, -1))
+            else:
+                raise RuntimeError
+            kwargs[name] = new_value
+        return self.replace(**kwargs)  # type: ignore
+
+    @final
+    def jeffreys_prior(self) -> RealArray:
+        fisher_matrix = self._fisher_information_matrix(len(self.shape)).real
+        return jnp.sqrt(jnp.linalg.det(fisher_matrix))
 
     @jit
     @final
@@ -120,22 +133,17 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         return expectation_parameters, f_vjp(vector)
 
     # Private methods ------------------------------------------------------------------------------
+    @classmethod
+    def _flat_log_normalizer(cls, flattened_parameters: RealArray, **kwargs: Any) -> RealArray:
+        distribution = cls.unflattened(flattened_parameters, **kwargs)
+        return distribution.log_normalizer()
+
     @partial(jit, static_argnums=1)
-    def _calculate_fisher_information(self: T, len_shape: int) -> T:
-        fisher_info_f = jacfwd(grad(type(self).log_normalizer))
+    def _fisher_information_matrix(self: T, len_shape: int) -> RealArray:
+        fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
         for _ in range(len_shape):
             fisher_info_f = vmap(fisher_info_f)
-        return fisher_info_f(self)
-
-
-def _summarize_fisher_information(f: Callable[..., Domain], array: Domain, axes: int) -> Domain:
-    if axes == 0:
-        return array
-    if axes == 1:
-        return f(array, axis1=-2, axis2=-1)
-    if axes == 2:
-        return f(f(array, axis1=-3, axis2=-1), axis1=-2, axis2=-1)
-    raise ValueError
+        return fisher_info_f(self.flattened(), **self.fixed_parameters_mapping())
 
 
 if TYPE_CHECKING:

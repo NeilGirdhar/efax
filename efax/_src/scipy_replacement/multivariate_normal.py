@@ -1,8 +1,8 @@
 from typing import Optional, Type, TypeVar
 
 import numpy as np
+import scipy.stats as ss
 from numpy.random import Generator
-from scipy import stats as ss
 from tjax import RealArray, ShapeLike
 
 from .shaped_distribution import ShapedDistribution

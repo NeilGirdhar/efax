@@ -1,7 +1,7 @@
 from typing import Optional
 
 import numpy as np
-from scipy import stats as ss
+import scipy.stats as ss
 from tjax import RealArray
 
 from .shaped_distribution import ShapedDistribution
