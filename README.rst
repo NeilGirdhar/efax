@@ -227,10 +227,14 @@ It's not hard to add a new distribution.  The steps are:
 - Solve for or research the equations needed to fill the blanks in the overview pdf, and put them in
   the issue.  I'll add them to the pdf for you.
 
-- Implement the natural and expectation parametrizations.  This can either be done directly like in
-  the Bernoulli distribution, or as a transformation of an existing exponential family like the
-  Rayleigh distribution.  If the conversion from the expectation to the natural parametrization has
-  no analytical solution, then there's a mixin that implements a numerical solution, which was used in the Dirichlet distribution.
+- Implement the natural and expectation parametrizations, either:
+
+  - directly like in the Bernoulli distribution, or
+  - as a transformation of an existing exponential family like the Rayleigh distribution.
+
+- Implement the conversion from the expectation to the natural parametrization.  If this has no
+  analytical solution, then there's a mixin that implements a numerical solution.  This can be seen
+  in the Dirichlet distribution.
 
 - Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.)
 
