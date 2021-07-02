@@ -33,7 +33,7 @@ def build_mvcn(generator: Generator,
         retval = sum(x * generator.multivariate_normal(np.zeros(size), cov=np.eye(size),
                                                        size=number_of_vectors)
                      for x in [1, 1j])
-        assert isinstance(retval, np.ndarray)  # type: ignore
+        assert isinstance(retval, np.ndarray)
         return retval
 
     mean = random_vector()

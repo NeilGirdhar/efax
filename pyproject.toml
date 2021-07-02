@@ -81,11 +81,13 @@ addopts = '-n auto'
 
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'
-disallow_untyped_calls = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
 disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
 disallow_untyped_decorators = true
+disallow_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
