@@ -94,7 +94,7 @@ class SymmetricMatrixSupport(Support):
         dimensions = (i_sqrt_discriminant - 1) // 2
         index = (..., *jnp.triu_indices(dimensions))
         empty = jnp.empty(x.shape[:-1] + (dimensions, dimensions), dtype=x.dtype)
-        lower_diagonal = empty.at[index].set(x).T
+        lower_diagonal = jnp.swapaxes(empty.at[index].set(x), -2, -1)
         if self.hermitian:
             lower_diagonal = lower_diagonal.conjugate()
         return lower_diagonal.at[index].set(x)

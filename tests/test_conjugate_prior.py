@@ -1,6 +1,7 @@
 from typing import Any
 
 import jax.numpy as jnp
+import numpy as np
 import pytest
 from jax import grad, vmap
 from jax.tree_util import tree_map
@@ -18,7 +19,7 @@ def test_conjugate_prior(generator: Generator,
     Test that the conjugate prior actually matches the distribution.
     """
     shape = (4, 3) if distribution_info.supports_shape() else ()
-    n = 100 * jnp.ones(shape)
+    n = 100.0 * np.ones(shape)
 
     # Choose a random distribution.
     p = distribution_info.exp_parameter_generator(generator, shape=shape)

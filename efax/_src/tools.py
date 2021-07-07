@@ -39,6 +39,36 @@ def iv(v: RealNumeric, z: RealNumeric) -> RealNumeric:
     return tfp.math.bessel_ive(v, z) / jnp.exp(-jnp.abs(z))
 
 
+def vectorized_tril(m: RealArray, k: int = 0) -> RealArray:
+    n, m_ = m.shape[-2:]
+    indices = (..., *np.tril_indices(n, k, m_))  # type: ignore
+    values = m[indices]
+    retval = np.zeros_like(m)
+    retval[indices] = values
+    return retval
+
+
+def vectorized_triu(m: RealArray, k: int = 0) -> RealArray:
+    n, m_ = m.shape[-2:]
+    indices = (..., *np.triu_indices(n, k, m_))  # type: ignore
+    values = m[indices]
+    retval = np.zeros_like(m)
+    retval[indices] = values
+    return retval
+
+
+def create_diagonal(m: RealArray) -> RealArray:
+    """
+    Args:
+        m: Has shape (*k, n)
+    Returns: Array with shape (*k, n, n) and the elements of m on the diagonals.
+    """
+    indices = (..., *np.diag_indices(m.shape[-1]))
+    retval = np.zeros(m.shape + (m.shape[-1],), dtype=m.dtype)
+    retval[indices] = m
+    return retval
+
+
 # Private functions --------------------------------------------------------------------------------
 def _parameter_dot_product(x: ComplexArray, y: ComplexArray, n_axes: int) -> RealArray:
     """

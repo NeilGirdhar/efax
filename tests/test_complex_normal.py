@@ -108,7 +108,7 @@ def test_p_hermitian(generator: Generator, polarization: float) -> None:
     dist = build_mvcn(generator, polarization=polarization)
     _, p_c = dist._r_and_p_c()
     assert_allclose(p_c, p_c.T.conjugate(), rtol=1e-2, atol=1e-2)
-    eigenvalues = np.linalg.eigvals(p_c)
+    eigenvalues = np.linalg.eigvals(p_c)  # type: ignore
     assert np.all(eigenvalues.real >= 0)
     assert_allclose(eigenvalues.imag, 0.0, atol=1e-5)
 
@@ -130,7 +130,7 @@ def test_multivariate_pdf(generator: Generator, n: int) -> None:
     mvn = multivariate_normal(mean=dist._multivariate_normal_mean(),
                               cov=dist._multivariate_normal_cov())
     x = np.array([random_complex(generator) for _ in range(n)])
-    xx = np.concatenate([x.real, x.imag], axis=-1)
+    xx = np.concatenate([x.real, x.imag], axis=-1)  # type: ignore
     assert_allclose(0.5 * (dist.variance + dist.pseudo_variance).real, mvn.cov[:n, :n])
     assert_allclose(0.5 * (dist.variance - dist.pseudo_variance).real, mvn.cov[n:, n:])
     assert_allclose(0.5 * (dist.variance + dist.pseudo_variance).imag, mvn.cov[n:, :n])

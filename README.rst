@@ -33,9 +33,9 @@ EFAX has a single base class for its objects: :python:`Parametrization` whose ty
 distribution family.
 
 Each parametrization object has a shape, and so it can store any number of distributions.
-When operating on such objects, NumPy's broadcasting rules apply.
+Operations on these objects are vectorized.
 This is unlike SciPy where each distribution is represented by a single object, and so a thousand
-distributions need a thousand objects.
+distributions need a thousand objects, and corresponding calls to functions that operate on them.
 
 All parametrization objects are dataclasses using :python:`tjax.dataclass`.  These dataclasses are
 a modification of Python's dataclasses to support JAX's “PyTree” type registration.

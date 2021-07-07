@@ -15,8 +15,9 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
                   NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
                   ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
-                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
-from efax._src.tools import np_abs_square
+                  ScipyMultivariateNormal, ScipyVonMises, VonMisesFisherEP, VonMisesFisherNP,
+                  WeibullEP, WeibullNP)
+from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vectorized_triu
 
 from .distribution_info import DistributionInfo
 
@@ -107,15 +108,10 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
-        return ss.multivariate_normal(mean=p.mean)
+        return ScipyMultivariateNormal(mean=p.mean)
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateUnitNormalEP:
-        if shape != ():
-            raise ValueError
         return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.dimensions)))
-
-    def supports_shape(self) -> bool:
-        return False
 
 
 class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP, RealArray]):
@@ -123,17 +119,14 @@ class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP,
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
-        return ss.multivariate_normal(mean=p.mean, cov=np.eye(self.dimensions) * p.variance())
+        v = p.variance()
+        e = np.eye(self.dimensions)
+        return ScipyMultivariateNormal(mean=p.mean, cov=np.multiply.outer(v, e))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> IsotropicNormalEP:
-        if shape != ():
-            raise ValueError
         mean = rng.normal(size=(*shape, self.dimensions))
         total_variance = self.dimensions * rng.exponential(size=shape)
         return IsotropicNormalEP(mean, np.sum(np.square(mean)) + total_variance)
-
-    def supports_shape(self) -> bool:
-        return False
 
 
 class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormalNP,
@@ -143,18 +136,13 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
-        return ss.multivariate_normal(mean=p.mean, cov=np.diag(p.variance()))
+        return ScipyMultivariateNormal(mean=p.mean, cov=create_diagonal(p.variance()))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateDiagonalNormalEP:
-        if shape != ():
-            raise ValueError
         dist_shape = (*shape, self.dimensions)
         mean = rng.normal(size=dist_shape)
         variance = rng.exponential(size=dist_shape)
         return MultivariateDiagonalNormalEP(mean, np.square(mean) + variance)
-
-    def supports_shape(self) -> bool:
-        return False
 
 
 class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, MultivariateNormalEP,
@@ -164,19 +152,16 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
 
     def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
         # Correct numerical errors introduced by various conversions.
-        covariance = np.tril(p.variance()) + np.triu(p.variance().T, 1)
-        return ss.multivariate_normal(mean=p.mean, cov=covariance)
+        v = p.variance()
+        v_transpose = v.swapaxes(-1, -2)
+        covariance = vectorized_tril(v) + vectorized_triu(v_transpose, 1)
+        return ScipyMultivariateNormal(mean=p.mean, cov=covariance)
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateNormalEP:
-        if shape != ():
-            raise ValueError
         covariance = generate_real_covariance(rng, self.dimensions)
         mean = rng.normal(size=(*shape, self.dimensions))
-        second_moment = covariance + np.multiply.outer(mean, mean)
+        second_moment = covariance + mean[..., :, np.newaxis] * mean[..., np.newaxis, :]
         return MultivariateNormalEP(mean, second_moment)
-
-    def supports_shape(self) -> bool:
-        return False
 
 
 class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, ComplexArray]):
@@ -299,11 +284,9 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, RealArray]):
 
 class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, RealArray]):
     def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
-        return ss.vonmises(*q.to_kappa_angle())
+        return ScipyVonMises(*q.to_kappa_angle())
 
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> VonMisesFisherNP:
-        if shape != ():
-            raise ValueError
         return VonMisesFisherNP(rng.normal(size=(*shape, 2), scale=4.0))
 
     def scipy_to_exp_family_observation(self, x: RealArray) -> RealArray:
@@ -312,9 +295,6 @@ class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, Re
         result[..., 0] = np.cos(x)
         result[..., 1] = np.sin(x)
         return result
-
-    def supports_shape(self) -> bool:
-        return False
 
 
 class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, RealArray]):
@@ -340,7 +320,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, RealArray]):
 
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> WeibullNP:
         equal_fixed_parameters = True
-        concentration = (np.broadcast_to(rng.exponential(), shape)
+        concentration = (np.broadcast_to(rng.exponential(), shape)  # type: ignore
                          if equal_fixed_parameters
                          else rng.exponential(size=shape)) + 1.0
         return WeibullNP(concentration, -rng.exponential(size=shape) - 1.0)

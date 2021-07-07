@@ -3,15 +3,24 @@ from typing import Optional
 import numpy as np
 from numpy.random import Generator
 from scipy import stats as ss
-from tjax import RealArray, Shape
+from tjax import RealArray, ShapeLike
+
+from .shaped_distribution import ShapedDistribution
 
 __all__ = ['ScipyDirichlet']
 
 
 # pylint: disable=protected-access
-class ScipyDirichletFixShape(ss._multivariate.dirichlet_frozen):
-
-    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> RealArray:
+class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):
+    """
+    This class repairs dirichlet.  See https://github.com/scipy/scipy/issues/6005 and
+    https://github.com/scipy/scipy/issues/6006.
+    """
+    def rvs(self,
+            size: Optional[ShapeLike] = None,
+            random_state: Optional[Generator] = None) -> RealArray:
+        if size is None:
+            size = ()
         # This somehow fixes the behaviour of rvs.
         return super().rvs(size=size, random_state=random_state)
 
@@ -21,41 +30,22 @@ class ScipyDirichletFixShape(ss._multivariate.dirichlet_frozen):
         return super().pdf(x)
 
 
-class ScipyDirichlet:
-
-    def __init__(self, parameters: RealArray):
-        self.parameters = parameters
-        self.component_shape = (parameters.shape[-1],)
-        self.shape = parameters[..., -1].shape
-        self.objects = np.empty(self.shape, dtype=object)
-        for i in np.ndindex(self.shape):
-            self.objects[i] = ScipyDirichletFixShape(parameters[i])
-
-    def rvs(self, size: Shape = None, random_state: Generator = None) -> RealArray:
-        if size is None:
-            size = ()
-        elif isinstance(size, int):
-            size = (size,)
-        retval = np.empty(self.shape + size + self.component_shape,
-                          dtype=self.parameters.dtype)
-        for i in np.ndindex(self.shape):
-            retval[i] = self.objects[i].rvs(size=size,
-                                            random_state=random_state)
-        return retval
+class ScipyDirichlet(ShapedDistribution):
+    """
+    This class allows distributions having a non-empty shape.
+    """
+    def __init__(self, alpha: RealArray):
+        shape = alpha[..., -1].shape
+        component_shape = (alpha.shape[-1],)
+        dtype = alpha.dtype
+        objects = np.empty(shape, dtype=np.object_)
+        for i in np.ndindex(shape):
+            objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
+        super().__init__(shape, component_shape, dtype, objects)
 
     def pdf(self, x: RealArray) -> RealArray:
-        retval = np.empty(self.shape, dtype=self.parameters.dtype)
-        for i in np.ndindex(self.shape):
-            xi = x[i].astype(np.float64)
-            if not np.allclose(1, np.sum(xi), atol=1e-5, rtol=0):
-                raise ValueError
-            if not np.allclose(1, np.sum(xi), atol=1e-10, rtol=0):
-                xi /= np.sum(xi)
-            retval[i] = self.objects[i].pdf(xi)
-        return retval
-
-    def entropy(self) -> RealArray:
-        retval = np.empty(self.shape, dtype=self.parameters.dtype)
-        for i in np.ndindex(self.shape):
-            retval[i] = self.objects[i].entropy()
-        return retval
+        x = x.astype(np.float64)
+        y = np.sum(x, axis=-1)
+        if not np.allclose(y, np.ones(y.shape), atol=1e-5, rtol=0):
+            raise ValueError
+        return super().pdf(x)

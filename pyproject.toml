@@ -76,9 +76,6 @@ output-format = "colorized"
 min-similarity-lines = 10
 ignore-imports = 'yes'
 
-[tool.pytest.ini_options]
-addopts = '-n auto'
-
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'
 disallow_any_generics = true

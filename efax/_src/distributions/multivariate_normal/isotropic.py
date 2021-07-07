@@ -34,7 +34,7 @@ class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP', RealArray]):
     def to_exp(self) -> IsotropicNormalEP:
         num_parameters = self.mean_times_precision.shape[-1]
         precision = -2.0 * self.negative_half_precision
-        mean = self.mean_times_precision / precision
+        mean = self.mean_times_precision / precision[..., jnp.newaxis]
         total_variance = num_parameters / precision
         total_second_moment = jnp.sum(jnp.square(mean), axis=-1) + total_variance
         return IsotropicNormalEP(mean, total_second_moment)
@@ -67,7 +67,7 @@ class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable
     def to_nat(self) -> IsotropicNormalNP:
         variance = self.variance()
         negative_half_precision = -0.5 / variance
-        mean_times_precision = self.mean / variance
+        mean_times_precision = self.mean / variance[..., jnp.newaxis]
         return IsotropicNormalNP(mean_times_precision, negative_half_precision)
 
     def expected_carrier_measure(self) -> RealArray:
