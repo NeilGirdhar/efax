@@ -4,7 +4,7 @@ import jax.numpy as jnp
 from jax import grad, jit, jvp, vjp
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_jax_allclose
+from tjax import assert_tree_allclose
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo
 from .distribution_info import DistributionInfo
@@ -27,7 +27,7 @@ def test_conversion(generator: Generator,
         intermediate_np = original_ep.to_nat()
         final_ep = intermediate_np.to_exp()
         try:
-            assert_jax_allclose(final_ep, original_ep, atol=atol, rtol=1e-4)
+            assert_tree_allclose(final_ep, original_ep, atol=atol, rtol=1e-4)
             original_fixed = original_ep.fixed_parameters_mapping()
             intermediate_fixed = intermediate_np.fixed_parameters_mapping()
             final_fixed = final_ep.fixed_parameters_mapping()
@@ -72,8 +72,8 @@ def test_gradient_log_normalizer(generator: Generator,
                                                       **kw_nat_parameters)
 
         # Test primal evaluation.
-        assert_jax_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)
-        assert_jax_allclose(exp_parameters, optimized_exp_parameters, rtol=1e-5)
+        assert_tree_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)
+        assert_tree_allclose(exp_parameters, optimized_exp_parameters, rtol=1e-5)
 
         # Test JVP.
         ones_like_nat_parameters = nat_cls(
@@ -90,7 +90,7 @@ def test_gradient_log_normalizer(generator: Generator,
         original_gln_of_nat, = original_vjp(1.0)
         optimized_ln_of_nat, optimized_vjp = vjp(optimized_ln, nat_parameters)
         optimized_gln_of_nat, = optimized_vjp(1.0)
-        assert_jax_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1e-5)
+        assert_tree_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1e-5)
         for name, original_value in original_gln_of_nat.parameters_name_value():
             optimized_value = getattr(optimized_gln_of_nat, name)
-            assert_jax_allclose(original_value, optimized_value, rtol=1e-5)
+            assert_tree_allclose(original_value, optimized_value, rtol=1e-5)

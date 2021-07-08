@@ -1,5 +1,5 @@
 import jax.numpy as jnp
-from tjax import assert_jax_allclose
+from tjax import assert_tree_allclose
 
 from efax import MultivariateNormalNP
 
@@ -7,7 +7,7 @@ from efax import MultivariateNormalNP
 def test_fisher_information() -> None:
     m = MultivariateNormalNP(jnp.zeros(2), -0.5 * jnp.eye(2))
 
-    assert_jax_allclose(
+    assert_tree_allclose(
         m.fisher_information(),
         MultivariateNormalNP(MultivariateNormalNP(jnp.array([[1., 0.], [0., 1.]]),  # type: ignore
                                                   jnp.array([[[0., 0.], [0., 0.]],
@@ -19,10 +19,10 @@ def test_fisher_information() -> None:
                                                              [[[0., 0.], [2., 0.]],
                                                               [[0., 0.], [0., 2.]]]]))))
 
-    assert_jax_allclose(
+    assert_tree_allclose(
         m.fisher_information(diagonal=True),
         MultivariateNormalNP(jnp.array([1.0, 1.0]),
                              jnp.array([[2., 0.], [0., 2.]])))
 
-    assert_jax_allclose(m.fisher_information(trace=True),
-                        MultivariateNormalNP(2.0, 8.0))  # type: ignore
+    assert_tree_allclose(m.fisher_information(trace=True),
+                         MultivariateNormalNP(2.0, 8.0))  # type: ignore

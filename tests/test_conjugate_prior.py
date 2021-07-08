@@ -6,7 +6,7 @@ import pytest
 from jax import grad, vmap
 from jax.tree_util import tree_map
 from numpy.random import Generator
-from tjax import assert_jax_allclose
+from tjax import assert_tree_allclose
 
 from efax import HasConjugatePrior
 
@@ -44,4 +44,4 @@ def test_conjugate_prior(generator: Generator,
     # Check the gradient of the density of the conjugate prior at p is zero.
     derivative = density_gradient(cp_q, cp_x)
     zero_derivative = tree_map(jnp.zeros_like, derivative)
-    assert_jax_allclose(derivative, zero_derivative, atol=1.5)
+    assert_tree_allclose(derivative, zero_derivative, atol=1.5)

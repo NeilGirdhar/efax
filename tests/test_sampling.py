@@ -9,7 +9,7 @@ import pytest
 from jax.tree_util import tree_map
 from numpy.random import Generator as NumpyGenerator
 from tjax import Generator as TjaxGenerator
-from tjax import assert_jax_allclose
+from tjax import assert_tree_allclose
 
 from efax import Samplable
 
@@ -62,4 +62,4 @@ def test_maximum_likelihood_estimation(generator: NumpyGenerator,
     # assert samples.shape == sample_shape TODO
     sampled_exp_parameters = nat_parameters.sufficient_statistics(samples)
     ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
-    assert_jax_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)
+    assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)

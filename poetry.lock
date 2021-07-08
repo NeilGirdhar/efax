@@ -333,7 +333,7 @@ test = ["pytest (>=3.6.0)", "pytest-cov", "mock"]
 
 [[package]]
 name = "isort"
-version = "5.9.1"
+version = "5.9.2"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
@@ -1150,7 +1150,7 @@ tfds = ["tfds-nightly"]
 
 [[package]]
 name = "tjax"
-version = "0.12.3"
+version = "0.12.5"
 description = "Tools for JAX."
 category = "main"
 optional = false
@@ -1258,7 +1258,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "c20c2c41f9d57e15ecaf3445209fa2e41afaffcf146bf37171834e654053b61e"
+content-hash = "a090ec4c39a92bdb0747ee204bd13345362da712b5f2e0c37807dea0a9b2023b"
 
 [metadata.files]
 absl-py = [
@@ -1514,8 +1514,8 @@ ipywidgets = [
     {file = "ipywidgets-7.6.3.tar.gz", hash = "sha256:9f1a43e620530f9e570e4a493677d25f08310118d315b00e25a18f12913c41f0"},
 ]
 isort = [
-    {file = "isort-5.9.1-py3-none-any.whl", hash = "sha256:8e2c107091cfec7286bc0f68a547d0ba4c094d460b732075b6fba674f1035c0c"},
-    {file = "isort-5.9.1.tar.gz", hash = "sha256:83510593e07e433b77bd5bff0f6f607dbafa06d1a89022616f02d8b699cfcd56"},
+    {file = "isort-5.9.2-py3-none-any.whl", hash = "sha256:eed17b53c3e7912425579853d078a0832820f023191561fcee9d7cae424e0813"},
+    {file = "isort-5.9.2.tar.gz", hash = "sha256:f65ce5bd4cbc6abdfbe29afc2f0245538ab358c14590912df638033f157d555e"},
 ]
 jax = [
     {file = "jax-0.2.16.tar.gz", hash = "sha256:75ea35f48c989bb0d81570b865e5bb60c4d4eb7f40924edf9d7860bb8a93de81"},
@@ -2055,8 +2055,8 @@ tfp-nightly = [
     {file = "tfp_nightly-0.14.0.dev20210630-py2.py3-none-any.whl", hash = "sha256:12d0e846e35d09c7e3bf9eb56708aff01b4b211a8360a61f188f0812e86efd3b"},
 ]
 tjax = [
-    {file = "tjax-0.12.3-py3-none-any.whl", hash = "sha256:8da772fd5a52012f0d0bf7c0425ee3bff8ed85275e36c7e1f6c70cb06c21b6c8"},
-    {file = "tjax-0.12.3.tar.gz", hash = "sha256:261e53fe835e65f6d2f60cc641e8b88b77aa938ffea1e5fcddd83c991cee7e96"},
+    {file = "tjax-0.12.5-py3-none-any.whl", hash = "sha256:363bd1e7faa3986824155243f836e2d18e8781fea66da32cf19526fd1d837ca7"},
+    {file = "tjax-0.12.5.tar.gz", hash = "sha256:4bde6edc0ec6755999882f57d5206df30000e21aca405e695bcace9a656640f8"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

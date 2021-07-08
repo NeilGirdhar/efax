@@ -8,7 +8,7 @@ import numpy as np
 from jax.tree_util import tree_map
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_jax_allclose
+from tjax import assert_tree_allclose
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
@@ -86,4 +86,4 @@ def test_maximum_likelihood_estimation(generator: Generator,
 
     calculated_parameters = tree_map(partial(np.mean, axis=0), sufficient_stats)
 
-    assert_jax_allclose(exp_parameters, calculated_parameters, rtol=rtol, atol=atol)
+    assert_tree_allclose(exp_parameters, calculated_parameters, rtol=rtol, atol=atol)
