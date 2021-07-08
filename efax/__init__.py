@@ -17,4 +17,4 @@ from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP
                                  PoissonEP, PoissonNP, RayleighEP, RayleighNP, VonMisesFisherEP,
                                  VonMisesFisherNP, WeibullEP, WeibullNP)
 from ._src.scipy_replacement import (ScipyComplexMultivariateNormal, ScipyComplexNormal,
-                                     ScipyDirichlet, ScipyMultivariateNormal)
+                                     ScipyDirichlet, ScipyMultivariateNormal, ScipyVonMises)

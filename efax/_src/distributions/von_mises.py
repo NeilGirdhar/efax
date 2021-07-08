@@ -90,7 +90,7 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
     def search_to_natural(self, search_parameters: RealArray) -> VonMisesFisherNP:
         kappa = softplus(search_parameters)
         mu = jnp.linalg.norm(self.mean, 2, axis=-1)
-        q = self.mean * (kappa / mu)
+        q = self.mean * (kappa / mu)[..., jnp.newaxis]
         return VonMisesFisherNP(q)
 
     def search_gradient(self, search_parameters: RealArray) -> RealArray:

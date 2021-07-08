@@ -45,6 +45,6 @@ class ScipyMultivariateNormal(ShapedDistribution):
         component_shape = (mean.shape[-1],)
         dtype = mean.dtype
         objects = np.empty(shape, dtype=np.object_)
-        for i in np.ndindex(shape):
+        for i in np.ndindex(*shape):
             objects[i] = ScipyMultivariateNormalFixRVs(mean[i], cov[i])
         super().__init__(shape, component_shape, dtype, objects)

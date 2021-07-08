@@ -14,7 +14,8 @@ from tjax import assert_jax_allclose
 from efax import Samplable
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
-                          ComplexNormalInfo, GammaInfo, MultivariateNormalInfo,
+                          ComplexNormalInfo, GammaInfo, IsotropicNormalInfo,
+                          MultivariateDiagonalNormalInfo, MultivariateNormalInfo,
                           MultivariateUnitNormalInfo, PoissonInfo)
 from .distribution_info import DistributionInfo
 
@@ -31,10 +32,13 @@ def test_maximum_likelihood_estimation(generator: NumpyGenerator,
     distribution_shape = (4,) if distribution_info.supports_shape() else ()
     sample_shape = (1024, 32)
     sample_axes = tuple(range(len(sample_shape)))
-    atol = (2e-1
+    atol = (3.0
+            if isinstance(distribution_info, IsotropicNormalInfo)
+            else 2e-1
             if isinstance(distribution_info, ComplexCircularlySymmetricNormalInfo)
             else 1e-1
             if isinstance(distribution_info, (ComplexNormalInfo, ComplexMultivariateUnitNormalInfo,
+                                              MultivariateDiagonalNormalInfo,
                                               MultivariateNormalInfo, MultivariateUnitNormalInfo))
             else 1e-2
             if isinstance(distribution_info, PoissonInfo)
