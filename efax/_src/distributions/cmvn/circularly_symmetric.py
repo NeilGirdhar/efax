@@ -25,7 +25,7 @@ class ComplexCircularlySymmetricNormalNP(
         NaturalParametrization['ComplexCircularlySymmetricNormalEP', ComplexArray],
         Samplable):
     """
-    The complex multivariate normal distribution with unit variance, and zero pseudo-variance.  This
+    The complex multivariate normal distribution with zero mean and and zero pseudo-variance.  This
     is a curved exponential family.
     """
     negative_precision: ComplexArray = distribution_parameter(

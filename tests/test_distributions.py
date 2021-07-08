@@ -22,7 +22,7 @@ def test_conversion(generator: Generator,
             else 1e-4)
 
     for _ in range(10):
-        shape = (3, 4) if distribution_info.supports_shape() else ()
+        shape = (3, 4)
         original_ep = distribution_info.exp_parameter_generator(generator, shape=shape)
         intermediate_np = original_ep.to_nat()
         final_ep = intermediate_np.to_exp()
@@ -33,8 +33,8 @@ def test_conversion(generator: Generator,
             final_fixed = final_ep.fixed_parameters_mapping()
             assert original_fixed.keys() == intermediate_fixed.keys() == final_fixed.keys()
             for name, value in original_fixed.items():
-                assert_allclose(value, intermediate_fixed[name])
-                assert_allclose(value, final_fixed[name])
+                assert_allclose(value, intermediate_fixed[name])  # type: ignore
+                assert_allclose(value, final_fixed[name])  # type: ignore
         except AssertionError:
             print(original_ep, intermediate_np, final_ep)
             raise
@@ -83,7 +83,7 @@ def test_gradient_log_normalizer(generator: Generator,
                for name, value in nat_parameters.parameters_name_value()})
         original_gradients = jvp(original_ln, (nat_parameters,), (ones_like_nat_parameters,))
         optimized_gradients = jvp(optimized_ln, (nat_parameters,), (ones_like_nat_parameters,))
-        assert_allclose(original_gradients, optimized_gradients, rtol=1.5e-5)
+        assert_allclose(original_gradients, optimized_gradients, rtol=1.5e-5)  # type: ignore
 
         # Test VJP.
         original_ln_of_nat, original_vjp = vjp(original_ln, nat_parameters)

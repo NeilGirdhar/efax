@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Type, TypeVar
 
 import numpy as np
 from numpy.random import Generator
@@ -11,7 +11,7 @@ __all__ = ['ScipyMultivariateNormal']
 
 
 # pylint: disable=protected-access
-class ScipyMultivariateNormalFixRVs(ss._multivariate.multivariate_normal_frozen):
+class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_frozen):
     """
     This class repairs multivariate_normal.  See https://github.com/scipy/scipy/issues/7689.
     """
@@ -28,11 +28,17 @@ class ScipyMultivariateNormalFixRVs(ss._multivariate.multivariate_normal_frozen)
         return retval.reshape(size + self.mean.shape)
 
 
+T = TypeVar('T', bound='ScipyMultivariateNormal')
+
+
 class ScipyMultivariateNormal(ShapedDistribution):
     """
     This class allows distributions having a non-empty shape.
     """
-    def __init__(self, mean: Optional[RealArray] = None, cov: Optional[RealArray] = None):
+    @classmethod
+    def from_mc(cls: Type[T],
+                mean: Optional[RealArray] = None,
+                cov: Optional[RealArray] = None) -> T:
         if mean is None and cov is None:
             mean = np.zeros(1)
         if mean is None:
@@ -42,9 +48,9 @@ class ScipyMultivariateNormal(ShapedDistribution):
         if cov is None:
             cov = np.tile(np.eye(mean.shape[-1]), mean.shape[:-1] + (1, 1))  # type: ignore
         shape = mean[..., -1].shape
-        component_shape = (mean.shape[-1],)
+        rvs_shape = (mean.shape[-1],)
         dtype = mean.dtype
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
-            objects[i] = ScipyMultivariateNormalFixRVs(mean[i], cov[i])
-        super().__init__(shape, component_shape, dtype, objects)
+            objects[i] = ScipyMultivariateNormalUnvectorized(mean[i], cov[i])
+        return cls(shape, rvs_shape, dtype, objects)

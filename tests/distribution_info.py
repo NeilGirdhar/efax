@@ -59,9 +59,6 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return x
 
-    def supports_shape(self) -> bool:
-        return True
-
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)  # type: ignore

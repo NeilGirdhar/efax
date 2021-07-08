@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 from numpy.random import Generator
 from scipy import stats as ss
-from tjax import RealArray, ShapeLike
+from tjax import ComplexArray, RealArray, ShapeLike
 
 from .shaped_distribution import ShapedDistribution
 
@@ -36,14 +36,14 @@ class ScipyDirichlet(ShapedDistribution):
     """
     def __init__(self, alpha: RealArray):
         shape = alpha[..., -1].shape
-        component_shape = (alpha.shape[-1],)
+        rvs_shape = (alpha.shape[-1],)
         dtype = alpha.dtype
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(shape):
             objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
-        super().__init__(shape, component_shape, dtype, objects)
+        super().__init__(shape, rvs_shape, dtype, objects)
 
-    def pdf(self, x: RealArray) -> RealArray:
+    def pdf(self, x: ComplexArray) -> RealArray:
         x = x.astype(np.float64)
         y = np.sum(x, axis=-1)
         if not np.allclose(y, np.ones(y.shape), atol=1e-5, rtol=0):

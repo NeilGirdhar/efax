@@ -17,11 +17,11 @@ class ScipyVonMises(ShapedDistribution):
         if loc is None:
             loc = np.zeros_like(kappa)
         shape = np.broadcast(kappa, loc).shape
-        component_shape = ()
+        rvs_shape = ()
         dtype = np.result_type(kappa.dtype, loc.dtype)  # type: ignore
         kappa = np.broadcast_to(kappa, shape).astype(dtype)  # type: ignore
         loc: RealArray = np.broadcast_to(loc, shape).astype(dtype)  # type: ignore
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
             objects[i] = ss.vonmises(kappa[i], loc[i])
-        super().__init__(shape, component_shape, dtype, objects)
+        super().__init__(shape, rvs_shape, dtype, objects)

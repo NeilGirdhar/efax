@@ -29,7 +29,7 @@ def test_maximum_likelihood_estimation(generator: NumpyGenerator,
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
-    distribution_shape = (4,) if distribution_info.supports_shape() else ()
+    distribution_shape = (4,)
     sample_shape = (1024, 32)
     sample_axes = tuple(range(len(sample_shape)))
     atol = (3.0

@@ -35,6 +35,13 @@ def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
     return ss.random_correlation.rvs(eigenvalues, random_state=rng)
 
 
+def vectorized_real_covariance(rng: Generator, shape: Shape, dimensions: int) -> ComplexArray:
+    if shape == ():
+        return generate_real_covariance(rng, dimensions)
+    return np.array([vectorized_real_covariance(rng, shape[1:], dimensions)
+                     for _ in range(shape[0])])
+
+
 def generate_complex_covariance(rng: Generator, dimensions: int) -> ComplexArray:
     x = generate_real_covariance(rng, dimensions)
     if dimensions == 1:
@@ -42,6 +49,13 @@ def generate_complex_covariance(rng: Generator, dimensions: int) -> ComplexArray
     y = generate_real_covariance(rng, dimensions)
     w = x + 1j * y
     return w @ (w.conjugate().T)
+
+
+def vectorized_complex_covariance(rng: Generator, shape: Shape, dimensions: int) -> ComplexArray:
+    if shape == ():
+        return generate_complex_covariance(rng, dimensions)
+    return np.array([vectorized_complex_covariance(rng, shape[1:], dimensions)
+                     for _ in range(shape[0])])
 
 
 class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, RealArray]):
@@ -108,7 +122,7 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
-        return ScipyMultivariateNormal(mean=p.mean)
+        return ScipyMultivariateNormal.from_mc(mean=p.mean)
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.dimensions)))
@@ -121,7 +135,7 @@ class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP,
     def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
         v = p.variance()
         e = np.eye(self.dimensions)
-        return ScipyMultivariateNormal(mean=p.mean, cov=np.multiply.outer(v, e))
+        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=np.multiply.outer(v, e))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> IsotropicNormalEP:
         mean = rng.normal(size=(*shape, self.dimensions))
@@ -136,7 +150,7 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
-        return ScipyMultivariateNormal(mean=p.mean, cov=create_diagonal(p.variance()))
+        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=create_diagonal(p.variance()))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateDiagonalNormalEP:
         dist_shape = (*shape, self.dimensions)
@@ -155,10 +169,10 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
         v = p.variance()
         v_transpose = v.swapaxes(-1, -2)
         covariance = vectorized_tril(v) + vectorized_triu(v_transpose, 1)
-        return ScipyMultivariateNormal(mean=p.mean, cov=covariance)
+        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=covariance)
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateNormalEP:
-        covariance = generate_real_covariance(rng, self.dimensions)
+        covariance = vectorized_real_covariance(rng, shape, self.dimensions)
         mean = rng.normal(size=(*shape, self.dimensions))
         second_moment = covariance + mean[..., :, np.newaxis] * mean[..., np.newaxis, :]
         return MultivariateNormalEP(mean, second_moment)
@@ -187,23 +201,14 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitNormalEP) -> Any:
-        if p.shape != ():
-            raise ValueError
-        eye = np.eye(p.dimensions())
-        z = np.zeros_like(eye)
-        return ScipyComplexMultivariateNormal(mean=p.mean, variance=eye, pseudo_variance=z)
+        return ScipyComplexMultivariateNormal(mean=p.mean)
 
     def exp_parameter_generator(self,
                                 rng: Generator,
                                 shape: Shape) -> ComplexMultivariateUnitNormalEP:
-        if shape != ():
-            raise ValueError
         a = rng.normal(size=(*shape, self.dimensions))
         b = rng.normal(size=(*shape, self.dimensions))
         return ComplexMultivariateUnitNormalEP(a + 1j * b)
-
-    def supports_shape(self) -> bool:
-        return False
 
 
 class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySymmetricNormalNP,
@@ -213,22 +218,13 @@ class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySym
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: ComplexCircularlySymmetricNormalEP) -> Any:
-        if p.shape != ():
-            raise ValueError
-        mean = np.zeros(p.dimensions())
-        return ScipyComplexMultivariateNormal(mean=mean, variance=p.variance,
-                                              pseudo_variance=np.zeros_like(p.variance))
+        return ScipyComplexMultivariateNormal(variance=p.variance)
 
     def exp_parameter_generator(self,
                                 rng: Generator,
                                 shape: Shape) -> ComplexCircularlySymmetricNormalEP:
-        if shape != ():
-            raise ValueError
-        variance = generate_complex_covariance(rng, self.dimensions)
-        return ComplexCircularlySymmetricNormalEP(variance)
-
-    def supports_shape(self) -> bool:
-        return False
+        return ComplexCircularlySymmetricNormalEP(vectorized_complex_covariance(rng, shape,
+                                                                                self.dimensions))
 
 
 class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, RealArray]):

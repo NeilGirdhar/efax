@@ -19,7 +19,7 @@ def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, 
     """
     Test that the entropy calculation matches scipy's.
     """
-    shape = (3, 2) if distribution_info.supports_shape() else ()
+    shape = (3, 2)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
     rtol = (1e-3
@@ -30,7 +30,7 @@ def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, 
     try:
         my_entropy = nat_parameters.entropy()
         scipy_entropy = scipy_distribution.entropy()
-        assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
+        assert_allclose(my_entropy, scipy_entropy, rtol=rtol)  # type: ignore
     except NotImplementedError:
         pass
 
@@ -59,7 +59,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         else:
             atol = 1e-5
             rtol = 1e-4
-        assert_allclose(my_density, density, rtol=rtol, atol=atol)
+        assert_allclose(my_density, density, rtol=rtol, atol=atol)  # type: ignore
 
 
 def test_maximum_likelihood_estimation(generator: Generator,

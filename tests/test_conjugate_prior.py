@@ -18,7 +18,7 @@ def test_conjugate_prior(generator: Generator,
     """
     Test that the conjugate prior actually matches the distribution.
     """
-    shape = (4, 3) if distribution_info.supports_shape() else ()
+    shape = (4, 3)
     n = 100.0 * np.ones(shape)
 
     # Choose a random distribution.

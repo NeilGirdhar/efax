@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from math import log, pi
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 import numpy as np
-from numpy.linalg import det, inv
 from numpy.random import Generator
-from scipy.stats import multivariate_normal
-from tjax import ComplexArray, RealArray, Shape
+from tjax import ComplexArray, RealArray, ShapeLike
+
+from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
+from .shaped_distribution import ShapedDistribution
 
 __all__ = ['ScipyComplexMultivariateNormal']
 
 
-class ScipyComplexMultivariateNormal:
+class ScipyComplexMultivariateNormalUnvectorized:
     """
     Represents a multivariate complex normal distribution.
     """
@@ -39,54 +39,14 @@ class ScipyComplexMultivariateNormal:
             raise ValueError("The pseudo-variance is not symmetric.")
 
     # New methods ----------------------------------------------------------------------------------
-    def log_normalizer(self) -> RealArray:
-        mu = self.mean
-        _, precision, pseudo_precision = self.natural_parameters()
-        det_s: RealArray = det(self.variance).real  # type: ignore
-        det_h: RealArray = det(-precision).real  # type: ignore
-        # https://github.com/numpy/numpy/issues/19318
-        return ((-mu.conjugate() @ precision @ mu).real
-                - (mu @ pseudo_precision @ mu).real
-                + 0.5 * log(det_s)
-                - 0.5 * log(det_h)
-                + self.size * log(pi)).real  # type: ignore
-
-    def natural_parameters(self) -> Tuple[ComplexArray, ComplexArray, ComplexArray]:
-        r, p_c = self._r_and_p_c()
-        p_inv_c: ComplexArray = inv(p_c)  # type: ignore
-        precision = -p_inv_c
-        pseudo_precision = r.T @ p_inv_c
-        eta = -2.0 * ((precision.T @ self.mean.conjugate())
-                      + pseudo_precision @ self.mean)
-        return (eta, precision, pseudo_precision)
-
-    def natural_to_sample(self,
-                          eta: ComplexArray,
-                          precision: ComplexArray,
-                          pseudo_precision: ComplexArray) -> (
-                              Tuple[ComplexArray, ComplexArray, ComplexArray]):
-        inv_precision = inv(precision)  # type: ignore
-        r = -(pseudo_precision @ inv_precision).T
-        s = inv(r.conjugate() @ r - np.eye(self.size)) @ inv_precision  # type: ignore
-        u = (r @ s).conjugate()
-        k = inv_precision.T @ pseudo_precision
-        l_eta = 0.5 * inv(k @ k.conjugate()  # type: ignore
-                          - np.eye(self.size)) @ inv_precision.T @ eta
-        mu = l_eta.conjugate() - (inv_precision.T @ pseudo_precision).conjugate() @ l_eta
-        return mu, s, u
-
-    # https://github.com/PyCQA/pylint/issues/4326
     # pylint: disable=unsubscriptable-object
     def pdf(self, z: ComplexArray, out: None = None) -> np.floating[Any]:
-        log_normalizer = self.log_normalizer()
-        eta, precision, pseudo_precision = self.natural_parameters()
-        # https://github.com/numpy/numpy/issues/19318
-        return np.exp((eta @ z).real
-                      + (z.conjugate() @ precision @ z).real
-                      + (z @ pseudo_precision @ z).real
-                      - log_normalizer)  # type: ignore
+        zr = np.concatenate([z.real, z.imag], axis=-1)  # type: ignore
+        return self.as_multivariate_normal().pdf(zr)
 
-    def rvs(self, size: Shape = (), random_state: Optional[Generator] = None) -> ComplexArray:
+    def rvs(self, size: ShapeLike = (), random_state: Optional[Generator] = None) -> ComplexArray:
+        if isinstance(size, int):
+            size = (size,)
         if random_state is None:
             random_state = np.random.default_rng()
         xy_rvs = random_state.multivariate_normal(mean=self._multivariate_normal_mean(),
@@ -95,21 +55,20 @@ class ScipyComplexMultivariateNormal:
         return xy_rvs[..., :self.size] + 1j * xy_rvs[..., self.size:]
 
     def entropy(self) -> RealArray:
+        return self.as_multivariate_normal().entropy()
+
+    def as_multivariate_normal(self) -> ScipyMultivariateNormalUnvectorized:
         mv_mean = self._multivariate_normal_mean()
         mv_cov = self._multivariate_normal_cov()
-        mvn = multivariate_normal(mean=mv_mean, cov=mv_cov)
-        return mvn.entropy()
+        return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)
 
     # Private methods ------------------------------------------------------------------------------
-    def _r_and_p_c(self) -> Tuple[ComplexArray, ComplexArray]:
-        r = self.pseudo_variance.conjugate().T @ inv(self.variance)  # type: ignore
-        p_c = self.variance - (r @ self.pseudo_variance).conjugate()
-        return r, p_c
-
     def _multivariate_normal_mean(self) -> RealArray:
+        "Return the mean of a corresponding real distribution with double the size."
         return np.concatenate([self.mean.real, self.mean.imag])  # type: ignore
 
     def _multivariate_normal_cov(self) -> RealArray:
+        "Return the covariance of a corresponding real distribution with double the size."
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
         xx = 0.5 * cov_sum.real
@@ -117,3 +76,67 @@ class ScipyComplexMultivariateNormal:
         yx = 0.5 * cov_sum.imag
         yy = 0.5 * cov_diff.real
         return np.block([[xx, xy], [yx, yy]])
+
+
+class ScipyComplexMultivariateNormal(ShapedDistribution):
+    """
+    This class allows distributions having a non-empty shape.
+    """
+    def __init__(self,
+                 mean: Optional[ComplexArray] = None,
+                 variance: Optional[ComplexArray] = None,
+                 pseudo_variance: Optional[ComplexArray] = None):
+        if mean is not None:
+            shape = mean.shape[:-1]
+            dimensions = mean.shape[-1]
+        elif variance is not None:
+            shape = variance.shape[:-2]
+            dimensions = variance.shape[-1]
+        elif pseudo_variance is not None:
+            shape = pseudo_variance.shape[:-2]
+            dimensions = pseudo_variance.shape[-1]
+        else:
+            raise ValueError
+        dtype = np.result_type(*[x.dtype  # type: ignore
+                                 for x in [mean, variance, pseudo_variance]
+                                 if x is not None])
+        rvs_shape = (dimensions,)
+        if mean is None:
+            mean = np.zeros(shape + (dimensions,), dtype=dtype)
+        if variance is None:
+            variance = np.array(np.tile(np.eye(dimensions), shape + (1, 1)).real)  # type: ignore
+        if pseudo_variance is None:
+            pseudo_variance = np.zeros(shape + (dimensions, dimensions), dtype=dtype)
+
+        objects = np.empty(shape, dtype=np.object_)
+        for i in np.ndindex(*shape):
+            objects[i] = ScipyComplexMultivariateNormalUnvectorized(mean[i], variance[i],
+                                                                    pseudo_variance[i])
+        super().__init__(shape, rvs_shape, dtype, objects)
+
+    def as_multivariate_normal(self) -> ScipyMultivariateNormal:
+        objects = np.empty(self.shape, dtype=np.object_)
+        for i in np.ndindex(*self.shape):
+            objects[i] = self.objects[i].as_multivariate_normal()
+        return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects)
+
+    @property
+    def mean(self) -> ComplexArray:
+        retval = np.empty(self.shape + self.rvs_shape, dtype=self.rvs_dtype)
+        for i in np.ndindex(*self.shape):
+            retval[i] = self.objects[i].mean
+        return retval
+
+    @property
+    def variance(self) -> ComplexArray:
+        retval = np.empty(self.shape + self.rvs_shape + self.rvs_shape, dtype=self.rvs_dtype)
+        for i in np.ndindex(*self.shape):
+            retval[i] = self.objects[i].variance
+        return retval
+
+    @property
+    def pseudo_variance(self) -> ComplexArray:
+        retval = np.empty(self.shape + self.rvs_shape + self.rvs_shape, dtype=self.rvs_dtype)
+        for i in np.ndindex(*self.shape):
+            retval[i] = self.objects[i].pseudo_variance
+        return retval

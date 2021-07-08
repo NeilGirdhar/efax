@@ -9,9 +9,9 @@ from efax import ScipyDirichlet, ScipyMultivariateNormal
 
 
 @pytest.mark.parametrize('distribution, m, n',
-                         [(ScipyMultivariateNormal(mean=np.zeros((3, 4))), (3,), 4),
-                          (ScipyMultivariateNormal(cov=np.eye(2)), (), 2),
-                          (ScipyMultivariateNormal(), (), 1),
+                         [(ScipyMultivariateNormal.from_mc(mean=np.zeros((3, 4))), (3,), 4),
+                          (ScipyMultivariateNormal.from_mc(cov=np.eye(2)), (), 2),
+                          (ScipyMultivariateNormal.from_mc(), (), 1),
                           (ScipyDirichlet(alpha=np.ones((2, 5))), (2,), 5),
                           (ScipyDirichlet(alpha=np.ones((2, 3, 5))), (2, 3), 5),
                           ])
