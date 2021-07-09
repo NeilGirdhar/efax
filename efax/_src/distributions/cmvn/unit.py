@@ -24,7 +24,7 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
     The complex multivariate normal distribution with unit variance, and zero pseudo-variance.  This
     is a curved exponential family.
     """
-    two_mean_conjugate: ComplexArray = distribution_parameter(VectorSupport())
+    two_mean_conjugate: ComplexArray = distribution_parameter(VectorSupport(is_complex=True))
     # S = I, U = 0
     # P = I, R = 0
     # H = -I, J = 0
@@ -62,7 +62,7 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
 @dataclass
 class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivariateUnitNormalNP],
                                       Samplable):
-    mean: ComplexArray = distribution_parameter(VectorSupport())
+    mean: ComplexArray = distribution_parameter(VectorSupport(is_complex=True))
 
     # Implemented methods --------------------------------------------------------------------------
     @property

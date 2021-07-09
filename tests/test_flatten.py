@@ -1,5 +1,6 @@
 from typing import Any
 
+import numpy as np
 from numpy.random import Generator
 from tjax import assert_tree_allclose
 
@@ -18,5 +19,11 @@ def test_flatten(generator: Generator, distribution_info: DistributionInfo[Any, 
     p_kwargs = p.fixed_parameters_mapping()
     q_kwargs = q.fixed_parameters_mapping()
 
-    assert_tree_allclose(type(p).unflattened(p.flattened(), **p_kwargs), p)
-    assert_tree_allclose(type(q).unflattened(q.flattened(), **q_kwargs), q)
+    p_flat = p.flattened()
+    q_flat = q.flattened()
+
+    assert np.issubdtype(p_flat.dtype, np.floating)
+    assert np.issubdtype(q_flat.dtype, np.floating)
+
+    assert_tree_allclose(type(p).unflattened(p_flat, **p_kwargs), p)
+    assert_tree_allclose(type(q).unflattened(q_flat, **q_kwargs), q)

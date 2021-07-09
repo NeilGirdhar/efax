@@ -4,27 +4,70 @@ from math import comb, sqrt
 from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
-from tjax import Array, Shape
+from tjax import Array, RealArray, Shape
 from tjax.dataclasses import field
 
 __all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',
            'SquareMatrixSupport']
 
 
-class Support:
-    def axes(self) -> int:
+class Field:
+    def num_elements(self, support_num_element: int) -> int:
         raise NotImplementedError
 
-    def num_elements(self, dimensions: int) -> int:
+    def flattened(self, x: Array) -> RealArray:
+        raise NotImplementedError
+
+    def unflattened(self, y: RealArray) -> Array:
+        raise NotImplementedError
+
+
+class RealField(Field):
+    def num_elements(self, support_num_element: int) -> int:
+        return support_num_element
+
+    def flattened(self, x: Array) -> RealArray:
+        # TODO: use a type guard when they're available.
+        return x
+
+    def unflattened(self, y: RealArray) -> Array:
+        return y
+
+
+class ComplexField(Field):
+    def num_elements(self, support_num_element: int) -> int:
+        return support_num_element * 2
+
+    def flattened(self, x: Array) -> RealArray:
+        return jnp.concatenate([x.real, x.imag], axis=-1)
+
+    def unflattened(self, y: RealArray) -> Array:
+        assert y.shape[-1] % 2 == 0
+        n = y.shape[-1] // 2
+        return y[..., :n] + 1j * y[..., n:]
+
+
+real_field = RealField()
+complex_field = ComplexField()
+
+
+class Support:
+    def __init__(self, *, is_complex: bool = False):
+        self.field = complex_field if is_complex else real_field
+
+    def axes(self) -> int:
         raise NotImplementedError
 
     def shape(self, dimensions: int) -> Shape:
         raise NotImplementedError
 
-    def flattened(self, x: Array) -> Array:
+    def num_elements(self, dimensions: int) -> int:
         raise NotImplementedError
 
-    def unflattened(self, x: Array, dimensions: int) -> Array:
+    def flattened(self, x: Array) -> RealArray:
+        raise NotImplementedError
+
+    def unflattened(self, y: RealArray, dimensions: int) -> Array:
         raise NotImplementedError
 
 
@@ -32,16 +75,17 @@ class ScalarSupport(Support):
     def axes(self) -> int:
         return 0
 
-    def num_elements(self, dimensions: int) -> int:
-        return 1
-
     def shape(self, dimensions: int) -> Shape:
         return ()
 
-    def flattened(self, x: Array) -> Array:
-        return jnp.reshape(x, (*x.shape, 1))
+    def num_elements(self, dimensions: int) -> int:
+        return self.field.num_elements(1)
 
-    def unflattened(self, x: Array, dimensions: int) -> Array:
+    def flattened(self, x: Array) -> RealArray:
+        return self.field.flattened(jnp.reshape(x, (*x.shape, 1)))
+
+    def unflattened(self, y: RealArray, dimensions: int) -> Array:
+        x = self.field.unflattened(y)
         assert x.shape[-1] == 1
         return jnp.reshape(x, x.shape[:-1])
 
@@ -50,40 +94,45 @@ class VectorSupport(Support):
     def axes(self) -> int:
         return 1
 
-    def num_elements(self, dimensions: int) -> int:
-        return dimensions
-
     def shape(self, dimensions: int) -> Shape:
         return (dimensions,)
 
-    def flattened(self, x: Array) -> Array:
-        return x
+    def num_elements(self, dimensions: int) -> int:
+        return self.field.num_elements(dimensions)
 
-    def unflattened(self, x: Array, dimensions: int) -> Array:
+    def flattened(self, x: Array) -> RealArray:
+        return self.field.flattened(x)
+
+    def unflattened(self, y: RealArray, dimensions: int) -> Array:
+        x = self.field.unflattened(y)
         assert x.shape[-1] == dimensions
         return x
 
 
 class SymmetricMatrixSupport(Support):
-    def __init__(self, *, hermitian: bool = False):
+    def __init__(self, *, hermitian: bool = False, **kwargs: Any):
+        if hermitian:
+            kwargs.setdefault('is_complex', True)
+        super().__init__(**kwargs)
         self.hermitian = hermitian
 
     def axes(self) -> int:
         return 2
 
-    def num_elements(self, dimensions: int) -> int:
-        return comb(dimensions + 1, 2)
-
     def shape(self, dimensions: int) -> Shape:
         return (dimensions, dimensions)
 
-    def flattened(self, x: Array) -> Array:
+    def num_elements(self, dimensions: int) -> int:
+        return self.field.num_elements(comb(dimensions + 1, 2))
+
+    def flattened(self, x: Array) -> RealArray:
         dimensions = x.shape[-1]
         assert x.shape[-2] == dimensions
         index = (..., *jnp.triu_indices(dimensions))
-        return x[index]
+        return self.field.flattened(x[index])
 
-    def unflattened(self, x: Array, dimensions: int) -> Array:
+    def unflattened(self, y: RealArray, dimensions: int) -> Array:
+        x = self.field.unflattened(y)
         k = x.shape[-1]
         sqrt_discriminant = sqrt(1 + 8 * k)
         i_sqrt_discriminant = int(sqrt_discriminant)
@@ -104,16 +153,18 @@ class SquareMatrixSupport(Support):
     def axes(self) -> int:
         return 2
 
-    def num_elements(self, dimensions: int) -> int:
-        return dimensions ** 2
-
     def shape(self, dimensions: int) -> Shape:
         return (dimensions, dimensions)
 
-    def flattened(self, x: Array) -> Array:
-        return jnp.reshape(x, (*x.shape[:-2], -1))
+    def num_elements(self, dimensions: int) -> int:
+        return self.field.num_elements(dimensions ** 2)
 
-    def unflattened(self, x: Array, dimensions: int) -> Array:
+    def flattened(self, x: Array) -> Array:
+        y = jnp.reshape(x, (*x.shape[:-2], -1))
+        return self.field.flattened(y)
+
+    def unflattened(self, y: Array, dimensions: int) -> Array:
+        x = self.field.unflattened(y)
         return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 
 

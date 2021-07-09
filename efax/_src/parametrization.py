@@ -65,13 +65,13 @@ class Parametrization:
                              for name, value, _ in self.parameters_name_value_support()}
         return type(self)(**sliced_parameters, **fixed_parameters)  # type: ignore
 
-    def flattened(self) -> ComplexArray:
+    def flattened(self) -> RealArray:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
                        for name, value, support in self.parameters_name_value_support()))
 
     @classmethod
-    def unflattened(cls: Type[T], flattened: ComplexArray, **kwargs: Any) -> T:
+    def unflattened(cls: Type[T], flattened: RealArray, **kwargs: Any) -> T:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)

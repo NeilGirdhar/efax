@@ -16,9 +16,9 @@ __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 @dataclass
 class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
-    mean_times_precision: ComplexArray = distribution_parameter(ScalarSupport())
+    mean_times_precision: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
     precision: RealArray = distribution_parameter(ScalarSupport())
-    pseudo_precision: ComplexArray = distribution_parameter(ScalarSupport())
+    pseudo_precision: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -57,9 +57,9 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
 
 @dataclass
 class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
-    mean: ComplexArray = distribution_parameter(ScalarSupport())
+    mean: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
     second_moment: RealArray = distribution_parameter(ScalarSupport())
-    pseudo_second_moment: ComplexArray = distribution_parameter(ScalarSupport())
+    pseudo_second_moment: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
 
     # Implemented methods --------------------------------------------------------------------------
     @property
