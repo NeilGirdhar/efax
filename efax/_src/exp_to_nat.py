@@ -4,7 +4,7 @@ from typing import Any, Generic, List, Tuple, TypeVar
 
 import jax.numpy as jnp
 from jax import jit
-from jax.tree_util import tree_multimap
+from jax.tree_util import tree_map
 from tjax.dataclasses import dataclass
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import GradientTransformation, adam
@@ -70,7 +70,7 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
             and self.  This difference is returned as natural parameters.
         """
         expectation_parameters: ExpToNat[NP, SP] = natural_parameters.to_exp()
-        exp_difference: ExpToNat[NP, SP] = tree_multimap(jnp.subtract, expectation_parameters, self)
+        exp_difference: ExpToNat[NP, SP] = tree_map(jnp.subtract, expectation_parameters, self)
         return type(natural_parameters).unflattened(exp_difference.flattened())
 
 
@@ -92,7 +92,7 @@ class ExpToNatIteratedFunction(
         transformed_gradient, new_gt_state = self.transform.update(search_gradient,
                                                                    current_gt_state,
                                                                    search_parameters)
-        new_search_parameters = tree_multimap(jnp.add, search_parameters, transformed_gradient)
+        new_search_parameters = tree_map(jnp.add, search_parameters, transformed_gradient)
         return new_gt_state, new_search_parameters
 
     def sampled_state_trajectory(
