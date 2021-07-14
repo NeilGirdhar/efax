@@ -107,11 +107,14 @@ class ExpToNatIteratedFunction(
         _, search_parameters = state
         return search_parameters
 
-    def extract_differentiand(self, state: Tuple[Any, SP]) -> SP:
+    def extract_differentiand(self,
+                              theta: ExpToNat[NP, SP],
+                              state: Tuple[Any, SP]) -> SP:
         _, search_parameters = state
         return search_parameters
 
     def implant_differentiand(self,
+                              theta: ExpToNat[NP, SP],
                               state: Tuple[Any, SP],
                               differentiand: SP) -> Tuple[Any, SP]:
         current_gt_state, _ = state
