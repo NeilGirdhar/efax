@@ -30,7 +30,6 @@ numpy = ">=1.21"
 scipy = "^1.4"
 tfp-nightly = ">=0.14.0dev20210623"
 tjax = ">=0.12.5"
-pytest-xdist = {version = "^2", extras = ["psutil"]}
 
 [tool.poetry.dev-dependencies]
 flake8 = ">=3.9"
@@ -40,6 +39,7 @@ jupyter-client = '<=6.1.12'
 mypy = ">=0.900"
 pylint = ">=2.8"
 pytest = "^6"
+pytest-xdist = {version = "^2", extras = ["psutil"]}
 
 [tool.isort]
 line_length = 100
