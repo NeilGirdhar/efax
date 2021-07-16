@@ -1,76 +1,77 @@
 [build-system]
-requires = ["setuptools", "poetry_core>=1.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ['setuptools', 'poetry_core>=1.0']
+build-backend = 'poetry.core.masonry.api'
 
 [tool.poetry]
-name = "efax"
-version = "1.4.0"
+name = 'efax'
+version = '1.4.0'
 description = "Exponential families for JAX"
-license = "MIT"
-authors = ["Neil Girdhar <mistersheik@gmail.com>"]
-readme = "README.rst"
-repository = "https://github.com/NeilGirdhar/efax"
+license = 'MIT'
+authors = ['Neil Girdhar <mistersheik@gmail.com>']
+readme = 'README.rst'
+repository = 'https://github.com/NeilGirdhar/efax'
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Science/Research",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "License :: OSI Approved :: MIT License"]
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Science/Research',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Typing :: Typed',
+    'License :: OSI Approved :: MIT License']
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.10"
-jax = "^0.2"
-jaxlib = "^0.1.55"
-numpy = ">=1.21"
-scipy = "^1.4"
-tfp-nightly = ">=0.14.0dev20210623"
-tjax = ">=0.13.0"
+python = '>=3.8,<3.10'
+jax = '^0.2'
+jaxlib = '^0.1.55'
+numpy = '>=1.21'
+scipy = '^1.4'
+tfp-nightly = '>=0.14.0dev20210623'
+tjax = '>=0.13.0'
 
 [tool.poetry.dev-dependencies]
-flake8 = ">=3.9"
-isort = ">=5.8"
+flake8 = '>=3.9'
+isort = '>=5.8'
 jupyter = '>=1'
 jupyter-client = '<=6.1.12'
-mypy = ">=0.900"
-pylint = ">=2.8"
-pytest = "^6"
-pytest-xdist = {version = "^2", extras = ["psutil"]}
+mypy = '>=0.900'
+pylint = '>=2.8'
+pytest = '^6'
+pytest-xdist = {version = '^2', extras = ['psutil']}
 
 [tool.isort]
 line_length = 100
 multi_line_output = 0
-known_third_party = ["jax"]
+skip_glob = ['.pytype/*.py']
 
 [tool.pycodestyle]
 max-line-length = 100
-exclude = ["__init__.py", "__pycache__"]
+exclude = ['__init__.py', '__pycache__']
 
 [tool.pylint.master]
 jobs = 0
 
 [tool.pylint.messages_control]
 disable = [
-    "abstract-method",
-    "arguments-differ",
-    "cyclic-import",  # https://github.com/PyCQA/pylint/issues/3525
+    'abstract-method',
+    'arguments-differ',
+    'cyclic-import',  # https://github.com/PyCQA/pylint/issues/3525
     'duplicate-code',
-    "invalid-name",
-    "invalid-unary-operand-type",
-    "missing-docstring",
-    "no-member",
-    "no-self-use",
-    "unused-argument"]
+    'invalid-name',
+    'invalid-unary-operand-type',
+    'missing-docstring',
+    'no-member',
+    'no-self-use',
+    'unused-argument']
 enable= [
     'useless-suppression',
     'use-symbolic-message-instead']
 
 [tool.pylint.reports]
-output-format = "colorized"
+output-format = 'colorized'
 
 [tool.pylint.similarities]
 min-similarity-lines = 10
