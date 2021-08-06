@@ -81,16 +81,22 @@ def test_gradient_log_normalizer(generator: Generator,
                for name, value in nat_parameters.fixed_parameters_mapping().items()},
             **{name: jnp.ones_like(value)
                for name, value in nat_parameters.parameters_name_value()})
-        original_gradients = jvp(original_ln, (nat_parameters,), (ones_like_nat_parameters,))
-        optimized_gradients = jvp(optimized_ln, (nat_parameters,), (ones_like_nat_parameters,))
-        assert_allclose(original_gradients, optimized_gradients, rtol=1.5e-5)  # type: ignore
+        original_ln_of_nat, original_jvp = jvp(original_ln, (nat_parameters,),
+                                               (ones_like_nat_parameters,))
+        optimized_ln_of_nat, optimized_jvp = jvp(optimized_ln, (nat_parameters,),
+                                                 (ones_like_nat_parameters,))
+        assert_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1.5e-5)  # type: ignore
+        assert_allclose(original_jvp, optimized_jvp, rtol=1.5e-5)  # type: ignore
 
         # Test VJP.
-        original_ln_of_nat, original_vjp = vjp(original_ln, nat_parameters)
+        original_ln_of_nat_b, original_vjp = vjp(original_ln, nat_parameters)
         original_gln_of_nat, = original_vjp(1.0)
-        optimized_ln_of_nat, optimized_vjp = vjp(optimized_ln, nat_parameters)
+        optimized_ln_of_nat_b, optimized_vjp = vjp(optimized_ln, nat_parameters)
         optimized_gln_of_nat, = optimized_vjp(1.0)
-        assert_tree_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1e-5)
+
+        assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)
+        assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)
+
         for name, original_value in original_gln_of_nat.parameters_name_value():
             optimized_value = getattr(optimized_gln_of_nat, name)
-            assert_tree_allclose(original_value, optimized_value, rtol=1e-5)
+            assert_allclose(original_value, optimized_value, rtol=1e-5)
