@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from numbers import Real
-from typing import Optional
+from typing import Optional, TypeVar, Type
 
 import numpy as np
 from numpy.random import Generator
@@ -35,15 +35,6 @@ class ScipyComplexNormalUnvectorized:
             raise ValueError("Shape mismatch.")
 
     # New methods ----------------------------------------------------------------------------------
-    @classmethod
-    def init_using_angle(cls,
-                         mean: ComplexNumeric,
-                         variance: RealNumeric,
-                         angle: RealNumeric,
-                         polarization: ComplexNumeric) -> ScipyComplexNormalUnvectorized:
-        r = polarization * np.exp(1j * 2 * np.pi * angle * 2)
-        return cls(mean, variance, r * variance)
-
     def pdf(self, z: ComplexNumeric, out: None = None) -> RealNumeric:
         zr = np.stack([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
@@ -113,6 +104,20 @@ class ScipyComplexNormal(ShapedDistribution):
         for i in np.ndindex(*shape):
             objects[i] = ScipyComplexNormalUnvectorized(mean[i], variance[i], pseudo_variance[i])
         super().__init__(shape, rvs_shape, dtype, objects)
+
+    _T = TypeVar('_T', bound=ScipyComplexNormal)
+
+    @classmethod
+    def init_using_angle(cls: Type[_T],
+                         mean: ComplexNumeric,
+                         variance: RealNumeric,
+                         angle: RealNumeric,
+                         polarization: ComplexNumeric) -> _T:
+        r = polarization * np.exp(1j * 2 * np.pi * angle * 2)
+        mean_array = np.array(mean)
+        variance_array = np.array(variance)
+        pseudo_variance_array = np.array(r * variance)
+        return cls(mean_array, variance_array, pseudo_variance_array)
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
         objects = np.empty(self.shape, dtype=np.object_)
