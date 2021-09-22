@@ -105,7 +105,7 @@ class ScipyComplexNormal(ShapedDistribution):
             objects[i] = ScipyComplexNormalUnvectorized(mean[i], variance[i], pseudo_variance[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 
-    _T = TypeVar('_T', bound=ScipyComplexNormal)
+    _T = TypeVar('_T', bound='ScipyComplexNormal')
 
     @classmethod
     def init_using_angle(cls: Type[_T],

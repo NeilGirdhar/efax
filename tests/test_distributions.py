@@ -94,9 +94,9 @@ def test_gradient_log_normalizer(generator: Generator,
         optimized_ln_of_nat_b, optimized_vjp = vjp(optimized_ln, nat_parameters)
         optimized_gln_of_nat, = optimized_vjp(1.0)
 
-        assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)
-        assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)
+        assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)  # type: ignore
+        assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)  # type: ignore
 
         for name, original_value in original_gln_of_nat.parameters_name_value():
             optimized_value = getattr(optimized_gln_of_nat, name)
-            assert_allclose(original_value, optimized_value, rtol=1e-5)
+            assert_allclose(original_value, optimized_value, rtol=1e-5)  # type: ignore
