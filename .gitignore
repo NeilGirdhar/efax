@@ -3,20 +3,13 @@ build/
 dist/
 .eggs/
 *.egg-info/
-setup.py
+
+# Byte-compiled Python
+*.pyc
 
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
-
-# my[py]
-.mypy_cache/
-
-# pytype
-.pytype/
-
-# Byte-compiled Python
-*.pyc
 
 # vim
 *.orig
