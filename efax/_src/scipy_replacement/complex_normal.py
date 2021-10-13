@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from numbers import Real
-from typing import Optional, TypeVar, Type
+from typing import Optional, Type, TypeVar
 
 import numpy as np
 from numpy.random import Generator

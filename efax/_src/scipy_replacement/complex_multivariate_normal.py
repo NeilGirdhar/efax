@@ -39,7 +39,6 @@ class ScipyComplexMultivariateNormalUnvectorized:
             raise ValueError("The pseudo-variance is not symmetric.")
 
     # New methods ----------------------------------------------------------------------------------
-    # pylint: disable=unsubscriptable-object
     def pdf(self, z: ComplexArray, out: None = None) -> np.floating[Any]:
         zr = np.concatenate([z.real, z.imag], axis=-1)  # type: ignore
         return self.as_multivariate_normal().pdf(zr)

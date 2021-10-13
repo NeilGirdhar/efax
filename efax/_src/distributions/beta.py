@@ -38,7 +38,7 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
         return jax.random.beta(rng.key,
                                1.0 + self.alpha_minus_one[..., 0],
                                1.0 + self.alpha_minus_one[..., 1],
-                               shape)
+                               shape)  # type: ignore
 
 
 @dataclass

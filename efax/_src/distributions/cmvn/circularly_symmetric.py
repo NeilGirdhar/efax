@@ -92,7 +92,8 @@ class ComplexCircularlySymmetricNormalEP(
         else:
             shape = self.variance.shape[:-1]
         mean = jnp.zeros(shape)
-        return jax.random.multivariate_normal(rng.key, mean, self.variance, shape[:-1])
+        return jax.random.multivariate_normal(rng.key, mean, self.variance,
+                                              shape[:-1])  # type: ignore
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
