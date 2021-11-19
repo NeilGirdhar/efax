@@ -27,7 +27,6 @@ class RealField(Field):
         return support_num_element
 
     def flattened(self, x: Array) -> RealArray:
-        # TODO: use a type guard when they're available.
         return x
 
     def unflattened(self, y: RealArray) -> Array:
