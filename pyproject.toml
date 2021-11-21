@@ -4,7 +4,7 @@ build-backend = 'poetry.core.masonry.api'
 
 [tool.poetry]
 name = 'efax'
-version = "1.4.6"
+version = "1.4.7"
 description = "Exponential families for JAX"
 license = 'MIT'
 authors = ['Neil Girdhar <mistersheik@gmail.com>']
@@ -25,10 +25,10 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = '>=3.8,<3.10'
-jax = '>=0.2, <0.2.22'  # Wait for tensorflow_probability release.
+jax = '>=0.2'
 numpy = '>=1.21'
 scipy = '^1.4'
-tensorflow_probability = '>=0.14'
+tensorflow_probability = '>=0.15'
 tjax = '>=0.14.2'
 
 [tool.poetry.dev-dependencies]

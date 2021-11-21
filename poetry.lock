@@ -374,7 +374,7 @@ plugins = ["setuptools"]
 
 [[package]]
 name = "jax"
-version = "0.2.21"
+version = "0.2.25"
 description = "Differentiate, compile, and transform Numpy code."
 category = "main"
 optional = false
@@ -385,13 +385,15 @@ absl-py = "*"
 numpy = ">=1.18"
 opt_einsum = "*"
 scipy = ">=1.2.1"
+typing_extensions = "*"
 
 [package.extras]
-cpu = ["jaxlib (==0.1.71)"]
-cuda102 = ["jaxlib (==0.1.71+cuda102)"]
-cuda111 = ["jaxlib (==0.1.71+cuda111)"]
+cpu = ["jaxlib (==0.1.73)"]
+cuda = ["jaxlib (==0.1.73+cuda11.cudnn82)"]
+cuda11_cudnn805 = ["jaxlib (==0.1.73+cuda11.cudnn805)"]
+cuda11_cudnn82 = ["jaxlib (==0.1.73+cuda11.cudnn82)"]
 minimum-jaxlib = ["jaxlib (==0.1.69)"]
-tpu = ["jaxlib (==0.1.71)", "libtpu-nightly (==0.1.dev20210809)", "requests"]
+tpu = ["jaxlib (==0.1.73)", "libtpu-nightly (==0.1.dev20211018)", "requests"]
 
 [[package]]
 name = "jaxlib"
@@ -1210,7 +1212,7 @@ test = ["pytest", "pathlib2"]
 
 [[package]]
 name = "tjax"
-version = "0.15.0"
+version = "0.15.1"
 description = "Tools for JAX."
 category = "main"
 optional = false
@@ -1334,7 +1336,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = '>=3.8,<3.10'
-content-hash = "647fac1e528e88f37be6e1eb6c7d6538e6140453f2ae967c1a6271961247f8b1"
+content-hash = "777d0be91dc43d91983c39720970d48370dc991eeabc80505ce316274794c7ac"
 
 [metadata.files]
 absl-py = [
@@ -1553,7 +1555,7 @@ isort = [
     {file = "isort-5.10.1.tar.gz", hash = "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"},
 ]
 jax = [
-    {file = "jax-0.2.21.tar.gz", hash = "sha256:7c760468ecb07b0a91144c8edddfcb04692cbeced2b56eede6dd6c7aa968c823"},
+    {file = "jax-0.2.25.tar.gz", hash = "sha256:822e8d1e06257eaa0fdc4c0a0686c4556e9f33647fa2a766755f984786ae7446"},
 ]
 jaxlib = [
     {file = "jaxlib-0.1.74-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:910317cd59a05209402d96d6f57660afbe36d2d81840fab29f4ed0608a1ae1c8"},
@@ -2145,8 +2147,8 @@ testpath = [
     {file = "testpath-0.5.0.tar.gz", hash = "sha256:1acf7a0bcd3004ae8357409fc33751e16d37ccc650921da1094a86581ad1e417"},
 ]
 tjax = [
-    {file = "tjax-0.15.0-py3-none-any.whl", hash = "sha256:0ada17739b1f29b22431d03747d0215cdc4a1c989e8b8f20eb717e990322604b"},
-    {file = "tjax-0.15.0.tar.gz", hash = "sha256:1b82a87835bd6ded5f565f2804d43d7d8eba8a88b2e16ffbf4f40ba5eaee67b0"},
+    {file = "tjax-0.15.1-py3-none-any.whl", hash = "sha256:241d9dda3f21364f4cada401d40731fea1225455ff8bd101bb14e6ad8c14bb1f"},
+    {file = "tjax-0.15.1.tar.gz", hash = "sha256:9cc1afec719fd01f6470a0cb0661e46d84628d97d960ccd5a8937ae89223effb"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
