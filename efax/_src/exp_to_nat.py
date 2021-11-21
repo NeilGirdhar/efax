@@ -5,7 +5,7 @@ from typing import Any, Generic, List, Tuple, TypeVar
 import jax.numpy as jnp
 from jax import jit
 from jax.tree_util import tree_map
-from tjax.dataclasses import dataclass
+from tjax.dataclasses import dataclass, field
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import GradientTransformation, adam
 
@@ -84,7 +84,7 @@ class ExpToNatIteratedFunction(
                                                 NP],
         Generic[NP, SP]):
 
-    transform: GradientTransformation[Any, NP]
+    transform: GradientTransformation[Any, NP] = field()  # TODO: kw_only=True
 
     def sampled_state(self, theta: ExpToNat[NP, SP], state: Tuple[Any, SP]) -> Tuple[Any, SP]:
         current_gt_state, search_parameters = state
