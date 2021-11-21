@@ -1210,7 +1210,7 @@ test = ["pytest", "pathlib2"]
 
 [[package]]
 name = "tjax"
-version = "0.14.5"
+version = "0.15.0"
 description = "Tools for JAX."
 category = "main"
 optional = false
@@ -1222,7 +1222,7 @@ jax = ">=0.2.21,<0.3.0"
 matplotlib = ">=3.3,<4.0"
 networkx = ">=2.4,<3.0"
 numpy = ">=1.21"
-optax = ">=0,<1"
+optax = ">=0.1"
 yapf = ">=0.31"
 
 [[package]]
@@ -2145,8 +2145,8 @@ testpath = [
     {file = "testpath-0.5.0.tar.gz", hash = "sha256:1acf7a0bcd3004ae8357409fc33751e16d37ccc650921da1094a86581ad1e417"},
 ]
 tjax = [
-    {file = "tjax-0.14.5-py3-none-any.whl", hash = "sha256:e293efafaba092af8154533bb875edcf0030e1029ad048310d7b8e45455cf5d3"},
-    {file = "tjax-0.14.5.tar.gz", hash = "sha256:13307dc3c208aa10f5515316652bf158efe0b5deea2fc0df36824875dba69df2"},
+    {file = "tjax-0.15.0-py3-none-any.whl", hash = "sha256:0ada17739b1f29b22431d03747d0215cdc4a1c989e8b8f20eb717e990322604b"},
+    {file = "tjax-0.15.0.tar.gz", hash = "sha256:1b82a87835bd6ded5f565f2804d43d7d8eba8a88b2e16ffbf4f40ba5eaee67b0"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, Tuple, Type, TypeVar, final, get_type_hints
 
@@ -111,7 +112,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
             else:
                 raise RuntimeError
             kwargs[name] = new_value
-        return self.replace(**kwargs)  # type: ignore
+        return replace(self, **kwargs)
 
     @final
     def jeffreys_prior(self) -> RealArray:
