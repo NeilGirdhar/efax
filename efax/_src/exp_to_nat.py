@@ -7,7 +7,7 @@ from jax import jit
 from jax.tree_util import tree_map
 from tjax.dataclasses import dataclass, field
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
-from tjax.gradient import GradientTransformation, adam
+from tjax.gradient import Adam, GradientTransformation
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
@@ -30,7 +30,7 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
     def to_nat(self) -> NP:
         iterated_function = ExpToNatIteratedFunction[NP, SP](minimum_iterations=1000,
                                                              maximum_iterations=1000,
-                                                             transform=adam(1e-1))
+                                                             transform=Adam(1e-1))
         initial_search_parameters = self.initial_search_parameters()
         initial_gt_state = iterated_function.transform.init(initial_search_parameters)
         initial_state = initial_gt_state, initial_search_parameters
