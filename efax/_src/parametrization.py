@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import fields
 from functools import partial, reduce
 from itertools import count
 from typing import TYPE_CHECKING, Any, Dict, Iterable, Tuple, Type, TypeVar
 
 import jax.numpy as jnp
 from tjax import ComplexArray, RealArray, Shape, custom_jvp, jit
-from tjax.dataclasses import field_names_values_metadata, fields
 
 from .parameter import Support
 from .tools import parameters_dot_product
@@ -96,15 +96,17 @@ class Parametrization:
         return cls(**kwargs)  # type: ignore
 
     def fixed_parameters_mapping(self) -> Dict[str, Any]:
-        return {name: value
-                for name, value, metadata in field_names_values_metadata(self)
-                if metadata['fixed']}
+        return {field.name: getattr(self, field.name)
+                for field in fields(self)
+                if field.metadata['fixed']}
 
     def parameters_value_support(self) -> Iterable[Tuple[ComplexArray, Support]]:
         """
         Returns: The value and support of each variable parameter.
         """
-        for _, value, metadata in field_names_values_metadata(self):
+        for field in fields(self):
+            value = getattr(self, field.name)
+            metadata = field.metadata
             if metadata['fixed']:
                 continue
             support = metadata['support']
@@ -116,7 +118,10 @@ class Parametrization:
         """
         Returns: The name and value of each variable parameter.
         """
-        for name, value, metadata in field_names_values_metadata(self):
+        for field in fields(self):
+            name = field.name
+            value = getattr(self, name)
+            metadata = field.metadata
             if metadata['fixed']:
                 continue
             yield name, value
@@ -125,7 +130,10 @@ class Parametrization:
         """
         Returns: The name, value, and support of each variable parameter.
         """
-        for name, value, metadata in field_names_values_metadata(self):
+        for field in fields(self):
+            name = field.name
+            value = getattr(self, name)
+            metadata = field.metadata
             if metadata['fixed']:
                 continue
             support = metadata['support']
@@ -138,13 +146,14 @@ class Parametrization:
         """
         Returns: The name and support of each variable parameter.
         """
-        for this_field in fields(cls):
-            if this_field.metadata['fixed']:
+        for field in fields(cls):
+            metadata = field.metadata
+            if metadata['fixed']:
                 continue
-            support = this_field.metadata['support']
+            support = metadata['support']
             if not isinstance(support, Support):
                 raise TypeError
-            yield this_field.name, support
+            yield field.name, support
 
     # Abstract methods -----------------------------------------------------------------------------
     @property
