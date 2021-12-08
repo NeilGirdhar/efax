@@ -19,19 +19,34 @@ python-versions = "*"
 
 [[package]]
 name = "argon2-cffi"
-version = "21.1.0"
+version = "21.2.0"
 description = "The secure Argon2 password hashing algorithm."
 category = "dev"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 
 [package.dependencies]
-cffi = ">=1.0.0"
+argon2-cffi-bindings = "*"
 
 [package.extras]
-dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pytest", "sphinx", "furo", "wheel", "pre-commit"]
-docs = ["sphinx", "furo"]
+dev = ["pre-commit", "cogapp", "tomli", "coverage[toml] (>=5.0.2)", "hypothesis", "pytest", "sphinx", "sphinx-notfound-page", "furo"]
+docs = ["sphinx", "sphinx-notfound-page", "furo"]
 tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pytest"]
+
+[[package]]
+name = "argon2-cffi-bindings"
+version = "21.2.0"
+description = "Low-level CFFI bindings for Argon2"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+cffi = ">=1.0.1"
+
+[package.extras]
+dev = ["pytest", "cogapp", "pre-commit", "wheel"]
+tests = ["pytest"]
 
 [[package]]
 name = "astroid"
@@ -374,7 +389,7 @@ plugins = ["setuptools"]
 
 [[package]]
 name = "jax"
-version = "0.2.25"
+version = "0.2.26"
 description = "Differentiate, compile, and transform Numpy code."
 category = "main"
 optional = false
@@ -388,16 +403,16 @@ scipy = ">=1.2.1"
 typing_extensions = "*"
 
 [package.extras]
-cpu = ["jaxlib (==0.1.73)"]
-cuda = ["jaxlib (==0.1.73+cuda11.cudnn82)"]
-cuda11_cudnn805 = ["jaxlib (==0.1.73+cuda11.cudnn805)"]
-cuda11_cudnn82 = ["jaxlib (==0.1.73+cuda11.cudnn82)"]
-minimum-jaxlib = ["jaxlib (==0.1.69)"]
-tpu = ["jaxlib (==0.1.73)", "libtpu-nightly (==0.1.dev20211018)", "requests"]
+cpu = ["jaxlib (==0.1.75)"]
+cuda = ["jaxlib (==0.1.75+cuda11.cudnn82)"]
+cuda11_cudnn805 = ["jaxlib (==0.1.75+cuda11.cudnn805)"]
+cuda11_cudnn82 = ["jaxlib (==0.1.75+cuda11.cudnn82)"]
+minimum-jaxlib = ["jaxlib (==0.1.74)"]
+tpu = ["jaxlib (==0.1.75)", "libtpu-nightly (==0.1.dev20211208)", "requests"]
 
 [[package]]
 name = "jaxlib"
-version = "0.1.74"
+version = "0.1.75"
 description = "XLA library for JAX"
 category = "main"
 optional = false
@@ -1210,11 +1225,11 @@ test = ["pytest", "pathlib2"]
 
 [[package]]
 name = "tjax"
-version = "0.16.0"
+version = "0.17.0"
 description = "Tools for JAX."
 category = "main"
 optional = false
-python-versions = ">=3.7.1,<3.10"
+python-versions = ">=3.7.1,<3.11"
 
 [package.dependencies]
 colorful = ">=0.5.4,<0.6.0"
@@ -1333,8 +1348,8 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 
 [metadata]
 lock-version = "1.1"
-python-versions = '>=3.8,<3.10'
-content-hash = "352477253eefcc6f99576a49d37a9294712965a715efb4cc78700247dc85e1f6"
+python-versions = '>=3.8,<3.11'
+content-hash = "411d277403aa56c3a1d42b2cd8b35f426c0094c1e21655c8f7cb7dad3d679daf"
 
 [metadata.files]
 absl-py = [
@@ -1346,17 +1361,31 @@ appnope = [
     {file = "appnope-0.1.2.tar.gz", hash = "sha256:dd83cd4b5b460958838f6eb3000c660b1f9caf2a5b1de4264e941512f603258a"},
 ]
 argon2-cffi = [
-    {file = "argon2-cffi-21.1.0.tar.gz", hash = "sha256:f710b61103d1a1f692ca3ecbd1373e28aa5e545ac625ba067ff2feca1b2bb870"},
-    {file = "argon2_cffi-21.1.0-cp35-abi3-macosx_10_14_x86_64.whl", hash = "sha256:217b4f0f853ccbbb5045242946ad2e162e396064575860141b71a85eb47e475a"},
-    {file = "argon2_cffi-21.1.0-cp35-abi3-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:fa7e7d1fc22514a32b1761fdfa1882b6baa5c36bb3ef557bdd69e6fc9ba14a41"},
-    {file = "argon2_cffi-21.1.0-cp35-abi3-win32.whl", hash = "sha256:e4d8f0ae1524b7b0372a3e574a2561cbdddb3fdb6c28b70a72868189bda19659"},
-    {file = "argon2_cffi-21.1.0-cp35-abi3-win_amd64.whl", hash = "sha256:65213a9174320a1aee03fe826596e0620783966b49eb636955958b3074e87ff9"},
-    {file = "argon2_cffi-21.1.0-pp36-pypy36_pp73-macosx_10_7_x86_64.whl", hash = "sha256:245f64a203012b144b7b8c8ea6d468cb02b37caa5afee5ba4a10c80599334f6a"},
-    {file = "argon2_cffi-21.1.0-pp36-pypy36_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:4ad152c418f7eb640eac41ac815534e6aa61d1624530b8e7779114ecfbf327f8"},
-    {file = "argon2_cffi-21.1.0-pp36-pypy36_pp73-win32.whl", hash = "sha256:bc513db2283c385ea4da31a2cd039c33380701f376f4edd12fe56db118a3b21a"},
-    {file = "argon2_cffi-21.1.0-pp37-pypy37_pp73-macosx_10_7_x86_64.whl", hash = "sha256:c7a7c8cc98ac418002090e4add5bebfff1b915ea1cb459c578cd8206fef10378"},
-    {file = "argon2_cffi-21.1.0-pp37-pypy37_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:165cadae5ac1e26644f5ade3bd9c18d89963be51d9ea8817bd671006d7909057"},
-    {file = "argon2_cffi-21.1.0-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:566ffb581bbd9db5562327aee71b2eda24a1c15b23a356740abe3c011bbe0dcb"},
+    {file = "argon2-cffi-21.2.0.tar.gz", hash = "sha256:50936e5ad9e860c5a6678063c5ac732c2fc8a178994cca9e1e7220351f930e9a"},
+    {file = "argon2_cffi-21.2.0-py3-none-any.whl", hash = "sha256:d5d7b9d38963c2769cd0dbfc5901ae00eb9bb98a9cb5a2ea0c9c7c4fec3e6b98"},
+]
+argon2-cffi-bindings = [
+    {file = "argon2-cffi-bindings-21.2.0.tar.gz", hash = "sha256:bb89ceffa6c791807d1305ceb77dbfacc5aa499891d2c55661c6459651fc39e3"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:ccb949252cb2ab3a08c02024acb77cfb179492d5701c7cbdbfd776124d4d2367"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9524464572e12979364b7d600abf96181d3541da11e23ddf565a32e70bd4dc0d"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b746dba803a79238e925d9046a63aa26bf86ab2a2fe74ce6b009a1c3f5c8f2ae"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:58ed19212051f49a523abb1dbe954337dc82d947fb6e5a0da60f7c8471a8476c"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:bd46088725ef7f58b5a1ef7ca06647ebaf0eb4baff7d1d0d177c6cc8744abd86"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-musllinux_1_1_i686.whl", hash = "sha256:8cd69c07dd875537a824deec19f978e0f2078fdda07fd5c42ac29668dda5f40f"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:f1152ac548bd5b8bcecfb0b0371f082037e47128653df2e8ba6e914d384f3c3e"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-win32.whl", hash = "sha256:603ca0aba86b1349b147cab91ae970c63118a0f30444d4bc80355937c950c082"},
+    {file = "argon2_cffi_bindings-21.2.0-cp36-abi3-win_amd64.whl", hash = "sha256:b2ef1c30440dbbcba7a5dc3e319408b59676e2e039e2ae11a8775ecf482b192f"},
+    {file = "argon2_cffi_bindings-21.2.0-cp38-abi3-macosx_10_9_universal2.whl", hash = "sha256:e415e3f62c8d124ee16018e491a009937f8cf7ebf5eb430ffc5de21b900dad93"},
+    {file = "argon2_cffi_bindings-21.2.0-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:3e385d1c39c520c08b53d63300c3ecc28622f076f4c2b0e6d7e796e9f6502194"},
+    {file = "argon2_cffi_bindings-21.2.0-pp37-pypy37_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2c3e3cc67fdb7d82c4718f19b4e7a87123caf8a93fde7e23cf66ac0337d3cb3f"},
+    {file = "argon2_cffi_bindings-21.2.0-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6a22ad9800121b71099d0fb0a65323810a15f2e292f2ba450810a7316e128ee5"},
+    {file = "argon2_cffi_bindings-21.2.0-pp37-pypy37_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:f9f8b450ed0547e3d473fdc8612083fd08dd2120d6ac8f73828df9b7d45bb351"},
+    {file = "argon2_cffi_bindings-21.2.0-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:93f9bf70084f97245ba10ee36575f0c3f1e7d7724d67d8e5b08e61787c320ed7"},
+    {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:3b9ef65804859d335dc6b31582cad2c5166f0c3e7975f324d9ffaa34ee7e6583"},
+    {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d4966ef5848d820776f5f562a7d45fdd70c2f330c961d0d745b784034bd9f48d"},
+    {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:20ef543a89dee4db46a1a6e206cd015360e5a75822f76df533845c3cbaf72670"},
+    {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ed2937d286e2ad0cc79a7087d3c272832865f779430e0cc2b4f3718d3159b0cb"},
+    {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:5e00316dabdaea0b2dd82d141cc66889ced0cdcbfa599e8b471cf22c620c329a"},
 ]
 astroid = [
     {file = "astroid-2.9.0-py3-none-any.whl", hash = "sha256:776ca0b748b4ad69c00bfe0fff38fa2d21c338e12c84aa9715ee0d473c422778"},
@@ -1553,16 +1582,19 @@ isort = [
     {file = "isort-5.10.1.tar.gz", hash = "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"},
 ]
 jax = [
-    {file = "jax-0.2.25.tar.gz", hash = "sha256:822e8d1e06257eaa0fdc4c0a0686c4556e9f33647fa2a766755f984786ae7446"},
+    {file = "jax-0.2.26.tar.gz", hash = "sha256:09eb0b5a1ba9675c908bb83b87df27e69a0878a2120f3d56b01a10c1307ac63f"},
 ]
 jaxlib = [
-    {file = "jaxlib-0.1.74-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:910317cd59a05209402d96d6f57660afbe36d2d81840fab29f4ed0608a1ae1c8"},
-    {file = "jaxlib-0.1.74-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:50f3f085e3954e4f171de123890bec74441ded6427f2b814467e3eb35e7228ec"},
-    {file = "jaxlib-0.1.74-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:f93714df7fbfde6d326e4738aa25881fe8904112edce8f6d8da41c486319b8bc"},
-    {file = "jaxlib-0.1.74-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:68d06c3761e38ce95c13845fa61c33204398898103e927ed69786ee60b4d7f71"},
-    {file = "jaxlib-0.1.74-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:d0b949c9d95bf040eae9ccfc71ad006c32d15c621266d5ef6f640bb7a2787b87"},
-    {file = "jaxlib-0.1.74-cp39-none-macosx_11_0_arm64.whl", hash = "sha256:f1545a16c39df63a37c0c58edb16f4f5feb75a5cff353e372b9ad25ab61ba048"},
-    {file = "jaxlib-0.1.74-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:1a8d9232ed24c3bae7c0c53e57b7183da98d83eeff86ac4fd2d182328337d71b"},
+    {file = "jaxlib-0.1.75-cp310-none-macosx_10_9_x86_64.whl", hash = "sha256:11b01864871cb44d8b28f854d3d8d41bf7b8a9f6cb55c4e5577fcec270f93a9f"},
+    {file = "jaxlib-0.1.75-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:aae98afae7cc95259a3152b8c4979cf5d5e74b8e482694e2ae7509a9364761d2"},
+    {file = "jaxlib-0.1.75-cp310-none-manylinux2010_x86_64.whl", hash = "sha256:14535c36fa556a2576dd66a4b606371c7a2b221f581872eed0760e962bd814be"},
+    {file = "jaxlib-0.1.75-cp37-none-macosx_10_9_x86_64.whl", hash = "sha256:6db43240f92e0c6fd49e946e105fd514a949076421903efc0c250acbed947ca0"},
+    {file = "jaxlib-0.1.75-cp37-none-manylinux2010_x86_64.whl", hash = "sha256:987e7974b054741bbc361a1c51ffd4d9007b3be83b11c3d04bdd6fcd774c59d1"},
+    {file = "jaxlib-0.1.75-cp38-none-macosx_10_9_x86_64.whl", hash = "sha256:62051bb817d543c7761d3ab29eef4a9931ff8e9c2e12167c9f93bd1f86f84059"},
+    {file = "jaxlib-0.1.75-cp38-none-manylinux2010_x86_64.whl", hash = "sha256:aa12c2101db4a0639c88c73f8024dfbe2c42e17a46ca9bee2296c8b03bb157fd"},
+    {file = "jaxlib-0.1.75-cp39-none-macosx_10_9_x86_64.whl", hash = "sha256:8bf84316a55a8a57539151415177bb171479e26866b3831d3fe6a49ab11ebc0d"},
+    {file = "jaxlib-0.1.75-cp39-none-macosx_11_0_arm64.whl", hash = "sha256:1cb508307f8edee6d46f9d660222299678fb93cf6aeaa2b492e44a7bdf8daf1f"},
+    {file = "jaxlib-0.1.75-cp39-none-manylinux2010_x86_64.whl", hash = "sha256:a61e0eeefa0ccb9ea552cbe06908351bca47861188a902076e28aadd52af5bb5"},
 ]
 jedi = [
     {file = "jedi-0.18.1-py2.py3-none-any.whl", hash = "sha256:637c9635fcf47945ceb91cd7f320234a7be540ded6f3e99a50cb6febdfd1ba8d"},
@@ -2196,8 +2228,8 @@ testpath = [
     {file = "testpath-0.5.0.tar.gz", hash = "sha256:1acf7a0bcd3004ae8357409fc33751e16d37ccc650921da1094a86581ad1e417"},
 ]
 tjax = [
-    {file = "tjax-0.16.0-py3-none-any.whl", hash = "sha256:be5f00e70c10e8430760a4e85c7436cd543be687a916e3872cd96d9a3508f3bf"},
-    {file = "tjax-0.16.0.tar.gz", hash = "sha256:edfdbd5fd9f2acfed6f063f3dd914dd54b47b7ab70d15f585351a5ef4737eb70"},
+    {file = "tjax-0.17.0-py3-none-any.whl", hash = "sha256:93a3bb32832a0caf90021fe8d3b39f928f291a3b8c371760506b0cfb9c747f00"},
+    {file = "tjax-0.17.0.tar.gz", hash = "sha256:671bdf0ccd5bf2d6b5c2dac32604bf45ffa8e8636e4f3157ae73ebfddcbc0414"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
