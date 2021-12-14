@@ -39,8 +39,16 @@ jupyter = '>=1'
 jupyter-client = '<=6.1.12'
 mypy = '>=0.910'
 pylint = '>=2.8'
+pyproject-flake8 = ">=0.0.1a2"
 pytest = '^6'
 pytest-xdist = {version = '^2', extras = ['psutil']}
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = "E741"
+per-file-ignores = """
+    __init__.py: F401, F403
+"""
 
 [tool.isort]
 line_length = 100
