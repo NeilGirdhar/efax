@@ -63,7 +63,7 @@ class Parametrization:
         fixed_parameters = self.fixed_parameters_mapping()
         sliced_parameters = {name: value[key]
                              for name, value, _ in self.parameters_name_value_support()}
-        return type(self)(**sliced_parameters, **fixed_parameters)  # type: ignore
+        return type(self)(**sliced_parameters, **fixed_parameters)
 
     def flattened(self) -> RealArray:
         return reduce(partial(jnp.append, axis=-1),
@@ -93,7 +93,7 @@ class Parametrization:
             kwargs[name] = support.unflattened(flattened[..., consumed: consumed + k], dimensions)
             consumed += k
 
-        return cls(**kwargs)  # type: ignore
+        return cls(**kwargs)
 
     def fixed_parameters_mapping(self) -> Dict[str, Any]:
         return {field.name: getattr(self, field.name)
