@@ -29,13 +29,13 @@ def build_mvcn(generator: Generator,
     weights = np.array(range(directions)) + 1.5
     mean = random_complex_array(generator, shape + (dimensions,))
     z = random_complex_array(generator, shape + (dimensions, directions))
-    regularizer = np.tile(np.eye(dimensions), shape + (1, 1))  # type: ignore
+    regularizer = np.tile(np.eye(dimensions), shape + (1, 1))
     variance = (
-        np.average(z.conjugate()[..., np.newaxis, :, :] * z[..., np.newaxis, :],  # type: ignore
+        np.average(z.conjugate()[..., np.newaxis, :, :] * z[..., np.newaxis, :],
                    weights=weights,
                    axis=-1)
         + regularizer)
-    pseudo_variance = np.average(z[..., np.newaxis, :, :] * z[..., np.newaxis, :],  # type: ignore
+    pseudo_variance = np.average(z[..., np.newaxis, :, :] * z[..., np.newaxis, :],
                                  weights=weights,
                                  axis=-1) * polarization
     return ScipyComplexMultivariateNormal(mean, variance, pseudo_variance)
@@ -50,14 +50,14 @@ def test_univariate_rvs(generator: Generator) -> None:
     rvs = dist.rvs(random_state=generator, size=rvs_shape)
     assert rvs.shape == shape + rvs_shape
 
-    estimated_mean = np.average(rvs, axis=rvs_axes)  # type: ignore
+    estimated_mean = np.average(rvs, axis=rvs_axes)
     centered_rvs = rvs - dist.mean[(...,) + (np.newaxis,) * len(rvs_shape)]
-    estimated_variance = np.average(  # type: ignore
+    estimated_variance = np.average(
         centered_rvs.conjugate() * centered_rvs, axis=rvs_axes).real
-    estimated_pseudo_variance = np.average(np.square(centered_rvs), axis=rvs_axes)  # type: ignore
-    assert_allclose(estimated_mean, dist.mean, rtol=0.0, atol=2e-2)  # type: ignore
-    assert_allclose(estimated_variance, dist.variance, rtol=3e-2, atol=2e-2)  # type: ignore
-    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=3e-2,  # type: ignore
+    estimated_pseudo_variance = np.average(np.square(centered_rvs), axis=rvs_axes)
+    assert_allclose(estimated_mean, dist.mean, rtol=0.0, atol=2e-2)
+    assert_allclose(estimated_variance, dist.variance, rtol=3e-2, atol=2e-2)
+    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=3e-2,
                     atol=2e-2)
 
 
@@ -71,16 +71,16 @@ def test_multivariate_rvs(generator: Generator) -> None:
     rvs = dist.rvs(random_state=generator, size=rvs_shape)
     assert rvs.shape == shape + rvs_shape + (dimensions,)
 
-    estimated_mean = np.average(rvs, axis=rvs_axes)  # type: ignore
+    estimated_mean = np.average(rvs, axis=rvs_axes)
     centered_rvs = rvs - dist.mean[(...,) + (np.newaxis,) * len(rvs_shape) + (slice(None),)]
-    estimated_variance = np.average(  # type: ignore
+    estimated_variance = np.average(
         centered_rvs[..., np.newaxis] * centered_rvs.conjugate()[..., np.newaxis, :],
         axis=rvs_axes2).real
-    estimated_pseudo_variance = np.average(  # type: ignore
+    estimated_pseudo_variance = np.average(
         centered_rvs[..., np.newaxis] * centered_rvs[..., np.newaxis, :], axis=rvs_axes2)
-    assert_allclose(estimated_mean, dist.mean, rtol=1e-2, atol=1e-2)  # type: ignore
-    assert_allclose(estimated_variance, dist.variance, rtol=2e-1, atol=5e-1)  # type: ignore
-    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=2e-1,  # type: ignore
+    assert_allclose(estimated_mean, dist.mean, rtol=1e-2, atol=1e-2)
+    assert_allclose(estimated_variance, dist.variance, rtol=2e-1, atol=5e-1)
+    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=2e-1,
                     atol=5e-1)
 
 
@@ -90,4 +90,4 @@ def test_univariate_multivariate_consistency(generator: Generator) -> None:
     uv = ScipyComplexNormal(component.mean[0], component.variance[0, 0].real,
                             component.pseudo_variance[0, 0])
     x = random_complex_array(generator)
-    assert_allclose(mv.pdf(np.array([x])), uv.pdf(x))  # type: ignore
+    assert_allclose(mv.pdf(np.array([x])), uv.pdf(x))

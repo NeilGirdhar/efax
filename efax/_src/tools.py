@@ -41,7 +41,7 @@ def iv(v: RealNumeric, z: RealNumeric) -> RealNumeric:
 
 def vectorized_tril(m: RealArray, k: int = 0) -> RealArray:
     n, m_ = m.shape[-2:]
-    indices = (..., *np.tril_indices(n, k, m_))  # type: ignore
+    indices = (..., *np.tril_indices(n, k, m_))
     values = m[indices]
     retval = np.zeros_like(m)
     retval[indices] = values
@@ -50,7 +50,7 @@ def vectorized_tril(m: RealArray, k: int = 0) -> RealArray:
 
 def vectorized_triu(m: RealArray, k: int = 0) -> RealArray:
     n, m_ = m.shape[-2:]
-    indices = (..., *np.triu_indices(n, k, m_))  # type: ignore
+    indices = (..., *np.triu_indices(n, k, m_))
     values = m[indices]
     retval = np.zeros_like(m)
     retval[indices] = values

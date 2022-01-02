@@ -46,7 +46,7 @@ class ScipyMultivariateNormal(ShapedDistribution):
                 raise ValueError
             mean = np.zeros(cov.shape[:-1], dtype=cov.dtype)
         if cov is None:
-            cov = np.tile(np.eye(mean.shape[-1]), mean.shape[:-1] + (1, 1))  # type: ignore
+            cov = np.tile(np.eye(mean.shape[-1]), mean.shape[:-1] + (1, 1))
         shape = mean[..., -1].shape
         rvs_shape = (mean.shape[-1],)
         dtype = mean.dtype

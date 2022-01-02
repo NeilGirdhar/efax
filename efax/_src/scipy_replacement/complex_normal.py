@@ -89,7 +89,7 @@ class ScipyComplexNormal(ShapedDistribution):
             shape = pseudo_variance.shape
         else:
             raise ValueError
-        dtype = np.result_type(*[x.dtype  # type: ignore
+        dtype = np.result_type(*[x.dtype
                                  for x in [mean, variance, pseudo_variance]
                                  if x is not None])
         rvs_shape = ()

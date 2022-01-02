@@ -18,8 +18,8 @@ class ScipyVonMises(ShapedDistribution):
             loc = np.zeros_like(kappa)
         shape = np.broadcast(kappa, loc).shape
         rvs_shape = ()
-        dtype = np.result_type(kappa.dtype, loc.dtype)  # type: ignore
-        kappa = np.broadcast_to(kappa, shape).astype(dtype)  # type: ignore
+        dtype = np.result_type(kappa.dtype, loc.dtype)
+        kappa = np.broadcast_to(kappa, shape).astype(dtype)
         loc: RealArray = np.broadcast_to(loc, shape).astype(dtype)  # type: ignore
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):

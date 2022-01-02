@@ -31,7 +31,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
             raise ValueError("The pseudo-variance has shape "
                              f"{pseudo_variance.shape} "
                              f"instead of {(self.size, self.size)}.")
-        if not np.all(np.linalg.eigvals(variance) >= 0):  # type: ignore
+        if not np.all(np.linalg.eigvals(variance) >= 0):
             raise ValueError("The variance is not positive semidefinite.")
         if not np.allclose(variance, variance.T.conjugate()):
             raise ValueError("The variance is not Hermitian.")
@@ -40,7 +40,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
     # New methods ----------------------------------------------------------------------------------
     def pdf(self, z: ComplexArray, out: None = None) -> np.floating[Any]:
-        zr = np.concatenate([z.real, z.imag], axis=-1)  # type: ignore
+        zr = np.concatenate([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
     def rvs(self, size: ShapeLike = (), random_state: Optional[Generator] = None) -> ComplexArray:
@@ -64,7 +64,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
     # Private methods ------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> RealArray:
         "Return the mean of a corresponding real distribution with double the size."
-        return np.concatenate([self.mean.real, self.mean.imag])  # type: ignore
+        return np.concatenate([self.mean.real, self.mean.imag])
 
     def _multivariate_normal_cov(self) -> RealArray:
         "Return the covariance of a corresponding real distribution with double the size."
@@ -96,14 +96,14 @@ class ScipyComplexMultivariateNormal(ShapedDistribution):
             dimensions = pseudo_variance.shape[-1]
         else:
             raise ValueError
-        dtype = np.result_type(*[x.dtype  # type: ignore
+        dtype = np.result_type(*[x.dtype
                                  for x in [mean, variance, pseudo_variance]
                                  if x is not None])
         rvs_shape = (dimensions,)
         if mean is None:
             mean = np.zeros(shape + (dimensions,), dtype=dtype)
         if variance is None:
-            variance = np.array(np.tile(np.eye(dimensions), shape + (1, 1)).real)  # type: ignore
+            variance = np.array(np.tile(np.eye(dimensions), shape + (1, 1)).real)
         if pseudo_variance is None:
             pseudo_variance = np.zeros(shape + (dimensions, dimensions), dtype=dtype)
 

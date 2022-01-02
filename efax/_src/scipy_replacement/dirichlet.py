@@ -39,7 +39,7 @@ class ScipyDirichlet(ShapedDistribution):
         rvs_shape = (alpha.shape[-1],)
         dtype = alpha.dtype
         objects = np.empty(shape, dtype=np.object_)
-        for i in np.ndindex(shape):
+        for i in np.ndindex(shape):  # type: ignore[arg-type]
             objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 

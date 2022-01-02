@@ -61,7 +61,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
 
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls, **kwargs: Any) -> None:
-        super().__init_subclass__(**kwargs)  # type: ignore
+        super().__init_subclass__(**kwargs)
 
         if (cls.exp_to_scipy_distribution is DistributionInfo.exp_to_scipy_distribution
                 and cls.nat_to_scipy_distribution is DistributionInfo.nat_to_scipy_distribution):

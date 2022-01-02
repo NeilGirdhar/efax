@@ -33,8 +33,8 @@ def test_conversion(generator: Generator,
             final_fixed = final_ep.fixed_parameters_mapping()
             assert original_fixed.keys() == intermediate_fixed.keys() == final_fixed.keys()
             for name, value in original_fixed.items():
-                assert_allclose(value, intermediate_fixed[name])  # type: ignore
-                assert_allclose(value, final_fixed[name])  # type: ignore
+                assert_allclose(value, intermediate_fixed[name])
+                assert_allclose(value, final_fixed[name])
         except AssertionError:
             print(original_ep, intermediate_np, final_ep)
             raise
@@ -85,8 +85,8 @@ def test_gradient_log_normalizer(generator: Generator,
                                                (ones_like_nat_parameters,))
         optimized_ln_of_nat, optimized_jvp = jvp(optimized_ln, (nat_parameters,),
                                                  (ones_like_nat_parameters,))
-        assert_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1.5e-5)  # type: ignore
-        assert_allclose(original_jvp, optimized_jvp, rtol=1.5e-5)  # type: ignore
+        assert_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1.5e-5)
+        assert_allclose(original_jvp, optimized_jvp, rtol=1.5e-5)
 
         # Test VJP.
         original_ln_of_nat_b, original_vjp = vjp(original_ln, nat_parameters)
@@ -94,9 +94,9 @@ def test_gradient_log_normalizer(generator: Generator,
         optimized_ln_of_nat_b, optimized_vjp = vjp(optimized_ln, nat_parameters)
         optimized_gln_of_nat, = optimized_vjp(1.0)
 
-        assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)  # type: ignore
-        assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)  # type: ignore
+        assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)
+        assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)
 
         for name, original_value in original_gln_of_nat.parameters_name_value():
             optimized_value = getattr(optimized_gln_of_nat, name)
-            assert_allclose(original_value, optimized_value, rtol=1e-5)  # type: ignore
+            assert_allclose(original_value, optimized_value, rtol=1e-5)

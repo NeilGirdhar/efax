@@ -1,5 +1,6 @@
 from typing import Any, List
 
+import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
@@ -35,7 +36,7 @@ def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
     return ss.random_correlation.rvs(eigenvalues, random_state=rng)
 
 
-def vectorized_real_covariance(rng: Generator, shape: Shape, dimensions: int) -> ComplexArray:
+def vectorized_real_covariance(rng: Generator, shape: Shape, dimensions: int) -> RealArray:
     if shape == ():
         return generate_real_covariance(rng, dimensions)
     return np.array([vectorized_real_covariance(rng, shape[1:], dimensions)
@@ -94,7 +95,8 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
         return ss.nbinom(self.r, 1.0 / (1.0 + p.mean / p.failures))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NegativeBinomialEP:
-        return NegativeBinomialEP(self.r * np.ones(shape), rng.exponential(size=shape))
+        return NegativeBinomialEP(self.r * np.ones(shape, dtype=jnp.int_),
+                                  rng.exponential(size=shape))
 
 
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, RealArray]):
@@ -316,7 +318,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, RealArray]):
 
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> WeibullNP:
         equal_fixed_parameters = True
-        concentration = (np.broadcast_to(rng.exponential(), shape)  # type: ignore
+        concentration = (np.broadcast_to(rng.exponential(), shape)
                          if equal_fixed_parameters
                          else rng.exponential(size=shape)) + 1.0
         return WeibullNP(concentration, -rng.exponential(size=shape) - 1.0)
