@@ -72,7 +72,7 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> BooleanArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.bernoulli(rng.key, self.probability, shape)  # type: ignore
+        return jax.random.bernoulli(rng.key, self.probability, shape)  # type: ignore[return-value]
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> BetaNP:

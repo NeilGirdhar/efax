@@ -108,7 +108,7 @@ class MultivariateNormalVP(Samplable):
         else:
             shape = self.shape
         return jax.random.multivariate_normal(rng.key, self.mean, self.variance,
-                                              shape)  # type: ignore
+                                              shape)  # type: ignore[return-value]
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:

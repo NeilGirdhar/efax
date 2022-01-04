@@ -68,4 +68,5 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
         else:
             shape = self.shape
         lambda_ = self.chi ** (1.0 / self.concentration)
-        return jax.random.weibull_min(rng.key, lambda_, self.concentration, shape)  # type: ignore
+        return jax.random.weibull_min(rng.key,  # type: ignore[return-value]
+                                      lambda_, self.concentration, shape)

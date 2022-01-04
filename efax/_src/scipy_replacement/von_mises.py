@@ -20,7 +20,7 @@ class ScipyVonMises(ShapedDistribution):
         rvs_shape = ()
         dtype = np.result_type(kappa.dtype, loc.dtype)
         kappa = np.broadcast_to(kappa, shape).astype(dtype)
-        loc: RealArray = np.broadcast_to(loc, shape).astype(dtype)  # type: ignore
+        loc = np.broadcast_to(loc, shape).astype(dtype)
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
             objects[i] = ss.vonmises(kappa[i], loc[i])

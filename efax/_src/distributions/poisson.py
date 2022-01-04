@@ -63,7 +63,7 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.poisson(rng.key, self.mean, shape)  # type: ignore
+        return jax.random.poisson(rng.key, self.mean, shape)  # type: ignore[return-value]
 
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> GammaNP:

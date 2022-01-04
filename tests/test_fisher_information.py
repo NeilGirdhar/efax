@@ -27,7 +27,7 @@ def test_mvn_fisher_information() -> None:
                              np.array([[2., 4.], [4., 2.]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
-                         MultivariateNormalNP(2.0, 8.0))  # type: ignore
+                         MultivariateNormalNP(2.0, 8.0))  # type: ignore[arg-type]
 
 
 def test_mvn_fisher_information_b() -> None:
@@ -47,7 +47,7 @@ def test_mvn_fisher_information_b() -> None:
                              np.array([[38., 64.062], [64.062, 25.1953]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
-                         MultivariateNormalNP(1.625, 127.258))  # type: ignore
+                         MultivariateNormalNP(1.625, 127.258))  # type: ignore[arg-type]
 
 
 def test_fisher_information_is_convex(generator: Generator,
