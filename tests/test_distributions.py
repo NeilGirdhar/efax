@@ -4,7 +4,7 @@ import jax.numpy as jnp
 from jax import grad, jit, jvp, vjp
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_tree_allclose
+from tjax import assert_tree_allclose, zero_tangent
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo
 from .distribution_info import DistributionInfo
@@ -49,9 +49,9 @@ def test_gradient_log_normalizer(generator: Generator,
     # pylint: disable=too-many-locals, disable=protected-access
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
     original_ln = cls._original_log_normalizer
-    original_gln = jit(grad(cls._original_log_normalizer))
+    original_gln = jit(grad(cls._original_log_normalizer, allow_int=True))
     optimized_ln = cls.log_normalizer
-    optimized_gln = jit(grad(optimized_ln))
+    optimized_gln = jit(grad(optimized_ln, allow_int=True))
 
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
@@ -77,7 +77,7 @@ def test_gradient_log_normalizer(generator: Generator,
 
         # Test JVP.
         ones_like_nat_parameters = nat_cls(
-            **{name: jnp.zeros_like(value)
+            **{name: zero_tangent(value)
                for name, value in nat_parameters.fixed_parameters_mapping().items()},
             **{name: jnp.ones_like(value)
                for name, value in nat_parameters.parameters_name_value()})
