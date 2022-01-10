@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, Iterable, Tuple, Type, TypeVar
 
 import jax.numpy as jnp
 from tjax import ComplexArray, RealArray, Shape, custom_jvp, jit
+from tjax.dataclasses import dataclass
 
 from .parameter import Support
 from .tools import parameters_dot_product
@@ -17,6 +18,7 @@ __all__ = ['Parametrization']
 T = TypeVar('T', bound='Parametrization')
 
 
+@dataclass
 class Parametrization:
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls) -> None:
