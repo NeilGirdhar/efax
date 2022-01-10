@@ -4,7 +4,7 @@ build-backend = 'poetry.core.masonry.api'
 
 [tool.poetry]
 name = 'efax'
-version = "1.5.1"
+version = "1.5.2"
 description = "Exponential families for JAX"
 license = 'MIT'
 authors = ['Neil Girdhar <mistersheik@gmail.com>']
@@ -30,7 +30,7 @@ jax = '>=0.2'
 numpy = '>=1.22'
 scipy = '^1.4'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.16'
+tjax = '>=0.18.2'
 
 [tool.poetry.dev-dependencies]
 flake8 = '>=3.9'
@@ -40,6 +40,7 @@ jupyter-client = '<=6.1.12'
 mypy = '>=0.930'
 pylint = '>=2.12'
 pyproject-flake8 = ">=0.0.1a2"
+pyright = ">=0.0.13"
 pytest = '^6'
 pytest-xdist = {version = '^2', extras = ['psutil']}
 
@@ -83,6 +84,9 @@ output-format = 'colorized'
 [tool.pylint.similarities]
 min-similarity-lines = 10
 ignore-imports = 'yes'
+
+[tool.pyright]
+stubPath = ""
 
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'

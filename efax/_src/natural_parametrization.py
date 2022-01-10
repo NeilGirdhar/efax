@@ -24,8 +24,6 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
-    T = TypeVar('T', bound='NaturalParametrization[EP, Domain]')
-
     # Abstract methods -----------------------------------------------------------------------------
     def log_normalizer(self) -> RealArray:
         """
@@ -82,7 +80,8 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
                        + self.carrier_measure(x))
 
     @final
-    def fisher_information_diagonal(self: T) -> T:
+    def fisher_information_diagonal(self: NaturalParametrization[EP, Domain]) -> (
+            NaturalParametrization[EP, Domain]):
         """
         Returns: The Fisher information stored in a NaturalParametrization object whose fields
             are an array of the same shape as self.
@@ -93,7 +92,8 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         return type(self).unflattened(fisher_diagonal, **self.fixed_parameters_mapping())
 
     @final
-    def fisher_information_trace(self: T) -> T:
+    def fisher_information_trace(self: NaturalParametrization[EP, Domain]) -> (
+            NaturalParametrization[EP, Domain]):
         """
         Returns: The Fisher information stored in a NaturalParametrization object whose fields
             are scalar.
@@ -121,7 +121,8 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     @jit
     @final
-    def apply_fisher_information(self: T, vector: EP) -> Tuple[EP, T]:
+    def apply_fisher_information(self: NaturalParametrization[EP, Domain],
+                                 vector: EP) -> Tuple[EP, NaturalParametrization[EP, Domain]]:
         """
         Args:
             vector: Some set of expectation parameters.
@@ -140,7 +141,8 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         return distribution.log_normalizer()
 
     @partial(jit, static_argnums=1)
-    def _fisher_information_matrix(self: T, len_shape: int) -> RealArray:
+    def _fisher_information_matrix(self: NaturalParametrization[EP, Domain],
+                                   len_shape: int) -> RealArray:
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
         for _ in range(len_shape):
             fisher_info_f = vmap(fisher_info_f)
