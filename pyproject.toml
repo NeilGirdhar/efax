@@ -87,6 +87,7 @@ ignore-imports = 'yes'
 
 [tool.pyright]
 stubPath = ""
+reportMissingSuperCall = true
 
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'
