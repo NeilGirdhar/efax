@@ -89,6 +89,7 @@ class PoissonInfo(DistributionInfo[PoissonNP, PoissonEP, RealArray]):
 
 class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomialEP, RealArray]):
     def __init__(self, r: int):
+        super().__init__()
         self.r = r
 
     def exp_to_scipy_distribution(self, p: NegativeBinomialEP) -> Any:
@@ -121,6 +122,7 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
                                                   MultivariateUnitNormalEP,
                                                   RealArray]):
     def __init__(self, dimensions: int):
+        super().__init__()
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
@@ -132,6 +134,7 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
 
 class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP, RealArray]):
     def __init__(self, dimensions: int):
+        super().__init__()
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
@@ -149,6 +152,7 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
                                                       MultivariateDiagonalNormalEP,
                                                       RealArray]):
     def __init__(self, dimensions: int):
+        super().__init__()
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
@@ -164,6 +168,7 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
 class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, MultivariateNormalEP,
                                               RealArray]):
     def __init__(self, dimensions: int):
+        super().__init__()
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
@@ -200,6 +205,7 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
                                                          ComplexMultivariateUnitNormalEP,
                                                          ComplexArray]):
     def __init__(self, dimensions: int):
+        super().__init__()
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitNormalEP) -> Any:
@@ -217,6 +223,7 @@ class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySym
                                                             ComplexCircularlySymmetricNormalEP,
                                                             ComplexArray]):
     def __init__(self, dimensions: int):
+        super().__init__()
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: ComplexCircularlySymmetricNormalEP) -> Any:
@@ -268,6 +275,7 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, RealArray]):
 
 class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, RealArray]):
     def __init__(self, dimensions: int):
+        super().__init__()
         self.dimensions = dimensions
 
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:

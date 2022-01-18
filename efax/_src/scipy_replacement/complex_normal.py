@@ -21,6 +21,7 @@ class ScipyComplexNormalUnvectorized:
                  mean: ComplexNumeric,
                  variance: RealNumeric,
                  pseudo_variance: ComplexNumeric):
+        super().__init__()
         self.mean: ComplexArray = np.asarray(mean)
         self.variance: RealArray = np.asarray(variance)
         self.pseudo_variance: ComplexArray = np.asarray(pseudo_variance)

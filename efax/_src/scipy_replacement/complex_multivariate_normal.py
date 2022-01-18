@@ -17,6 +17,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
     Represents a multivariate complex normal distribution.
     """
     def __init__(self, mean: ComplexArray, variance: ComplexArray, pseudo_variance: ComplexArray):
+        super().__init__()
         self.size = mean.shape[0]
         self.mean = mean
         self.variance = variance

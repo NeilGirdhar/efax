@@ -52,6 +52,7 @@ complex_field = ComplexField()
 
 class Support:
     def __init__(self, *, is_complex: bool = False):
+        super().__init__()
         self.field = complex_field if is_complex else real_field
 
     def axes(self) -> int:
