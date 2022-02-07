@@ -2,17 +2,10 @@ from __future__ import annotations
 
 from typing import Any, Callable, Generic, TypeVar
 
-from jax.dtypes import canonicalize_dtype
-from jax.tree_util import tree_map
 from numpy.random import Generator
 from tjax import ComplexArray, Shape
 
 from efax import ExpectationParametrization, NaturalParametrization
-
-
-def canonicalize_tree(tree: Any) -> Any:
-    return tree_map(lambda array: array.astype(canonicalize_dtype(array.dtype)), tree)
-
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 EP = TypeVar('EP', bound=ExpectationParametrization[Any])
@@ -78,6 +71,6 @@ class DistributionInfo(Generic[NP, EP, Domain]):
             def new_method(*args: Any,
                            old_method: Callable[..., Any] = old_method,
                            **kwargs: Any) -> Any:
-                return canonicalize_tree(old_method(*args, **kwargs))
+                return old_method(*args, **kwargs)
 
             setattr(cls, method, new_method)

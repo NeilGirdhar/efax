@@ -5,7 +5,6 @@ from typing import Any, Generic, List, Tuple, TypeVar
 import jax.numpy as jnp
 from jax import jit
 from jax.tree_util import tree_map
-from tjax import default_atol, default_rtol
 from tjax.dataclasses import dataclass, field
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import Adam, GradientTransformation
@@ -30,8 +29,8 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
     def to_nat(self) -> NP:
         iterated_function = ExpToNatIteratedFunction[NP, SP](minimum_iterations=1000,
                                                              maximum_iterations=1000,
-                                                             rtol=default_rtol(),
-                                                             atol=default_atol(),
+                                                             rtol=1e-4,
+                                                             atol=1e-6,
                                                              z_minimum_iterations=100,
                                                              z_maximum_iterations=1000,
                                                              transform=Adam(1e-1))
