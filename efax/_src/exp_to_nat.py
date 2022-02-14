@@ -86,7 +86,7 @@ class ExpToNatIteratedFunction(
                                                 SP,
                                                 NP],
         Generic[NP, SP]):
-    transform: GradientTransformation[Any, NP] = field()
+    transform: GradientTransformation[Any, SP] = field()
 
     def sampled_state(self, theta: ExpToNat[NP, SP], state: Tuple[Any, SP]) -> Tuple[Any, SP]:
         current_gt_state, search_parameters = state
@@ -100,7 +100,7 @@ class ExpToNatIteratedFunction(
     def sampled_state_trajectory(
             self,
             theta: ExpToNat[NP, SP],
-            augmented: ComparingState[Tuple[Any, SP], SP]) -> Tuple[Tuple[Any, SP], NP]:
+            augmented: ComparingState[Tuple[Any, SP], SP]) -> Tuple[Tuple[Any, SP], SP]:
         sampled_state = self.sampled_state(theta, augmented.current_state)
         _, trajectory = sampled_state
         return sampled_state, trajectory
