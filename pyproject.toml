@@ -26,11 +26,11 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = '>=3.8,<3.11'
-jax = '>=0.2'
+jax = '>=0.3'
 numpy = '>=1.22'
 scipy = '^1.4'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.18.5'
+tjax = '>=0.19.1'
 
 [tool.poetry.dev-dependencies]
 flake8 = '>=3.9'
