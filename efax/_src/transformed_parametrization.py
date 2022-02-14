@@ -5,13 +5,12 @@ from typing import Any, Generic, List, TypeVar
 from tjax import ComplexArray, RealArray, Shape
 
 from .expectation_parametrization import ExpectationParametrization
-from .natural_parametrization import NaturalParametrization
+from .natural_parametrization import EP, NaturalParametrization
 
 __all__: List[str] = []
 
 
-TEP = TypeVar('TEP', bound='TransformedExpectationParametrization[Any, Any, Any]')
-EP = TypeVar('EP', bound=ExpectationParametrization[Any])
+TEP = TypeVar('TEP', bound=ExpectationParametrization[Any])
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 Domain = TypeVar('Domain', bound=ComplexArray)
 

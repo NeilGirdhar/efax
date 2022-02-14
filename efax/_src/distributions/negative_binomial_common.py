@@ -7,12 +7,9 @@ from jax.scipy.special import gammaln
 from tjax import IntegralNumeric, RealArray, Shape
 
 from ..expectation_parametrization import ExpectationParametrization
-from ..natural_parametrization import NaturalParametrization
+from ..natural_parametrization import EP, NaturalParametrization
 
 __all__: List[str] = []
-
-
-EP = TypeVar('EP', bound='NBCommonEP[Any]')
 
 
 class NBCommonNP(NaturalParametrization[EP, RealArray], Generic[EP]):
