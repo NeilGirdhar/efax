@@ -36,7 +36,6 @@ tjax = '>=0.19.1'
 flake8 = '>=3.9'
 isort = '>=5.8'
 jupyter = '>=1'
-jupyter-client = '<=6.1.12'
 mypy = '>=0.930'
 pylint = '>=2.12'
 pyproject-flake8 = ">=0.0.1a2"
