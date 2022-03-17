@@ -40,7 +40,10 @@ class ShapedDistribution:
     def pdf(self, x: ComplexArray) -> RealArray:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
-            retval[i] = self.objects[i].pdf(x[i])
+            value = self.objects[i].pdf(x[i])
+            if i == ():
+                return value
+            retval[i] = value
         return retval
 
     def entropy(self) -> RealArray:
