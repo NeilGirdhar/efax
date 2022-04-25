@@ -41,7 +41,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
     # New methods ----------------------------------------------------------------------------------
     def pdf(self, z: ComplexArray, out: None = None) -> np.floating[Any]:
-        zr = np.concatenate([z.real, z.imag], axis=-1)
+        zr = np.concatenate([z.real, z.imag], axis=-1)  # pyright: ignore
         return self.as_multivariate_normal().pdf(zr)
 
     def rvs(self, size: ShapeLike = (), random_state: Optional[Generator] = None) -> ComplexArray:
@@ -65,17 +65,17 @@ class ScipyComplexMultivariateNormalUnvectorized:
     # Private methods ------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> RealArray:
         "Return the mean of a corresponding real distribution with double the size."
-        return np.concatenate([self.mean.real, self.mean.imag])
+        return np.concatenate([self.mean.real, self.mean.imag])  # pyright: ignore
 
     def _multivariate_normal_cov(self) -> RealArray:
         "Return the covariance of a corresponding real distribution with double the size."
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
-        xx = 0.5 * cov_sum.real
-        xy = 0.5 * -cov_diff.imag
-        yx = 0.5 * cov_sum.imag
-        yy = 0.5 * cov_diff.real
-        return np.block([[xx, xy], [yx, yy]])
+        xx = 0.5 * cov_sum.real  # pyright: ignore
+        xy = 0.5 * -cov_diff.imag  # pyright: ignore
+        yx = 0.5 * cov_sum.imag  # pyright: ignore
+        yy = 0.5 * cov_diff.real  # pyright: ignore
+        return np.block([[xx, xy], [yx, yy]])  # pyright: ignore
 
 
 class ScipyComplexMultivariateNormal(ShapedDistribution):
@@ -104,7 +104,7 @@ class ScipyComplexMultivariateNormal(ShapedDistribution):
         if mean is None:
             mean = np.zeros(shape + (dimensions,), dtype=dtype)
         if variance is None:
-            variance = np.array(np.tile(np.eye(dimensions), shape + (1, 1)).real)
+            variance = np.array(np.tile(np.eye(dimensions), shape + (1, 1)))
         if pseudo_variance is None:
             pseudo_variance = np.zeros(shape + (dimensions, dimensions), dtype=dtype)
 

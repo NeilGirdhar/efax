@@ -12,7 +12,7 @@ __all__: List[str] = []
 
 
 def np_abs_square(x: ComplexNumeric) -> RealNumeric:
-    return np.square(x.real) + np.square(x.imag)  # type: ignore[pyright]
+    return np.square(x.real) + np.square(x.imag)  # pyright: ignore
 
 
 def parameters_dot_product(x: NaturalParametrization[Any, Any], y: Any) -> RealArray:

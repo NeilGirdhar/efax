@@ -27,7 +27,7 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
 
     def log_normalizer(self) -> RealArray:
         _, s, mu = self._r_s_mu()
-        det_s = s.real
+        det_s = s
         det_h = -self.precision
         return (-abs_square(mu) * self.precision
                 - (jnp.square(mu) * self.pseudo_precision).real

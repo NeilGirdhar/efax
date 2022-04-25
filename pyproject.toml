@@ -87,17 +87,26 @@ ignore-imports = 'yes'
 [tool.pyright]
 stubPath = ""
 reportMissingSuperCall = true
+reportUnnecessaryTypeIgnoreComment = true
 
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'
+check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
 disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
+no_implicit_optional = true
+pretty = true
 show_error_codes = true
+show_error_context = true
+strict_equality = true
+warn_redundant_casts = true
+# warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',

@@ -77,7 +77,8 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
     # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> BetaNP:
         reshaped_n = n[..., np.newaxis]
-        return BetaNP(reshaped_n * jnp.stack([self.probability, (1.0 - self.probability)], axis=-1))
+        return BetaNP(reshaped_n * jnp.stack(  # pyright: ignore
+                                             [self.probability, (1.0 - self.probability)], axis=-1))
 
     def conjugate_prior_observation(self) -> RealArray:
         return self.probability

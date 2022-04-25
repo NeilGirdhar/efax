@@ -116,7 +116,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     @final
     def jeffreys_prior(self) -> RealArray:
-        fisher_matrix = self._fisher_information_matrix(len(self.shape)).real
+        fisher_matrix = self._fisher_information_matrix(len(self.shape))
         return jnp.sqrt(jnp.linalg.det(fisher_matrix))
 
     @jit

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, List
+from typing import Any, List, Optional, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -26,7 +26,9 @@ class ShapedDistribution:
         self.real_dtype: np.dtype[Any] = np.zeros(0, dtype=rvs_dtype).real.dtype
         self.objects = objects
 
-    def rvs(self, size: Shape = None, random_state: Generator = None) -> RealArray:
+    def rvs(self,
+            size: Union[None, int, Shape] = None,
+            random_state: Optional[Generator] = None) -> RealArray:
         if size is None:
             size = ()
         elif isinstance(size, int):

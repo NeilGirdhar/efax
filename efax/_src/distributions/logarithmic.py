@@ -67,7 +67,8 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
         return self._natural_gradient(self.search_to_natural(search_parameters)).log_probability
 
     # Overridden methods ---------------------------------------------------------------------------
-    def to_nat(self) -> LogarithmicNP:
+    # This type error will be fixed by https://github.com/NeilGirdhar/jax/tree/jit_annotation
+    def to_nat(self) -> LogarithmicNP:  # type: ignore[override]
         z = super().to_nat()
         return LogarithmicNP(jnp.where(self.chi < 1.0,
                                        jnp.nan,
