@@ -36,7 +36,7 @@ class ScipyComplexNormalUnvectorized:
 
     # New methods ----------------------------------------------------------------------------------
     def pdf(self, z: ComplexNumeric, out: None = None) -> RealNumeric:
-        zr = np.stack([z.real, z.imag], axis=-1)  # pyright: ignore
+        zr = np.stack([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
     def rvs(self, size: ShapeLike = (), random_state: Optional[Generator] = None) -> ComplexArray:
@@ -59,15 +59,15 @@ class ScipyComplexNormalUnvectorized:
 
     # Private methods ------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> RealArray:
-        return np.stack([self.mean.real, self.mean.imag], axis=-1)  # pyright: ignore
+        return np.stack([self.mean.real, self.mean.imag], axis=-1)
 
     def _multivariate_normal_cov(self) -> RealArray:
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
-        xx = 0.5 * cov_sum.real  # pyright: ignore
-        xy = 0.5 * -cov_diff.imag  # pyright: ignore
-        yx = 0.5 * cov_sum.imag  # pyright: ignore
-        yy = 0.5 * cov_diff.real  # pyright: ignore
+        xx = 0.5 * cov_sum.real
+        xy = 0.5 * -cov_diff.imag
+        yx = 0.5 * cov_sum.imag
+        yy = 0.5 * cov_diff.real
         xx_xy = np.stack([xx, xy], axis=-1)
         yx_yy = np.stack([yx, yy], axis=-1)
         return np.stack([xx_xy, yx_yy], axis=-2)

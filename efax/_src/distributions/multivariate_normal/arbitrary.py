@@ -34,13 +34,14 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP', RealAr
         eta = self.mean_times_precision
         k = eta.shape[-1]
         h_inv = jnp.linalg.inv(self.negative_half_precision)
-        a = jnp.einsum("...i,...ij,...j", eta, h_inv, eta)
+        a: RealArray = jnp.einsum("...i,...ij,...j", eta, h_inv, eta)  # pyright: ignore
         _, ld = jnp.linalg.slogdet(-self.negative_half_precision)
         return -0.25 * a - 0.5 * ld + 0.5 * k * jnp.log(np.pi)
 
     def to_exp(self) -> MultivariateNormalEP:
         h_inv = jnp.linalg.inv(self.negative_half_precision)
-        h_inv_times_eta = jnp.einsum("...ij,...j->...i", h_inv, self.mean_times_precision)
+        h_inv_times_eta: RealArray = jnp.einsum(
+            "...ij,...j->...i", h_inv, self.mean_times_precision)  # pyright: ignore
         mean = -0.5 * h_inv_times_eta
         second_moment = 0.25 * _broadcasted_outer(h_inv_times_eta) - 0.5 * h_inv
         return MultivariateNormalEP(mean, second_moment)
