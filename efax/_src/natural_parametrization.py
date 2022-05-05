@@ -11,7 +11,11 @@ from tjax import ComplexArray, RealArray, jit
 from .parametrization import Parametrization
 from .tools import parameters_dot_product
 
+if TYPE_CHECKING:
+    from .expectation_parametrization import ExpectationParametrization
+
 __all__ = ['NaturalParametrization']
+
 
 EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
 Domain = TypeVar('Domain', bound=ComplexArray)
@@ -147,11 +151,3 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         for _ in range(len_shape):
             fisher_info_f = vmap(fisher_info_f)
         return fisher_info_f(self.flattened(), **self.fixed_parameters_mapping())
-
-
-if TYPE_CHECKING:
-    from .expectation_parametrization import ExpectationParametrization
-
-    # Prevent autoflake from removing imports.
-    # pylint: disable=pointless-statement
-    ExpectationParametrization, Any
