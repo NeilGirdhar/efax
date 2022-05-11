@@ -48,3 +48,4 @@ def distribution_info(request: Any) -> Optional[DistributionInfo[Any, Any, Any]]
     if distribution_name is None or info_name == distribution_name:
         return request.param
     pytest.skip(f"Deselected {info_name}")
+    return None
