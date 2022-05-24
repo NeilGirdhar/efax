@@ -55,3 +55,21 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         return (-parameters_dot_product(q, self)
                 + q.log_normalizer()
                 - self.expected_carrier_measure())
+
+    @jit
+    @final
+    def entropy(self) -> RealArray:
+        """
+        Returns: The Shannon entropy.  This can be quite slow since it depends on a conversion to
+            natural parameters.
+        """
+        return self.cross_entropy(self.to_nat())
+
+    @jit
+    @final
+    def kl_divergence(self, q: NP) -> RealArray:
+        """
+        Returns: The Kullback–Leibler divergence.  This can be quite slow since it depends on a
+            conversion to natural parameters.
+        """
+        return self.cross_entropy(q) - self.entropy()
