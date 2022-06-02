@@ -71,7 +71,6 @@ disable = [
     'invalid-unary-operand-type',
     'missing-docstring',
     'no-member',
-    'no-self-use',
     'unused-argument']
 enable= [
     'useless-suppression',

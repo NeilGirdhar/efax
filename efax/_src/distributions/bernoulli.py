@@ -43,7 +43,7 @@ class BernoulliNP(NaturalParametrization['BernoulliEP', RealArray]):
     def nat_to_probability(self) -> RealArray:
         p = jss.expit(self.log_odds)
         final_p = 1.0 - p
-        return jnp.stack([p, final_p], axis=-1)
+        return jnp.stack([p, final_p], axis=-1)  # pyright: ignore
 
     def nat_to_surprisal(self) -> RealArray:
         total_p = self.nat_to_probability()

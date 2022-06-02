@@ -79,10 +79,11 @@ def test_maximum_likelihood_estimation(generator: Generator,
         rtol = 2e-2
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
     nat_parameters = exp_parameters.to_nat()
-    scipy_distribution = distribution_info.exp_to_scipy_distribution(exp_parameters)
+    scipy_distribution = distribution_info.exp_to_scipy_distribution(
+        exp_parameters)  # pyright: ignore
     x = scipy_distribution.rvs(random_state=generator, size=70000)
     my_x = distribution_info.scipy_to_exp_family_observation(x)
-    sufficient_stats = nat_parameters.sufficient_statistics(my_x)
+    sufficient_stats = nat_parameters.sufficient_statistics(my_x)  # pyright: ignore
 
     calculated_parameters = tree_map(partial(np.mean, axis=0), sufficient_stats)
 
