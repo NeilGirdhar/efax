@@ -75,7 +75,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
         xy = 0.5 * -cov_diff.imag
         yx = 0.5 * cov_sum.imag
         yy = 0.5 * cov_diff.real
-        return np.block([[xx, xy], [yx, yy]])
+        return np.block([[xx, xy], [yx, yy]])  # pyright: ignore
 
 
 class ScipyComplexMultivariateNormal(ShapedDistribution):
