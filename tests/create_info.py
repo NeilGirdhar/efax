@@ -12,7 +12,8 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
                   GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP, IsotropicNormalNP,
                   LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
-                  MultivariateDiagonalNormalNP, MultivariateNormalEP, MultivariateUnitNormalEP,
+                  MultivariateDiagonalNormalNP, MultivariateFixedVarianceNormalEP,
+                  MultivariateFixedVarianceNormalNP, MultivariateNormalEP, MultivariateUnitNormalEP,
                   MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
                   NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
                   ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
@@ -116,6 +117,27 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP, RealArray]):
         mean = rng.normal(scale=4.0, size=shape)
         variance = rng.exponential(size=shape)
         return NormalEP(mean, mean ** 2 + variance)
+
+
+class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVarianceNormalNP,
+                                                           MultivariateFixedVarianceNormalEP,
+                                                           RealArray]):
+    def __init__(self, dimensions: int, variance: float):
+        super().__init__()
+        self.dimensions = dimensions
+        self.variance = variance
+
+    def exp_to_scipy_distribution(self, p: MultivariateFixedVarianceNormalEP) -> Any:
+        cov = np.tile(np.eye(p.dimensions()), p.shape + (1, 1))
+        for i in np.ndindex(*p.shape):
+            cov[i] *= p.variance[i]
+        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=cov)
+
+    def exp_parameter_generator(self, rng: Generator, shape: Shape
+                                ) -> MultivariateFixedVarianceNormalEP:
+        variance = self.variance * jnp.ones(shape)
+        return MultivariateFixedVarianceNormalEP(rng.normal(size=(*shape, self.dimensions)),
+                                                 variance=variance)
 
 
 class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
@@ -363,11 +385,14 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
                                                          weibull]
 
     # Multivariate normal
+    multivariate_fixed_variance_normal = MultivariateFixedVarianceNormalInfo(dimensions=5,
+                                                                             variance=3.0)
     multivariate_unit_normal = MultivariateUnitNormalInfo(dimensions=5)
     isotropic_normal = IsotropicNormalInfo(dimensions=4)
     diagonal_normal = MultivariateDiagonalNormalInfo(dimensions=4)
     multivariate_normal = MultivariateNormalInfo(dimensions=4)
-    mvn: List[DistributionInfo[Any, Any, Any]] = [multivariate_unit_normal, isotropic_normal,
+    mvn: List[DistributionInfo[Any, Any, Any]] = [multivariate_fixed_variance_normal,
+                                                  multivariate_unit_normal, isotropic_normal,
                                                   diagonal_normal, multivariate_normal]
 
     return discrete + continuous + mvn

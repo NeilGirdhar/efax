@@ -130,7 +130,8 @@ EFAX supports the following distributions:
     - with arbitrary variance
     - with diagonal variance
     - with isotropic variance
-    - with unit variance
+    - with fixed variance
+    - with fixed unit variance
 
   - multivariate complex
 

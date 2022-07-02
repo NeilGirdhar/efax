@@ -15,8 +15,8 @@ from efax import Samplable
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
                           ComplexNormalInfo, GammaInfo, IsotropicNormalInfo,
-                          MultivariateDiagonalNormalInfo, MultivariateNormalInfo,
-                          MultivariateUnitNormalInfo, PoissonInfo)
+                          MultivariateDiagonalNormalInfo, MultivariateFixedVarianceNormalInfo,
+                          MultivariateNormalInfo, MultivariateUnitNormalInfo, PoissonInfo)
 from .distribution_info import DistributionInfo
 
 
@@ -39,7 +39,9 @@ def test_maximum_likelihood_estimation(generator: NumpyGenerator,
             else 1e-1
             if isinstance(distribution_info, (ComplexNormalInfo, ComplexMultivariateUnitNormalInfo,
                                               MultivariateDiagonalNormalInfo,
-                                              MultivariateNormalInfo, MultivariateUnitNormalInfo))
+                                              MultivariateNormalInfo,
+                                              MultivariateFixedVarianceNormalInfo,
+                                              MultivariateUnitNormalInfo))
             else 1e-2
             if isinstance(distribution_info, PoissonInfo)
             else 1e-6)
