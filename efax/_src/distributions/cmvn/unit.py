@@ -38,9 +38,8 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
         return self.two_mean_conjugate.shape[:-1]
 
     def log_normalizer(self) -> RealArray:
-        num_parameters = self.two_mean_conjugate.shape[-1]
         mean_conjugate = self.two_mean_conjugate * 0.5
-        return jnp.sum(abs_square(mean_conjugate), axis=-1) + num_parameters * math.log(math.pi)
+        return jnp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
 
     def to_exp(self) -> ComplexMultivariateUnitNormalEP:
         return ComplexMultivariateUnitNormalEP(self.two_mean_conjugate.conjugate() * 0.5)
@@ -77,9 +76,8 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
         return ComplexMultivariateUnitNormalNP(self.mean.conjugate() * 2.0)
 
     def expected_carrier_measure(self) -> RealArray:
-        num_parameters = self.mean.shape[-1]
         # The second moment of a normal distribution with the given mean.
-        return -(jnp.sum(abs_square(self.mean), axis=-1) + num_parameters)
+        return -(jnp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> ComplexArray:
         if shape is not None:

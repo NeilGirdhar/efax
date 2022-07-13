@@ -50,7 +50,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Samplabl
         if shape is not None:
             shape += self.shape
         return one_hot(jax.random.categorical(rng.key, self.log_odds, shape=shape),
-                       self.log_odds.shape[-1])
+                       self.dimensions())
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:

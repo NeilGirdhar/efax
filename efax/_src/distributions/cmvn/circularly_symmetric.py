@@ -43,9 +43,8 @@ class ComplexCircularlySymmetricNormalNP(
         return self.negative_precision.shape[:-2]
 
     def log_normalizer(self) -> RealArray:
-        num_parameters = self.negative_precision.shape[-1]
         log_det_s = jnp.log(jnp.linalg.det(-self.negative_precision).real)
-        return -log_det_s + num_parameters * math.log(math.pi)
+        return -log_det_s + self.dimensions() * math.log(math.pi)
 
     def to_exp(self) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(

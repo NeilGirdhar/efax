@@ -33,7 +33,7 @@ class DirichletCommonNP(NaturalParametrization[EP, RealArray], Samplable, Generi
     def log_normalizer(self) -> RealArray:
         q = self.alpha_minus_one
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
-                - jss.gammaln(jnp.sum(q, axis=-1) + q.shape[-1]))
+                - jss.gammaln(jnp.sum(q, axis=-1) + self.dimensions()))
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:

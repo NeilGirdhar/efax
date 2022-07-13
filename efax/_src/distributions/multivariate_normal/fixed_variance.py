@@ -34,9 +34,8 @@ class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixe
 
     def log_normalizer(self) -> RealArray:
         eta = self.mean_times_precision
-        num_parameters = self.mean_times_precision.shape[-1]
         return 0.5 * (jnp.sum(jnp.square(eta), axis=-1) * self.variance
-                      + num_parameters * jnp.log(math.pi * 2.0 * self.variance))
+                      + self.dimensions() * jnp.log(math.pi * 2.0 * self.variance))
 
     def to_exp(self) -> MultivariateFixedVarianceNormalEP:
         return MultivariateFixedVarianceNormalEP(
@@ -79,8 +78,7 @@ class MultivariateFixedVarianceNormalEP(HasConjugatePrior[MultivariateFixedVaria
                                                  variance=self.variance)
 
     def expected_carrier_measure(self) -> RealArray:
-        num_parameters = self.mean.shape[-1]
-        return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) / self.variance + num_parameters)
+        return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) / self.variance + self.dimensions())
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         if shape is not None:

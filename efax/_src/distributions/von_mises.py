@@ -26,7 +26,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
         return self.mean_times_concentration.shape[:-1]
 
     def log_normalizer(self) -> RealArray:
-        half_k = self.mean_times_concentration.shape[-1] * 0.5
+        half_k = self.dimensions() * 0.5
         kappa = jnp.linalg.norm(self.mean_times_concentration, 2, axis=-1)
         return (kappa
                 - (half_k - 1.0) * jnp.log(kappa)
@@ -39,7 +39,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
         return VonMisesFisherEP(
             jnp.where(kappa == 0.0,
                       q,
-                      q * (_a_k(q.shape[-1], kappa) / kappa)))
+                      q * (_a_k(self.dimensions(), kappa) / kappa)))
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         return jnp.zeros(self.shape)
@@ -52,7 +52,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
         return self.mean_times_concentration.shape[-1]
 
     def to_kappa_angle(self) -> Tuple[RealArray, RealArray]:
-        if self.mean_times_concentration.shape[-1] != 2:
+        if self.dimensions() != 2:
             raise ValueError
         kappa = jnp.linalg.norm(self.mean_times_concentration, axis=-1)
         angle = jnp.where(kappa == 0.0,
@@ -79,12 +79,11 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
         return jnp.zeros(self.shape)
 
     def initial_search_parameters(self) -> RealArray:
-        k = self.mean.shape[-1]
         mu = jnp.linalg.norm(self.mean, 2, axis=-1)
         # 0 <= mu <= 1.0
         initial_kappa = jnp.where(mu == 1.0,
                                   jnp.inf,
-                                  (mu * k - mu ** 3) / (1.0 - mu ** 2))
+                                  (mu * self.dimensions() - mu ** 3) / (1.0 - mu ** 2))
         return inverse_softplus(initial_kappa)
 
     def search_to_natural(self, search_parameters: RealArray) -> VonMisesFisherNP:
@@ -94,10 +93,9 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
         return VonMisesFisherNP(q)
 
     def search_gradient(self, search_parameters: RealArray) -> RealArray:
-        k = self.mean.shape[-1]
         kappa = softplus(search_parameters)
         mu = jnp.linalg.norm(self.mean, 2, axis=-1)
-        return _a_k(k, kappa) - mu
+        return _a_k(self.dimensions(), kappa) - mu
 
     # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:

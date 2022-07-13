@@ -31,9 +31,8 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
         return self.mean.shape[:-1]
 
     def log_normalizer(self) -> RealArray:
-        num_parameters = self.mean.shape[-1]
         return 0.5 * (jnp.sum(jnp.square(self.mean), axis=-1)
-                      + num_parameters * math.log(math.pi * 2.0))
+                      + self.dimensions() * math.log(math.pi * 2.0))
 
     def to_exp(self) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(self.mean)
@@ -74,9 +73,8 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
         return MultivariateUnitNormalNP(self.mean)
 
     def expected_carrier_measure(self) -> RealArray:
-        num_parameters = self.mean.shape[-1]
         # The second moment of a normal distribution with the given mean.
-        return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + num_parameters)
+        return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + self.dimensions())
 
     def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
         return self.to_nat().sample(rng, shape)
