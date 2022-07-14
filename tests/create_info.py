@@ -50,7 +50,7 @@ def generate_complex_covariance(rng: Generator, dimensions: int) -> ComplexArray
         return x
     y = generate_real_covariance(rng, dimensions)
     w = x + 1j * y
-    return w @ (w.conjugate().T)
+    return w @ (w.conjugate().T)  # type: ignore[return-value]
 
 
 def vectorized_complex_covariance(rng: Generator, shape: Shape, dimensions: int) -> ComplexArray:

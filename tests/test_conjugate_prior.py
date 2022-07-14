@@ -2,7 +2,6 @@ from typing import Any
 
 import jax.numpy as jnp
 import numpy as np
-import pytest
 from jax import grad, vmap
 from jax.tree_util import tree_map
 from numpy.random import Generator
@@ -14,7 +13,7 @@ from .distribution_info import DistributionInfo
 
 
 def test_conjugate_prior(generator: Generator,
-                         distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+                         cp_distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """
     Test that the conjugate prior actually matches the distribution.
     """
@@ -22,10 +21,8 @@ def test_conjugate_prior(generator: Generator,
     n = 100.0 * np.ones(shape)
 
     # Choose a random distribution.
-    p = distribution_info.exp_parameter_generator(generator, shape=shape)
-
-    if not isinstance(p, HasConjugatePrior):
-        pytest.skip("")
+    p = cp_distribution_info.exp_parameter_generator(generator, shape=shape)
+    assert isinstance(p, HasConjugatePrior)
 
     # Find its conjugate prior at that point with many observations.
     cp_q = p.conjugate_prior_distribution(n)

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Generic, TypeVar
+from typing import Any, Callable, Generic, Type, TypeVar
 
-from numpy.random import Generator
+from numpy.random import Generator, default_rng
 from tjax import ComplexArray, Shape
 
 from efax import ExpectationParametrization, NaturalParametrization
@@ -51,6 +51,12 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         Returns: The observation that's expected by the exponential family.
         """
         return x
+
+    def exp_class(self) -> Type[EP]:
+        return type(self.exp_parameter_generator(default_rng(), ()))
+
+    def nat_class(self) -> Type[NP]:
+        return type(self.nat_parameter_generator(default_rng(), ()))
 
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls, **kwargs: Any) -> None:
