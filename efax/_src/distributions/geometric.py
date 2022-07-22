@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
-
 import jax.numpy as jnp
 from tjax import RealArray
 from tjax.dataclasses import dataclass
@@ -35,7 +33,7 @@ class GeometricEP(NBCommonEP[GeometricNP]):
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[GeometricNP]:
+    def natural_parametrization_cls(cls) -> type[GeometricNP]:
         return GeometricNP
 
     def to_nat(self) -> GeometricNP:

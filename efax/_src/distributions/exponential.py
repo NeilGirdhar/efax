@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 from tjax import Generator, RealArray, Shape
@@ -37,7 +35,7 @@ class ExponentialNP(NaturalParametrization['ExponentialEP', RealArray], Samplabl
     def sufficient_statistics(self, x: RealArray) -> ExponentialEP:
         return ExponentialEP(x)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
@@ -55,7 +53,7 @@ class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
         return self.mean.shape
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[ExponentialNP]:
+    def natural_parametrization_cls(cls) -> type[ExponentialNP]:
         return ExponentialNP
 
     def to_nat(self) -> ExponentialNP:
@@ -64,7 +62,7 @@ class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:

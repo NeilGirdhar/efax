@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -56,7 +55,7 @@ class ComplexCircularlySymmetricNormalNP(
     def sufficient_statistics(self, x: ComplexArray) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(_broadcasted_outer_c(x))
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> ComplexArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
         return self.to_exp().sample(rng, shape)
 
     # New methods ----------------------------------------------------------------------------------
@@ -75,7 +74,7 @@ class ComplexCircularlySymmetricNormalEP(
         return self.variance.shape[:-2]
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[ComplexCircularlySymmetricNormalNP]:
+    def natural_parametrization_cls(cls) -> type[ComplexCircularlySymmetricNormalNP]:
         return ComplexCircularlySymmetricNormalNP
 
     def to_nat(self) -> ComplexCircularlySymmetricNormalNP:
@@ -85,7 +84,7 @@ class ComplexCircularlySymmetricNormalEP(
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> ComplexArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
         if shape is not None:
             shape += self.variance.shape[:-1]
         else:

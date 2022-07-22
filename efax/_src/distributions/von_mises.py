@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Tuple, Type
 
 import jax.numpy as jnp
 from jax.nn import softplus
@@ -51,7 +50,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
     def dimensions(self) -> int:
         return self.mean_times_concentration.shape[-1]
 
-    def to_kappa_angle(self) -> Tuple[RealArray, RealArray]:
+    def to_kappa_angle(self) -> tuple[RealArray, RealArray]:
         if self.dimensions() != 2:
             raise ValueError
         kappa = jnp.linalg.norm(self.mean_times_concentration, axis=-1)
@@ -72,7 +71,7 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
         return self.mean.shape[:-1]
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[VonMisesFisherNP]:
+    def natural_parametrization_cls(cls) -> type[VonMisesFisherNP]:
         return VonMisesFisherNP
 
     def expected_carrier_measure(self) -> RealArray:

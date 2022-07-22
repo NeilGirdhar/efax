@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -46,7 +44,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Samplabl
     def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
         return MultinomialEP(x)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         return one_hot(jax.random.categorical(rng.key, self.log_odds, shape=shape),
@@ -79,7 +77,7 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
         return self.probability.shape[:-1]
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[MultinomialNP]:
+    def natural_parametrization_cls(cls) -> type[MultinomialNP]:
         return MultinomialNP
 
     def to_nat(self) -> MultinomialNP:

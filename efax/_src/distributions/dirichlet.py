@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
-
 import jax.numpy as jnp
 from tjax import RealArray
 from tjax.dataclasses import dataclass
@@ -29,7 +27,7 @@ class DirichletNP(DirichletCommonNP['DirichletEP']):
 class DirichletEP(DirichletCommonEP[DirichletNP]):
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[DirichletNP]:
+    def natural_parametrization_cls(cls) -> type[DirichletNP]:
         return DirichletNP
 
     def search_to_natural(self, search_parameters: RealArray) -> DirichletNP:

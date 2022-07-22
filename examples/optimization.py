@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import jax.numpy as jnp
 from jax import grad, jit, lax
 from jax.tree_util import tree_map, tree_reduce

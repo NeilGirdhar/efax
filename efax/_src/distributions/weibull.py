@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 from tjax import Generator, RealArray, Shape
@@ -51,7 +49,7 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
         return self.chi.shape
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[WeibullNP]:
+    def natural_parametrization_cls(cls) -> type[WeibullNP]:
         return WeibullNP
 
     def to_nat(self) -> WeibullNP:
@@ -62,7 +60,7 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
         lambda_ = self.chi ** (1.0 / k)
         return (k - 1.0) * jnp.log(lambda_) - jnp.euler_gamma * (1.0 - 1.0 / k)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:

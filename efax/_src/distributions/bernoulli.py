@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -60,7 +58,7 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
         return self.probability.shape
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[BernoulliNP]:
+    def natural_parametrization_cls(cls) -> type[BernoulliNP]:
         return BernoulliNP
 
     def to_nat(self) -> BernoulliNP:
@@ -69,7 +67,7 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> BooleanArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> BooleanArray:
         if shape is not None:
             shape += self.shape
         return jax.random.bernoulli(rng.key, self.probability, shape)  # type: ignore[return-value]

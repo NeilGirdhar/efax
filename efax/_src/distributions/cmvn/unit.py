@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -50,7 +49,7 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
     def sufficient_statistics(self, x: ComplexArray) -> ComplexMultivariateUnitNormalEP:
         return ComplexMultivariateUnitNormalEP(x)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> ComplexArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
         return self.to_exp().sample(rng, shape)
 
     # New methods ----------------------------------------------------------------------------------
@@ -69,7 +68,7 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
         return self.mean.shape[:-1]
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[ComplexMultivariateUnitNormalNP]:
+    def natural_parametrization_cls(cls) -> type[ComplexMultivariateUnitNormalNP]:
         return ComplexMultivariateUnitNormalNP
 
     def to_nat(self) -> ComplexMultivariateUnitNormalNP:
@@ -79,7 +78,7 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
         # The second moment of a normal distribution with the given mean.
         return -(jnp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> ComplexArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
         if shape is not None:
             shape += self.mean.shape
         else:

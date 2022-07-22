@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
-
 import jax.numpy as jnp
 from tjax import Array, RealArray
 from tjax.dataclasses import dataclass
@@ -41,7 +39,7 @@ class RayleighEP(TransformedExpectationParametrization[ExponentialEP, Exponentia
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[RayleighNP]:
+    def natural_parametrization_cls(cls) -> type[RayleighNP]:
         return RayleighNP
 
     def base_distribution(self) -> ExponentialEP:

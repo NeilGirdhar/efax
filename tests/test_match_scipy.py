@@ -1,6 +1,8 @@
 """
 These tests ensure that our distributions match scipy's.
 """
+from __future__ import annotations
+
 from functools import partial
 from typing import Any
 

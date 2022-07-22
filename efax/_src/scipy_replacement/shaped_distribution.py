@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, List, Optional, Union
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 from numpy.random import Generator
 from tjax import ComplexArray, RealArray, Shape
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class ShapedDistribution:
@@ -27,8 +27,8 @@ class ShapedDistribution:
         self.objects = objects
 
     def rvs(self,
-            size: Union[None, int, Shape] = None,
-            random_state: Optional[Generator] = None) -> RealArray:
+            size: None | int | Shape = None,
+            random_state: Generator | None = None) -> RealArray:
         if size is None:
             size = ()
         elif isinstance(size, int):

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 from tjax import Generator, RealArray, Shape
@@ -32,7 +30,7 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
     def carrier_measure(self, x: RealArray) -> RealArray:
         return jnp.zeros(x.shape)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         return jax.random.beta(rng.key,
@@ -45,7 +43,7 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
 class BetaEP(DirichletCommonEP[BetaNP]):
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[BetaNP]:
+    def natural_parametrization_cls(cls) -> type[BetaNP]:
         return BetaNP
 
     def search_to_natural(self, search_parameters: RealArray) -> BetaNP:

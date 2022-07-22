@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from functools import reduce
-from typing import TYPE_CHECKING, Any, Iterable, List
+from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
 import numpy as np
 from tensorflow_probability.substrates import jax as tfp
 from tjax import ComplexArray, ComplexNumeric, RealArray, RealNumeric
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 def np_abs_square(x: ComplexNumeric) -> RealNumeric:

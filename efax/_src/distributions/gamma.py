@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 from jax.nn import softplus
@@ -43,7 +41,7 @@ class GammaNP(NaturalParametrization['GammaEP', RealArray], Samplable):
     def sufficient_statistics(self, x: RealArray) -> GammaEP:
         return GammaEP(x, jnp.log(x))
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         return -jax.random.gamma(rng.key, self.shape_minus_one + 1.0, shape) / self.negative_rate
@@ -60,7 +58,7 @@ class GammaEP(ExpToNat[GammaNP, RealArray]):
         return self.mean.shape
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[GammaNP]:
+    def natural_parametrization_cls(cls) -> type[GammaNP]:
         return GammaNP
 
     def expected_carrier_measure(self) -> RealArray:

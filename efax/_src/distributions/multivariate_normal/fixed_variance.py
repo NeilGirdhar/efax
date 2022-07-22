@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -50,7 +49,7 @@ class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixe
         variance = jnp.broadcast_to(self.variance, shape)
         return MultivariateFixedVarianceNormalEP(x, variance=variance)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         return self.to_exp().sample(rng, shape)
 
     # New methods ----------------------------------------------------------------------------------
@@ -70,7 +69,7 @@ class MultivariateFixedVarianceNormalEP(HasConjugatePrior[MultivariateFixedVaria
         return self.mean.shape[:-1]
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[MultivariateFixedVarianceNormalNP]:
+    def natural_parametrization_cls(cls) -> type[MultivariateFixedVarianceNormalNP]:
         return MultivariateFixedVarianceNormalNP
 
     def to_nat(self) -> MultivariateFixedVarianceNormalNP:
@@ -80,7 +79,7 @@ class MultivariateFixedVarianceNormalEP(HasConjugatePrior[MultivariateFixedVaria
     def expected_carrier_measure(self) -> RealArray:
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) / self.variance + self.dimensions())
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:

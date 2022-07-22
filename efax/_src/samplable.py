@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 from tjax import Array, Generator, Shape
 
@@ -8,5 +8,5 @@ __all__ = ['Samplable']
 
 
 class Samplable(Parametrization):
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> Array:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> Array:
         raise NotImplementedError

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
-
 import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import Array, RealArray
@@ -39,7 +37,7 @@ class ChiEP(TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiN
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[ChiNP]:
+    def natural_parametrization_cls(cls) -> type[ChiNP]:
         return ChiNP
 
     def base_distribution(self) -> ChiSquareEP:

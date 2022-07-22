@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from numpy.random import Generator
@@ -44,7 +44,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
         zr = np.concatenate([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
-    def rvs(self, size: ShapeLike = (), random_state: Optional[Generator] = None) -> ComplexArray:
+    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> ComplexArray:
         if isinstance(size, int):
             size = (size,)
         if random_state is None:
@@ -83,9 +83,9 @@ class ScipyComplexMultivariateNormal(ShapedDistribution):
     This class allows distributions having a non-empty shape.
     """
     def __init__(self,
-                 mean: Optional[ComplexArray] = None,
-                 variance: Optional[ComplexArray] = None,
-                 pseudo_variance: Optional[ComplexArray] = None):
+                 mean: ComplexArray | None = None,
+                 variance: ComplexArray | None = None,
+                 pseudo_variance: ComplexArray | None = None):
         if mean is not None:
             shape = mean.shape[:-1]
             dimensions = mean.shape[-1]

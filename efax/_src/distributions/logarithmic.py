@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
-
 import jax.numpy as jnp
 from jax.nn import softplus
 from tjax import RealArray, Shape
@@ -51,7 +49,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
         return self.chi.shape
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[LogarithmicNP]:
+    def natural_parametrization_cls(cls) -> type[LogarithmicNP]:
         return LogarithmicNP
 
     # The expected_carrier_measure is unknown.

@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 import numpy as np
 import scipy.stats as ss
@@ -17,8 +17,8 @@ class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):
     https://github.com/scipy/scipy/issues/6006.
     """
     def rvs(self,
-            size: Optional[ShapeLike] = None,
-            random_state: Optional[Generator] = None) -> RealArray:
+            size: ShapeLike | None = None,
+            random_state: Generator | None = None) -> RealArray:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.

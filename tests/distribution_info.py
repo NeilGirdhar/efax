@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Generic, Type, TypeVar
+from collections.abc import Callable
+from typing import Any, Generic, TypeVar
 
 from numpy.random import Generator, default_rng
 from tjax import ComplexArray, Shape
@@ -52,10 +53,10 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return x
 
-    def exp_class(self) -> Type[EP]:
+    def exp_class(self) -> type[EP]:
         return type(self.exp_parameter_generator(default_rng(), ()))
 
-    def nat_class(self) -> Type[NP]:
+    def nat_class(self) -> type[NP]:
         return type(self.nat_parameter_generator(default_rng(), ()))
 
     # Magic methods --------------------------------------------------------------------------------

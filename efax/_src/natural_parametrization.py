@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from functools import partial
-from typing import TYPE_CHECKING, Any, Generic, Tuple, Type, TypeVar, final, get_type_hints
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
 
 import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
@@ -60,7 +60,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     # Final methods --------------------------------------------------------------------------------
     @classmethod
-    def expectation_parametrization_cls(cls) -> Type[EP]:
+    def expectation_parametrization_cls(cls) -> type[EP]:
         return get_type_hints(cls.to_exp)['return']
 
     @jit
@@ -126,7 +126,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     @jit
     @final
     def apply_fisher_information(self: NaturalParametrization[EP, Domain],
-                                 vector: EP) -> Tuple[EP, NaturalParametrization[EP, Domain]]:
+                                 vector: EP) -> tuple[EP, NaturalParametrization[EP, Domain]]:
         """
         Args:
             vector: Some set of expectation parameters.

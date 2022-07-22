@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, List, TypeVar
+from typing import Any, Generic, TypeVar
 
 import jax.numpy as jnp
 from jax.scipy.special import gammaln
@@ -9,7 +9,7 @@ from tjax import IntegralNumeric, RealArray, Shape
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import EP, NaturalParametrization
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 class NBCommonNP(NaturalParametrization[EP, RealArray], Generic[EP]):

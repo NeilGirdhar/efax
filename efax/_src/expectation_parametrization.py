@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, Type, TypeVar, final
+from typing import Any, Generic, TypeVar, final
 
 from tjax import RealArray, jit
 
@@ -25,7 +25,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
     """
     # Abstract methods -----------------------------------------------------------------------------
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[NP]:
+    def natural_parametrization_cls(cls) -> type[NP]:
         raise NotImplementedError
 
     def to_nat(self) -> NP:

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Tuple, Type
 
 import jax.numpy as jnp
 from tjax import ComplexArray, RealArray, Shape, abs_square
@@ -46,7 +45,7 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
     def sufficient_statistics(self, x: ComplexArray) -> ComplexNormalEP:
         return ComplexNormalEP(x, abs_square(x), jnp.square(x))
 
-    def _r_s_mu(self) -> Tuple[ComplexArray, RealArray, ComplexArray]:
+    def _r_s_mu(self) -> tuple[ComplexArray, RealArray, ComplexArray]:
         r = -self.pseudo_precision / self.precision
         s = 1.0 / ((abs_square(r) - 1.0) * self.precision)
         k = self.pseudo_precision / self.precision
@@ -67,7 +66,7 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
         return self.mean.shape
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[ComplexNormalNP]:
+    def natural_parametrization_cls(cls) -> type[ComplexNormalNP]:
         return ComplexNormalNP
 
     def to_nat(self) -> ComplexNormalNP:

@@ -1,4 +1,6 @@
-from typing import Any, List
+from __future__ import annotations
+
+from typing import Any
 
 import jax.numpy as jnp
 import numpy as np
@@ -354,7 +356,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, RealArray]):
         return WeibullNP(concentration, -rng.exponential(size=shape) - 1.0)
 
 
-def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
+def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     # pylint: disable=too-many-locals
     # Discrete
     bernoulli = BernoulliInfo()
@@ -362,7 +364,7 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     poisson = PoissonInfo()
     negative_binomial = NegativeBinomialInfo(3)
     logarithmic = LogarithmicInfo()
-    discrete: List[DistributionInfo[Any, Any, Any]] = [bernoulli, geometric, poisson,
+    discrete: list[DistributionInfo[Any, Any, Any]] = [bernoulli, geometric, poisson,
                                                        negative_binomial, logarithmic]
 
     # Continuous
@@ -379,7 +381,7 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
     weibull = WeibullInfo()
-    continuous: List[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn_unit, cmvn_cs,
+    continuous: list[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn_unit, cmvn_cs,
                                                          exponential, rayleigh, gamma, beta,
                                                          dirichlet, von_mises, chi_square, chi,
                                                          weibull]
@@ -391,7 +393,7 @@ def create_infos() -> List[DistributionInfo[Any, Any, Any]]:
     isotropic_normal = IsotropicNormalInfo(dimensions=4)
     diagonal_normal = MultivariateDiagonalNormalInfo(dimensions=4)
     multivariate_normal = MultivariateNormalInfo(dimensions=4)
-    mvn: List[DistributionInfo[Any, Any, Any]] = [multivariate_fixed_variance_normal,
+    mvn: list[DistributionInfo[Any, Any, Any]] = [multivariate_fixed_variance_normal,
                                                   multivariate_unit_normal, isotropic_normal,
                                                   diagonal_normal, multivariate_normal]
 

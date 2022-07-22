@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, List, Tuple, TypeVar
+from typing import Any, Generic, TypeVar
 
 import jax.numpy as jnp
 from jax import jit
@@ -12,7 +12,7 @@ from tjax.gradient import Adam, GradientTransformation
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
@@ -81,14 +81,14 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
 class ExpToNatIteratedFunction(
         # The generic parameters are: Parameters, State, Comparand, Differentiand, Trajectory.
         ComparingIteratedFunctionWithCombinator[ExpToNat[NP, SP],
-                                                Tuple[Any, SP],
+                                                tuple[Any, SP],
                                                 SP,
                                                 SP,
                                                 NP],
         Generic[NP, SP]):
     transform: GradientTransformation[Any, SP] = field()
 
-    def sampled_state(self, theta: ExpToNat[NP, SP], state: Tuple[Any, SP]) -> Tuple[Any, SP]:
+    def sampled_state(self, theta: ExpToNat[NP, SP], state: tuple[Any, SP]) -> tuple[Any, SP]:
         current_gt_state, search_parameters = state
         search_gradient = theta.search_gradient(search_parameters)
         transformed_gradient, new_gt_state = self.transform.update(search_gradient,
@@ -100,24 +100,24 @@ class ExpToNatIteratedFunction(
     def sampled_state_trajectory(
             self,
             theta: ExpToNat[NP, SP],
-            augmented: ComparingState[Tuple[Any, SP], SP]) -> Tuple[Tuple[Any, SP], SP]:
+            augmented: ComparingState[tuple[Any, SP], SP]) -> tuple[tuple[Any, SP], SP]:
         sampled_state = self.sampled_state(theta, augmented.current_state)
         _, trajectory = sampled_state
         return sampled_state, trajectory
 
-    def extract_comparand(self, state: Tuple[Any, SP]) -> SP:
+    def extract_comparand(self, state: tuple[Any, SP]) -> SP:
         _, search_parameters = state
         return search_parameters
 
     def extract_differentiand(self,
                               theta: ExpToNat[NP, SP],
-                              state: Tuple[Any, SP]) -> SP:
+                              state: tuple[Any, SP]) -> SP:
         _, search_parameters = state
         return search_parameters
 
     def implant_differentiand(self,
                               theta: ExpToNat[NP, SP],
-                              state: Tuple[Any, SP],
-                              differentiand: SP) -> Tuple[Any, SP]:
+                              state: tuple[Any, SP],
+                              differentiand: SP) -> tuple[Any, SP]:
         current_gt_state, _ = state
         return current_gt_state, differentiand

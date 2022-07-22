@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import fields
 from functools import partial, reduce
 from itertools import count
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Tuple, Type, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import jax.numpy as jnp
 from tjax import ComplexArray, RealArray, Shape, custom_jvp, jit
@@ -46,8 +47,8 @@ class Parametrization:
 
             method_jvp: Any = custom_jvp(method)
 
-            def ln_jvp(primals: Tuple[NaturalParametrization[Any, Any]],
-                       tangents: Tuple[NaturalParametrization[Any, Any]]) -> Tuple[RealArray,
+            def ln_jvp(primals: tuple[NaturalParametrization[Any, Any]],
+                       tangents: tuple[NaturalParametrization[Any, Any]]) -> tuple[RealArray,
                                                                                    RealArray]:
                 q, = primals
                 q_dot, = tangents
@@ -73,7 +74,7 @@ class Parametrization:
                        for name, value, support in self.parameters_name_value_support()))
 
     @classmethod
-    def unflattened(cls: Type[T], flattened: RealArray, **kwargs: Any) -> T:
+    def unflattened(cls: type[T], flattened: RealArray, **kwargs: Any) -> T:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
@@ -97,12 +98,12 @@ class Parametrization:
 
         return cls(**kwargs)
 
-    def fixed_parameters_mapping(self) -> Dict[str, Any]:
+    def fixed_parameters_mapping(self) -> dict[str, Any]:
         return {field.name: getattr(self, field.name)
                 for field in fields(self)
                 if field.metadata['fixed']}
 
-    def parameters_value_support(self) -> Iterable[Tuple[ComplexArray, Support]]:
+    def parameters_value_support(self) -> Iterable[tuple[ComplexArray, Support]]:
         """
         Returns: The value and support of each variable parameter.
         """
@@ -116,7 +117,7 @@ class Parametrization:
                 raise TypeError
             yield value, support
 
-    def parameters_name_value(self) -> Iterable[Tuple[str, ComplexArray]]:
+    def parameters_name_value(self) -> Iterable[tuple[str, ComplexArray]]:
         """
         Returns: The name and value of each variable parameter.
         """
@@ -128,7 +129,7 @@ class Parametrization:
                 continue
             yield name, value
 
-    def parameters_name_value_support(self) -> Iterable[Tuple[str, ComplexArray, Support]]:
+    def parameters_name_value_support(self) -> Iterable[tuple[str, ComplexArray, Support]]:
         """
         Returns: The name, value, and support of each variable parameter.
         """
@@ -144,7 +145,7 @@ class Parametrization:
             yield name, value, support
 
     @classmethod
-    def parameters_name_support(cls) -> Iterable[Tuple[str, Support]]:
+    def parameters_name_support(cls) -> Iterable[tuple[str, Support]]:
         """
         Returns: The name and support of each variable parameter.
         """

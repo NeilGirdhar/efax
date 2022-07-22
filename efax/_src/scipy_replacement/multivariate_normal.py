@@ -1,4 +1,6 @@
-from typing import Optional, Type, TypeVar
+from __future__ import annotations
+
+from typing import TypeVar
 
 import numpy as np
 import scipy.stats as ss
@@ -16,8 +18,8 @@ class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_f
     This class repairs multivariate_normal.  See https://github.com/scipy/scipy/issues/7689.
     """
     def rvs(self,
-            size: Optional[ShapeLike] = None,
-            random_state: Optional[Generator] = None) -> RealArray:
+            size: ShapeLike | None = None,
+            random_state: Generator | None = None) -> RealArray:
         retval = super().rvs(size=size, random_state=random_state)
         if size is None:
             size = ()
@@ -36,9 +38,9 @@ class ScipyMultivariateNormal(ShapedDistribution):
     This class allows distributions having a non-empty shape.
     """
     @classmethod
-    def from_mc(cls: Type[T],
-                mean: Optional[RealArray] = None,
-                cov: Optional[RealArray] = None) -> T:
+    def from_mc(cls: type[T],
+                mean: RealArray | None = None,
+                cov: RealArray | None = None) -> T:
         if mean is None and cov is None:
             mean = np.zeros(1)
         if mean is None:

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Optional, Type
 
 import jax
 import jax.numpy as jnp
@@ -44,7 +43,7 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
     def sufficient_statistics(self, x: RealArray) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:
@@ -66,7 +65,7 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
         return self.mean.shape[:-1]
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[MultivariateUnitNormalNP]:
+    def natural_parametrization_cls(cls) -> type[MultivariateUnitNormalNP]:
         return MultivariateUnitNormalNP
 
     def to_nat(self) -> MultivariateUnitNormalNP:
@@ -76,7 +75,7 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
         # The second moment of a normal distribution with the given mean.
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + self.dimensions())
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         return self.to_nat().sample(rng, shape)
 
     # New methods ----------------------------------------------------------------------------------

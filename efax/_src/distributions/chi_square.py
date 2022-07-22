@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
-
 import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import RealArray, Shape
@@ -49,7 +47,7 @@ class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[ChiSquareNP]:
+    def natural_parametrization_cls(cls) -> type[ChiSquareNP]:
         return ChiSquareNP
 
     @property

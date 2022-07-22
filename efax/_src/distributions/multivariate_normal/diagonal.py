@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -61,7 +59,7 @@ class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagon
         return self.mean.shape[:-1]
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[MultivariateDiagonalNormalNP]:
+    def natural_parametrization_cls(cls) -> type[MultivariateDiagonalNormalNP]:
         return MultivariateDiagonalNormalNP
 
     def to_nat(self) -> MultivariateDiagonalNormalNP:
@@ -70,7 +68,7 @@ class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagon
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         return self.to_variance_parametrization().sample(rng, shape)
 
     # New methods ----------------------------------------------------------------------------------
@@ -94,7 +92,7 @@ class MultivariateDiagonalNormalVP(Samplable):
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:

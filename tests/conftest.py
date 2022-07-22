@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import subprocess
-from typing import Any, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 
 import numpy as np
 import pytest
@@ -48,10 +51,9 @@ _all_infos = create_infos()
 
 @pytest.fixture(scope='session', params=_all_infos)
 def distribution_info(request: Any  # pylint: disable=inconsistent-return-statements
-                      ) -> Optional[DistributionInfo[Any, Any, Any]]:
-    distribution_name: Optional[str] = request.config.getoption('--distribution')
+                      ) -> DistributionInfo[Any, Any, Any] | None:
+    distribution_name: str | None = request.config.getoption('--distribution')
     info_name = type(request.param).__name__.removesuffix('Info')
-    print(info_name, distribution_name)
     if distribution_name is None or info_name == distribution_name:
         return request.param
     pytest.skip(f"Deselected {info_name}")

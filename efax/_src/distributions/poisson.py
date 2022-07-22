@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type
-
 import jax
 import jax.numpy as jnp
 from jax.scipy import special as jss
@@ -49,7 +47,7 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
         return self.mean.shape
 
     @classmethod
-    def natural_parametrization_cls(cls) -> Type[PoissonNP]:
+    def natural_parametrization_cls(cls) -> type[PoissonNP]:
         return PoissonNP
 
     def to_nat(self) -> PoissonNP:
@@ -58,7 +56,7 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
     # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of
     #   lambda ** k * log(k!) / k! = lambda ** k * log Gamma(k+1) / Gamma(k+1)
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:

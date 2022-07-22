@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import Any, Generic, TypeVar
 
 import jax
 import jax.numpy as jnp
@@ -14,7 +14,7 @@ from ..natural_parametrization import EP, NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..samplable import Samplable
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 # https://github.com/python/mypy/issues/10140
@@ -35,7 +35,7 @@ class DirichletCommonNP(NaturalParametrization[EP, RealArray], Samplable, Generi
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
                 - jss.gammaln(jnp.sum(q, axis=-1) + self.dimensions()))
 
-    def sample(self, rng: Generator, shape: Optional[Shape] = None) -> RealArray:
+    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         return jax.random.dirichlet(rng.key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
