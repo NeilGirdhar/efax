@@ -72,7 +72,6 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
             shape += self.shape
         return jax.random.bernoulli(rng.key, self.probability, shape)  # type: ignore[return-value]
 
-    # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> BetaNP:
         reshaped_n = n[..., np.newaxis]
         return BetaNP(reshaped_n * jnp.stack(  # pyright: ignore

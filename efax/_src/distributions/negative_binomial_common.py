@@ -46,10 +46,9 @@ class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
     def shape(self) -> Shape:
         return self.mean.shape
 
+    # def conjugate_prior_distribution(self, n: RealArray) -> BetaPrimeNP:
+    #     return BetaPrimeNP(n * self.failures * (self.mean, jnp.ones_like(self.mean)))
+
     # Private methods ------------------------------------------------------------------------------
     def _log_not_p(self) -> RealArray:
         return -jnp.log1p(self.failures / self.mean)
-
-    # Overridden methods ---------------------------------------------------------------------------
-    # def conjugate_prior_distribution(self, n: RealArray) -> BetaPrimeNP:
-    #     return BetaPrimeNP(n * self.failures * (self.mean, jnp.ones_like(self.mean)))

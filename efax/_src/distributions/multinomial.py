@@ -87,11 +87,6 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    # New methods ----------------------------------------------------------------------------------
-    def dimensions(self) -> int:
-        return self.probability.shape[-1]
-
-    # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> DirichletNP:
         reshaped_n = n[..., np.newaxis]
         final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
@@ -99,3 +94,7 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
 
     def conjugate_prior_observation(self) -> RealArray:
         return self.probability
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.probability.shape[-1]

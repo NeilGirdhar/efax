@@ -88,14 +88,13 @@ class MultivariateFixedVarianceNormalEP(HasConjugatePrior[MultivariateFixedVaria
         deviation = jnp.sqrt(variance)
         return jax.random.normal(rng.key, shape) * deviation + self.mean
 
-    # New methods ----------------------------------------------------------------------------------
-    def dimensions(self) -> int:
-        return self.mean.shape[-1]
-
-    # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
         negative_half_precision = -0.5 * n / self.variance
         return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
 
     def conjugate_prior_observation(self) -> RealArray:
         return self.mean
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]

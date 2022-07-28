@@ -87,14 +87,13 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
         b = jax.random.normal(rng.key, shape)
         return a + 1j * b + self.mean
 
-    # New methods ----------------------------------------------------------------------------------
-    def dimensions(self) -> int:
-        return self.mean.shape[-1]
-
-    # Overridden methods ---------------------------------------------------------------------------
     # def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
     #     negative_half_precision = -0.5 * n * jnp.ones(self.shape)
     #     return IsotropicNormalNP(n * self.mean, negative_half_precision)
     #
     # def conjugate_prior_observation(self) -> ComplexArray:
     #     return self.mean
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]

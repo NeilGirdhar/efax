@@ -69,7 +69,6 @@ class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
             shape = self.shape
         return jax.random.exponential(rng.key, shape) * self.mean
 
-    # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> GammaNP:
         return GammaNP(-n / self.mean, n)
 

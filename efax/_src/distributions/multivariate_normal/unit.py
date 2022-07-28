@@ -78,14 +78,13 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
     def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         return self.to_nat().sample(rng, shape)
 
-    # New methods ----------------------------------------------------------------------------------
-    def dimensions(self) -> int:
-        return self.mean.shape[-1]
-
-    # Overridden methods ---------------------------------------------------------------------------
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
         negative_half_precision = -0.5 * n * jnp.ones(self.shape)
         return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
 
     def conjugate_prior_observation(self) -> RealArray:
         return self.mean
+
+    # New methods ----------------------------------------------------------------------------------
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]
