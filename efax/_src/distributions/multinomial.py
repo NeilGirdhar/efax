@@ -8,12 +8,13 @@ from jax.scipy import special as jss
 from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..conjugate_prior import HasConjugatePrior
+from ..conjugate_prior import HasConjugatePrior, HasGeneralizedConjugatePrior
 from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..samplable import Samplable
 from .dirichlet import DirichletNP
+from .gen_dirichlet import GeneralizedDirichletNP
 
 __all__ = ['MultinomialNP', 'MultinomialEP']
 
@@ -70,7 +71,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
 
 
 @dataclass
-class MultinomialEP(HasConjugatePrior[MultinomialNP], Multidimensional):
+class MultinomialEP(HasGeneralizedConjugatePrior[MultinomialNP], Multidimensional):
     probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -93,6 +94,15 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP], Multidimensional):
         reshaped_n = n[..., np.newaxis]
         final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
         return DirichletNP(reshaped_n * jnp.append(self.probability, final_p, axis=-1))
+
+    def generalized_conjugate_prior_distribution(self, n: RealArray) -> GeneralizedDirichletNP:
+        final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
+        all_p = jnp.append(self.probability, final_p, axis=-1)
+        alpha = n * all_p
+        beta = n * (1.0 - all_p)
+        alpha_roll = jnp.roll(alpha, -1, axis=-1).at[..., -1].set(0.0)
+        gamma = -jnp.diff(beta, append=1.0) - alpha_roll
+        return GeneralizedDirichletNP(alpha - 1.0, gamma)
 
     def conjugate_prior_observation(self) -> RealArray:
         return self.probability
