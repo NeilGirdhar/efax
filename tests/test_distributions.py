@@ -8,7 +8,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose, zero_tangent_like
 
-from .create_info import BetaInfo, DirichletInfo, GammaInfo
+from .create_info import BetaInfo, DirichletInfo, GammaInfo, GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
 
 
@@ -20,7 +20,7 @@ def test_conversion(generator: Generator,
     atol = (5e-3
             if isinstance(distribution_info, (GammaInfo, BetaInfo))
             else 2e-2
-            if isinstance(distribution_info, DirichletInfo)
+            if isinstance(distribution_info, (DirichletInfo, GeneralizedDirichletInfo))
             else 1e-4)
 
     for _ in range(10):

@@ -6,7 +6,8 @@ from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP
                                  ComplexCircularlySymmetricNormalNP,
                                  ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP,
                                  ComplexNormalEP, ComplexNormalNP, DirichletEP, DirichletNP,
-                                 ExponentialEP, ExponentialNP, GammaEP, GammaNP, GeometricEP,
+                                 ExponentialEP, ExponentialNP, GammaEP, GammaNP,
+                                 GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP,
                                  GeometricNP, IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP,
                                  LogarithmicNP, MultinomialEP, MultinomialNP,
                                  MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
@@ -18,7 +19,8 @@ from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP
                                  PoissonEP, PoissonNP, RayleighEP, RayleighNP, VonMisesFisherEP,
                                  VonMisesFisherNP, WeibullEP, WeibullNP)
 from ._src.scipy_replacement import (ScipyComplexMultivariateNormal, ScipyComplexNormal,
-                                     ScipyDirichlet, ScipyMultivariateNormal, ScipyVonMises)
+                                     ScipyDirichlet, ScipyGeneralizedDirichlet,
+                                     ScipyMultivariateNormal, ScipyVonMises)
 
 __all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedConjugatePrior',
            'Multidimensional', 'NaturalParametrization', 'Samplable', 'ScalarSupport',
@@ -27,9 +29,10 @@ __all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedCon
            'ChiSquareNP', 'ComplexCircularlySymmetricNormalEP',
            'ComplexCircularlySymmetricNormalNP', 'ComplexMultivariateUnitNormalEP',
            'ComplexMultivariateUnitNormalNP', 'ComplexNormalEP', 'ComplexNormalNP', 'DirichletEP',
-           'DirichletNP', 'ExponentialEP', 'ExponentialNP', 'GammaEP', 'GammaNP', 'GeometricEP',
-           'GeometricNP', 'IsotropicNormalEP', 'IsotropicNormalNP', 'LogarithmicEP',
-           'LogarithmicNP', 'MultinomialEP', 'MultinomialNP', 'MultivariateDiagonalNormalEP',
+           'DirichletNP', 'ExponentialEP', 'ExponentialNP', 'GammaEP', 'GammaNP',
+           'GeneralizedDirichletEP', 'GeneralizedDirichletNP', 'GeometricEP', 'GeometricNP',
+           'IsotropicNormalEP', 'IsotropicNormalNP', 'LogarithmicEP', 'LogarithmicNP',
+           'MultinomialEP', 'MultinomialNP', 'MultivariateDiagonalNormalEP',
            'MultivariateDiagonalNormalNP', 'MultivariateDiagonalNormalVP',
            'MultivariateFixedVarianceNormalEP', 'MultivariateFixedVarianceNormalNP',
            'MultivariateNormalEP', 'MultivariateNormalNP', 'MultivariateNormalVP',
@@ -37,4 +40,4 @@ __all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedCon
            'NegativeBinomialNP', 'NormalEP', 'NormalNP', 'PoissonEP', 'PoissonNP', 'RayleighEP',
            'RayleighNP', 'VonMisesFisherEP', 'VonMisesFisherNP', 'WeibullEP', 'WeibullNP',
            'ScipyComplexMultivariateNormal', 'ScipyComplexNormal', 'ScipyDirichlet',
-           'ScipyMultivariateNormal', 'ScipyVonMises']
+           'ScipyGeneralizedDirichlet', 'ScipyMultivariateNormal', 'ScipyVonMises']

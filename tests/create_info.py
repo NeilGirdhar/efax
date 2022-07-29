@@ -12,15 +12,15 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,
                   ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP, ComplexNormalEP,
                   ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
-                  GammaNP, GeometricEP, GeometricNP, IsotropicNormalEP, IsotropicNormalNP,
-                  LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
-                  MultivariateDiagonalNormalNP, MultivariateFixedVarianceNormalEP,
-                  MultivariateFixedVarianceNormalNP, MultivariateNormalEP, MultivariateUnitNormalEP,
-                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
-                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
-                  ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
-                  ScipyMultivariateNormal, ScipyVonMises, VonMisesFisherEP, VonMisesFisherNP,
-                  WeibullEP, WeibullNP)
+                  GammaNP, GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
+                  IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP, LogarithmicNP,
+                  MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
+                  MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
+                  MultivariateNormalEP, MultivariateUnitNormalEP, MultivariateUnitNormalNP,
+                  NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP,
+                  RayleighEP, RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal,
+                  ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises,
+                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vectorized_triu
 
 from .distribution_info import DistributionInfo
@@ -312,6 +312,21 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, RealArray]):
         return x[..., : -1]
 
 
+class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, GeneralizedDirichletEP,
+                                                RealArray]):
+    def __init__(self, dimensions: int):
+        super().__init__()
+        self.dimensions = dimensions
+
+    def nat_to_scipy_distribution(self, q: GeneralizedDirichletNP) -> Any:
+        return ScipyGeneralizedDirichlet(*q.alpha_beta())
+
+    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> GeneralizedDirichletNP:
+        alpha_minus_one = dirichlet_parameter_generator(self.dimensions, rng, shape)
+        gamma = dirichlet_parameter_generator(self.dimensions, rng, shape) + 1.0
+        return GeneralizedDirichletNP(alpha_minus_one, gamma)
+
+
 class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, RealArray]):
     def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
         return ScipyVonMises(*q.to_kappa_angle())
@@ -377,14 +392,15 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     gamma = GammaInfo()
     beta = BetaInfo()
     dirichlet = DirichletInfo(5)
+    gen_dirichlet = GeneralizedDirichletInfo(5)
     von_mises = VonMisesFisherInfo()
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
     weibull = WeibullInfo()
     continuous: list[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn_unit, cmvn_cs,
                                                          exponential, rayleigh, gamma, beta,
-                                                         dirichlet, von_mises, chi_square, chi,
-                                                         weibull]
+                                                         dirichlet, gen_dirichlet, von_mises,
+                                                         chi_square, chi, weibull]
 
     # Multivariate normal
     multivariate_fixed_variance_normal = MultivariateFixedVarianceNormalInfo(dimensions=5,

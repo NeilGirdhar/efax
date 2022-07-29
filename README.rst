@@ -110,17 +110,22 @@ Distributions
 =============
 EFAX supports the following distributions:
 
-- Bernoulli
-- beta
 - chi
 - chi-square
-- Dirichlet
 - exponential
 - gamma
 - geometric
 - logarithmic
-- multinomial
 - negative binomial
+- on a finite set:
+
+  - Bernoulli
+  - multinomial
+- on the simplex:
+
+  - beta
+  - Dirichlet
+  - generalized Dirichlet
 - normal
 
   - univariate real
