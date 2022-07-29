@@ -34,6 +34,7 @@ def inverse_softplus(y: RealArray) -> RealArray:
 
 ive = tfp.math.bessel_ive
 log_ive = tfp.math.log_bessel_ive
+betaln = tfp.math.lbeta
 
 
 def iv(v: RealNumeric, z: RealNumeric) -> RealNumeric:

@@ -32,9 +32,10 @@ def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, 
     try:
         my_entropy = nat_parameters.entropy()
         scipy_entropy = scipy_distribution.entropy()
-        assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
     except NotImplementedError:
         pass
+    else:
+        assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
 
 
 def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:

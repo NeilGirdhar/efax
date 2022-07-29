@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import numpy as np
+import scipy.special
 import scipy.stats as ss
 from numpy.random import Generator
 from tjax import ComplexArray, RealArray, ShapeLike
 
 from .shaped_distribution import ShapedDistribution
 
-__all__ = ['ScipyDirichlet']
+__all__ = ['ScipyDirichlet', 'ScipyGeneralizedDirichlet']
 
 
 # pylint: disable=protected-access
@@ -49,3 +50,35 @@ class ScipyDirichlet(ShapedDistribution):
         if not np.allclose(y, np.ones(y.shape), atol=1e-5, rtol=0):
             raise ValueError
         return super().pdf(x)
+
+
+class ScipyGeneralizedDirichlet:
+    def __init__(self, alpha: RealArray, beta: RealArray):
+        self.alpha = alpha
+        self.beta = beta
+
+    def pdf(self, x: RealArray) -> RealArray:
+        alpha_roll = np.roll(self.alpha, -1, axis=-1)
+        alpha_roll[..., -1] = 0.0
+        gamma = -np.diff(self.beta, append=1.0) - alpha_roll
+        cs_x = np.cumsum(x, axis=-1)
+        terms = x ** (self.alpha - 1.0) * (1.0 - cs_x) ** gamma / scipy.special.beta(self.alpha,
+                                                                                     self.beta)
+        return np.prod(terms, axis=-1)
+
+    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> ComplexArray:
+        if isinstance(size, int):
+            size = (size,)
+        if random_state is None:
+            random_state = np.random.default_rng()
+        dimensions = self.alpha.shape[-1]
+        beta_samples = random_state.beta(self.alpha, self.beta,
+                                         size=(tuple(size) + self.alpha.shape))
+        q = np.zeros(beta_samples.shape[:-1])
+        for i in range(dimensions):
+            beta_samples[..., i] *= 1 - q
+            q += beta_samples[..., i]
+        return beta_samples
+
+    def entropy(self) -> RealArray:
+        raise NotImplementedError

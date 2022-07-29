@@ -7,6 +7,7 @@ from .complex_normal import *
 from .dirichlet import *
 from .exponential import *
 from .gamma import *
+from .gen_dirichlet import *
 from .geometric import *
 from .logarithmic import *
 from .multinomial import *
