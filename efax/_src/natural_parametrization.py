@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
 
 import jax.numpy as jnp
@@ -91,7 +90,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
             are an array of the same shape as self.
         See also: apply_fisher_information
         """
-        fisher_matrix = self._fisher_information_matrix(len(self.shape))
+        fisher_matrix = self._fisher_information_matrix()
         fisher_diagonal = jnp.diagonal(fisher_matrix)
         return type(self).unflattened(fisher_diagonal, **self.fixed_parameters_mapping())
 
@@ -120,7 +119,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     @final
     def jeffreys_prior(self) -> RealArray:
-        fisher_matrix = self._fisher_information_matrix(len(self.shape))
+        fisher_matrix = self._fisher_information_matrix()
         return jnp.sqrt(jnp.linalg.det(fisher_matrix))
 
     @jit
@@ -144,10 +143,9 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         distribution = cls.unflattened(flattened_parameters, **kwargs)
         return distribution.log_normalizer()
 
-    @partial(jit, static_argnums=1)
-    def _fisher_information_matrix(self: NaturalParametrization[EP, Domain],
-                                   len_shape: int) -> RealArray:
+    @jit
+    def _fisher_information_matrix(self: NaturalParametrization[EP, Domain]) -> RealArray:
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
-        for _ in range(len_shape):
+        for _ in range(len(self.shape)):
             fisher_info_f = vmap(fisher_info_f)
         return fisher_info_f(self.flattened(), **self.fixed_parameters_mapping())
