@@ -11,15 +11,14 @@ from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
 from ..multidimensional import Multidimensional
-from ..natural_parametrization import EP, NaturalParametrization
+from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..samplable import Samplable
 
 __all__: list[str] = []
 
 
-# https://github.com/python/mypy/issues/10140
-# EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
+EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
 
 
 @dataclass
