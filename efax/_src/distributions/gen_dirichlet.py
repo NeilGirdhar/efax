@@ -6,8 +6,8 @@ The generalized Dirichlet distribution is based off:
 from __future__ import annotations
 
 import jax.numpy as jnp
-from jax import grad, vmap
 from jax.nn import softplus
+from jax.scipy.special import digamma
 from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
@@ -36,15 +36,17 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Re
         return jnp.sum(betaln(alpha, beta), axis=-1)
 
     def to_exp(self) -> GeneralizedDirichletEP:
-        def f(gen_np: GeneralizedDirichletNP) -> RealArray:
-            alpha, beta = gen_np.alpha_beta()
-            return jnp.sum(betaln(alpha, beta), axis=-1)
-        f = grad(f)
-        for _ in range(len(self.shape)):
-            f = vmap(f)
-        values = f(self)
-        flattened = values.flattened()
-        return GeneralizedDirichletEP.unflattened(flattened)
+        # Given a log-normalizer y.
+        # alpha_bar = d y / d alpha = betaln'(alpha, beta) = digamma(alpha) - digamma(alpha + beta)
+        # beta_bar = d y / d beta = betaln'(alpha, beta) = digamma(beta) - digamma(alpha + beta)
+        alpha, beta = self.alpha_beta()
+        digamma_sum = digamma(alpha + beta)
+        alpha_bar_direct = digamma(alpha) - digamma_sum
+        beta_bar = digamma(beta) - digamma_sum
+        gamma_bar = jnp.cumsum(beta_bar, axis=-1)
+        alpha_bar_indirect = jnp.roll(gamma_bar, 1, axis=-1).at[..., 0].set(0.0)
+        alpha_bar = alpha_bar_direct + alpha_bar_indirect
+        return GeneralizedDirichletEP(alpha_bar, gamma_bar)
 
     def sufficient_statistics(self, x: RealArray) -> GeneralizedDirichletEP:
         cs_x = jnp.cumsum(x, axis=-1)
