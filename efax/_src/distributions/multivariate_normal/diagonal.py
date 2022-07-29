@@ -7,6 +7,7 @@ from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import VectorSupport, distribution_parameter
 from ...samplable import Samplable
@@ -17,7 +18,8 @@ __all__ = ['MultivariateDiagonalNormalNP', 'MultivariateDiagonalNormalEP',
 
 @dataclass
 class MultivariateDiagonalNormalNP(NaturalParametrization['MultivariateDiagonalNormalEP',
-                                                          RealArray]):
+                                                          RealArray],
+                                   Multidimensional):
     mean_times_precision: RealArray = distribution_parameter(VectorSupport())
     negative_half_precision: RealArray = distribution_parameter(VectorSupport())
 
@@ -42,13 +44,13 @@ class MultivariateDiagonalNormalNP(NaturalParametrization['MultivariateDiagonalN
     def sufficient_statistics(self, x: RealArray) -> MultivariateDiagonalNormalEP:
         return MultivariateDiagonalNormalEP(x, jnp.square(x))
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean_times_precision.shape[-1]
 
 
 @dataclass
 class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagonalNormalNP],
+                                   Multidimensional,
                                    Samplable):
     mean: RealArray = distribution_parameter(VectorSupport())
     second_moment: RealArray = distribution_parameter(VectorSupport())
@@ -71,10 +73,10 @@ class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagon
     def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         return self.to_variance_parametrization().sample(rng, shape)
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
+    # New methods ----------------------------------------------------------------------------------
     def variance(self) -> RealArray:
         return self.second_moment - jnp.square(self.mean)
 
@@ -83,7 +85,7 @@ class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagon
 
 
 @dataclass
-class MultivariateDiagonalNormalVP(Samplable):
+class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
     mean: RealArray = distribution_parameter(VectorSupport())
     variance: RealArray = distribution_parameter(VectorSupport())
 
@@ -100,10 +102,10 @@ class MultivariateDiagonalNormalVP(Samplable):
         deviation = jnp.sqrt(self.variance)
         return jax.random.normal(rng.key, shape) * deviation + self.mean
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
+    # New methods ----------------------------------------------------------------------------------
     def to_exp(self) -> MultivariateDiagonalNormalEP:
         second_moment = self.variance + jnp.square(self.mean)
         return MultivariateDiagonalNormalEP(self.mean, second_moment)

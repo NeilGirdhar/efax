@@ -7,10 +7,12 @@ import jax.numpy as jnp
 from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
-from ...conjugate_prior import HasConjugatePrior
+from ...conjugate_prior import HasGeneralizedConjugatePrior
+from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, VectorSupport, distribution_parameter
 from ...samplable import Samplable
+from .diagonal import MultivariateDiagonalNormalNP
 from .isotropic import IsotropicNormalNP
 
 __all__ = ['MultivariateFixedVarianceNormalNP', 'MultivariateFixedVarianceNormalEP']
@@ -19,6 +21,7 @@ __all__ = ['MultivariateFixedVarianceNormalNP', 'MultivariateFixedVarianceNormal
 @dataclass
 class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixedVarianceNormalEP',
                                                                RealArray],
+                                        Multidimensional,
                                         Samplable):
     """
     The multivariate normal distribution with fixed variance.  This is a curved exponential family.
@@ -52,14 +55,15 @@ class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixe
     def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
         return self.to_exp().sample(rng, shape)
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean_times_precision.shape[-1]
 
 
 @dataclass
-class MultivariateFixedVarianceNormalEP(HasConjugatePrior[MultivariateFixedVarianceNormalNP],
-                                        Samplable):
+class MultivariateFixedVarianceNormalEP(
+        HasGeneralizedConjugatePrior[MultivariateFixedVarianceNormalNP],
+        Multidimensional,
+        Samplable):
     mean: RealArray = distribution_parameter(VectorSupport())
     variance: RealArray = distribution_parameter(ScalarSupport(), fixed=True)
 
@@ -92,9 +96,13 @@ class MultivariateFixedVarianceNormalEP(HasConjugatePrior[MultivariateFixedVaria
         negative_half_precision = -0.5 * n / self.variance
         return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
 
+    def generalized_conjugate_prior_distribution(self, n: RealArray
+                                                 ) -> MultivariateDiagonalNormalNP:
+        negative_half_precision = -0.5 * n / self.variance[..., jnp.newaxis]
+        return MultivariateDiagonalNormalNP(n * self.mean, negative_half_precision)
+
     def conjugate_prior_observation(self) -> RealArray:
         return self.mean
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean.shape[-1]

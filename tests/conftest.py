@@ -10,7 +10,7 @@ from jax.experimental import enable_x64
 from numpy.random import Generator as NumpyGenerator
 from tjax import Generator as TjaxGenerator
 
-from efax import HasConjugatePrior, Samplable
+from efax import HasConjugatePrior, HasGeneralizedConjugatePrior, Samplable
 
 from .create_info import create_infos
 from .distribution_info import DistributionInfo
@@ -71,3 +71,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              for info in _all_infos
              if issubclass(info.exp_class(), HasConjugatePrior)]
         metafunc.parametrize("cp_distribution_info", q)
+    if 'gcp_distribution_info' in metafunc.fixturenames:
+        q = [info
+             for info in _all_infos
+             if issubclass(info.exp_class(), HasGeneralizedConjugatePrior)]
+        metafunc.parametrize("gcp_distribution_info", q)

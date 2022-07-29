@@ -9,6 +9,7 @@ from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasConjugatePrior
+from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..samplable import Samplable
@@ -18,7 +19,8 @@ __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
-class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Samplable):
+class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidimensional,
+                    Samplable):
     log_odds: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -50,10 +52,10 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Samplabl
         return one_hot(jax.random.categorical(rng.key, self.log_odds, shape=shape),
                        self.dimensions())
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.log_odds.shape[-1]
 
+    # New methods ----------------------------------------------------------------------------------
     def nat_to_probability(self) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
@@ -68,7 +70,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Samplabl
 
 
 @dataclass
-class MultinomialEP(HasConjugatePrior[MultinomialNP]):
+class MultinomialEP(HasConjugatePrior[MultinomialNP], Multidimensional):
     probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -95,6 +97,5 @@ class MultinomialEP(HasConjugatePrior[MultinomialNP]):
     def conjugate_prior_observation(self) -> RealArray:
         return self.probability
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.probability.shape[-1]

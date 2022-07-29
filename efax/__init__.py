@@ -1,6 +1,6 @@
-from ._src import (ExpectationParametrization, HasConjugatePrior, NaturalParametrization, Samplable,
-                   ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
-                   VectorSupport)
+from ._src import (ExpectationParametrization, HasConjugatePrior, HasGeneralizedConjugatePrior,
+                   Multidimensional, NaturalParametrization, Samplable, ScalarSupport,
+                   SquareMatrixSupport, Support, SymmetricMatrixSupport, VectorSupport)
 from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP,
                                  ChiSquareEP, ChiSquareNP, ComplexCircularlySymmetricNormalEP,
                                  ComplexCircularlySymmetricNormalNP,
@@ -20,10 +20,11 @@ from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP
 from ._src.scipy_replacement import (ScipyComplexMultivariateNormal, ScipyComplexNormal,
                                      ScipyDirichlet, ScipyMultivariateNormal, ScipyVonMises)
 
-__all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'NaturalParametrization', 'Samplable',
-           'ScalarSupport', 'SquareMatrixSupport', 'Support', 'SymmetricMatrixSupport',
-           'VectorSupport', 'BernoulliEP', 'BernoulliNP', 'BetaEP', 'BetaNP', 'ChiEP', 'ChiNP',
-           'ChiSquareEP', 'ChiSquareNP', 'ComplexCircularlySymmetricNormalEP',
+__all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedConjugatePrior',
+           'Multidimensional', 'NaturalParametrization', 'Samplable', 'ScalarSupport',
+           'SquareMatrixSupport', 'Support', 'SymmetricMatrixSupport', 'VectorSupport',
+           'BernoulliEP', 'BernoulliNP', 'BetaEP', 'BetaNP', 'ChiEP', 'ChiNP', 'ChiSquareEP',
+           'ChiSquareNP', 'ComplexCircularlySymmetricNormalEP',
            'ComplexCircularlySymmetricNormalNP', 'ComplexMultivariateUnitNormalEP',
            'ComplexMultivariateUnitNormalNP', 'ComplexNormalEP', 'ComplexNormalNP', 'DirichletEP',
            'DirichletNP', 'ExponentialEP', 'ExponentialNP', 'GammaEP', 'GammaNP', 'GeometricEP',

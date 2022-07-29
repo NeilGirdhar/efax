@@ -8,6 +8,7 @@ from tjax import ComplexArray, Generator, RealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import VectorSupport, distribution_parameter
 from ...samplable import Samplable
@@ -18,6 +19,7 @@ __all__ = ['ComplexMultivariateUnitNormalNP', 'ComplexMultivariateUnitNormalEP']
 @dataclass
 class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariateUnitNormalEP',
                                                              ComplexArray],
+                                      Multidimensional,
                                       Samplable):
     """
     The complex multivariate normal distribution with unit variance, and zero pseudo-variance.  This
@@ -52,13 +54,13 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
     def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
         return self.to_exp().sample(rng, shape)
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.two_mean_conjugate.shape[-1]
 
 
 @dataclass
 class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivariateUnitNormalNP],
+                                      Multidimensional,
                                       Samplable):
     mean: ComplexArray = distribution_parameter(VectorSupport(is_complex=True))
 
@@ -94,6 +96,5 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
     # def conjugate_prior_observation(self) -> ComplexArray:
     #     return self.mean
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean.shape[-1]

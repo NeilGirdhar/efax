@@ -10,6 +10,7 @@ from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
+from ..multidimensional import Multidimensional
 from ..natural_parametrization import EP, NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..samplable import Samplable
@@ -22,7 +23,8 @@ __all__: list[str] = []
 
 
 @dataclass
-class DirichletCommonNP(NaturalParametrization[EP, RealArray], Samplable, Generic[EP]):
+class DirichletCommonNP(NaturalParametrization[EP, RealArray], Samplable, Multidimensional,
+                        Generic[EP]):
     alpha_minus_one: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -40,7 +42,6 @@ class DirichletCommonNP(NaturalParametrization[EP, RealArray], Samplable, Generi
             shape += self.shape
         return jax.random.dirichlet(rng.key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.alpha_minus_one.shape[-1]
 
@@ -54,7 +55,7 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 
 @dataclass
-class DirichletCommonEP(ExpToNat[NP, RealArray], Generic[NP]):
+class DirichletCommonEP(ExpToNat[NP, RealArray], Multidimensional, Generic[NP]):
     mean_log_probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -71,7 +72,6 @@ class DirichletCommonEP(ExpToNat[NP, RealArray], Generic[NP]):
     def search_gradient(self, search_parameters: RealArray) -> RealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).alpha_minus_one
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean_log_probability.shape[-1]
 
