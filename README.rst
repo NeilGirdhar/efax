@@ -110,27 +110,11 @@ Distributions
 =============
 EFAX supports the following distributions:
 
-- chi
-- chi-square
-- exponential
-- gamma
-- geometric
-- logarithmic
-- negative binomial
-- on a finite set:
-
-  - Bernoulli
-  - multinomial
-- on the simplex:
-
-  - beta
-  - Dirichlet
-  - generalized Dirichlet
-- normal
+- normal:
 
   - univariate real
   - univariate complex
-  - multivariate real
+  - multivariate real:
 
     - with arbitrary variance
     - with diagonal variance
@@ -138,14 +122,44 @@ EFAX supports the following distributions:
     - with fixed variance
     - with fixed unit variance
 
-  - multivariate complex
+  - multivariate complex:
 
     - with unit variance and zero pseudo-variance
     - circularly symmetric
-- Poisson
-- Rayleigh
-- von Mises-Fisher
-- Weibull
+
+- on a finite set:
+
+  - Bernoulli
+  - multinomial
+
+- on the nonnegative integers:
+
+  - geometric
+  - negative binomial
+  - Poisson
+
+- on the positive integers:
+
+  - logarithmic
+
+- on the positive reals:
+
+  - chi
+  - chi-square
+  - exponential
+  - gamma
+  - Rayleigh
+  - Weibull
+
+- on the simplex:
+
+  - beta
+  - Dirichlet
+  - generalized Dirichlet
+
+- on the n-dimensional circle:
+
+  - von Mises-Fisher
 
 Usage
 =====
