@@ -6,6 +6,7 @@ from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, VectorSupport, distribution_parameter
 from ...samplable import Samplable
@@ -14,7 +15,8 @@ __all__ = ['IsotropicNormalNP', 'IsotropicNormalEP']
 
 
 @dataclass
-class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP', RealArray]):
+class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP', RealArray],
+                        Multidimensional):
     mean_times_precision: RealArray = distribution_parameter(VectorSupport())
     negative_half_precision: RealArray = distribution_parameter(ScalarSupport())
 
@@ -41,13 +43,12 @@ class IsotropicNormalNP(NaturalParametrization['IsotropicNormalEP', RealArray]):
     def sufficient_statistics(self, x: RealArray) -> IsotropicNormalEP:
         return IsotropicNormalEP(x, jnp.sum(jnp.square(x), axis=-1))
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean_times_precision.shape[-1]
 
 
 @dataclass
-class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable):
+class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable, Multidimensional):
     mean: RealArray = distribution_parameter(VectorSupport())
     total_second_moment: RealArray = distribution_parameter(ScalarSupport())
 
@@ -77,10 +78,10 @@ class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable
         deviation = jnp.sqrt(self.variance())
         return jax.random.normal(rng.key, shape) * deviation + self.mean
 
+    def dimensions(self) -> int:
+        return self.mean.shape[-1]
+
     # New methods ----------------------------------------------------------------------------------
     def variance(self) -> RealArray:
         dimensions = self.dimensions()
         return (self.total_second_moment - jnp.sum(jnp.square(self.mean), axis=-1)) / dimensions
-
-    def dimensions(self) -> int:
-        return self.mean.shape[-1]

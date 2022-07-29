@@ -7,10 +7,12 @@ import jax.numpy as jnp
 from tjax import Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
-from ...conjugate_prior import HasConjugatePrior
+from ...conjugate_prior import HasGeneralizedConjugatePrior
+from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import VectorSupport, distribution_parameter
 from ...samplable import Samplable
+from .diagonal import MultivariateDiagonalNormalNP
 from .isotropic import IsotropicNormalNP
 
 __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
@@ -18,6 +20,7 @@ __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 @dataclass
 class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP', RealArray],
+                               Multidimensional,
                                Samplable):
     """
     The multivariate normal distribution with unit variance.  This is a curved exponential family.
@@ -50,13 +53,15 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
             shape = self.mean.shape
         return jax.random.normal(rng.key, shape) + self.mean
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
 
 @dataclass
-class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samplable):
+class MultivariateUnitNormalEP(
+        HasGeneralizedConjugatePrior[MultivariateUnitNormalNP],
+        Multidimensional,
+        Samplable):
     mean: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -82,9 +87,13 @@ class MultivariateUnitNormalEP(HasConjugatePrior[MultivariateUnitNormalNP], Samp
         negative_half_precision = -0.5 * n * jnp.ones(self.shape)
         return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
 
+    def generalized_conjugate_prior_distribution(self, n: RealArray
+                                                 ) -> MultivariateDiagonalNormalNP:
+        negative_half_precision = -0.5 * n
+        return MultivariateDiagonalNormalNP(n * self.mean, negative_half_precision)
+
     def conjugate_prior_observation(self) -> RealArray:
         return self.mean
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean.shape[-1]

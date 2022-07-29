@@ -8,6 +8,7 @@ from tjax import RealArray, RealNumeric, Shape
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
+from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..tools import inverse_softplus, ive, log_ive
@@ -16,7 +17,8 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 
 @dataclass
-class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
+class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray],
+                       Multidimensional):
     mean_times_concentration: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -46,10 +48,10 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
     def sufficient_statistics(self, x: RealArray) -> VonMisesFisherEP:
         return VonMisesFisherEP(x)
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean_times_concentration.shape[-1]
 
+    # New methods ----------------------------------------------------------------------------------
     def to_kappa_angle(self) -> tuple[RealArray, RealArray]:
         if self.dimensions() != 2:
             raise ValueError
@@ -62,7 +64,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray]):
 
 
 @dataclass
-class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
+class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray], Multidimensional):
     mean: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -96,7 +98,6 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray]):
         mu = jnp.linalg.norm(self.mean, 2, axis=-1)
         return _a_k(self.dimensions(), kappa) - mu
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 

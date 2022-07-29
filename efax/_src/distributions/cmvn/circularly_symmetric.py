@@ -8,6 +8,7 @@ from tjax import ComplexArray, Generator, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import SymmetricMatrixSupport, distribution_parameter
 from ...samplable import Samplable
@@ -22,6 +23,7 @@ def _broadcasted_outer_c(x: ComplexArray) -> ComplexArray:
 @dataclass
 class ComplexCircularlySymmetricNormalNP(
         NaturalParametrization['ComplexCircularlySymmetricNormalEP', ComplexArray],
+        Multidimensional,
         Samplable):
     """
     The complex multivariate normal distribution with zero mean and and zero pseudo-variance.  This
@@ -58,14 +60,15 @@ class ComplexCircularlySymmetricNormalNP(
     def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
         return self.to_exp().sample(rng, shape)
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.negative_precision.shape[-1]
 
 
 @dataclass
 class ComplexCircularlySymmetricNormalEP(
-        ExpectationParametrization[ComplexCircularlySymmetricNormalNP], Samplable):
+        ExpectationParametrization[ComplexCircularlySymmetricNormalNP],
+        Multidimensional,
+        Samplable):
     variance: ComplexArray = distribution_parameter(SymmetricMatrixSupport(hermitian=True))
 
     # Implemented methods --------------------------------------------------------------------------
@@ -93,6 +96,5 @@ class ComplexCircularlySymmetricNormalEP(
         return jax.random.multivariate_normal(rng.key, mean, self.variance,
                                               shape[:-1])  # type: ignore[return-value]
 
-    # New methods ----------------------------------------------------------------------------------
     def dimensions(self) -> int:
         return self.variance.shape[-1]
