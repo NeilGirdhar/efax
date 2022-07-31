@@ -52,6 +52,7 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Re
 
     def sufficient_statistics(self, x: RealArray) -> GeneralizedDirichletEP:
         cs_x = jnp.cumsum(x, axis=-1)
+        # cs_x[i] = sum_{j<=i} x[j]
         return GeneralizedDirichletEP(jnp.log(x), jnp.log(1.0 - cs_x))
 
     def carrier_measure(self, x: RealArray) -> RealArray:
@@ -67,7 +68,7 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Re
         # cs_gamma[i] = sum_{j>=i} gamma[j]
         cs_alpha = jnp.cumsum(alpha[..., ::-1], axis=-1)[..., ::-1]
         cs_gamma = jnp.cumsum(self.gamma[..., ::-1], axis=-1)[..., ::-1]
-        # roll_cs_alpha[i] = sum_{j>i} cs_alpha[j]
+        # roll_cs_alpha[i] = sum_{j>i} alpha[j]
         roll_cs_alpha = jnp.roll(cs_alpha, -1, axis=-1)
         roll_cs_alpha = roll_cs_alpha.at[..., -1].set(0.0)
         beta = cs_gamma + roll_cs_alpha + 1.0
@@ -76,7 +77,9 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Re
 
 @dataclass
 class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, RealArray], Multidimensional):
+    # E({log(x_i)}_i)
     mean_log_probability: RealArray = distribution_parameter(VectorSupport())
+    # E({log(1−∑_{j≤i} x_j)}_i)
     mean_log_cumulative_probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
