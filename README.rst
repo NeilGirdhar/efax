@@ -116,11 +116,11 @@ EFAX supports the following distributions:
   - univariate complex
   - multivariate real:
 
-    - with arbitrary variance
-    - with diagonal variance
-    - with isotropic variance
-    - with fixed variance
     - with fixed unit variance
+    - with fixed variance
+    - with isotropic variance
+    - with diagonal variance
+    - with general variance
 
   - multivariate complex:
 
@@ -135,12 +135,9 @@ EFAX supports the following distributions:
 - on the nonnegative integers:
 
   - geometric
+  - logarithmic
   - negative binomial
   - Poisson
-
-- on the positive integers:
-
-  - logarithmic
 
 - on the positive reals:
 
@@ -157,7 +154,7 @@ EFAX supports the following distributions:
   - Dirichlet
   - generalized Dirichlet
 
-- on the n-dimensional circle:
+- on the n-sphere:
 
   - von Mises-Fisher
 
