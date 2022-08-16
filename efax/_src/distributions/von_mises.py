@@ -11,7 +11,7 @@ from ..exp_to_nat import ExpToNat
 from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
-from ..tools import inverse_softplus, ive, log_ive
+from ..tools import inverse_softplus, iv_ratio, log_ive
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
@@ -104,5 +104,4 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray], Multidimensional):
 
 # Private functions --------------------------------------------------------------------------------
 def _a_k(k: RealNumeric, kappa: RealNumeric) -> RealNumeric:
-    half_k = k * 0.5
-    return ive(half_k, kappa) / ive(half_k - 1.0, kappa)
+    return iv_ratio(k * 0.5, kappa)
