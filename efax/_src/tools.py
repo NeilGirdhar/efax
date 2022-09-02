@@ -26,12 +26,6 @@ def parameters_dot_product(x: NaturalParametrization[Any, Any], y: Any) -> RealA
     return reduce(jnp.add, dotted_fields())
 
 
-def inverse_softplus(y: RealArray) -> RealArray:
-    return jnp.where(y > 80.0,
-                     y,
-                     jnp.log(jnp.expm1(y)))
-
-
 iv_ratio = tfp.math.bessel_iv_ratio
 ive = tfp.math.bessel_ive
 log_ive = tfp.math.log_bessel_ive

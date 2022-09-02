@@ -4,14 +4,13 @@ import jax
 import jax.numpy as jnp
 from jax.nn import softplus
 from jax.scipy import special as jss
-from tjax import Generator, RealArray, Shape
+from tjax import Generator, RealArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from ..samplable import Samplable
-from ..tools import inverse_softplus
 
 __all__ = ['GammaNP', 'GammaEP']
 

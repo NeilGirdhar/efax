@@ -4,14 +4,14 @@ import math
 
 import jax.numpy as jnp
 from jax.nn import softplus
-from tjax import RealArray, RealNumeric, Shape
+from tjax import RealArray, RealNumeric, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
 from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
-from ..tools import inverse_softplus, iv_ratio, log_ive
+from ..tools import iv_ratio, log_ive
 
 __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
