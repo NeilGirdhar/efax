@@ -5,7 +5,7 @@ from typing import Any
 import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
-from numpy.random import Generator
+from jax.random import KeyArray
 from tjax import ComplexArray, RealArray, Shape
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
@@ -26,12 +26,12 @@ from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vec
 from .distribution_info import DistributionInfo
 
 
-def dirichlet_parameter_generator(n: int, rng: Generator, shape: Shape) -> RealArray:
+def dirichlet_parameter_generator(n: int, rng: KeyArray, shape: Shape) -> RealArray:
     # q can be as low as -1, but we prevent low values
     return rng.exponential(size=(*shape, n), scale=4.0) + 0.7
 
 
-def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
+def generate_real_covariance(rng: KeyArray, dimensions: int) -> RealArray:
     if dimensions == 1:
         return np.ones((1, 1)) * rng.exponential()
     eigenvalues = rng.exponential(size=dimensions) + 1.0
@@ -39,14 +39,14 @@ def generate_real_covariance(rng: Generator, dimensions: int) -> RealArray:
     return ss.random_correlation.rvs(eigenvalues, random_state=rng)
 
 
-def vectorized_real_covariance(rng: Generator, shape: Shape, dimensions: int) -> RealArray:
+def vectorized_real_covariance(rng: KeyArray, shape: Shape, dimensions: int) -> RealArray:
     if shape == ():
         return generate_real_covariance(rng, dimensions)
     return np.array([vectorized_real_covariance(rng, shape[1:], dimensions)
                      for _ in range(shape[0])])
 
 
-def generate_complex_covariance(rng: Generator, dimensions: int) -> ComplexArray:
+def generate_complex_covariance(rng: KeyArray, dimensions: int) -> ComplexArray:
     x = generate_real_covariance(rng, dimensions)
     if dimensions == 1:
         return x
@@ -55,7 +55,7 @@ def generate_complex_covariance(rng: Generator, dimensions: int) -> ComplexArray
     return w @ (w.conjugate().T)  # type: ignore[return-value]
 
 
-def vectorized_complex_covariance(rng: Generator, shape: Shape, dimensions: int) -> ComplexArray:
+def vectorized_complex_covariance(rng: KeyArray, shape: Shape, dimensions: int) -> ComplexArray:
     if shape == ():
         return generate_complex_covariance(rng, dimensions)
     return np.array([vectorized_complex_covariance(rng, shape[1:], dimensions)
@@ -66,7 +66,7 @@ class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, RealArray]):
     def exp_to_scipy_distribution(self, p: BernoulliEP) -> Any:
         return ss.bernoulli(p.probability)
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> BernoulliEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> BernoulliEP:
         return BernoulliEP(rng.uniform(size=shape))
 
 
@@ -75,7 +75,7 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, RealArray]):
         # p is inverse odds
         return ss.geom(1.0 / (1.0 + p.mean))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> GeometricEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> GeometricEP:
         return GeometricEP(rng.exponential(size=shape))
 
     def scipy_to_exp_family_observation(self, x: RealArray) -> RealArray:
@@ -86,7 +86,7 @@ class PoissonInfo(DistributionInfo[PoissonNP, PoissonEP, RealArray]):
     def exp_to_scipy_distribution(self, p: PoissonEP) -> Any:
         return ss.poisson(p.mean)
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> PoissonEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> PoissonEP:
         return PoissonEP(rng.exponential(size=shape))
 
 
@@ -98,7 +98,7 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
     def exp_to_scipy_distribution(self, p: NegativeBinomialEP) -> Any:
         return ss.nbinom(self.r, 1.0 / (1.0 + p.mean / p.failures))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NegativeBinomialEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> NegativeBinomialEP:
         return NegativeBinomialEP(self.r * np.ones(shape, dtype=jnp.int_),
                                   rng.exponential(size=shape))
 
@@ -107,7 +107,7 @@ class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, RealArray])
     def nat_to_scipy_distribution(self, q: LogarithmicNP) -> Any:
         return ss.logser(np.exp(q.log_probability))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> LogarithmicEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> LogarithmicEP:
         return LogarithmicEP(rng.exponential(size=shape) + 1.0)
 
 
@@ -115,7 +115,7 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP, RealArray]):
     def exp_to_scipy_distribution(self, p: NormalEP) -> Any:
         return ss.norm(p.mean, np.sqrt(p.variance()))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NormalEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> NormalEP:
         mean = rng.normal(scale=4.0, size=shape)
         variance = rng.exponential(size=shape)
         return NormalEP(mean, mean ** 2 + variance)
@@ -135,7 +135,7 @@ class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVari
             cov[i] *= p.variance[i]
         return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=cov)
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape
                                 ) -> MultivariateFixedVarianceNormalEP:
         variance = self.variance * jnp.ones(shape)
         return MultivariateFixedVarianceNormalEP(rng.normal(size=(*shape, self.dimensions)),
@@ -152,7 +152,7 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
     def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
         return ScipyMultivariateNormal.from_mc(mean=p.mean)
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateUnitNormalEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.dimensions)))
 
 
@@ -166,7 +166,7 @@ class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP,
         e = np.eye(self.dimensions)
         return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=np.multiply.outer(v, e))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> IsotropicNormalEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> IsotropicNormalEP:
         mean = rng.normal(size=(*shape, self.dimensions))
         total_variance = self.dimensions * rng.exponential(size=shape)
         return IsotropicNormalEP(mean, np.sum(np.square(mean)) + total_variance)
@@ -182,7 +182,7 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
         return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=create_diagonal(p.variance()))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateDiagonalNormalEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> MultivariateDiagonalNormalEP:
         dist_shape = (*shape, self.dimensions)
         mean = rng.normal(size=dist_shape)
         variance = rng.exponential(size=dist_shape)
@@ -202,7 +202,7 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
         covariance = vectorized_tril(v) + vectorized_triu(v_transpose, 1)
         return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=covariance)
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateNormalEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> MultivariateNormalEP:
         covariance = vectorized_real_covariance(rng, shape, self.dimensions)
         mean = rng.normal(size=(*shape, self.dimensions))
         second_moment = covariance + mean[..., :, np.newaxis] * mean[..., np.newaxis, :]
@@ -215,7 +215,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Compl
                                   p.second_moment - np_abs_square(p.mean),
                                   p.pseudo_second_moment - np.square(p.mean))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> ComplexNormalEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> ComplexNormalEP:
         mean = rng.normal(size=shape) + 1j * rng.normal(size=shape)
         variance = rng.exponential(size=shape)
         second_moment = np_abs_square(mean) + variance
@@ -236,7 +236,7 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
         return ScipyComplexMultivariateNormal(mean=p.mean)
 
     def exp_parameter_generator(self,
-                                rng: Generator,
+                                rng: KeyArray,
                                 shape: Shape) -> ComplexMultivariateUnitNormalEP:
         a = rng.normal(size=(*shape, self.dimensions))
         b = rng.normal(size=(*shape, self.dimensions))
@@ -254,7 +254,7 @@ class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySym
         return ScipyComplexMultivariateNormal(variance=p.variance)
 
     def exp_parameter_generator(self,
-                                rng: Generator,
+                                rng: KeyArray,
                                 shape: Shape) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(vectorized_complex_covariance(rng, shape,
                                                                                 self.dimensions))
@@ -264,7 +264,7 @@ class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, RealArray])
     def exp_to_scipy_distribution(self, p: ExponentialEP) -> Any:
         return ss.expon(0, p.mean)
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> ExponentialEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> ExponentialEP:
         return ExponentialEP(rng.exponential(size=shape))
 
 
@@ -272,7 +272,7 @@ class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP, RealArray]):
     def exp_to_scipy_distribution(self, p: RayleighEP) -> Any:
         return ss.rayleigh(scale=np.sqrt(p.chi / 2.0))
 
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> RayleighEP:
+    def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> RayleighEP:
         return RayleighEP(rng.exponential(size=shape))
 
 
@@ -281,7 +281,7 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, RealArray]):
         n1 = q.alpha_minus_one + 1.0
         return ss.beta(n1[..., 0], n1[..., 1])
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> BetaNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> BetaNP:
         return BetaNP(dirichlet_parameter_generator(2, rng, shape))
 
 
@@ -291,7 +291,7 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, RealArray]):
         scale = -1.0 / q.negative_rate
         return ss.gamma(shape, scale=scale)
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> GammaNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> GammaNP:
         gamma_shape = rng.exponential(size=shape)
         rate = rng.exponential(size=shape)
         return GammaNP(-rate, gamma_shape - 1.0)
@@ -305,7 +305,7 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, RealArray]):
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:
         return ScipyDirichlet(q.alpha_minus_one + 1.0)
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> DirichletNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> DirichletNP:
         return DirichletNP(dirichlet_parameter_generator(self.dimensions, rng, shape))
 
     def scipy_to_exp_family_observation(self, x: RealArray) -> RealArray:
@@ -321,7 +321,7 @@ class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, Generali
     def nat_to_scipy_distribution(self, q: GeneralizedDirichletNP) -> Any:
         return ScipyGeneralizedDirichlet(*q.alpha_beta())
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> GeneralizedDirichletNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> GeneralizedDirichletNP:
         alpha_minus_one = dirichlet_parameter_generator(self.dimensions, rng, shape)
         gamma = dirichlet_parameter_generator(self.dimensions, rng, shape) + 1.0
         return GeneralizedDirichletNP(alpha_minus_one, gamma)
@@ -331,7 +331,7 @@ class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, Re
     def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
         return ScipyVonMises(*q.to_kappa_angle())
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> VonMisesFisherNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> VonMisesFisherNP:
         return VonMisesFisherNP(rng.normal(size=(*shape, 2), scale=4.0))
 
     def scipy_to_exp_family_observation(self, x: RealArray) -> RealArray:
@@ -346,7 +346,7 @@ class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, RealArray]):
     def nat_to_scipy_distribution(self, q: ChiSquareNP) -> Any:
         return ss.chi2((q.k_over_two_minus_one + 1.0) * 2.0)
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> ChiSquareNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> ChiSquareNP:
         return ChiSquareNP(rng.exponential(size=shape))
 
 
@@ -354,7 +354,7 @@ class ChiInfo(DistributionInfo[ChiNP, ChiEP, RealArray]):
     def nat_to_scipy_distribution(self, q: ChiNP) -> Any:
         return ss.chi((q.k_over_two_minus_one + 1.0) * 2.0)
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> ChiNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> ChiNP:
         return ChiNP(rng.exponential(size=shape))
 
 
@@ -363,7 +363,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, RealArray]):
         scale = p.chi ** (1.0 / p.concentration)
         return ss.weibull_min(p.concentration, scale=scale)
 
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> WeibullNP:
+    def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> WeibullNP:
         equal_fixed_parameters = True
         concentration = (np.broadcast_to(rng.exponential(), shape)
                          if equal_fixed_parameters

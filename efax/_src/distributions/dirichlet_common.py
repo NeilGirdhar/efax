@@ -5,8 +5,9 @@ from typing import Any, Generic, TypeVar
 import jax
 import jax.numpy as jnp
 from jax.nn import softplus
+from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import Generator, RealArray, Shape
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
@@ -36,10 +37,10 @@ class DirichletCommonNP(NaturalParametrization[EP, RealArray], Samplable, Multid
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
                 - jss.gammaln(jnp.sum(q, axis=-1) + self.dimensions()))
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.dirichlet(rng.key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
+        return jax.random.dirichlet(rng, 1.0 + self.alpha_minus_one, shape)[..., :-1]
 
     def dimensions(self) -> int:
         return self.alpha_minus_one.shape[-1]

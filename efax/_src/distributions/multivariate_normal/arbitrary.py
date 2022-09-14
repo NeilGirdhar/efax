@@ -3,7 +3,8 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 import numpy as np
-from tjax import Generator, RealArray, Shape
+from jax.random import KeyArray
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
@@ -74,7 +75,7 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Mul
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         return self.to_variance_parametrization().sample(rng, shape)
 
     def dimensions(self) -> int:
@@ -102,12 +103,12 @@ class MultivariateNormalVP(Samplable, Multidimensional):
     def natural_parametrization_cls(cls) -> type[MultivariateNormalNP]:
         return MultivariateNormalNP
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.multivariate_normal(rng.key, self.mean, self.variance,
+        return jax.random.multivariate_normal(rng, self.mean, self.variance,
                                               shape)  # type: ignore[return-value]
 
     def dimensions(self) -> int:

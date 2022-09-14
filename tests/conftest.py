@@ -7,8 +7,8 @@ from typing import Any
 import numpy as np
 import pytest
 from jax.experimental import enable_x64
+from jax.random import KeyArray, PRNGKey
 from numpy.random import Generator as NumpyGenerator
-from tjax import Generator as TjaxGenerator
 
 from efax import HasConjugatePrior, HasGeneralizedConjugatePrior, Samplable
 
@@ -32,8 +32,8 @@ def generator() -> NumpyGenerator:
 
 
 @pytest.fixture
-def rng() -> TjaxGenerator:
-    return TjaxGenerator.from_seed(123)
+def rng() -> KeyArray:
+    return PRNGKey(123)
 
 
 @pytest.fixture(scope='session')

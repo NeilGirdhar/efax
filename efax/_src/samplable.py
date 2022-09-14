@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from tjax import Array, Generator, Shape
+from jax.random import KeyArray
+from tjax import Array, Shape
 
 from .parametrization import Parametrization
 
@@ -8,5 +9,5 @@ __all__ = ['Samplable']
 
 
 class Samplable(Parametrization):
-    def sample(self, rng: Generator, shape: Shape | None = None) -> Array:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> Array:
         raise NotImplementedError

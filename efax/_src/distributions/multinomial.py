@@ -4,8 +4,9 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from jax.nn import one_hot
+from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import Generator, RealArray, Shape
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasGeneralizedConjugatePrior
@@ -47,10 +48,10 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
     def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
         return MultinomialEP(x)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
-        return one_hot(jax.random.categorical(rng.key, self.log_odds, shape=shape),
+        return one_hot(jax.random.categorical(rng, self.log_odds, shape=shape),
                        self.dimensions())
 
     def dimensions(self) -> int:

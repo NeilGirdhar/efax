@@ -7,9 +7,9 @@ from functools import partial
 from typing import Any
 
 import jax.numpy as jnp
+from jax.random import KeyArray
 from jax.tree_util import tree_map
-from numpy.random import Generator as NumpyGenerator
-from tjax import Generator as TjaxGenerator
+from numpy.random import Generator
 from tjax import assert_tree_allclose
 
 from efax import Samplable
@@ -21,8 +21,8 @@ from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivari
 from .distribution_info import DistributionInfo
 
 
-def test_maximum_likelihood_estimation(generator: NumpyGenerator,
-                                       rng: TjaxGenerator,
+def test_maximum_likelihood_estimation(generator: Generator,
+                                       rng: KeyArray,
                                        sampling_distribution_info: DistributionInfo[Any, Any, Any],
                                        natural: bool) -> None:
     """

@@ -3,8 +3,9 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 from jax.nn import softplus
+from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import Generator, RealArray, Shape, inverse_softplus
+from tjax import RealArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
@@ -40,10 +41,10 @@ class GammaNP(NaturalParametrization['GammaEP', RealArray], Samplable):
     def sufficient_statistics(self, x: RealArray) -> GammaEP:
         return GammaEP(x, jnp.log(x))
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
-        return -jax.random.gamma(rng.key, self.shape_minus_one + 1.0, shape) / self.negative_rate
+        return -jax.random.gamma(rng, self.shape_minus_one + 1.0, shape) / self.negative_rate
 
 
 @dataclass

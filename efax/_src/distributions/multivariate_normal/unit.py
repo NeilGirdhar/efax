@@ -4,7 +4,8 @@ import math
 
 import jax
 import jax.numpy as jnp
-from tjax import Generator, RealArray, Shape
+from jax.random import KeyArray
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...conjugate_prior import HasGeneralizedConjugatePrior
@@ -46,12 +47,12 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
     def sufficient_statistics(self, x: RealArray) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        return jax.random.normal(rng.key, shape) + self.mean
+        return jax.random.normal(rng, shape) + self.mean
 
     def dimensions(self) -> int:
         return self.mean.shape[-1]
@@ -80,7 +81,7 @@ class MultivariateUnitNormalEP(
         # The second moment of a normal distribution with the given mean.
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + self.dimensions())
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         return self.to_nat().sample(rng, shape)
 
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:

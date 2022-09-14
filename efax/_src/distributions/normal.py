@@ -3,7 +3,8 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 import numpy as np
-from tjax import Generator, RealArray, Shape
+from jax.random import KeyArray
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -60,13 +61,13 @@ class NormalEP(ExpectationParametrization[NormalNP], Samplable):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
         deviation = jnp.sqrt(self.variance())
-        return jax.random.normal(rng.key, shape) * deviation + self.mean
+        return jax.random.normal(rng, shape) * deviation + self.mean
 
     # New methods ----------------------------------------------------------------------------------
     def variance(self) -> RealArray:

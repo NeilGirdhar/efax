@@ -4,7 +4,8 @@ import math
 
 import jax
 import jax.numpy as jnp
-from tjax import ComplexArray, Generator, RealArray, Shape
+from jax.random import KeyArray
+from tjax import ComplexArray, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
@@ -57,7 +58,7 @@ class ComplexCircularlySymmetricNormalNP(
     def sufficient_statistics(self, x: ComplexArray) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(_broadcasted_outer_c(x))
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> ComplexArray:
         return self.to_exp().sample(rng, shape)
 
     def dimensions(self) -> int:
@@ -87,13 +88,13 @@ class ComplexCircularlySymmetricNormalEP(
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> ComplexArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> ComplexArray:
         if shape is not None:
             shape += self.variance.shape[:-1]
         else:
             shape = self.variance.shape[:-1]
         mean = jnp.zeros(shape)
-        return jax.random.multivariate_normal(rng.key, mean, self.variance,
+        return jax.random.multivariate_normal(rng, mean, self.variance,
                                               shape[:-1])  # type: ignore[return-value]
 
     def dimensions(self) -> int:

@@ -3,7 +3,8 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 import numpy as np
-from tjax import Generator, RealArray, Shape
+from jax.random import KeyArray
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
@@ -70,7 +71,7 @@ class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagon
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         return self.to_variance_parametrization().sample(rng, shape)
 
     def dimensions(self) -> int:
@@ -94,13 +95,13 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
         deviation = jnp.sqrt(self.variance)
-        return jax.random.normal(rng.key, shape) * deviation + self.mean
+        return jax.random.normal(rng, shape) * deviation + self.mean
 
     def dimensions(self) -> int:
         return self.mean.shape[-1]

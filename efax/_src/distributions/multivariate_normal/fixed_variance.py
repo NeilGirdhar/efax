@@ -4,7 +4,8 @@ import math
 
 import jax
 import jax.numpy as jnp
-from tjax import Generator, RealArray, Shape
+from jax.random import KeyArray
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...conjugate_prior import HasGeneralizedConjugatePrior
@@ -52,7 +53,7 @@ class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixe
         variance = jnp.broadcast_to(self.variance, shape)
         return MultivariateFixedVarianceNormalEP(x, variance=variance)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         return self.to_exp().sample(rng, shape)
 
     def dimensions(self) -> int:
@@ -83,14 +84,14 @@ class MultivariateFixedVarianceNormalEP(
     def expected_carrier_measure(self) -> RealArray:
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) / self.variance + self.dimensions())
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
         variance = self.variance[..., jnp.newaxis]
         deviation = jnp.sqrt(variance)
-        return jax.random.normal(rng.key, shape) * deviation + self.mean
+        return jax.random.normal(rng, shape) * deviation + self.mean
 
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
         negative_half_precision = -0.5 * n / self.variance

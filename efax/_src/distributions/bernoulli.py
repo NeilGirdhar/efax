@@ -3,8 +3,9 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 import numpy as np
+from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import BooleanArray, Generator, RealArray, Shape
+from tjax import BooleanArray, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasConjugatePrior
@@ -67,10 +68,10 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> BooleanArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> BooleanArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.bernoulli(rng.key, self.probability, shape)  # type: ignore[return-value]
+        return jax.random.bernoulli(rng, self.probability, shape)  # type: ignore[return-value]
 
     def conjugate_prior_distribution(self, n: RealArray) -> BetaNP:
         reshaped_n = n[..., np.newaxis]

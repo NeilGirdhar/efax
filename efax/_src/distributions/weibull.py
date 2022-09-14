@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import jax
 import jax.numpy as jnp
-from tjax import Generator, RealArray, Shape
+from jax.random import KeyArray
+from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -60,11 +61,11 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
         lambda_ = self.chi ** (1.0 / k)
         return (k - 1.0) * jnp.log(lambda_) - jnp.euler_gamma * (1.0 - 1.0 / k)
 
-    def sample(self, rng: Generator, shape: Shape | None = None) -> RealArray:
+    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
         lambda_ = self.chi ** (1.0 / self.concentration)
-        return jax.random.weibull_min(rng.key,  # type: ignore[return-value]
+        return jax.random.weibull_min(rng,  # type: ignore[return-value]
                                       lambda_, self.concentration, shape)
