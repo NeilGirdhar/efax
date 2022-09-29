@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
 from jax.random import KeyArray
-from tjax import ComplexArray, RealArray, Shape
+from tjax import ComplexArray, RealArray, Shape, NumpyRealArray, NumpyComplexArray
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,
@@ -31,7 +31,7 @@ def dirichlet_parameter_generator(n: int, rng: KeyArray, shape: Shape) -> RealAr
     return rng.exponential(size=(*shape, n), scale=4.0) + 0.7
 
 
-def generate_real_covariance(rng: KeyArray, dimensions: int) -> RealArray:
+def generate_real_covariance(rng: KeyArray, dimensions: int) -> NumpyRealArray:
     if dimensions == 1:
         return np.ones((1, 1)) * rng.exponential()
     eigenvalues = rng.exponential(size=dimensions) + 1.0
@@ -39,20 +39,20 @@ def generate_real_covariance(rng: KeyArray, dimensions: int) -> RealArray:
     return ss.random_correlation.rvs(eigenvalues, random_state=rng)
 
 
-def vectorized_real_covariance(rng: KeyArray, shape: Shape, dimensions: int) -> RealArray:
+def vectorized_real_covariance(rng: KeyArray, shape: Shape, dimensions: int) -> NumpyRealArray:
     if shape == ():
         return generate_real_covariance(rng, dimensions)
     return np.array([vectorized_real_covariance(rng, shape[1:], dimensions)
                      for _ in range(shape[0])])
 
 
-def generate_complex_covariance(rng: KeyArray, dimensions: int) -> ComplexArray:
+def generate_complex_covariance(rng: KeyArray, dimensions: int) -> NumpyComplexArray:
     x = generate_real_covariance(rng, dimensions)
     if dimensions == 1:
         return x
     y = generate_real_covariance(rng, dimensions)
-    w = x + 1j * y
-    return w @ (w.conjugate().T)  # type: ignore[return-value]
+    w: NumpyComplexArray = x + 1j * y
+    return w @ (w.conjugate().T)
 
 
 def vectorized_complex_covariance(rng: KeyArray, shape: Shape, dimensions: int) -> ComplexArray:
@@ -133,7 +133,7 @@ class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVari
         cov = np.tile(np.eye(p.dimensions()), p.shape + (1, 1))
         for i in np.ndindex(*p.shape):
             cov[i] *= p.variance[i]
-        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=cov)
+        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=np.asarray(cov))
 
     def exp_parameter_generator(self, rng: KeyArray, shape: Shape
                                 ) -> MultivariateFixedVarianceNormalEP:
@@ -150,7 +150,7 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
-        return ScipyMultivariateNormal.from_mc(mean=p.mean)
+        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean))
 
     def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(rng.normal(size=(*shape, self.dimensions)))
@@ -164,7 +164,8 @@ class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP,
     def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
         v = p.variance()
         e = np.eye(self.dimensions)
-        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=np.multiply.outer(v, e))
+        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean),
+                                               cov=np.asarray(np.multiply.outer(v, e)))
 
     def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> IsotropicNormalEP:
         mean = rng.normal(size=(*shape, self.dimensions))
@@ -180,7 +181,8 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
-        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=create_diagonal(p.variance()))
+        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean),
+                                               cov=create_diagonal(np.asarray(p.variance())))
 
     def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> MultivariateDiagonalNormalEP:
         dist_shape = (*shape, self.dimensions)
@@ -197,10 +199,10 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
 
     def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
         # Correct numerical errors introduced by various conversions.
-        v = p.variance()
+        v = np.asarray(p.variance())
         v_transpose = v.swapaxes(-1, -2)
         covariance = vectorized_tril(v) + vectorized_triu(v_transpose, 1)
-        return ScipyMultivariateNormal.from_mc(mean=p.mean, cov=covariance)
+        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
 
     def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> MultivariateNormalEP:
         covariance = vectorized_real_covariance(rng, shape, self.dimensions)
@@ -211,9 +213,12 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
 
 class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, ComplexArray]):
     def exp_to_scipy_distribution(self, p: ComplexNormalEP) -> Any:
-        return ScipyComplexNormal(p.mean,
-                                  p.second_moment - np_abs_square(p.mean),
-                                  p.pseudo_second_moment - np.square(p.mean))
+        mean = np.asarray(p.mean)
+        second_moment = np.asarray(p.second_moment)
+        pseudo_second_moment = np.asarray(p.pseudo_second_moment)
+        return ScipyComplexNormal(mean,
+                                  second_moment - np_abs_square(mean),
+                                  pseudo_second_moment - np.square(mean))
 
     def exp_parameter_generator(self, rng: KeyArray, shape: Shape) -> ComplexNormalEP:
         mean = rng.normal(size=shape) + 1j * rng.normal(size=shape)
@@ -233,7 +238,7 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitNormalEP) -> Any:
-        return ScipyComplexMultivariateNormal(mean=p.mean)
+        return ScipyComplexMultivariateNormal(mean=np.asarray(p.mean))
 
     def exp_parameter_generator(self,
                                 rng: KeyArray,
@@ -251,7 +256,7 @@ class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySym
         self.dimensions = dimensions
 
     def exp_to_scipy_distribution(self, p: ComplexCircularlySymmetricNormalEP) -> Any:
-        return ScipyComplexMultivariateNormal(variance=p.variance)
+        return ScipyComplexMultivariateNormal(variance=np.asarray(p.variance))
 
     def exp_parameter_generator(self,
                                 rng: KeyArray,
@@ -303,7 +308,7 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, RealArray]):
         self.dimensions = dimensions
 
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:
-        return ScipyDirichlet(q.alpha_minus_one + 1.0)
+        return ScipyDirichlet(np.asarray(q.alpha_minus_one) + 1.0)
 
     def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> DirichletNP:
         return DirichletNP(dirichlet_parameter_generator(self.dimensions, rng, shape))
@@ -319,7 +324,8 @@ class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, Generali
         self.dimensions = dimensions
 
     def nat_to_scipy_distribution(self, q: GeneralizedDirichletNP) -> Any:
-        return ScipyGeneralizedDirichlet(*q.alpha_beta())
+        alpha, beta = q.alpha_beta()
+        return ScipyGeneralizedDirichlet(np.asarray(alpha), np.asarray(beta))
 
     def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> GeneralizedDirichletNP:
         alpha_minus_one = dirichlet_parameter_generator(self.dimensions, rng, shape)
@@ -329,7 +335,8 @@ class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, Generali
 
 class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, RealArray]):
     def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
-        return ScipyVonMises(*q.to_kappa_angle())
+        kappa, angle = q.to_kappa_angle()
+        return ScipyVonMises(np.asarray(kappa), np.asarray(angle))
 
     def nat_parameter_generator(self, rng: KeyArray, shape: Shape) -> VonMisesFisherNP:
         return VonMisesFisherNP(rng.normal(size=(*shape, 2), scale=4.0))

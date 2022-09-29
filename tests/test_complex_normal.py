@@ -3,13 +3,13 @@ from __future__ import annotations
 import numpy as np
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import ComplexArray, Shape
+from tjax import NumpyComplexArray, Shape
 
 from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 
 # Tools --------------------------------------------------------------------------------------------
-def random_complex_array(generator: Generator, shape: Shape = ()) -> ComplexArray:
+def random_complex_array(generator: Generator, shape: Shape = ()) -> NumpyComplexArray:
     return np.array(sum(x * generator.normal(size=shape) for x in [0.5, 0.5j]))
 
 
