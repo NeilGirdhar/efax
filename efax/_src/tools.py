@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 import jax.numpy as jnp
 import numpy as np
 from tensorflow_probability.substrates import jax as tfp
-from tjax import ComplexArray, ComplexNumeric, RealArray, RealNumeric
+from tjax import ComplexArray, ComplexNumeric, NumpyRealArray, RealArray, RealNumeric
 
 __all__: list[str] = []
 
@@ -36,7 +36,7 @@ def iv(v: RealNumeric, z: RealNumeric) -> RealNumeric:
     return tfp.math.bessel_ive(v, z) / jnp.exp(-jnp.abs(z))
 
 
-def vectorized_tril(m: RealArray, k: int = 0) -> RealArray:
+def vectorized_tril(m: NumpyRealArray, k: int = 0) -> NumpyRealArray:
     n, m_ = m.shape[-2:]
     indices = (..., *np.tril_indices(n, k, m_))
     values = m[indices]
@@ -45,7 +45,7 @@ def vectorized_tril(m: RealArray, k: int = 0) -> RealArray:
     return retval
 
 
-def vectorized_triu(m: RealArray, k: int = 0) -> RealArray:
+def vectorized_triu(m: NumpyRealArray, k: int = 0) -> NumpyRealArray:
     n, m_ = m.shape[-2:]
     indices = (..., *np.triu_indices(n, k, m_))
     values = m[indices]
@@ -54,7 +54,7 @@ def vectorized_triu(m: RealArray, k: int = 0) -> RealArray:
     return retval
 
 
-def create_diagonal(m: RealArray) -> RealArray:
+def create_diagonal(m: NumpyRealArray) -> NumpyRealArray:
     """
     Args:
         m: Has shape (*k, n)

@@ -4,7 +4,7 @@ from typing import TypeVar
 
 import numpy as np
 from numpy.random import Generator
-from tjax import ComplexArray, ComplexNumeric, RealArray, RealNumeric, ShapeLike
+from tjax import ComplexNumeric, NumpyComplexArray, NumpyRealArray, RealNumeric, ShapeLike
 
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
@@ -21,9 +21,9 @@ class ScipyComplexNormalUnvectorized:
                  variance: RealNumeric,
                  pseudo_variance: ComplexNumeric):
         super().__init__()
-        self.mean: ComplexArray = np.asarray(mean)
-        self.variance: RealArray = np.asarray(variance)
-        self.pseudo_variance: ComplexArray = np.asarray(pseudo_variance)
+        self.mean: NumpyComplexArray = np.asarray(mean)
+        self.variance: NumpyRealArray = np.asarray(variance)
+        self.pseudo_variance: NumpyComplexArray = np.asarray(pseudo_variance)
         if not issubclass(self.variance.dtype.type, np.floating):
             raise TypeError(f"The variance {self.variance} has non-real "
                             f"dtype {self.variance.dtype}.")
@@ -39,7 +39,7 @@ class ScipyComplexNormalUnvectorized:
         zr = np.stack([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
-    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> ComplexArray:
+    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
         if isinstance(size, int):
             size = (size,)
         if random_state is None:
@@ -49,7 +49,7 @@ class ScipyComplexNormalUnvectorized:
                                                   size=size)
         return xy_rvs[..., 0] + 1j * xy_rvs[..., 1]
 
-    def entropy(self) -> RealArray:
+    def entropy(self) -> NumpyRealArray:
         return self.as_multivariate_normal().entropy()
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormalUnvectorized:
@@ -58,10 +58,10 @@ class ScipyComplexNormalUnvectorized:
         return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)
 
     # Private methods ------------------------------------------------------------------------------
-    def _multivariate_normal_mean(self) -> RealArray:
+    def _multivariate_normal_mean(self) -> NumpyRealArray:
         return np.stack([self.mean.real, self.mean.imag], axis=-1)
 
-    def _multivariate_normal_cov(self) -> RealArray:
+    def _multivariate_normal_cov(self) -> NumpyRealArray:
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
         xx = 0.5 * cov_sum.real
@@ -78,9 +78,9 @@ class ScipyComplexNormal(ShapedDistribution):
     This class allows distributions having a non-empty shape.
     """
     def __init__(self,
-                 mean: ComplexArray | None = None,
-                 variance: RealArray | None = None,
-                 pseudo_variance: ComplexArray | None = None):
+                 mean: NumpyComplexArray | None = None,
+                 variance: NumpyRealArray | None = None,
+                 pseudo_variance: NumpyComplexArray | None = None):
         if mean is not None:
             shape = mean.shape
         elif variance is not None:
@@ -113,8 +113,8 @@ class ScipyComplexNormal(ShapedDistribution):
                          variance: RealNumeric,
                          angle: RealNumeric,
                          polarization: ComplexNumeric) -> _T:
-        r: ComplexArray = (polarization *
-                           np.exp(1j * 2 * np.pi * angle * 2))  # type: ignore[assignment]
+        r: NumpyComplexArray = (polarization *
+                                np.exp(1j * 2 * np.pi * angle * 2))  # type: ignore[assignment]
         mean_array = np.array(mean)
         variance_array = np.array(variance)
         pseudo_variance_array = np.array(r * variance)
@@ -127,21 +127,21 @@ class ScipyComplexNormal(ShapedDistribution):
         return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects)
 
     @property
-    def mean(self) -> ComplexArray:
+    def mean(self) -> NumpyComplexArray:
         retval = np.empty(self.shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
             retval[i] = self.objects[i].mean
         return retval
 
     @property
-    def variance(self) -> ComplexArray:
+    def variance(self) -> NumpyComplexArray:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             retval[i] = self.objects[i].variance
         return retval
 
     @property
-    def pseudo_variance(self) -> ComplexArray:
+    def pseudo_variance(self) -> NumpyComplexArray:
         retval = np.empty(self.shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
             retval[i] = self.objects[i].pseudo_variance

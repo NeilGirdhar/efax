@@ -4,7 +4,7 @@ import numpy as np
 import scipy.special
 import scipy.stats as ss
 from numpy.random import Generator
-from tjax import ComplexArray, RealArray, ShapeLike
+from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
 
 from .shaped_distribution import ShapedDistribution
 
@@ -19,13 +19,13 @@ class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):
     """
     def rvs(self,
             size: ShapeLike | None = None,
-            random_state: Generator | None = None) -> RealArray:
+            random_state: Generator | None = None) -> NumpyRealArray:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
         return super().rvs(size=size, random_state=random_state)
 
-    def pdf(self, x: RealArray) -> RealArray:
+    def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
         if x.ndim == 2:
             return super().pdf(x.T)
         return super().pdf(x)
@@ -35,7 +35,7 @@ class ScipyDirichlet(ShapedDistribution):
     """
     This class allows distributions having a non-empty shape.
     """
-    def __init__(self, alpha: RealArray):
+    def __init__(self, alpha: NumpyRealArray):
         shape = alpha[..., -1].shape
         rvs_shape = (alpha.shape[-1],)
         dtype = alpha.dtype
@@ -44,7 +44,7 @@ class ScipyDirichlet(ShapedDistribution):
             objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 
-    def pdf(self, x: ComplexArray) -> RealArray:
+    def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
         x = x.astype(np.float64)
         y = np.sum(x, axis=-1)
         if not np.allclose(y, np.ones(y.shape), atol=1e-5, rtol=0):
@@ -53,11 +53,11 @@ class ScipyDirichlet(ShapedDistribution):
 
 
 class ScipyGeneralizedDirichlet:
-    def __init__(self, alpha: RealArray, beta: RealArray):
+    def __init__(self, alpha: NumpyRealArray, beta: NumpyRealArray):
         self.alpha = alpha
         self.beta = beta
 
-    def pdf(self, x: RealArray) -> RealArray:
+    def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
         alpha_roll = np.roll(self.alpha, -1, axis=-1)
         alpha_roll[..., -1] = 0.0
         gamma = -np.diff(self.beta, append=1.0) - alpha_roll
@@ -66,7 +66,7 @@ class ScipyGeneralizedDirichlet:
                                                                                      self.beta)
         return np.prod(terms, axis=-1)
 
-    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> ComplexArray:
+    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
         if isinstance(size, int):
             size = (size,)
         if random_state is None:
@@ -80,5 +80,5 @@ class ScipyGeneralizedDirichlet:
             q += beta_samples[..., i]
         return beta_samples
 
-    def entropy(self) -> RealArray:
+    def entropy(self) -> NumpyRealArray:
         raise NotImplementedError

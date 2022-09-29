@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import scipy.stats as ss
-from tjax import RealArray
+from tjax import NumpyRealArray
 
 from .shaped_distribution import ShapedDistribution
 
@@ -13,7 +13,7 @@ class ScipyVonMises(ShapedDistribution):
     """
     This class allows distributions having a non-empty shape.
     """
-    def __init__(self, kappa: RealArray, loc: RealArray | None = None):
+    def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None):
         if loc is None:
             loc = np.zeros_like(kappa)
         shape = np.broadcast(kappa, loc).shape

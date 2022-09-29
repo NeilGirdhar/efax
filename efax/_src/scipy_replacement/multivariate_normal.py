@@ -5,7 +5,7 @@ from typing import TypeVar
 import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
-from tjax import RealArray, ShapeLike
+from tjax import NumpyRealArray, ShapeLike
 
 from .shaped_distribution import ShapedDistribution
 
@@ -19,7 +19,7 @@ class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_f
     """
     def rvs(self,
             size: ShapeLike | None = None,
-            random_state: Generator | None = None) -> RealArray:
+            random_state: Generator | None = None) -> NumpyRealArray:
         retval = super().rvs(size=size, random_state=random_state)
         if size is None:
             size = ()
@@ -39,8 +39,8 @@ class ScipyMultivariateNormal(ShapedDistribution):
     """
     @classmethod
     def from_mc(cls: type[T],
-                mean: RealArray | None = None,
-                cov: RealArray | None = None) -> T:
+                mean: NumpyRealArray | None = None,
+                cov: NumpyRealArray | None = None) -> T:
         if mean is None and cov is None:
             mean = np.zeros(1)
         if mean is None:

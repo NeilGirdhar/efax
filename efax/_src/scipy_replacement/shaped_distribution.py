@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 from numpy.random import Generator
-from tjax import ComplexArray, RealArray, Shape
+from tjax import NumpyComplexArray, NumpyRealArray, Shape
 
 __all__: list[str] = []
 
@@ -28,7 +28,7 @@ class ShapedDistribution:
 
     def rvs(self,
             size: None | int | Shape = None,
-            random_state: Generator | None = None) -> RealArray:
+            random_state: Generator | None = None) -> NumpyRealArray:
         if size is None:
             size = ()
         elif isinstance(size, int):
@@ -39,7 +39,7 @@ class ShapedDistribution:
             retval[i] = self.objects[i].rvs(size=size, random_state=random_state)
         return retval
 
-    def pdf(self, x: ComplexArray) -> RealArray:
+    def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             value = self.objects[i].pdf(x[i])
@@ -48,7 +48,7 @@ class ShapedDistribution:
             retval[i] = value
         return retval
 
-    def entropy(self) -> RealArray:
+    def entropy(self) -> NumpyRealArray:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             retval[i] = self.objects[i].entropy()
