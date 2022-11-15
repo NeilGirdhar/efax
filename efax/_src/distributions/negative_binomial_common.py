@@ -22,7 +22,7 @@ class NBCommonNP(NaturalParametrization[EP, RealArray], Generic[EP]):
         return self.log_not_p.shape
 
     def log_normalizer(self) -> RealArray:
-        return -self.failures * jnp.log1p(-jnp.exp(self.log_not_p))
+        return -self.failures * jnp.log1p(-jnp.exp(self.log_not_p))  # type: ignore[return-value]
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         a = x + self.failures - 1
