@@ -38,7 +38,7 @@ class ComplexField(Field):
         return support_num_element * 2
 
     def flattened(self, x: Array) -> RealArray:
-        return jnp.concatenate([x.real, x.imag], axis=-1)  # pyright: ignore
+        return jnp.concatenate([x.real, x.imag], axis=-1)
 
     def unflattened(self, y: RealArray) -> Array:
         assert y.shape[-1] % 2 == 0

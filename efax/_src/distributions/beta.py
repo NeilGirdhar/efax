@@ -26,7 +26,7 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
         return BetaEP(self._exp_helper())
 
     def sufficient_statistics(self, x: RealArray) -> BetaEP:
-        return BetaEP(jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1))  # pyright: ignore
+        return BetaEP(jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1))
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         return jnp.zeros(x.shape)

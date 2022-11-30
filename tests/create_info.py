@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
 from jax.random import KeyArray
-from tjax import ComplexArray, RealArray, Shape, NumpyRealArray, NumpyComplexArray
+from tjax import ComplexArray, NumpyComplexArray, NumpyRealArray, RealArray, Shape
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,

@@ -54,6 +54,7 @@ class ScipyDirichlet(ShapedDistribution):
 
 class ScipyGeneralizedDirichlet:
     def __init__(self, alpha: NumpyRealArray, beta: NumpyRealArray):
+        super().__init__()
         self.alpha = alpha
         self.beta = beta
 
