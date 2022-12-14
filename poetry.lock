@@ -63,6 +63,17 @@ dev = ["pytest", "cogapp", "pre-commit", "wheel"]
 tests = ["pytest"]
 
 [[package]]
+name = "arrow"
+version = "1.2.3"
+description = "Better dates & times for Python"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+python-dateutil = ">=2.7.0"
+
+[[package]]
 name = "astroid"
 version = "2.12.13"
 description = "An abstract syntax tree for Python with inference support."
@@ -77,7 +88,7 @@ wrapt = {version = ">=1.11,<2", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "asttokens"
-version = "2.2.0"
+version = "2.2.1"
 description = "Annotate AST trees with source code positions"
 category = "dev"
 optional = false
@@ -181,34 +192,34 @@ python-versions = ">=3.6"
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 
 [[package]]
-name = "colorful"
-version = "0.5.4"
-description = "Terminal string styling done right, in Python."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-colorama = {version = "*", markers = "platform_system == \"Windows\""}
-
-[[package]]
 name = "comm"
-version = "0.1.1"
+version = "0.1.2"
 description = "Jupyter Python Comm implementation, for usage in ipykernel, xeus-python etc."
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-traitlets = ">5.3"
+traitlets = ">=5.3"
 
 [package.extras]
 test = ["pytest"]
+
+[[package]]
+name = "commonmark"
+version = "0.9.1"
+description = "Python parser for the CommonMark Markdown spec"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 
 [[package]]
 name = "debugpy"
@@ -319,6 +330,14 @@ pycodestyle = ">=2.10.0,<2.11.0"
 pyflakes = ">=3.0.0,<3.1.0"
 
 [[package]]
+name = "fqdn"
+version = "1.5.1"
+description = "Validates fully-qualified domain names against RFC 1123, so that they are acceptable to modern bowsers"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0, !=3.1, !=3.2, !=3.3, !=3.4, <4"
+
+[[package]]
 name = "gast"
 version = "0.5.3"
 description = "Python AST that abstracts the underlying Python version"
@@ -352,7 +371,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 
 [[package]]
 name = "importlib-resources"
-version = "5.10.0"
+version = "5.10.1"
 description = "Read resources from Python packages"
 category = "dev"
 optional = false
@@ -363,7 +382,7 @@ zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 docs = ["sphinx (>=3.5)", "jaraco.packaging (>=9)", "rst.linker (>=1.9)", "furo", "jaraco.tidelift (>=1.4)"]
-testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 (<5)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)", "pytest-flake8"]
 
 [[package]]
 name = "iniconfig"
@@ -375,7 +394,7 @@ python-versions = "*"
 
 [[package]]
 name = "ipykernel"
-version = "6.18.3"
+version = "6.19.2"
 description = "IPython Kernel for Jupyter"
 category = "dev"
 optional = false
@@ -383,7 +402,7 @@ python-versions = ">=3.8"
 
 [package.dependencies]
 appnope = {version = "*", markers = "platform_system == \"Darwin\""}
-comm = ">=0.1"
+comm = ">=0.1.1"
 debugpy = ">=1.0"
 ipython = ">=7.23.1"
 jupyter-client = ">=6.1.12"
@@ -393,12 +412,14 @@ packaging = "*"
 psutil = "*"
 pyzmq = ">=17"
 tornado = ">=6.1"
-traitlets = ">=5.1.0"
+traitlets = ">=5.4.0"
 
 [package.extras]
 cov = ["coverage", "curio", "matplotlib", "pytest-cov", "trio"]
 docs = ["myst-parser", "pydata-sphinx-theme", "sphinx", "sphinxcontrib-github-alt"]
+lint = ["black (>=22.6.0)", "mdformat (>0.7)", "ruff (>=0.0.156)"]
 test = ["flaky", "ipyparallel", "pre-commit", "pytest-asyncio", "pytest-cov", "pytest-timeout", "pytest (>=7.0)"]
+typing = ["mypy (>=0.990)"]
 
 [[package]]
 name = "ipython"
@@ -445,7 +466,7 @@ python-versions = "*"
 
 [[package]]
 name = "ipywidgets"
-version = "8.0.2"
+version = "8.0.3"
 description = "Jupyter interactive widgets"
 category = "dev"
 optional = false
@@ -462,50 +483,60 @@ widgetsnbextension = ">=4.0,<5.0"
 test = ["jsonschema", "pytest (>=3.6.0)", "pytest-cov", "pytz"]
 
 [[package]]
+name = "isoduration"
+version = "20.11.0"
+description = "Operations with ISO 8601 durations"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+arrow = ">=0.15.0"
+
+[[package]]
 name = "isort"
-version = "5.10.1"
+version = "5.11.2"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
-python-versions = ">=3.6.1,<4.0"
+python-versions = ">=3.7.0"
 
 [package.extras]
-pipfile_deprecated_finder = ["pipreqs", "requirementslib"]
-requirements_deprecated_finder = ["pipreqs", "pip-api"]
+pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
+requirements-deprecated-finder = ["pipreqs", "pip-api"]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
 plugins = ["setuptools"]
 
 [[package]]
 name = "jax"
-version = "0.3.25"
+version = "0.4.1"
 description = "Differentiate, compile, and transform Numpy code."
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 
 [package.dependencies]
 numpy = ">=1.20"
 opt_einsum = "*"
 scipy = ">=1.5"
-typing_extensions = "*"
 
 [package.extras]
 australis = ["protobuf (>=3.13,<4)"]
-ci = ["jaxlib (==0.3.24)"]
-cpu = ["jaxlib (==0.3.25)"]
-cuda = ["jaxlib (==0.3.25+cuda11.cudnn82)"]
-cuda11_cudnn805 = ["jaxlib (==0.3.25+cuda11.cudnn805)"]
-cuda11_cudnn82 = ["jaxlib (==0.3.25+cuda11.cudnn82)"]
+ci = ["jaxlib (==0.4.0)"]
+cpu = ["jaxlib (==0.4.1)"]
+cuda = ["jaxlib (==0.4.1+cuda11.cudnn86)"]
+cuda11_cudnn82 = ["jaxlib (==0.4.1+cuda11.cudnn82)"]
+cuda11_cudnn86 = ["jaxlib (==0.4.1+cuda11.cudnn86)"]
 minimum-jaxlib = ["jaxlib (==0.3.22)"]
-tpu = ["jaxlib (==0.3.25)", "libtpu-nightly (==0.1.dev20221109)", "requests"]
+tpu = ["jaxlib (==0.4.1)", "libtpu-nightly (==0.1.dev20221212)", "requests"]
 
 [[package]]
 name = "jaxlib"
-version = "0.3.25"
+version = "0.4.1"
 description = "XLA library for JAX"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 
 [package.dependencies]
 numpy = ">=1.20"
@@ -542,6 +573,14 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jsonpointer"
+version = "2.3"
+description = "Identify specific nodes in a JSON document (RFC 6901)"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[[package]]
 name = "jsonschema"
 version = "4.17.3"
 description = "An implementation of JSON Schema validation for Python"
@@ -551,9 +590,17 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 attrs = ">=17.4.0"
+fqdn = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
+idna = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
 importlib-resources = {version = ">=1.4.0", markers = "python_version < \"3.9\""}
+isoduration = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
+jsonpointer = {version = ">1.13", optional = true, markers = "extra == \"format-nongpl\""}
 pkgutil-resolve-name = {version = ">=1.3.10", markers = "python_version < \"3.9\""}
 pyrsistent = ">=0.14.0,<0.17.0 || >0.17.0,<0.17.1 || >0.17.1,<0.17.2 || >0.17.2"
+rfc3339-validator = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
+rfc3986-validator = {version = ">0.1.0", optional = true, markers = "extra == \"format-nongpl\""}
+uri-template = {version = "*", optional = true, markers = "extra == \"format-nongpl\""}
+webcolors = {version = ">=1.11", optional = true, markers = "extra == \"format-nongpl\""}
 
 [package.extras]
 format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
@@ -577,7 +624,7 @@ qtconsole = "*"
 
 [[package]]
 name = "jupyter-client"
-version = "7.4.7"
+version = "7.4.8"
 description = "Jupyter protocol implementation and client libraries"
 category = "dev"
 optional = false
@@ -632,33 +679,72 @@ docs = ["myst-parser", "sphinxcontrib-github-alt", "traitlets"]
 test = ["ipykernel", "pre-commit", "pytest", "pytest-cov", "pytest-timeout"]
 
 [[package]]
-name = "jupyter-server"
-version = "1.23.3"
-description = "The backend—i.e. core services, APIs, and REST endpoints—to Jupyter web applications."
+name = "jupyter-events"
+version = "0.5.0"
+description = "Jupyter Event System library"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
+jsonschema = {version = ">=4.3.0", extras = ["format-nongpl"]}
+python-json-logger = "*"
+pyyaml = "*"
+traitlets = "*"
+
+[package.extras]
+cli = ["click", "rich"]
+test = ["click", "coverage", "pre-commit", "pytest-asyncio (>=0.19.0)", "pytest-console-scripts", "pytest-cov", "pytest (>=6.1.0)", "rich"]
+
+[[package]]
+name = "jupyter-server"
+version = "2.0.1"
+description = "The backend—i.e. core services, APIs, and REST endpoints—to Jupyter web applications."
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
 anyio = ">=3.1.0,<4"
 argon2-cffi = "*"
 jinja2 = "*"
-jupyter-client = ">=6.1.12"
-jupyter-core = ">=4.7.0"
+jupyter-client = ">=7.4.4"
+jupyter-core = ">=4.12,<5.0.0 || >=5.1.0"
+jupyter-events = ">=0.4.0"
+jupyter-server-terminals = "*"
 nbconvert = ">=6.4.4"
-nbformat = ">=5.2.0"
+nbformat = ">=5.3.0"
 packaging = "*"
 prometheus-client = "*"
 pywinpty = {version = "*", markers = "os_name == \"nt\""}
-pyzmq = ">=17"
-Send2Trash = "*"
+pyzmq = ">=24"
+send2trash = "*"
 terminado = ">=0.8.3"
-tornado = ">=6.1.0"
-traitlets = ">=5.1"
+tornado = ">=6.2.0"
+traitlets = ">=5.6.0"
 websocket-client = "*"
 
 [package.extras]
-test = ["coverage", "ipykernel", "pre-commit", "pytest-console-scripts", "pytest-cov", "pytest-mock", "pytest-timeout", "pytest-tornasync", "pytest (>=7.0)", "requests"]
+docs = ["docutils (<0.20)", "ipykernel", "jinja2", "jupyter-client", "jupyter-server", "mistune (<1.0.0)", "myst-parser", "nbformat", "prometheus-client", "pydata-sphinx-theme", "send2trash", "sphinxcontrib-github-alt", "sphinxcontrib-openapi", "sphinxemoji", "tornado"]
+lint = ["black (>=22.6.0)", "mdformat (>0.7)", "ruff (>=0.0.156)"]
+test = ["ipykernel", "pre-commit", "pytest-console-scripts", "pytest-jupyter[server] (>=0.4)", "pytest-timeout", "pytest (>=7.0)", "requests"]
+typing = ["mypy (>=0.990)"]
+
+[[package]]
+name = "jupyter-server-terminals"
+version = "0.4.2"
+description = "A Jupyter Server Extension Providing Terminals."
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+pywinpty = {version = ">=2.0.3", markers = "os_name == \"nt\""}
+terminado = ">=0.8.3"
+
+[package.extras]
+docs = ["jinja2", "jupyter-server", "mistune (<2.0)", "myst-parser", "nbformat", "packaging", "pydata-sphinx-theme", "sphinxcontrib-github-alt", "sphinxcontrib-openapi", "sphinxemoji", "tornado"]
+test = ["coverage", "jupyter-server (>=2.0.0rc8)", "pytest-cov", "pytest-jupyter[server] (>=0.5.3)", "pytest-timeout", "pytest (>=7.0)"]
 
 [[package]]
 name = "jupyterlab-pygments"
@@ -670,7 +756,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "jupyterlab-widgets"
-version = "3.0.3"
+version = "3.0.4"
 description = "Jupyter interactive widgets for JupyterLab"
 category = "dev"
 optional = false
@@ -799,7 +885,7 @@ test = ["ipykernel", "ipython", "ipywidgets", "nbconvert (>=7.0.0)", "pytest-asy
 
 [[package]]
 name = "nbconvert"
-version = "7.2.5"
+version = "7.2.6"
 description = "Converting Jupyter Notebooks"
 category = "dev"
 optional = false
@@ -824,12 +910,12 @@ tinycss2 = "*"
 traitlets = ">=5.0"
 
 [package.extras]
-all = ["ipykernel", "ipython", "ipywidgets (>=7)", "myst-parser", "nbsphinx (>=0.2.12)", "pre-commit", "pyppeteer (>=1,<1.1)", "pyqtwebengine (>=5.15)", "pytest", "pytest-cov", "pytest-dependency", "sphinx-rtd-theme", "sphinx (==5.0.2)", "tornado (>=6.1)"]
-docs = ["ipython", "myst-parser", "nbsphinx (>=0.2.12)", "sphinx-rtd-theme", "sphinx (==5.0.2)"]
-qtpdf = ["pyqtwebengine (>=5.15)"]
+all = ["nbconvert"]
+docs = ["ipykernel", "ipython", "myst-parser", "nbsphinx (>=0.2.12)", "pydata-sphinx-theme", "sphinx (==5.0.2)"]
+qtpdf = ["nbconvert"]
 qtpng = ["pyqtwebengine (>=5.15)"]
 serve = ["tornado (>=6.1)"]
-test = ["ipykernel", "ipywidgets (>=7)", "pre-commit", "pyppeteer (>=1,<1.1)", "pytest", "pytest-cov", "pytest-dependency"]
+test = ["ipykernel", "ipywidgets (>=7)", "pre-commit", "pyppeteer (>=1,<1.1)", "pytest", "pytest-dependency"]
 webpdf = ["pyppeteer (>=1,<1.1)"]
 
 [[package]]
@@ -954,14 +1040,11 @@ typing-extensions = ">=3.10.0"
 
 [[package]]
 name = "packaging"
-version = "21.3"
+version = "22.0"
 description = "Core utilities for Python packages"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
+python-versions = ">=3.7"
 
 [[package]]
 name = "pandocfilters"
@@ -1012,7 +1095,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "platformdirs"
-version = "2.5.4"
+version = "2.6.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 category = "dev"
 optional = false
@@ -1047,7 +1130,7 @@ twisted = ["twisted"]
 
 [[package]]
 name = "prompt-toolkit"
-version = "3.0.33"
+version = "3.0.36"
 description = "Library for building powerful interactive command lines in Python"
 category = "dev"
 optional = false
@@ -1122,7 +1205,7 @@ python-versions = ">=3.6"
 name = "pygments"
 version = "2.13.0"
 description = "Pygments is a syntax highlighting package written in Python."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1131,7 +1214,7 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pylint"
-version = "2.15.7"
+version = "2.15.8"
 description = "python code static checker"
 category = "dev"
 optional = false
@@ -1153,17 +1236,6 @@ spelling = ["pyenchant (>=3.2,<4.0)"]
 testutils = ["gitpython (>3)"]
 
 [[package]]
-name = "pyparsing"
-version = "3.0.9"
-description = "pyparsing module - Classes and methods to define and execute parsing grammars"
-category = "dev"
-optional = false
-python-versions = ">=3.6.8"
-
-[package.extras]
-diagrams = ["railroad-diagrams", "jinja2"]
-
-[[package]]
 name = "pyproject-flake8"
 version = "6.0.0"
 description = "pyproject-flake8 (`pflake8`), a monkey patching wrapper to connect flake8 with pyproject.toml configuration"
@@ -1177,7 +1249,7 @@ tomli = {version = "*", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "pyright"
-version = "1.1.282"
+version = "1.1.284"
 description = "Command line wrapper for pyright"
 category = "dev"
 optional = false
@@ -1220,11 +1292,11 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 
 [[package]]
 name = "pytest-xdist"
-version = "3.0.2"
-description = "pytest xdist plugin for distributed testing and loop-on-failing modes"
+version = "3.1.0"
+description = "pytest xdist plugin for distributed testing, most importantly across multiple CPUs"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 execnet = ">=1.1"
@@ -1248,6 +1320,14 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 six = ">=1.5"
 
 [[package]]
+name = "python-json-logger"
+version = "2.0.4"
+description = "A python library adding a json log formatter"
+category = "dev"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "pywin32"
 version = "305"
 description = "Python for Window Extensions"
@@ -1262,6 +1342,14 @@ description = "Pseudo terminal support for Windows from Python."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "pyyaml"
+version = "6.0"
+description = "YAML parser and emitter for Python"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
 
 [[package]]
 name = "pyzmq"
@@ -1310,6 +1398,41 @@ packaging = "*"
 
 [package.extras]
 test = ["pytest (>=6,!=7.0.0,!=7.0.1)", "pytest-cov (>=3.0.0)", "pytest-qt"]
+
+[[package]]
+name = "rfc3339-validator"
+version = "0.1.4"
+description = "A pure python RFC3339 validator"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+
+[package.dependencies]
+six = "*"
+
+[[package]]
+name = "rfc3986-validator"
+version = "0.1.1"
+description = "Pure python rfc3986 validator"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+
+[[package]]
+name = "rich"
+version = "12.6.0"
+description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
+category = "main"
+optional = false
+python-versions = ">=3.6.3,<4.0.0"
+
+[package.dependencies]
+commonmark = ">=0.9.0,<0.10.0"
+pygments = ">=2.6.0,<3.0.0"
+typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9\""}
+
+[package.extras]
+jupyter = ["ipywidgets (>=7.5.1,<8.0.0)"]
 
 [[package]]
 name = "scipy"
@@ -1395,7 +1518,7 @@ tests = ["pytest", "typeguard", "pygments", "littleutils", "cython"]
 
 [[package]]
 name = "tensorflow-probability"
-version = "0.18.0"
+version = "0.19.0"
 description = "Probabilistic modeling and statistical inference in TensorFlow"
 category = "main"
 optional = false
@@ -1416,7 +1539,7 @@ tfds = ["tensorflow-datasets (>=2.2.0)"]
 
 [[package]]
 name = "terminado"
-version = "0.17.0"
+version = "0.17.1"
 description = "Tornado websocket backend for the Xterm.js Javascript terminal emulator library."
 category = "dev"
 optional = false
@@ -1428,7 +1551,7 @@ pywinpty = {version = ">=1.1.0", markers = "os_name == \"nt\""}
 tornado = ">=6.1.0"
 
 [package.extras]
-docs = ["pydata-sphinx-theme", "sphinx"]
+docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["pre-commit", "pytest-timeout", "pytest (>=7.0)"]
 
 [[package]]
@@ -1448,17 +1571,17 @@ test = ["pytest", "isort", "flake8"]
 
 [[package]]
 name = "tjax"
-version = "0.23.0"
+version = "0.24.1"
 description = "Tools for JAX."
 category = "main"
 optional = false
-python-versions = ">=3.8,<3.11"
+python-versions = ">=3.8.1,<3.11"
 
 [package.dependencies]
-colorful = ">=0.5.4,<0.6.0"
-jax = ">=0.3.20,<0.4.0"
+jax = ">=0.4"
 numpy = ">=1.22"
 optax = ">=0.1"
+rich = ">=12.6"
 typing_extensions = ">=4.2"
 
 [[package]]
@@ -1495,7 +1618,7 @@ python-versions = ">= 3.7"
 
 [[package]]
 name = "traitlets"
-version = "5.6.0"
+version = "5.7.1"
 description = "Traitlets Python configuration system"
 category = "dev"
 optional = false
@@ -1503,7 +1626,9 @@ python-versions = ">=3.7"
 
 [package.extras]
 docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
+lint = ["black (>=22.6.0)", "mdformat (>0.7)", "ruff (>=0.0.156)"]
 test = ["pre-commit", "pytest"]
+typing = ["mypy (>=0.990)"]
 
 [[package]]
 name = "typing-extensions"
@@ -1514,12 +1639,31 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "uri-template"
+version = "1.2.0"
+description = "RFC 6570 URI Template Processor"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+dev = ["mypy", "flake8 (<4.0.0)", "flake8-annotations", "flake8-bugbear", "flake8-commas", "flake8-comprehensions", "flake8-continuation", "flake8-datetimez", "flake8-docstrings", "flake8-import-order", "flake8-literal", "flake8-noqa", "flake8-requirements", "flake8-type-annotations", "flake8-use-fstring", "pep8-naming"]
+
+[[package]]
 name = "wcwidth"
 version = "0.2.5"
 description = "Measures the displayed width of unicode strings in a terminal"
 category = "dev"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "webcolors"
+version = "1.12"
+description = "A library for working with color names and color values formats defined by HTML and CSS."
+category = "dev"
+optional = false
+python-versions = ">=3.7"
 
 [[package]]
 name = "webencodings"
@@ -1544,7 +1688,7 @@ test = ["websockets"]
 
 [[package]]
 name = "widgetsnbextension"
-version = "4.0.3"
+version = "4.0.4"
 description = "Jupyter interactive widgets for Jupyter Notebook"
 category = "dev"
 optional = false
@@ -1573,7 +1717,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = '>=3.8.1,<3.11'
-content-hash = "ef23d107de22e16a7c98e33031a8844ac1980d7d26e89910465045dad76531c5"
+content-hash = "2fbd75cdb8c95ff8b1146129766a6d5d7020ac5619681da3b31e659441bafee3"
 
 [metadata.files]
 absl-py = []
@@ -1581,6 +1725,7 @@ anyio = []
 appnope = []
 argon2-cffi = []
 argon2-cffi-bindings = []
+arrow = []
 astroid = []
 asttokens = []
 attrs = []
@@ -1591,8 +1736,8 @@ cffi = []
 chex = []
 cloudpickle = []
 colorama = []
-colorful = []
 comm = []
+commonmark = []
 debugpy = []
 decorator = []
 defusedxml = []
@@ -1604,6 +1749,7 @@ execnet = []
 executing = []
 fastjsonschema = []
 flake8 = []
+fqdn = []
 gast = []
 idna = []
 importlib-metadata = []
@@ -1613,17 +1759,21 @@ ipykernel = []
 ipython = []
 ipython-genutils = []
 ipywidgets = []
+isoduration = []
 isort = []
 jax = []
 jaxlib = []
 jedi = []
 jinja2 = []
+jsonpointer = []
 jsonschema = []
 jupyter = []
 jupyter-client = []
 jupyter-console = []
 jupyter-core = []
+jupyter-events = []
 jupyter-server = []
+jupyter-server-terminals = []
 jupyterlab-pygments = []
 jupyterlab-widgets = []
 lazy-object-proxy = []
@@ -1663,18 +1813,22 @@ pycparser = []
 pyflakes = []
 pygments = []
 pylint = []
-pyparsing = []
 pyproject-flake8 = []
 pyright = []
 pyrsistent = []
 pytest = []
 pytest-xdist = []
 python-dateutil = []
+python-json-logger = []
 pywin32 = []
 pywinpty = []
+pyyaml = []
 pyzmq = []
 qtconsole = []
 qtpy = []
+rfc3339-validator = []
+rfc3986-validator = []
+rich = []
 scipy = []
 send2trash = []
 setuptools = []
@@ -1692,7 +1846,9 @@ toolz = []
 tornado = []
 traitlets = []
 typing-extensions = []
+uri-template = []
 wcwidth = []
+webcolors = []
 webencodings = []
 websocket-client = []
 widgetsnbextension = []

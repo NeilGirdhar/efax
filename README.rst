@@ -196,10 +196,12 @@ Using the cross entropy to iteratively optimize a prediction is simple:
 
 .. code:: python
 
+    from __future__ import annotations
+
     import jax.numpy as jnp
     from jax import grad, jit, lax
     from jax.tree_util import tree_map, tree_reduce
-    from tjax import BooleanNumeric, RealArray, RealNumeric
+    from tjax import BooleanNumeric, RealArray, RealNumeric, print_generic
 
     from efax import BernoulliEP, BernoulliNP
 
@@ -238,22 +240,22 @@ Using the cross entropy to iteratively optimize a prediction is simple:
     # Optimize the predictive distribution iteratively, and output the natural parameters of the
     # prediction.
     optimized_q = lax.while_loop(cond_fun, body_fun, some_q)
-    print(optimized_q)
+    print_generic(optimized_q)
     # BernoulliNP
-    #     log_odds=Jax Array (3,) float32
-    #            -0.8440     -0.4047      0.8440
+    # └── log_odds=Jax Array (3,) float32
+    #     └──  -0.8440 │ -0.4047 │ 0.8440
 
     # Compare with the true value.
-    print(some_p.to_nat())
+    print_generic(some_p.to_nat())
     # BernoulliNP
-    #     log_odds=Jax Array (3,) float32
-    #            -0.8473     -0.4055      0.8473
+    # └── log_odds=Jax Array (3,) float32
+    #     └──  -0.8473 │ -0.4055 │ 0.8473
 
     # Print optimized natural parameters as expectation parameters.
-    print(optimized_q.to_exp())
+    print_generic(optimized_q.to_exp())
     # BernoulliEP
-    #     probability=Jax Array (3,) float32
-    #             0.3007      0.4002      0.6993
+    # └── probability=Jax Array (3,) float32
+    #     └──  0.3007 │ 0.4002 │ 0.6993
 
 Contribution guidelines
 =======================

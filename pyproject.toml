@@ -32,7 +32,7 @@ scipy = '^1.4'
 tensorflow_probability = '>=0.15'
 tjax = '>=0.21.3'
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 flake8 = '>=3.9'
 isort = '>=5.8'
 jupyter = '>=1'
