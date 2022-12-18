@@ -89,12 +89,28 @@ class ComplexCircularlySymmetricNormalEP(
         return jnp.zeros(self.shape)
 
     def sample(self, rng: KeyArray, shape: Shape | None = None) -> ComplexArray:
+        n = self.dimensions()
         if shape is not None:
-            shape += self.variance.shape[:-1]
+            shape += self.shape
         else:
-            shape = self.variance.shape[:-1]
-        mean = jnp.zeros(shape)
-        return jax.random.multivariate_normal(rng, mean, self.variance, shape[:-1])
+            shape = self.shape
+        xy_rvs = jax.random.multivariate_normal(rng,
+                                                self._multivariate_normal_mean(),
+                                                self._multivariate_normal_cov(),
+                                                shape)
+        return xy_rvs[..., :n] + 1j * xy_rvs[..., n:]
 
     def dimensions(self) -> int:
         return self.variance.shape[-1]
+
+    # Private method -------------------------------------------------------------------------------
+    def _multivariate_normal_mean(self) -> NumpyRealArray:
+        "Return the mean of a corresponding real distribution with double the size."
+        n = self.dimensions()
+        return jnp.zeros((*self.shape, n * 2))
+
+    def _multivariate_normal_cov(self) -> NumpyRealArray:
+        "Return the covariance of a corresponding real distribution with double the size."
+        gamma_r = 0.5 * self.variance.real
+        gamma_i = 0.5 * self.variance.imag
+        return jnp.block([[gamma_r, -gamma_i], [gamma_i, gamma_r]])
