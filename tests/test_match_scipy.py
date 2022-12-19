@@ -71,10 +71,11 @@ def test_maximum_likelihood_estimation(generator: Generator,
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
-    if isinstance(distribution_info, ComplexCircularlySymmetricNormalInfo):
+    if isinstance(distribution_info, (ComplexCircularlySymmetricNormalInfo,
+                                      MultivariateNormalInfo)):
         atol = 2e-2
         rtol = 1e-3
-    elif isinstance(distribution_info, (ComplexNormalInfo, MultivariateNormalInfo)):
+    elif isinstance(distribution_info, ComplexNormalInfo):
         atol = 1e-2
         rtol = 1e-3
     else:
