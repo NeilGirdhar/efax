@@ -24,8 +24,8 @@ def test_flatten(generator: Generator, distribution_info: DistributionInfo[Any, 
     p_flat = p.flattened()
     q_flat = q.flattened()
 
-    assert np.issubdtype(p_flat.dtype, np.floating)
-    assert np.issubdtype(q_flat.dtype, np.floating)
+    assert issubclass(p_flat.dtype.type, np.floating)
+    assert issubclass(q_flat.dtype.type, np.floating)
 
     assert_tree_allclose(type(p).unflattened(p_flat, **p_kwargs), p)
     assert_tree_allclose(type(q).unflattened(q_flat, **q_kwargs), q)

@@ -47,7 +47,7 @@ class ScipyDirichlet(ShapedDistribution):
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
         x = x.astype(np.float64)
         y = np.sum(x, axis=-1)
-        if not np.allclose(y, np.ones(y.shape), atol=1e-5, rtol=0):
+        if not np.all(np.isclose(y, np.ones(y.shape), atol=1e-5, rtol=0)):
             raise ValueError
         return super().pdf(x)
 

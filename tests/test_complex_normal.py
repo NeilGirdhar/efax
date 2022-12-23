@@ -10,7 +10,7 @@ from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 # Tools --------------------------------------------------------------------------------------------
 def random_complex_array(generator: Generator, shape: Shape = ()) -> NumpyComplexArray:
-    return np.array(sum(x * generator.normal(size=shape) for x in [0.5, 0.5j]))
+    return np.asarray(sum(x * generator.normal(size=shape) for x in [0.5, 0.5j]))
 
 
 def build_uvcn(generator: Generator, shape: Shape) -> ScipyComplexNormal:
@@ -28,7 +28,7 @@ def build_mvcn(generator: Generator,
                polarization: float = 0.98,
                regularization: float = 0.01) -> ScipyComplexMultivariateNormal:
     directions = 3
-    weights = np.array(range(directions)) + 1.5
+    weights = np.asarray(range(directions)) + 1.5
     mean = random_complex_array(generator, shape + (dimensions,))
     z = random_complex_array(generator, shape + (dimensions, directions))
     regularizer = np.tile(np.eye(dimensions), shape + (1, 1))
@@ -92,4 +92,4 @@ def test_univariate_multivariate_consistency(generator: Generator) -> None:
     uv = ScipyComplexNormal(component.mean[0], component.variance[0, 0].real,
                             component.pseudo_variance[0, 0])
     x = random_complex_array(generator)
-    assert_allclose(mv.pdf(np.array([x])), uv.pdf(x))
+    assert_allclose(mv.pdf(np.asarray([x])), uv.pdf(x))

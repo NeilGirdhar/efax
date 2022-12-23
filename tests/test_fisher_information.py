@@ -17,36 +17,36 @@ def test_mvn_fisher_information() -> None:
 
     # pylint: disable=protected-access
     assert_tree_allclose(m._fisher_information_matrix(),
-                         np.array([[1., 0., 0., 0., 0.],
-                                   [0., 1., 0., 0., 0.],
-                                   [0., 0., 2., 0., 0.],
-                                   [0., 0., 0., 4., 0.],
-                                   [0., 0., 0., 0., 2.]]))
+                         np.asarray([[1., 0., 0., 0., 0.],
+                                     [0., 1., 0., 0., 0.],
+                                     [0., 0., 2., 0., 0.],
+                                     [0., 0., 0., 4., 0.],
+                                     [0., 0., 0., 0., 2.]]))
 
     assert_tree_allclose(
         m.fisher_information_diagonal(),
-        MultivariateNormalNP(np.array([1.0, 1.0]),
-                             np.array([[2., 4.], [4., 2.]])))
+        MultivariateNormalNP(np.asarray([1.0, 1.0]),
+                             np.asarray([[2., 4.], [4., 2.]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
                          MultivariateNormalNP(2.0, 8.0))  # type: ignore[arg-type]
 
 
 def test_mvn_fisher_information_b() -> None:
-    m = MultivariateNormalNP(np.array([3.0, 5.0]), np.array([[-0.5, 0.0], [0.0, -0.8]]))
+    m = MultivariateNormalNP(np.asarray([3.0, 5.0]), np.asarray([[-0.5, 0.0], [0.0, -0.8]]))
 
     # pylint: disable=protected-access
     assert_tree_allclose(m._fisher_information_matrix(),
-                         np.array([[1., -0., 6., 6.25, -0.],
-                                   [-0., 0.625, -0., 3.75, 3.90625],
-                                   [6., 0., 38., 37.5, 0.],
-                                   [6.25, 3.75, 37.5, 64.062, 23.4375],
-                                   [0., 3.90625, 0., 23.4375, 25.1953]]))
+                         np.asarray([[1., -0., 6., 6.25, -0.],
+                                     [-0., 0.625, -0., 3.75, 3.90625],
+                                     [6., 0., 38., 37.5, 0.],
+                                     [6.25, 3.75, 37.5, 64.062, 23.4375],
+                                     [0., 3.90625, 0., 23.4375, 25.1953]]))
 
     assert_tree_allclose(
         m.fisher_information_diagonal(),
-        MultivariateNormalNP(np.array([1.0, 0.625]),
-                             np.array([[38., 64.062], [64.062, 25.1953]])))
+        MultivariateNormalNP(np.asarray([1.0, 0.625]),
+                             np.asarray([[38., 64.062], [64.062, 25.1953]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
                          MultivariateNormalNP(1.625, 127.258))  # type: ignore[arg-type]
@@ -58,7 +58,7 @@ def test_fisher_information_is_convex(generator: Generator,
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     # pylint: disable=protected-access
     fisher_information = nat_parameters._fisher_information_matrix()
-    assert jnp.issubdtype(fisher_information.dtype, jnp.floating)
+    assert issubclass(fisher_information.dtype.type, jnp.floating)
     eigvals = jnp.linalg.eigvals(fisher_information)
     if not jnp.all(eigvals >= 0.0):
         raise AssertionError(
@@ -66,7 +66,7 @@ def test_fisher_information_is_convex(generator: Generator,
             f"{eigvals}")
     determinant = jnp.linalg.det(fisher_information)
     assert determinant.shape == shape
-    assert jnp.issubdtype(determinant.dtype, jnp.floating)
+    assert issubclass(determinant.dtype.type, jnp.floating)
 
     if not jnp.all(determinant >= 0.0):
         raise AssertionError(

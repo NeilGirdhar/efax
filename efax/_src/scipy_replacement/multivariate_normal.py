@@ -27,7 +27,7 @@ class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_f
             size = (size,)
         else:
             size = tuple(size)
-        return retval.reshape(size + self.mean.shape)
+        return np.reshape(retval, size + self.mean.shape)
 
 
 T = TypeVar('T', bound='ScipyMultivariateNormal')

@@ -33,7 +33,7 @@ def cond_fun(q: BernoulliNP) -> BooleanNumeric:
 
 # some_p are expectation parameters of a Bernoulli distribution corresponding
 # to probabilities 0.3, 0.4, and 0.7.
-some_p = BernoulliEP(jnp.array([0.3, 0.4, 0.7]))
+some_p = BernoulliEP(jnp.asarray([0.3, 0.4, 0.7]))
 
 # some_q are natural parameters of a Bernoulli distribution corresponding to
 # log-odds 0, which is probability 0.5.

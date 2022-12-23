@@ -96,7 +96,7 @@ class ScipyComplexNormal(ShapedDistribution):
         if mean is None:
             mean = np.zeros(shape, dtype=dtype)
         if variance is None:
-            variance = np.array(np.ones(shape, dtype=dtype).real)
+            variance = np.ones(shape, dtype=dtype).real
         if pseudo_variance is None:
             pseudo_variance = np.zeros(shape, dtype=dtype)
 
@@ -115,9 +115,9 @@ class ScipyComplexNormal(ShapedDistribution):
                          polarization: ComplexNumeric) -> _T:
         r: NumpyComplexArray = (polarization *
                                 np.exp(1j * 2 * np.pi * angle * 2))  # type: ignore[assignment]
-        mean_array = np.array(mean)
-        variance_array = np.array(variance)
-        pseudo_variance_array = np.array(r * variance)
+        mean_array = np.asarray(mean)
+        variance_array = np.asarray(variance)
+        pseudo_variance_array = np.asarray(r * variance)
         return cls(mean_array, variance_array, pseudo_variance_array)
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:

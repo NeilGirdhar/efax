@@ -42,8 +42,8 @@ def generate_real_covariance(rng: KeyArray, dimensions: int) -> NumpyRealArray:
 def vectorized_real_covariance(rng: KeyArray, shape: Shape, dimensions: int) -> NumpyRealArray:
     if shape == ():
         return generate_real_covariance(rng, dimensions)
-    return np.array([vectorized_real_covariance(rng, shape[1:], dimensions)
-                     for _ in range(shape[0])])
+    return np.asarray([vectorized_real_covariance(rng, shape[1:], dimensions)
+                       for _ in range(shape[0])])
 
 
 def generate_complex_covariance(rng: KeyArray, dimensions: int) -> NumpyComplexArray:
@@ -58,8 +58,8 @@ def generate_complex_covariance(rng: KeyArray, dimensions: int) -> NumpyComplexA
 def vectorized_complex_covariance(rng: KeyArray, shape: Shape, dimensions: int) -> ComplexArray:
     if shape == ():
         return generate_complex_covariance(rng, dimensions)
-    return np.array([vectorized_complex_covariance(rng, shape[1:], dimensions)
-                     for _ in range(shape[0])])
+    return np.asarray([vectorized_complex_covariance(rng, shape[1:], dimensions)
+                       for _ in range(shape[0])])
 
 
 class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, RealArray]):

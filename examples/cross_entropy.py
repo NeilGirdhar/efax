@@ -6,7 +6,7 @@ from efax import BernoulliEP, BernoulliNP
 
 # p is the expectation parameters of three Bernoulli distributions having probabilities 0.4, 0.5,
 # and 0.6.
-p = BernoulliEP(jnp.array([0.4, 0.5, 0.6]))
+p = BernoulliEP(jnp.asarray([0.4, 0.5, 0.6]))
 
 # q is the natural parameters of three Bernoulli distributions having log-odds 0, which is
 # probability 0.5.

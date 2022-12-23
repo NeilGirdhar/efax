@@ -5,7 +5,7 @@ import math
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
-from tjax import ComplexArray, RealArray, Shape
+from tjax import ComplexArray, RealArray, Shape, NumpyRealArray
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization

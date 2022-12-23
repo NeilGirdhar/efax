@@ -37,9 +37,9 @@ class ScipyComplexMultivariateNormalUnvectorized:
                              f"instead of {(self.size, self.size)}.")
         if not np.all(np.linalg.eigvals(variance) >= 0):
             raise ValueError("The variance is not positive semidefinite.")
-        if not np.allclose(variance, variance.T.conjugate()):
+        if not np.all(np.isclose(variance, variance.T.conjugate())):
             raise ValueError("The variance is not Hermitian.")
-        if not np.allclose(pseudo_variance, pseudo_variance.T):
+        if not np.all(np.isclose(pseudo_variance, pseudo_variance.T)):
             raise ValueError("The pseudo-variance is not symmetric.")
 
     # New methods ----------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ class ScipyComplexMultivariateNormal(ShapedDistribution):
         if mean is None:
             mean = np.zeros(shape + (dimensions,), dtype=dtype)
         if variance is None:
-            variance = np.array(np.tile(np.eye(dimensions), shape + (1, 1)))
+            variance = np.asarray(np.tile(np.eye(dimensions), shape + (1, 1)))
         if pseudo_variance is None:
             pseudo_variance = np.zeros(shape + (dimensions, dimensions), dtype=dtype)
 
