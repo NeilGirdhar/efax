@@ -31,7 +31,7 @@ class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):
         return super().pdf(x)
 
 
-class ScipyDirichlet(ShapedDistribution):
+class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
     """
     This class allows distributions having a non-empty shape.
     """
@@ -39,7 +39,7 @@ class ScipyDirichlet(ShapedDistribution):
         shape = alpha[..., -1].shape
         rvs_shape = (alpha.shape[-1],)
         dtype = alpha.dtype
-        objects = np.empty(shape, dtype=np.object_)
+        objects = np.empty(shape, dtype=ScipyDirichletFixRVsAndPDF)
         for i in np.ndindex(shape):
             objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
         super().__init__(shape, rvs_shape, dtype, objects)

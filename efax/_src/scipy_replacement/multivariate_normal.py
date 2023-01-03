@@ -33,7 +33,7 @@ class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_f
 T = TypeVar('T', bound='ScipyMultivariateNormal')
 
 
-class ScipyMultivariateNormal(ShapedDistribution):
+class ScipyMultivariateNormal(ShapedDistribution[ScipyMultivariateNormalUnvectorized]):
     """
     This class allows distributions having a non-empty shape.
     """
@@ -52,7 +52,7 @@ class ScipyMultivariateNormal(ShapedDistribution):
         shape = mean[..., -1].shape
         rvs_shape = (mean.shape[-1],)
         dtype = mean.dtype
-        objects = np.empty(shape, dtype=np.object_)
+        objects = np.empty(shape, dtype=ScipyMultivariateNormalUnvectorized)
         for i in np.ndindex(*shape):
             objects[i] = ScipyMultivariateNormalUnvectorized(mean[i], cov[i])
         return cls(shape, rvs_shape, dtype, objects)

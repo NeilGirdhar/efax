@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 import numpy as np
 import numpy.typing as npt
@@ -10,7 +10,10 @@ from tjax import NumpyComplexArray, NumpyRealArray, Shape
 __all__: list[str] = []
 
 
-class ShapedDistribution:
+T = TypeVar('T')
+
+
+class ShapedDistribution(Generic[T]):
     """
     Allow a distributions with shape.
     """
@@ -53,3 +56,6 @@ class ShapedDistribution:
         for i in np.ndindex(*self.shape):
             retval[i] = self.objects[i].entropy()
         return retval
+
+    def access_object(self, index: tuple[int, ...]) -> T:
+        return self.objects[index]

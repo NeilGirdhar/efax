@@ -73,7 +73,7 @@ class ScipyComplexNormalUnvectorized:
         return np.stack([xx_xy, yx_yy], axis=-2)
 
 
-class ScipyComplexNormal(ShapedDistribution):
+class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
     """
     This class allows distributions having a non-empty shape.
     """
@@ -100,7 +100,7 @@ class ScipyComplexNormal(ShapedDistribution):
         if pseudo_variance is None:
             pseudo_variance = np.zeros(shape, dtype=dtype)
 
-        objects = np.empty(shape, dtype=np.object_)
+        objects = np.empty(shape, dtype=ScipyComplexNormalUnvectorized)
         for i in np.ndindex(*shape):
             objects[i] = ScipyComplexNormalUnvectorized(mean[i], variance[i], pseudo_variance[i])
         super().__init__(shape, rvs_shape, dtype, objects)
@@ -121,7 +121,7 @@ class ScipyComplexNormal(ShapedDistribution):
         return cls(mean_array, variance_array, pseudo_variance_array)
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
-        objects = np.empty(self.shape, dtype=np.object_)
+        objects = np.empty(self.shape, dtype=ScipyMultivariateNormalUnvectorized)
         for i in np.ndindex(*self.shape):
             objects[i] = self.objects[i].as_multivariate_normal()
         return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects)

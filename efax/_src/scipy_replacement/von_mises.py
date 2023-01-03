@@ -9,7 +9,7 @@ from .shaped_distribution import ShapedDistribution
 __all__ = ['ScipyVonMises']
 
 
-class ScipyVonMises(ShapedDistribution):
+class ScipyVonMises(ShapedDistribution[ss.vonmises]):
     """
     This class allows distributions having a non-empty shape.
     """

@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import NumpyComplexArray, Shape
+from tjax import NumpyComplexArray, NumpyRealArray, Shape
 
 from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
@@ -88,8 +88,10 @@ def test_multivariate_rvs(generator: Generator) -> None:
 
 def test_univariate_multivariate_consistency(generator: Generator) -> None:
     mv = build_mvcn(generator, (), 1, polarization=0.5)
-    component = mv.objects[()]
-    uv = ScipyComplexNormal(component.mean[0], component.variance[0, 0].real,
-                            component.pseudo_variance[0, 0])
+    component = mv.access_object(())
+    mean: NumpyComplexArray = np.asarray(component.mean[0])
+    variance: NumpyRealArray = np.asarray(component.variance[0, 0].real)
+    pseudo_variance: NumpyComplexArray = np.asarray(component.pseudo_variance[0, 0])
+    uv = ScipyComplexNormal(mean, variance, pseudo_variance)
     x = random_complex_array(generator)
     assert_allclose(mv.pdf(np.asarray([x])), uv.pdf(x))

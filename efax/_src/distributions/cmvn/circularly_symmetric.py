@@ -5,7 +5,7 @@ import math
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
-from tjax import ComplexArray, RealArray, Shape, NumpyRealArray
+from tjax import ComplexArray, RealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...expectation_parametrization import ExpectationParametrization
@@ -104,12 +104,12 @@ class ComplexCircularlySymmetricNormalEP(
         return self.variance.shape[-1]
 
     # Private method -------------------------------------------------------------------------------
-    def _multivariate_normal_mean(self) -> NumpyRealArray:
+    def _multivariate_normal_mean(self) -> RealArray:
         "Return the mean of a corresponding real distribution with double the size."
         n = self.dimensions()
         return jnp.zeros((*self.shape, n * 2))
 
-    def _multivariate_normal_cov(self) -> NumpyRealArray:
+    def _multivariate_normal_cov(self) -> RealArray:
         "Return the covariance of a corresponding real distribution with double the size."
         gamma_r = 0.5 * self.variance.real
         gamma_i = 0.5 * self.variance.imag
