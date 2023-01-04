@@ -58,8 +58,8 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
 
     def expected_carrier_measure(self) -> RealArray:
         k = self.concentration
-        lambda_ = self.chi ** (1.0 / k)
-        return (k - 1.0) * jnp.log(lambda_) - jnp.euler_gamma * (1.0 - 1.0 / k)
+        one_minus_one_over_k = 1.0 - 1.0 / k
+        return one_minus_one_over_k * jnp.log(self.chi) - jnp.euler_gamma * one_minus_one_over_k
 
     def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
