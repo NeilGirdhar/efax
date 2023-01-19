@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import operator
 from typing import Any, Generic, TypeVar, final
 
+from jax.tree_util import tree_map
 from tjax import RealArray, jit
 
 from .natural_parametrization import NaturalParametrization
@@ -72,4 +74,8 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         Returns: The Kullback–Leibler divergence.  This can be quite slow since it depends on a
             conversion to natural parameters.
         """
-        return self.cross_entropy(q) - self.entropy()
+        self_nat = self.to_nat()
+        difference = tree_map(operator.sub, self_nat, q)
+        return (parameters_dot_product(difference, self)
+                + q.log_normalizer()
+                - self_nat.log_normalizer())
