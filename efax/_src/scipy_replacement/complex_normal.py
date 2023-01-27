@@ -4,7 +4,7 @@ from typing import TypeVar
 
 import numpy as np
 from numpy.random import Generator
-from tjax import ComplexNumeric, NumpyComplexArray, NumpyRealArray, RealNumeric, ShapeLike
+from tjax import NumpyComplexArray, NumpyComplexNumeric, NumpyRealArray, NumpyRealNumeric, ShapeLike
 
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
@@ -17,9 +17,9 @@ class ScipyComplexNormalUnvectorized:
     Represents an array of univariate complex normal distributions.
     """
     def __init__(self,
-                 mean: ComplexNumeric,
-                 variance: RealNumeric,
-                 pseudo_variance: ComplexNumeric):
+                 mean: NumpyComplexNumeric,
+                 variance: NumpyRealNumeric,
+                 pseudo_variance: NumpyComplexNumeric):
         super().__init__()
         self.mean: NumpyComplexArray = np.asarray(mean)
         self.variance: NumpyRealArray = np.asarray(variance)
@@ -35,7 +35,7 @@ class ScipyComplexNormalUnvectorized:
             raise ValueError("Shape mismatch.")
 
     # New methods ----------------------------------------------------------------------------------
-    def pdf(self, z: ComplexNumeric, out: None = None) -> RealNumeric:
+    def pdf(self, z: NumpyComplexNumeric, out: None = None) -> NumpyRealNumeric:
         zr = np.stack([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
@@ -109,10 +109,10 @@ class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
 
     @classmethod
     def init_using_angle(cls: type[_T],
-                         mean: ComplexNumeric,
-                         variance: RealNumeric,
-                         angle: RealNumeric,
-                         polarization: ComplexNumeric) -> _T:
+                         mean: NumpyComplexNumeric,
+                         variance: NumpyRealNumeric,
+                         angle: NumpyRealNumeric,
+                         polarization: NumpyComplexNumeric) -> _T:
         r: NumpyComplexArray = (polarization *
                                 np.exp(1j * 2 * np.pi * angle * 2))  # type: ignore[assignment]
         mean_array = np.asarray(mean)

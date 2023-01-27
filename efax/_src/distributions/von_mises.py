@@ -103,5 +103,5 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray], Multidimensional):
 
 
 # Private functions --------------------------------------------------------------------------------
-def _a_k(k: RealNumeric, kappa: RealNumeric) -> RealNumeric:
+def _a_k(k: RealNumeric, kappa: RealNumeric) -> RealArray:
     return iv_ratio(k * 0.5, kappa)

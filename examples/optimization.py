@@ -3,12 +3,12 @@ from __future__ import annotations
 import jax.numpy as jnp
 from jax import grad, jit, lax
 from jax.tree_util import tree_map, tree_reduce
-from tjax import BooleanNumeric, RealArray, RealNumeric, print_generic
+from tjax import BooleanNumeric, RealArray, print_generic
 
 from efax import BernoulliEP, BernoulliNP
 
 
-def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> RealNumeric:
+def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> RealArray:
     return jnp.sum(p.cross_entropy(q))
 
 

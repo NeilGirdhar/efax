@@ -7,8 +7,7 @@ import pytest
 from numpy.linalg import det, inv
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from scipy.special import digamma, gammaln
-from tjax import RealArray
+from scipy.special import digamma, gammaln  # pylint: disable=no-name-in-module
 
 from .create_info import GammaInfo, MultivariateNormalInfo, NormalInfo
 from .distribution_info import DistributionInfo
