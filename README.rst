@@ -8,7 +8,7 @@ EFAX: Exponential Families in JAX
     :language: bash
 
 .. role:: python(code)
-   :language: python
+    :language: python
 
 This library provides a set of tools for working with *exponential family distributions* in the
 differential programming library `JAX <https://github.com/google/jax/>`_.
