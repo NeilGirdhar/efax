@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TypeVar
-
 import numpy as np
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyComplexNumeric, NumpyRealArray, NumpyRealNumeric, ShapeLike
+from typing_extensions import Self
 
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
@@ -105,14 +104,12 @@ class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
             objects[i] = ScipyComplexNormalUnvectorized(mean[i], variance[i], pseudo_variance[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 
-    _T = TypeVar('_T', bound='ScipyComplexNormal')
-
     @classmethod
-    def init_using_angle(cls: type[_T],
+    def init_using_angle(cls,
                          mean: NumpyComplexNumeric,
                          variance: NumpyRealNumeric,
                          angle: NumpyRealNumeric,
-                         polarization: NumpyComplexNumeric) -> _T:
+                         polarization: NumpyComplexNumeric) -> Self:
         r: NumpyComplexArray = (polarization *
                                 np.exp(1j * 2 * np.pi * angle * 2))  # type: ignore[assignment]
         mean_array = np.asarray(mean)

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import TypeVar
-
 import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyRealArray, ShapeLike
+from typing_extensions import Self
 
 from .shaped_distribution import ShapedDistribution
 
@@ -30,17 +29,14 @@ class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_f
         return np.reshape(retval, size + self.mean.shape)
 
 
-T = TypeVar('T', bound='ScipyMultivariateNormal')
-
-
 class ScipyMultivariateNormal(ShapedDistribution[ScipyMultivariateNormalUnvectorized]):
     """
     This class allows distributions having a non-empty shape.
     """
     @classmethod
-    def from_mc(cls: type[T],
+    def from_mc(cls,
                 mean: NumpyRealArray | None = None,
-                cov: NumpyRealArray | None = None) -> T:
+                cov: NumpyRealArray | None = None) -> Self:
         if mean is None and cov is None:
             mean = np.zeros(1)
         if mean is None:

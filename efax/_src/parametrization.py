@@ -4,19 +4,17 @@ from collections.abc import Iterable
 from dataclasses import fields
 from functools import partial, reduce
 from itertools import count
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
 from tjax import ComplexArray, RealArray, Shape, custom_jvp, jit
 from tjax.dataclasses import dataclass
+from typing_extensions import Self
 
 from .parameter import Support
 from .tools import parameters_dot_product
 
 __all__ = ['Parametrization']
-
-
-T = TypeVar('T', bound='Parametrization')
 
 
 @dataclass
@@ -62,7 +60,7 @@ class Parametrization:
             setattr(cls, name, method_jvp)
 
     # New methods ----------------------------------------------------------------------------------
-    def __getitem__(self: T, key: Any) -> T:
+    def __getitem__(self, key: Any) -> Self:
         fixed_parameters = self.fixed_parameters_mapping()
         sliced_parameters = {name: value[key]
                              for name, value, _ in self.parameters_name_value_support()}
@@ -74,7 +72,7 @@ class Parametrization:
                        for name, value, support in self.parameters_name_value_support()))
 
     @classmethod
-    def unflattened(cls: type[T], flattened: RealArray, **kwargs: Any) -> T:
+    def unflattened(cls, flattened: RealArray, **kwargs: Any) -> Self:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
