@@ -34,22 +34,14 @@ tensorflow_probability = '>=0.15'
 tjax = '>=0.23.0'
 
 [tool.poetry.group.dev.dependencies]
-flake8 = '>=3.9'
 isort = '>=5.8'
 jupyter = '>=1'
 mypy = '>=1.0'
 pylint = '>=2.12'
-pyproject-flake8 = ">=6"
 pyright = ">=0.0.13"
 pytest = '^7'
 pytest-xdist = {version = '>=3', extras = ['psutil']}
-
-[tool.flake8]
-max-line-length = 100
-extend-ignore = "E741"
-per-file-ignores = """
-    __init__.py: F401, F403
-"""
+ruff = '>=0'
 
 [tool.isort]
 line_length = 100
@@ -122,3 +114,8 @@ warn_unused_ignores = true
 module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
        'tensorflow_probability.substrates']
 ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["__init__.py"]

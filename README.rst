@@ -284,7 +284,8 @@ Implementation should respect PEP8.
 The tests can be run using :bash:`pytest . -n auto`.
 There are a few tools to clean and check the source:
 
-- :bash:`isort .`
+- :bash:`ruff .`
+- :bash:`pyright .`
 - :bash:`mypy .`
+- :bash:`isort .`
 - :bash:`pylint efax tests`
-- :bash:`pflake8 .`
