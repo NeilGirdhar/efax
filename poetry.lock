@@ -755,13 +755,13 @@ requirements-deprecated-finder = ["pip-api", "pipreqs"]
 
 [[package]]
 name = "jax"
-version = "0.4.3"
+version = "0.4.4"
 description = "Differentiate, compile, and transform Numpy code."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jax-0.4.3.tar.gz", hash = "sha256:d43f08f940aa30eb339965cfb3d6bee2296537b0dc2f0c65ccae3009279529ae"},
+    {file = "jax-0.4.4.tar.gz", hash = "sha256:39b07e07343ed7c74492ee5e75db77456d3afdd038a322671f09fc748f6392cb"},
 ]
 
 [package.dependencies]
@@ -771,34 +771,34 @@ scipy = ">=1.5"
 
 [package.extras]
 australis = ["protobuf (>=3.13,<4)"]
-ci = ["jaxlib (==0.4.2)"]
-cpu = ["jaxlib (==0.4.3)"]
-cuda = ["jaxlib (==0.4.3+cuda11.cudnn86)"]
-cuda11-cudnn82 = ["jaxlib (==0.4.3+cuda11.cudnn82)"]
-cuda11-cudnn86 = ["jaxlib (==0.4.3+cuda11.cudnn86)"]
+ci = ["jaxlib (==0.4.3)"]
+cpu = ["jaxlib (==0.4.4)"]
+cuda = ["jaxlib (==0.4.4+cuda11.cudnn86)"]
+cuda11-cudnn82 = ["jaxlib (==0.4.4+cuda11.cudnn82)"]
+cuda11-cudnn86 = ["jaxlib (==0.4.4+cuda11.cudnn86)"]
 minimum-jaxlib = ["jaxlib (==0.4.2)"]
-tpu = ["jaxlib (==0.4.3)", "libtpu-nightly (==0.1.dev20230207)", "requests"]
+tpu = ["jaxlib (==0.4.4)", "libtpu-nightly (==0.1.dev20230216)", "requests"]
 
 [[package]]
 name = "jaxlib"
-version = "0.4.3"
+version = "0.4.4"
 description = "XLA library for JAX"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jaxlib-0.4.3-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:512b31532cdec88bf04721bff66ad8639a8d95a462284cb9af2e7a9b7a9d37ed"},
-    {file = "jaxlib-0.4.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ae631f788c060e0c765c01176c210723fcb9b6824b2a189bfd13c2152c228c1d"},
-    {file = "jaxlib-0.4.3-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:f17b53736aca7c31a5eedd4cdad64be92c8b774c943a516d72296d6e2a3dc6c2"},
-    {file = "jaxlib-0.4.3-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:71a77f3fa7922a5e87c24596abc246e1af85c77eee20b67c161d9d85b3e22944"},
-    {file = "jaxlib-0.4.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:af2cd5613feb1fb4b8895483f0d3140378803f591d79ac6db7718b7b21664baf"},
-    {file = "jaxlib-0.4.3-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:2a284b9b7972b25a4bbfba674be91c295b4cacd62640d956045383d7b40525ba"},
-    {file = "jaxlib-0.4.3-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:2ab6546ad6fd2b3a4720ba0b03e355e59840a61e0852991ea78bb6ab7e9dc60e"},
-    {file = "jaxlib-0.4.3-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:0c78c3b24a84e177a8a9ac668d5fc991f23f0a7406dcd3e262b6a29a7c907855"},
-    {file = "jaxlib-0.4.3-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:2f00f05970c62fea2054ce081d0d14c4d2d40655c9c58bc4b7967fe6888d2143"},
-    {file = "jaxlib-0.4.3-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:9aa4e89c6d8f1415af70d5f02dfb40e6895337896680b900b801ed648151ac4b"},
-    {file = "jaxlib-0.4.3-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:8e8765fe1a5284b072fab8d10018c88449c6922a4752a91c9211b2fe4c95151a"},
-    {file = "jaxlib-0.4.3-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:ca5532c2865f10f782a5d106d355a40fd80a1a509d0400a5886f83254003fb14"},
+    {file = "jaxlib-0.4.4-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:6ab7e24f0f3269f2708d1c0984a6f2d8eef2dfee24b21dcf8da296f49809d689"},
+    {file = "jaxlib-0.4.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:c2e3a6a0279395db2549ad0ca269907937be4582a150c6a6d595eb812a2ffbc5"},
+    {file = "jaxlib-0.4.4-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:e154fdd3d001fad8b91f342fb1a656358e8c4bf188b65544147f6a7999d4b8a4"},
+    {file = "jaxlib-0.4.4-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:43f7c2193c2572c33106f41e4c206c70e4b30e97139699134d29a3e4ba367afb"},
+    {file = "jaxlib-0.4.4-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:6e8794ec07504a2e68f49f7751130ff4bc1754eb554560e70a9e2004b6f728bf"},
+    {file = "jaxlib-0.4.4-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:49acc44c2fe8fc7e3e66a0056b6ea55fc6bd4685686070d57d05d7bbd7872cdf"},
+    {file = "jaxlib-0.4.4-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:32141275ca791277ae6cb26f3e0c51be3c3eff96d2a886a32b34090ce66eacf6"},
+    {file = "jaxlib-0.4.4-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:f3f065cb4596d360a259ea9dd6ff86b937d9a0536ade73c4391e24e1660a2555"},
+    {file = "jaxlib-0.4.4-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:754bbe7a78cdf04b6cd6227089e4d6e4940b9ce304cc92bd606f16d36770c6a9"},
+    {file = "jaxlib-0.4.4-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:d2e56b310d6294ad233b1b770e474f37398bc12aae0cd3718ec36e982af4483b"},
+    {file = "jaxlib-0.4.4-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:6c41bb297ed270a7de6e65445f87b72e8a0fa6b57e584192bb55f0646159c9e4"},
+    {file = "jaxlib-0.4.4-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:a54176971e8897c1e7e75f2a207fbd2b1e46158c246915d294e8cc0d4897863b"},
 ]
 
 [package.dependencies]
@@ -908,14 +908,14 @@ qtconsole = "*"
 
 [[package]]
 name = "jupyter-client"
-version = "8.0.2"
+version = "8.0.3"
 description = "Jupyter protocol implementation and client libraries"
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jupyter_client-8.0.2-py3-none-any.whl", hash = "sha256:c53731eb590b68839b0ce04bf46ff8c4f03278f5d9fe5c3b0f268a57cc2bd97e"},
-    {file = "jupyter_client-8.0.2.tar.gz", hash = "sha256:47ac9f586dbcff4d79387ec264faf0fdeb5f14845fa7345fd7d1e378f8096011"},
+    {file = "jupyter_client-8.0.3-py3-none-any.whl", hash = "sha256:be48ac6bd659cbbddb7a674cf06b3b8afbf53f228253cf58bde604c03bd487b0"},
+    {file = "jupyter_client-8.0.3.tar.gz", hash = "sha256:ed65498bea6d876ef9d8da3e0db3dd33c5d129f5b2645f56ae03993782966bd0"},
 ]
 
 [package.dependencies]

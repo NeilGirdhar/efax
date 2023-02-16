@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
 import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
 from tjax import ComplexArray, RealArray, jit
+from typing_extensions import Self
 
 from .parametrization import Parametrization
 from .tools import parameters_dot_product
@@ -136,6 +137,10 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         expectation_parameters: EP
         expectation_parameters, f_vjp = vjp(type(self).to_exp, self)
         return expectation_parameters, f_vjp(vector)
+
+    @final
+    def kl_divergence(self, q: Self) -> RealArray:
+        return self.to_exp().kl_divergence(q, self_nat=self)
 
     # Private methods ------------------------------------------------------------------------------
     @classmethod

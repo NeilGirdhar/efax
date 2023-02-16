@@ -66,7 +66,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
 
     @jit
     @final
-    def kl_divergence(self, q: NP) -> RealArray:
+    def kl_divergence(self, q: NP, *, self_nat: None | NP = None) -> RealArray:
         """The Kullback-Leibler divergence.
 
         This can be quite slow since it depends on a conversion to natural parameters.
@@ -74,8 +74,10 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         Args:
             self: The expectation parameters of the first distribution.
             q: The natural parameters of second destribution.
+            self_nat: The natural parameters of the first distribution, if available.
         """
-        self_nat = self.to_nat()
+        if self_nat is None:
+            self_nat = self.to_nat()
         difference = tree_map(operator.sub, self_nat, q)
         return (parameters_dot_product(difference, self)
                 + q.log_normalizer()
