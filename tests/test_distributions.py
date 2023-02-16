@@ -14,9 +14,7 @@ from .distribution_info import DistributionInfo
 
 def test_conversion(generator: Generator,
                     distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Test that the conversion between the different parametrizations are consistent.
-    """
+    """Test that the conversion between the different parametrizations are consistent."""
     atol = (5e-3
             if isinstance(distribution_info, (GammaInfo, BetaInfo))
             else 2e-2
@@ -38,16 +36,12 @@ def test_conversion(generator: Generator,
                 assert_allclose(value, intermediate_fixed[name])
                 assert_allclose(value, final_fixed[name])
         except AssertionError:
-            print(original_ep, intermediate_np, final_ep)
             raise
 
 
 def test_gradient_log_normalizer(generator: Generator,
                                  distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Tests that the gradient log-normalizer evaluates to the same as the gradient of the
-    log-normalizer.
-    """
+    """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
     # pylint: disable=too-many-locals, disable=protected-access
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
     original_ln = cls._original_log_normalizer

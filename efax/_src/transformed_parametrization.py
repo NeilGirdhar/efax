@@ -17,9 +17,7 @@ Domain = TypeVar('Domain', bound=ComplexArray)
 
 class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
                                         Generic[NP, EP, TEP, Domain]):
-    """
-    Produce a NaturalParametrization by relating it to some base distrubtion NP.
-    """
+    """Produce a NaturalParametrization by relating it to some base distrubtion NP."""
     # Abstract methods -----------------------------------------------------------------------------
     def base_distribution(self) -> NP:
         raise NotImplementedError
@@ -36,15 +34,11 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
         return self.base_distribution().shape
 
     def log_normalizer(self) -> RealArray:
-        """
-        Returns: The log-normalizer.
-        """
+        """The log-normalizer."""
         return self.base_distribution().log_normalizer()
 
     def to_exp(self) -> TEP:
-        """
-        Returns: The corresponding expectation parameters.
-        """
+        """The corresponding expectation parameters."""
         return self.create_expectation(self.base_distribution().to_exp())
 
     def sufficient_statistics(self, x: Domain) -> TEP:
@@ -56,9 +50,7 @@ TNP = TypeVar('TNP', bound=TransformedNaturalParametrization[Any, Any, Any, Any]
 
 
 class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):
-    """
-    Produce an ExpectationParametrization by relating it to some base distrubtion EP.
-    """
+    """Produce an ExpectationParametrization by relating it to some base distrubtion EP."""
     # Abstract methods -----------------------------------------------------------------------------
     def base_distribution(self) -> EP:
         raise NotImplementedError
@@ -72,7 +64,5 @@ class TransformedExpectationParametrization(ExpectationParametrization[TNP], Gen
         return self.base_distribution().shape
 
     def to_nat(self) -> TNP:
-        """
-        Returns: The corresponding natural parameters.
-        """
+        """The corresponding natural parameters."""
         return self.create_natural(self.base_distribution().to_nat())

@@ -17,9 +17,7 @@ from .distribution_info import DistributionInfo
                                                   MultivariateNormalInfo(dimensions=4),
                                                   GammaInfo()])
 def test_kl(generator: Generator, distribution_info_kl: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Test the KL divergence.
-    """
+    """Test the KL divergence."""
     shape = (3, 2)
     x = distribution_info_kl.exp_parameter_generator(generator, shape=shape)
     y = distribution_info_kl.nat_parameter_generator(generator, shape=shape)

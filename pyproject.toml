@@ -116,6 +116,28 @@ module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
 ignore_missing_imports = true
 
 [tool.ruff]
+select = ["F", "E", "W", "I", "N", "D", "UP", "YTT", "ANN", "S", "BLE", "FBT", "B", "A", "C4",
+    "EM", "EXE", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "RSE", "RET", "SLF", "SIM",
+    "TID", "PTH", "PGH", "PL", "TRY", "NPY", "RUF"]
+ignore = ["B008", "B011", "D100", "D101", "D102", "D107", "S101", "D103", "D105",
+    "SIM117", "ANN101", "ANN102", "ANN401", "TID252", "FBT003", "I001", "G004",
+    "PT015", "PGH003", "PT013"]
 line-length = 100
-target-version = "py310"
-extend-exclude = ["__init__.py"]
+target-version = "py38"
+extend-exclude = ["__init__.py", "examples"]
+
+[tool.ruff.flake8-annotations]
+mypy-init-return = true
+
+[tool.ruff.flake8-errmsg]
+max-string-length = 40
+
+[tool.ruff.isort]
+combine-as-imports = true
+
+[tool.ruff.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
+
+[tool.ruff.pylint]
+max-args = 8

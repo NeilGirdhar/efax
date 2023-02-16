@@ -26,18 +26,18 @@ def pytest_addoption(parser: Any) -> None:
     parser.addoption('--distribution', action='store', default=None)
 
 
-@pytest.fixture
+@pytest.fixture()
 def generator() -> NumpyGenerator:
     return np.random.default_rng(123)
 
 
-@pytest.fixture
+@pytest.fixture()
 def rng() -> KeyArray:
     return PRNGKey(123)
 
 
 @pytest.fixture(scope='session')
-def configure_numpy() -> Generator[None, None, None]:
+def _configure_numpy() -> Generator[None, None, None]:
     line_width = [int(x)
                   for x in subprocess.check_output(['stty', 'size']).decode().split()][1]
 

@@ -29,9 +29,9 @@ def build_mvcn(generator: Generator,
                regularization: float = 0.01) -> ScipyComplexMultivariateNormal:
     directions = 3
     weights = np.asarray(range(directions)) + 1.5
-    mean = random_complex_array(generator, shape + (dimensions,))
-    z = random_complex_array(generator, shape + (dimensions, directions))
-    regularizer = np.tile(np.eye(dimensions), shape + (1, 1))
+    mean = random_complex_array(generator, (*shape, dimensions))
+    z = random_complex_array(generator, (*shape, dimensions, directions))
+    regularizer = np.tile(np.eye(dimensions), (*shape, 1, 1))
     variance = (
         np.average(z.conjugate()[..., np.newaxis, :, :] * z[..., np.newaxis, :],
                    weights=weights,

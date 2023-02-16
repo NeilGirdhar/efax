@@ -102,9 +102,7 @@ class Parametrization:
                 if field.metadata['fixed']}
 
     def parameters_value_support(self) -> Iterable[tuple[ComplexArray, Support]]:
-        """
-        Returns: The value and support of each variable parameter.
-        """
+        """The value and support of each variable parameter."""
         for field in fields(self):
             value = getattr(self, field.name)
             metadata = field.metadata
@@ -116,9 +114,7 @@ class Parametrization:
             yield value, support
 
     def parameters_name_value(self) -> Iterable[tuple[str, ComplexArray]]:
-        """
-        Returns: The name and value of each variable parameter.
-        """
+        """The name and value of each variable parameter."""
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
@@ -128,9 +124,7 @@ class Parametrization:
             yield name, value
 
     def parameters_name_value_support(self) -> Iterable[tuple[str, ComplexArray, Support]]:
-        """
-        Returns: The name, value, and support of each variable parameter.
-        """
+        """The name, value, and support of each variable parameter."""
         for field in fields(self):
             name = field.name
             value = getattr(self, name)
@@ -144,9 +138,7 @@ class Parametrization:
 
     @classmethod
     def parameters_name_support(cls) -> Iterable[tuple[str, Support]]:
-        """
-        Returns: The name and support of each variable parameter.
-        """
+        """The name and support of each variable parameter."""
         for field in fields(cls):
             metadata = field.metadata
             if metadata['fixed']:

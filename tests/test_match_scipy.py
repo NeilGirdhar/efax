@@ -1,6 +1,4 @@
-"""
-These tests ensure that our distributions match scipy's.
-"""
+"""These tests ensure that our distributions match scipy's."""
 from __future__ import annotations
 
 from functools import partial
@@ -18,9 +16,7 @@ from .distribution_info import DistributionInfo
 
 
 def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Test that the entropy calculation matches scipy's.
-    """
+    """Test that the entropy calculation matches scipy's."""
     shape = (3, 2)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
@@ -39,9 +35,7 @@ def test_entropy(generator: Generator, distribution_info: DistributionInfo[Any, 
 
 
 def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Test that the density/mass function calculation matches scipy's.
-    """
+    """Test that the density/mass function calculation matches scipy's."""
     for _ in range(10):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
@@ -67,7 +61,8 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
 
 def test_maximum_likelihood_estimation(generator: Generator,
                                        distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
+    """Test maximum likelihood estimation using SciPy.
+
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
@@ -81,14 +76,18 @@ def test_maximum_likelihood_estimation(generator: Generator,
     else:
         atol = 1e-4
         rtol = 2e-2
+    # Generate a distribution with expectation and natural parameters.
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
     nat_parameters = exp_parameters.to_nat()
+    # Generate variates from the corresponding scipy distribution.
     scipy_distribution = distribution_info.exp_to_scipy_distribution(
         exp_parameters)  # type: ignore[arg-type]
     x = scipy_distribution.rvs(random_state=generator, size=70000)
+    # Convert the variates to sufficient statistics.
     my_x = distribution_info.scipy_to_exp_family_observation(x)
     sufficient_stats = nat_parameters.sufficient_statistics(my_x)  # type: ignore[arg-type]
 
+    # Verify that the mean of the sufficient statistics equals the expectation parameters.
     calculated_parameters = tree_map(partial(np.mean, axis=0), sufficient_stats)
 
     assert_tree_allclose(exp_parameters, calculated_parameters, rtol=rtol, atol=atol)

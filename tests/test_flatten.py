@@ -10,9 +10,7 @@ from .distribution_info import DistributionInfo
 
 
 def test_flatten(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Test that the methods produce the correct shapes.
-    """
+    """Test that the methods produce the correct shapes."""
     shape = (3, 4)
 
     p = distribution_info.exp_parameter_generator(generator, shape=shape)

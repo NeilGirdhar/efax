@@ -1,6 +1,4 @@
-"""
-These tests apply to only samplable distributions.
-"""
+"""These tests apply to only samplable distributions."""
 from __future__ import annotations
 
 from functools import partial
@@ -24,10 +22,12 @@ from .distribution_info import DistributionInfo
 def test_maximum_likelihood_estimation(generator: Generator,
                                        rng: KeyArray,
                                        sampling_distribution_info: DistributionInfo[Any, Any, Any],
+                                       *,
                                        natural: bool) -> None:
-    """
-    Test that maximum likelihood estimation from scipy-generated variates produce the same
-    distribution from which they were drawn.
+    """Test that sampling is consistent with maximum likelihood estimation.
+
+    This tests samples variates from either natural or expectation parametrizations.  Calculates the
+    mean of the sufficient statistics, and verifies that it equals the expectation parameters.
     """
     distribution_shape = (4,)
     sample_shape = (1024, 32)

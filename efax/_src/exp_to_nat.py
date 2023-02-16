@@ -20,9 +20,9 @@ SP = TypeVar('SP', bound=Any)
 
 
 class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
-    """
-    This mixin implements the conversion from expectation to natural parameters using Newton's
-    method with a Jacobian to invert the gradient log-normalizer.
+    """This mixin implements the conversion from expectation to natural parameters.
+
+    It uses Newton's method with a Jacobian to invert the gradient log-normalizer.
     """
     # Implemented methods --------------------------------------------------------------------------
     @jit
@@ -43,23 +43,22 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
 
     # Non-final methods ----------------------------------------------------------------------------
     def _zero_natural_parameters(self) -> NP:
-        "A convenience method for implementing initial_search_parameters"
+        """A convenience method for implementing initial_search_parameters."""
         fixed_parameters = self.fixed_parameters_mapping()
         cls = type(self).natural_parametrization_cls()
         return cls.unflattened(jnp.zeros_like(self.flattened()), **fixed_parameters)
 
     # Abstract methods -----------------------------------------------------------------------------
     def initial_search_parameters(self) -> SP:
-        """
-        Returns: The initial value of the parameters that Newton's method runs on.
-        """
+        """Returns: The initial value of the parameters that Newton's method runs on."""
         raise NotImplementedError
 
     def search_to_natural(self, search_parameters: SP) -> NP:
-        """
+        """Convert the search parameters to the natural parametrization.
+
         Args:
             search_parameters: The parameters that Newton's method runs on.
-        Returns: The corresponding natural parametrization.
+        Returns: The corresponding natural parameters.
         """
         raise NotImplementedError
 
@@ -68,7 +67,8 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
 
     # Private methods ------------------------------------------------------------------------------
     def _natural_gradient(self, natural_parameters: NP) -> NP:
-        """
+        """The natural gradient.
+
         Returns: The difference of the expectation parameters corresponding to natural_parameters
             and self.  This difference is returned as natural parameters.
         """

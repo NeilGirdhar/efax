@@ -12,10 +12,10 @@ __all__ = ['ScipyDirichlet', 'ScipyGeneralizedDirichlet']
 
 
 # pylint: disable=protected-access
-class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):
-    """
-    This class repairs dirichlet.  See https://github.com/scipy/scipy/issues/6005 and
-    https://github.com/scipy/scipy/issues/6006.
+class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):  # noqa: SLF001
+    """This class repairs dirichlet.
+
+    See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.
     """
     def rvs(self,
             size: ShapeLike | None = None,
@@ -26,15 +26,13 @@ class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):
         return super().rvs(size=size, random_state=random_state)
 
     def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
-        if x.ndim == 2:
+        if x.ndim == 2:  # noqa: PLR2004
             return super().pdf(x.T)
         return super().pdf(x)
 
 
 class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
-    """
-    This class allows distributions having a non-empty shape.
-    """
+    """This class allows distributions having a non-empty shape."""
     def __init__(self, alpha: NumpyRealArray):
         shape = alpha[..., -1].shape
         rvs_shape = (alpha.shape[-1],)

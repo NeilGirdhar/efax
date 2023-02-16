@@ -14,8 +14,7 @@ __all__ = ['BetaNP', 'BetaEP']
 
 @dataclass
 class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
-    """
-    The Beta distribution.
+    """The Beta distribution.
 
     The best way to interpret the parameters of the beta distribution are that an observation x in
     [0, 1] represents the Bernoulli probability that outcome 0 (out of {0, 1}) is realized.  In this

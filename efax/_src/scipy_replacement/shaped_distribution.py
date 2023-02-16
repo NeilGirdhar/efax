@@ -14,9 +14,7 @@ T = TypeVar('T')
 
 
 class ShapedDistribution(Generic[T]):
-    """
-    Allow a distributions with shape.
-    """
+    """Allow a distributions with shape."""
     def __init__(self,
                  shape: Shape,
                  rvs_shape: Shape,

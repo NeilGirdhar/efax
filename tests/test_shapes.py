@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import Any
 
 import numpy as np
@@ -9,9 +10,7 @@ from .distribution_info import DistributionInfo
 
 
 def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Test that the methods produce the correct shapes.
-    """
+    """Test that the methods produce the correct shapes."""
     shape = (3, 4)
 
     p = distribution_info.exp_parameter_generator(generator, shape=shape)
@@ -31,22 +30,17 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
     check(q)
 
     assert q.log_normalizer().shape == shape
-    try:
+    with suppress(NotImplementedError):
         assert p.cross_entropy(q).shape == shape
-    except NotImplementedError:
-        pass
-    try:
+    with suppress(NotImplementedError):
         assert q.entropy().shape == shape
-    except NotImplementedError:
-        pass
     assert q.carrier_measure(x).shape == shape
-    try:
+    with suppress(NotImplementedError):
         assert p.expected_carrier_measure().shape == shape
-    except NotImplementedError:
-        pass
     assert q.pdf(x).shape == shape
 
 
 def test_types(distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     if isinstance(distribution_info.exp_parameter_generator(np.random.default_rng(), ()), tuple):
-        raise TypeError("This should return a number or an ndarray")
+        msg = "This should return a number or an ndarray"
+        raise TypeError(msg)

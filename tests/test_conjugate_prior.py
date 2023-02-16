@@ -16,9 +16,7 @@ from .distribution_info import DistributionInfo
 
 def test_conjugate_prior(generator: Generator,
                          cp_distribution_info: DistributionInfo[Any, Any, Any]) -> None:
-    """
-    Test that the conjugate prior actually matches the distribution.
-    """
+    """Test that the conjugate prior actually matches the distribution."""
     shape = (4, 3)
     n = 100.0 * np.ones(shape)
 
@@ -49,9 +47,7 @@ def test_conjugate_prior(generator: Generator,
 def test_generalized_conjugate_prior(generator: Generator,
                                      gcp_distribution_info: DistributionInfo[Any, Any, Any]
                                      ) -> None:
-    """
-    Same as test_conjugate_prior, but with generalized_conjugate_prior_distribution.
-    """
+    """Same as test_conjugate_prior, but with generalized_conjugate_prior_distribution."""
     shape = (4, 3)
 
     # Choose a random distribution.
@@ -59,7 +55,7 @@ def test_generalized_conjugate_prior(generator: Generator,
     assert isinstance(p, HasGeneralizedConjugatePrior)
 
     # Find its conjugate prior at that point with many observations.
-    n = 100.0 * np.ones(shape + (p.dimensions(),))
+    n = 100.0 * np.ones((*shape, p.dimensions()))
     gcp_q = p.generalized_conjugate_prior_distribution(n)
 
     assert gcp_q.shape == p.shape

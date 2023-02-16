@@ -16,7 +16,7 @@ def test_mvn_fisher_information() -> None:
     m = MultivariateNormalNP(jnp.zeros(2), -0.5 * jnp.eye(2))
 
     # pylint: disable=protected-access
-    assert_tree_allclose(m._fisher_information_matrix(),
+    assert_tree_allclose(m._fisher_information_matrix(),  # noqa: SLF001
                          np.asarray([[1., 0., 0., 0., 0.],
                                      [0., 1., 0., 0., 0.],
                                      [0., 0., 2., 0., 0.],
@@ -36,7 +36,7 @@ def test_mvn_fisher_information_b() -> None:
     m = MultivariateNormalNP(np.asarray([3.0, 5.0]), np.asarray([[-0.5, 0.0], [0.0, -0.8]]))
 
     # pylint: disable=protected-access
-    assert_tree_allclose(m._fisher_information_matrix(),
+    assert_tree_allclose(m._fisher_information_matrix(),  # noqa: SLF001
                          np.asarray([[1., -0., 6., 6.25, -0.],
                                      [-0., 0.625, -0., 3.75, 3.90625],
                                      [6., 0., 38., 37.5, 0.],
@@ -57,18 +57,18 @@ def test_fisher_information_is_convex(generator: Generator,
     shape = (3, 2)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     # pylint: disable=protected-access
-    fisher_information = nat_parameters._fisher_information_matrix()
+    fisher_information = nat_parameters._fisher_information_matrix()  # noqa: SLF001
     assert issubclass(fisher_information.dtype.type, jnp.floating)
     eigvals = jnp.linalg.eigvals(fisher_information)
-    if not jnp.all(eigvals >= 0.0):
-        raise AssertionError(
-            f"The Fisher information of {nat_parameters} is not convex.  Its eigenvalues are:"
-            f"{eigvals}")
+    if not jnp.all(eigvals >= 0.0):  # noqa: PLR2004
+        msg = (f"The Fisher information of {nat_parameters} is not convex.  Its eigenvalues are:"
+               f"{eigvals}")
+        raise AssertionError(msg)
     determinant = jnp.linalg.det(fisher_information)
     assert determinant.shape == shape
     assert issubclass(determinant.dtype.type, jnp.floating)
 
-    if not jnp.all(determinant >= 0.0):
-        raise AssertionError(
-            f"The determinant of the Fisher information of {nat_parameters} is not all "
-            f"nonnegative: {determinant}")
+    if not jnp.all(determinant >= 0.0):  # noqa: PLR2004
+        msg = (f"The determinant of the Fisher information of {nat_parameters} is not all "
+               f"nonnegative: {determinant}")
+        raise AssertionError(msg)

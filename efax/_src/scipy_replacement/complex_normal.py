@@ -12,9 +12,7 @@ __all__ = ['ScipyComplexNormal']
 
 
 class ScipyComplexNormalUnvectorized:
-    """
-    Represents an array of univariate complex normal distributions.
-    """
+    """Represents an array of univariate complex normal distributions."""
     def __init__(self,
                  mean: NumpyComplexNumeric,
                  variance: NumpyRealNumeric,
@@ -24,14 +22,15 @@ class ScipyComplexNormalUnvectorized:
         self.variance: NumpyRealArray = np.asarray(variance)
         self.pseudo_variance: NumpyComplexArray = np.asarray(pseudo_variance)
         if not issubclass(self.variance.dtype.type, np.floating):
-            raise TypeError(f"The variance {self.variance} has non-real "
-                            f"dtype {self.variance.dtype}.")
+            msg = f"The variance {self.variance} has non-real dtype {self.variance.dtype}."
+            raise TypeError(msg)
         if np.any(np.abs(self.pseudo_variance) > self.variance):
-            raise ValueError(f"The pseudo-variance {pseudo_variance} "
-                             f"is bigger than the variance {variance}.")
+            msg = f"The pseudo-variance {pseudo_variance} is bigger than the variance {variance}."
+            raise ValueError(msg)
         if not (self.mean.shape == self.variance.shape
                 == self.pseudo_variance.shape):
-            raise ValueError("Shape mismatch.")
+            msg = "Shape mismatch."
+            raise ValueError(msg)
 
     # New methods ----------------------------------------------------------------------------------
     def pdf(self, z: NumpyComplexNumeric, out: None = None) -> NumpyRealNumeric:
@@ -73,9 +72,7 @@ class ScipyComplexNormalUnvectorized:
 
 
 class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
-    """
-    This class allows distributions having a non-empty shape.
-    """
+    """This class allows distributions having a non-empty shape."""
     def __init__(self,
                  mean: NumpyComplexArray | None = None,
                  variance: NumpyRealArray | None = None,

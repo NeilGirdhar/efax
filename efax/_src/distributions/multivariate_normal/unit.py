@@ -23,8 +23,9 @@ __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP', RealArray],
                                Multidimensional,
                                Samplable):
-    """
-    The multivariate normal distribution with unit variance.  This is a curved exponential family.
+    """The multivariate normal distribution with unit variance.
+
+    This is a curved exponential family.
     """
     mean: RealArray = distribution_parameter(VectorSupport())
 

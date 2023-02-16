@@ -130,7 +130,7 @@ class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVari
         self.variance = variance
 
     def exp_to_scipy_distribution(self, p: MultivariateFixedVarianceNormalEP) -> Any:
-        cov = np.tile(np.eye(p.dimensions()), p.shape + (1, 1))
+        cov = np.tile(np.eye(p.dimensions()), (*p.shape, 1, 1))
         for i in np.ndindex(*p.shape):
             cov[i] *= p.variance[i]
         return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=np.asarray(cov))
@@ -343,7 +343,7 @@ class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, Re
 
     def scipy_to_exp_family_observation(self, x: RealArray) -> RealArray:
         x = np.asarray(x)
-        result = np.empty(x.shape + (2,))
+        result = np.empty((*x.shape, 2))
         result[..., 0] = np.cos(x)
         result[..., 1] = np.sin(x)
         return result

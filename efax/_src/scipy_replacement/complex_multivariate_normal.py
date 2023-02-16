@@ -13,9 +13,7 @@ __all__ = ['ScipyComplexMultivariateNormal']
 
 
 class ScipyComplexMultivariateNormalUnvectorized:
-    """
-    Represents a multivariate complex normal distribution.
-    """
+    """Represents a multivariate complex normal distribution."""
     def __init__(self,
                  mean: NumpyComplexArray,
                  variance: NumpyComplexArray,
@@ -26,21 +24,24 @@ class ScipyComplexMultivariateNormalUnvectorized:
         self.variance = variance
         self.pseudo_variance = pseudo_variance
         if mean.shape != (self.size,):
-            raise ValueError(f"Mean has shape {mean.shape} instead of {(self.size,)}.")
+            msg = f"Mean has shape {mean.shape} instead of {(self.size,)}."
+            raise ValueError(msg)
         if variance.shape != (self.size, self.size):
-            raise ValueError("The variance has shape "
-                             f"{variance.shape} "
-                             f"instead of {(self.size, self.size)}.")
+            msg = "The variance has shape {variance.shape} instead of {(self.size, self.size)}."
+            raise ValueError(msg)
         if pseudo_variance.shape != (self.size, self.size):
-            raise ValueError("The pseudo-variance has shape "
-                             f"{pseudo_variance.shape} "
-                             f"instead of {(self.size, self.size)}.")
+            msg = ("The pseudo-variance has shape {pseudo_variance.shape} "
+                   f"instead of {(self.size, self.size)}.")
+            raise ValueError(msg)
         if not np.all(np.linalg.eigvals(variance) >= 0):
-            raise ValueError("The variance is not positive semidefinite.")
+            msg = "The variance is not positive semidefinite."
+            raise ValueError(msg)
         if not np.all(np.isclose(variance, variance.T.conjugate())):
-            raise ValueError("The variance is not Hermitian.")
+            msg = "The variance is not Hermitian."
+            raise ValueError(msg)
         if not np.all(np.isclose(pseudo_variance, pseudo_variance.T)):
-            raise ValueError("The pseudo-variance is not symmetric.")
+            msg = "The pseudo-variance is not symmetric."
+            raise ValueError(msg)
 
     # New methods ----------------------------------------------------------------------------------
     def pdf(self, z: NumpyComplexArray, out: None = None) -> np.floating[Any]:
@@ -67,11 +68,11 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
     # Private methods ------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> NumpyRealArray:
-        "Return the mean of a corresponding real distribution with double the size."
+        """Return the mean of a corresponding real distribution with double the size."""
         return np.concatenate([self.mean.real, self.mean.imag])
 
     def _multivariate_normal_cov(self) -> NumpyRealArray:
-        "Return the covariance of a corresponding real distribution with double the size."
+        """Return the covariance of a corresponding real distribution with double the size."""
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
         xx = 0.5 * cov_sum.real
@@ -83,9 +84,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
 class ScipyComplexMultivariateNormal(
         ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]):
-    """
-    This class allows distributions having a non-empty shape.
-    """
+    """This class allows distributions having a non-empty shape."""
     def __init__(self,
                  mean: NumpyComplexArray | None = None,
                  variance: NumpyComplexArray | None = None,
@@ -106,11 +105,11 @@ class ScipyComplexMultivariateNormal(
                                  if x is not None])
         rvs_shape = (dimensions,)
         if mean is None:
-            mean = np.zeros(shape + (dimensions,), dtype=dtype)
+            mean = np.zeros((*shape, dimensions), dtype=dtype)
         if variance is None:
-            variance = np.asarray(np.tile(np.eye(dimensions), shape + (1, 1)))
+            variance = np.asarray(np.tile(np.eye(dimensions), (*shape, 1, 1)))
         if pseudo_variance is None:
-            pseudo_variance = np.zeros(shape + (dimensions, dimensions), dtype=dtype)
+            pseudo_variance = np.zeros((*shape, dimensions, dimensions), dtype=dtype)
 
         objects = np.empty(shape, dtype=ScipyComplexMultivariateNormalUnvectorized)
         for i in np.ndindex(*shape):

@@ -17,9 +17,9 @@ NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 
 
 class ExpectationParametrization(Parametrization, Generic[NP]):
-    """
-    The expectation parametrization of an exponential family distribution.  This class also doubles
-    as the sufficient statistics of an exponential family distribution.
+    """The expectation parametrization of an exponential family distribution.
+
+    This class also doubles as the sufficient statistics of an exponential family distribution.
 
     The motivation for the expectation parametrization is combining independent and identically
     distributed observations into the maximum likelihood distribution.  In the expectation
@@ -31,16 +31,14 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         raise NotImplementedError
 
     def to_nat(self) -> NP:
-        """
-        Returns: The corresponding natural parameters.
-        """
+        """The corresponding natural parameters."""
         raise NotImplementedError
 
     def expected_carrier_measure(self) -> RealArray:
-        """
-        Returns: The expected carrier measure of the distribution.  This is the missing term from
-            the inner product between the observed distribution and the predicted distribution.
-            Often, it is just jnp.zeros(self.shape).
+        """The expected carrier measure of the distribution.
+
+        This is the missing term from the inner product between the observed distribution and the
+        predicted distribution.  Often, it is just jnp.zeros(self.shape).
         """
         raise NotImplementedError
 
@@ -48,11 +46,10 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
     @jit
     @final
     def cross_entropy(self, q: NP) -> RealArray:
-        """
+        """The cross entropy.
+
         Args:
             q: The natural parameters of the prediction.
-        Returns:
-            The cross entropy.
         """
         return (-parameters_dot_product(q, self)
                 + q.log_normalizer()
@@ -61,18 +58,22 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
     @jit
     @final
     def entropy(self) -> RealArray:
-        """
-        Returns: The Shannon entropy.  This can be quite slow since it depends on a conversion to
-            natural parameters.
+        """The Shannon entropy.
+
+        This can be quite slow since it depends on a conversion to natural parameters.
         """
         return self.cross_entropy(self.to_nat())
 
     @jit
     @final
     def kl_divergence(self, q: NP) -> RealArray:
-        """
-        Returns: The Kullback–Leibler divergence.  This can be quite slow since it depends on a
-            conversion to natural parameters.
+        """The Kullback-Leibler divergence.
+
+        This can be quite slow since it depends on a conversion to natural parameters.
+
+        Args:
+            self: The expectation parameters of the first distribution.
+            q: The natural parameters of second destribution.
         """
         self_nat = self.to_nat()
         difference = tree_map(operator.sub, self_nat, q)

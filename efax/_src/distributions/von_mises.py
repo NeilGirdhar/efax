@@ -38,7 +38,7 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray],
         q = self.mean_times_concentration
         kappa: RealArray = jnp.linalg.norm(q, 2, axis=-1, keepdims=True)
         return VonMisesFisherEP(
-            jnp.where(kappa == 0.0,
+            jnp.where(kappa == 0.0,  # noqa: PLR2004
                       q,
                       q * (_a_k(self.dimensions(), kappa) / kappa)))
 
@@ -53,10 +53,10 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', RealArray],
 
     # New methods ----------------------------------------------------------------------------------
     def to_kappa_angle(self) -> tuple[RealArray, RealArray]:
-        if self.dimensions() != 2:
+        if self.dimensions() != 2:  # noqa: PLR2004
             raise ValueError
         kappa: RealArray = jnp.linalg.norm(self.mean_times_concentration, axis=-1)
-        angle = jnp.where(kappa == 0.0,
+        angle = jnp.where(kappa == 0.0,  # noqa: PLR2004
                           0.0,
                           jnp.arctan2(self.mean_times_concentration[..., 1],
                                       self.mean_times_concentration[..., 0]))
@@ -82,7 +82,7 @@ class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, RealArray], Multidimensional):
     def initial_search_parameters(self) -> RealArray:
         mu: RealArray = jnp.linalg.norm(self.mean, 2, axis=-1)
         # 0 <= mu <= 1.0
-        initial_kappa = jnp.where(mu == 1.0,
+        initial_kappa = jnp.where(mu == 1.0,  # noqa: PLR2004
                                   jnp.inf,
                                   (mu * self.dimensions() - mu ** 3) / (1.0 - mu ** 2))
         return inverse_softplus(initial_kappa)

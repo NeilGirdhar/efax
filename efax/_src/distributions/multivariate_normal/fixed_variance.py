@@ -24,8 +24,9 @@ class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixe
                                                                RealArray],
                                         Multidimensional,
                                         Samplable):
-    """
-    The multivariate normal distribution with fixed variance.  This is a curved exponential family.
+    """The multivariate normal distribution with fixed variance.
+
+    This is a curved exponential family.
     """
     mean_times_precision: RealArray = distribution_parameter(VectorSupport())
     variance: RealArray = distribution_parameter(ScalarSupport(), fixed=True)

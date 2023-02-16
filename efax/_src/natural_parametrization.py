@@ -21,27 +21,23 @@ Domain = TypeVar('Domain', bound=ComplexArray)
 
 
 class NaturalParametrization(Parametrization, Generic[EP, Domain]):
-    """
-    The natural parametrization of an exponential family distribution.
+    """The natural parametrization of an exponential family distribution.
 
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
     # Abstract methods -----------------------------------------------------------------------------
     def log_normalizer(self) -> RealArray:
-        """
-        Returns: The log-normalizer.
-        """
+        """Returns: The log-normalizer."""
         raise NotImplementedError
 
     def to_exp(self) -> EP:
-        """
-        Returns: The corresponding expectation parameters.
-        """
+        """Returns: The corresponding expectation parameters."""
         raise NotImplementedError
 
     def carrier_measure(self, x: Domain) -> RealArray:
-        """
+        """The corresponding carrier measure.
+
         Args:
             x: The sample.
         Returns: The corresponding carrier measure, which is typically jnp.zeros(x.shape[:-1]).
@@ -49,11 +45,11 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         raise NotImplementedError
 
     def sufficient_statistics(self, x: Domain) -> EP:
-        """
+        """The corresponding sufficient statistics.
+
         Args:
             x: The sample.
-        Returns: The corresponding sufficient statistics, which are conveniently stored as
-            expectation parameters.
+        Returns: These are conveniently stored as expectation parameters.
         """
         raise NotImplementedError
 
@@ -65,18 +61,16 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     @jit
     @final
     def entropy(self) -> RealArray:
-        """
-        Returns: The Shannon entropy.
-        """
+        """The Shannon entropy."""
         return self.to_exp().cross_entropy(self)
 
     @jit
     @final
     def pdf(self, x: Domain) -> RealArray:
-        """
+        """The distribution's density or mass function at x.
+
         Args:
             x: The sample.
-        Returns: The distribution's density or mass function at x.
         """
         tx = self.sufficient_statistics(x)
         return jnp.exp(parameters_dot_product(self, tx) - self.log_normalizer()
@@ -85,10 +79,12 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     @final
     def fisher_information_diagonal(self: NaturalParametrization[EP, Domain]) -> (
             NaturalParametrization[EP, Domain]):
-        """
+        """The diagonal elements of the Fisher information.
+
         Returns: The Fisher information stored in a NaturalParametrization object whose fields
             are an array of the same shape as self.
-        See also: apply_fisher_information
+
+        See also: apply_fisher_information.
         """
         fisher_matrix = self._fisher_information_matrix()
         fisher_diagonal = jnp.diagonal(fisher_matrix)
@@ -97,10 +93,12 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     @final
     def fisher_information_trace(self: NaturalParametrization[EP, Domain]) -> (
             NaturalParametrization[EP, Domain]):
-        """
-        Returns: The Fisher information stored in a NaturalParametrization object whose fields
-            are scalar.
-        See also: apply_fisher_information
+        """The trace of the Fisher information.
+
+        Returns: The trace of the Fisher information stored in a NaturalParametrization object whose
+            fields are scalar.
+
+        See also: apply_fisher_information.
         """
         fisher_information_diagonal = self.fisher_information_diagonal()
         kwargs = {}
@@ -110,7 +108,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
                 new_value = value
             elif na == 1:
                 new_value = jnp.sum(value, axis=-1)
-            elif na == 2:
+            elif na == 2:  # noqa: PLR2004
                 new_value = jnp.sum(jnp.triu(value), axis=(-2, -1))
             else:
                 raise RuntimeError
@@ -126,9 +124,11 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     @final
     def apply_fisher_information(self: NaturalParametrization[EP, Domain],
                                  vector: EP) -> tuple[EP, NaturalParametrization[EP, Domain]]:
-        """
+        """Efficiently apply the Fisher information matrix to a vector.
+
         Args:
             vector: Some set of expectation parameters.
+
         Returns:
             The expectation parameters corresponding to self.
             The Fisher information of self applied to the inputted vector.

@@ -10,9 +10,7 @@ __all__ = ['ScipyVonMises']
 
 
 class ScipyVonMises(ShapedDistribution[ss.vonmises]):
-    """
-    This class allows distributions having a non-empty shape.
-    """
+    """This class allows distributions having a non-empty shape."""
     def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None):
         if loc is None:
             loc = np.zeros_like(kappa)

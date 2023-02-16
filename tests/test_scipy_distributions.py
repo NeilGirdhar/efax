@@ -10,7 +10,7 @@ from tjax import Shape
 from efax import ScipyDirichlet, ScipyMultivariateNormal
 
 
-@pytest.mark.parametrize('distribution, m, n',
+@pytest.mark.parametrize(('distribution', 'm', 'n'),
                          [(ScipyMultivariateNormal.from_mc(mean=np.zeros((3, 4))), (3,), 4),
                           (ScipyMultivariateNormal.from_mc(cov=np.eye(2)), (), 2),
                           (ScipyMultivariateNormal.from_mc(), (), 1),

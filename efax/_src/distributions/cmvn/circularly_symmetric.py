@@ -26,9 +26,9 @@ class ComplexCircularlySymmetricNormalNP(
         NaturalParametrization['ComplexCircularlySymmetricNormalEP', ComplexArray],
         Multidimensional,
         Samplable):
-    """
-    The complex multivariate normal distribution with zero mean and and zero pseudo-variance.  This
-    is a curved exponential family.
+    """The complex multivariate normal distribution with zero mean and and zero pseudo-variance.
+
+    This is a curved exponential family.
     """
     negative_precision: ComplexArray = distribution_parameter(
         SymmetricMatrixSupport(hermitian=True))
@@ -105,12 +105,12 @@ class ComplexCircularlySymmetricNormalEP(
 
     # Private method -------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> RealArray:
-        "Return the mean of a corresponding real distribution with double the size."
+        """Return the mean of a corresponding real distribution with double the size."""
         n = self.dimensions()
         return jnp.zeros((*self.shape, n * 2))
 
     def _multivariate_normal_cov(self) -> RealArray:
-        "Return the covariance of a corresponding real distribution with double the size."
+        """Return the covariance of a corresponding real distribution with double the size."""
         gamma_r = 0.5 * self.variance.real
         gamma_i = 0.5 * self.variance.imag
         return jnp.block([[gamma_r, -gamma_i], [gamma_i, gamma_r]])

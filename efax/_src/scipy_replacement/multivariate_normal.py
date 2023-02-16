@@ -12,9 +12,11 @@ __all__ = ['ScipyMultivariateNormal']
 
 
 # pylint: disable=protected-access
-class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_frozen):
-    """
-    This class repairs multivariate_normal.  See https://github.com/scipy/scipy/issues/7689.
+mvn = ss._multivariate.multivariate_normal_frozen  # noqa: SLF001
+class ScipyMultivariateNormalUnvectorized(mvn):
+    """This class repairs multivariate_normal.
+
+    See https://github.com/scipy/scipy/issues/7689.
     """
     def rvs(self,
             size: ShapeLike | None = None,
@@ -30,9 +32,7 @@ class ScipyMultivariateNormalUnvectorized(ss._multivariate.multivariate_normal_f
 
 
 class ScipyMultivariateNormal(ShapedDistribution[ScipyMultivariateNormalUnvectorized]):
-    """
-    This class allows distributions having a non-empty shape.
-    """
+    """This class allows distributions having a non-empty shape."""
     @classmethod
     def from_mc(cls,
                 mean: NumpyRealArray | None = None,

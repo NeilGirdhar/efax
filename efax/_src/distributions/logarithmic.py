@@ -68,8 +68,8 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, RealArray]):
     # This type error will be fixed by https://github.com/NeilGirdhar/jax/tree/jit_annotation
     def to_nat(self) -> LogarithmicNP:  # type: ignore[override]
         z: LogarithmicNP = super().to_nat()
-        return LogarithmicNP(jnp.where(self.chi < 1.0,
+        return LogarithmicNP(jnp.where(self.chi < 1.0,  # noqa: PLR2004
                                        jnp.nan,
-                                       jnp.where(self.chi == 1.0,
+                                       jnp.where(self.chi == 1.0,  # noqa: PLR2004
                                                  jnp.inf,
                                                  z.log_probability)))

@@ -1,8 +1,9 @@
-"""
-The generalized Dirichlet distribution is based off:
+"""The generalized Dirichlet distribution.
 
-    T.-T. Wong 1998. Generalized Dirichlet distribution in Bayesian analysis. Applied Mathematics
-    and Computation, volume 97, pp165-181
+It is based off:
+
+T.-T. Wong 1998. Generalized Dirichlet distribution in Bayesian analysis. Applied Mathematics
+and Computation, volume 97, pp165-181
 """
 from __future__ import annotations
 
@@ -79,7 +80,7 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Re
 class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, RealArray], Multidimensional):
     # E({log(x_i)}_i)
     mean_log_probability: RealArray = distribution_parameter(VectorSupport())
-    # E({log(1−∑_{j≤i} x_j)}_i)
+    # E({log(1-∑_{j≤i} x_j)}_i)
     mean_log_cumulative_probability: RealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -102,7 +103,7 @@ class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, RealArray], Multid
         return jnp.zeros(self.shape)
 
     def initial_search_parameters(self) -> RealArray:
-        return jnp.zeros(self.shape + (self.dimensions() * 2,))
+        return jnp.zeros((*self.shape, self.dimensions() * 2))
 
     def search_gradient(self, search_parameters: RealArray) -> RealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).flattened()

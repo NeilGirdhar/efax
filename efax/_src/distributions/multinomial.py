@@ -33,14 +33,14 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
     def log_normalizer(self) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
-        return max_q + log_scaled_A
+        log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        return max_q + log_scaled_a
 
     def to_exp(self) -> MultinomialEP:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
-        return MultinomialEP(jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis]))
+        log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        return MultinomialEP(jnp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
 
     def carrier_measure(self, x: RealArray) -> RealArray:
         return jnp.zeros(x.shape[:-1])
@@ -61,8 +61,8 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
     def nat_to_probability(self) -> RealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_A = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
-        p = jnp.exp(q_minus_max_q - log_scaled_A[..., np.newaxis])
+        log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        p = jnp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis])
         final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
         return jnp.append(p, final_p, axis=-1)
 

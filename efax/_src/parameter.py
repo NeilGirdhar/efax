@@ -137,7 +137,8 @@ class SymmetricMatrixSupport(Support):
         sqrt_discriminant = sqrt(1 + 8 * k)
         i_sqrt_discriminant = int(sqrt_discriminant)
         if i_sqrt_discriminant != sqrt_discriminant:
-            raise ValueError(f"{k} {sqrt_discriminant}")
+            msg =f"{k} {sqrt_discriminant}"
+            raise ValueError(msg)
         if i_sqrt_discriminant % 2 != 1:
             raise ValueError
         dimensions = (i_sqrt_discriminant - 1) // 2
@@ -168,7 +169,10 @@ class SquareMatrixSupport(Support):
         return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 
 
-def distribution_parameter(support: Support, fixed: bool = False, static: bool = False) -> Any:
+def distribution_parameter(support: Support,
+                           *,
+                           fixed: bool = False,
+                           static: bool = False) -> Any:
     if static and not fixed:
         raise ValueError
     return field(static=static, metadata={'support': support, 'fixed': fixed})
