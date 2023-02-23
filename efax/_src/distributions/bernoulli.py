@@ -68,10 +68,10 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> BooleanArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> BooleanArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.bernoulli(rng, self.probability, shape)
+        return jax.random.bernoulli(key, self.probability, shape)
 
     def conjugate_prior_distribution(self, n: RealArray) -> BetaNP:
         reshaped_n = n[..., np.newaxis]

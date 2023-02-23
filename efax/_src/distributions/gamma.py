@@ -41,10 +41,10 @@ class GammaNP(NaturalParametrization['GammaEP', RealArray], Samplable):
     def sufficient_statistics(self, x: RealArray) -> GammaEP:
         return GammaEP(x, jnp.log(x))
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
-        return -jax.random.gamma(rng, self.shape_minus_one + 1.0, shape) / self.negative_rate
+        return -jax.random.gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
 
 
 @dataclass

@@ -9,5 +9,5 @@ __all__ = ['Samplable']
 
 
 class Samplable(Parametrization):
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> Array:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> Array:
         raise NotImplementedError

@@ -71,13 +71,13 @@ class IsotropicNormalEP(ExpectationParametrization[IsotropicNormalNP], Samplable
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
         deviation = jnp.sqrt(self.variance())
-        return jax.random.normal(rng, shape) * deviation + self.mean
+        return jax.random.normal(key, shape) * deviation + self.mean
 
     def dimensions(self) -> int:
         return self.mean.shape[-1]

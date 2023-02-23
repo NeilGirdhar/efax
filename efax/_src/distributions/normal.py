@@ -61,13 +61,13 @@ class NormalEP(ExpectationParametrization[NormalNP], Samplable):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
         deviation = jnp.sqrt(self.variance())
-        return jax.random.normal(rng, shape) * deviation + self.mean
+        return jax.random.normal(key, shape) * deviation + self.mean
 
     # New methods ----------------------------------------------------------------------------------
     def variance(self) -> RealArray:

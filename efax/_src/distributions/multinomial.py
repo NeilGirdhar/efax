@@ -48,10 +48,10 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
     def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
         return MultinomialEP(x)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
-        return one_hot(jax.random.categorical(rng, self.log_odds, shape=shape),
+        return one_hot(jax.random.categorical(key, self.log_odds, shape=shape),
                        self.dimensions())
 
     def dimensions(self) -> int:

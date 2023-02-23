@@ -57,12 +57,12 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
     # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of
     #   lambda ** k * log(k!) / k! = lambda ** k * log Gamma(k+1) / Gamma(k+1)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.poisson(rng, self.mean, shape)
+        return jax.random.poisson(key, self.mean, shape)
 
     def conjugate_prior_distribution(self, n: RealArray) -> GammaNP:
         return GammaNP(-n, n * self.mean)

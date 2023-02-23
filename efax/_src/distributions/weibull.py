@@ -61,10 +61,10 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
         one_minus_one_over_k = 1.0 - 1.0 / k
         return one_minus_one_over_k * jnp.log(self.chi) - jnp.euler_gamma * one_minus_one_over_k
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
         lambda_ = self.chi ** (1.0 / self.concentration)
-        return jax.random.weibull_min(rng, lambda_, self.concentration, shape)
+        return jax.random.weibull_min(key, lambda_, self.concentration, shape)

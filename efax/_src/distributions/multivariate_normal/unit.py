@@ -48,12 +48,12 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
     def sufficient_statistics(self, x: RealArray) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        return jax.random.normal(rng, shape) + self.mean
+        return jax.random.normal(key, shape) + self.mean
 
     def dimensions(self) -> int:
         return self.mean.shape[-1]
@@ -82,8 +82,8 @@ class MultivariateUnitNormalEP(
         # The second moment of a normal distribution with the given mean.
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + self.dimensions())
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
-        return self.to_nat().sample(rng, shape)
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+        return self.to_nat().sample(key, shape)
 
     def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
         negative_half_precision = -0.5 * n * jnp.ones(self.shape)

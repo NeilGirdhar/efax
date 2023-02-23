@@ -36,12 +36,12 @@ class ExponentialNP(NaturalParametrization['ExponentialEP', RealArray], Samplabl
     def sufficient_statistics(self, x: RealArray) -> ExponentialEP:
         return ExponentialEP(x)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        return -jax.random.exponential(rng, shape) / self.negative_rate
+        return -jax.random.exponential(key, shape) / self.negative_rate
 
 
 @dataclass
@@ -63,12 +63,12 @@ class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.exponential(rng, shape) * self.mean
+        return jax.random.exponential(key, shape) * self.mean
 
     def conjugate_prior_distribution(self, n: RealArray) -> GammaNP:
         return GammaNP(-n / self.mean, n)

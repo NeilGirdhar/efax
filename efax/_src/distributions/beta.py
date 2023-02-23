@@ -30,10 +30,10 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
     def carrier_measure(self, x: RealArray) -> RealArray:
         return jnp.zeros(x.shape)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.beta(rng,
+        return jax.random.beta(key,
                                1.0 + self.alpha_minus_one[..., 0],
                                1.0 + self.alpha_minus_one[..., 1],
                                shape)

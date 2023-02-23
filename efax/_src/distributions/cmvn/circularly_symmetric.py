@@ -58,8 +58,8 @@ class ComplexCircularlySymmetricNormalNP(
     def sufficient_statistics(self, x: ComplexArray) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(_broadcasted_outer_c(x))
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> ComplexArray:
-        return self.to_exp().sample(rng, shape)
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> ComplexArray:
+        return self.to_exp().sample(key, shape)
 
     def dimensions(self) -> int:
         return self.negative_precision.shape[-1]
@@ -88,13 +88,13 @@ class ComplexCircularlySymmetricNormalEP(
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> ComplexArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> ComplexArray:
         n = self.dimensions()
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        xy_rvs = jax.random.multivariate_normal(rng,
+        xy_rvs = jax.random.multivariate_normal(key,
                                                 self._multivariate_normal_mean(),
                                                 self._multivariate_normal_cov(),
                                                 shape)

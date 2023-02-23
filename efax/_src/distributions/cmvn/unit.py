@@ -52,8 +52,8 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
     def sufficient_statistics(self, x: ComplexArray) -> ComplexMultivariateUnitNormalEP:
         return ComplexMultivariateUnitNormalEP(x)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> ComplexArray:
-        return self.to_exp().sample(rng, shape)
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> ComplexArray:
+        return self.to_exp().sample(key, shape)
 
     def dimensions(self) -> int:
         return self.two_mean_conjugate.shape[-1]
@@ -81,13 +81,13 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
         # The second moment of a normal distribution with the given mean.
         return -(jnp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> ComplexArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> ComplexArray:
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        a = jax.random.normal(rng, shape)
-        b = jax.random.normal(rng, shape)
+        a = jax.random.normal(key, shape)
+        b = jax.random.normal(key, shape)
         return a + 1j * b + self.mean
 
     # def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:

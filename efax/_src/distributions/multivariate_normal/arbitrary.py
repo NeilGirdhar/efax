@@ -75,8 +75,8 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Mul
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
-        return self.to_variance_parametrization().sample(rng, shape)
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+        return self.to_variance_parametrization().sample(key, shape)
 
     def dimensions(self) -> int:
         return self.mean.shape[-1]
@@ -103,12 +103,12 @@ class MultivariateNormalVP(Samplable, Multidimensional):
     def natural_parametrization_cls(cls) -> type[MultivariateNormalNP]:
         return MultivariateNormalNP
 
-    def sample(self, rng: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.multivariate_normal(rng, self.mean, self.variance, shape)
+        return jax.random.multivariate_normal(key, self.mean, self.variance, shape)
 
     def dimensions(self) -> int:
         return self.mean.shape[-1]
