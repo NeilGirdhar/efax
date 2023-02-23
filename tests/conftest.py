@@ -32,7 +32,7 @@ def generator() -> NumpyGenerator:
 
 
 @pytest.fixture()
-def rng() -> KeyArray:
+def key() -> KeyArray:
     return PRNGKey(123)
 
 

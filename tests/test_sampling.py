@@ -20,7 +20,7 @@ from .distribution_info import DistributionInfo
 
 
 def test_maximum_likelihood_estimation(generator: Generator,
-                                       rng: KeyArray,
+                                       key: KeyArray,
                                        sampling_distribution_info: DistributionInfo[Any, Any, Any],
                                        *,
                                        natural: bool) -> None:
@@ -55,13 +55,13 @@ def test_maximum_likelihood_estimation(generator: Generator,
                                                                             distribution_shape)
         assert isinstance(nat_parameters, Samplable)
         exp_parameters = nat_parameters.to_exp()  # type: ignore[attr-defined]
-        samples = nat_parameters.sample(rng, sample_shape)
+        samples = nat_parameters.sample(key, sample_shape)
     else:
         exp_parameters = sampling_distribution_info.exp_parameter_generator(generator,
                                                                             distribution_shape)
         assert isinstance(exp_parameters, Samplable)
         nat_parameters = exp_parameters.to_nat()  # type: ignore[attr-defined]
-        samples = exp_parameters.sample(rng, sample_shape)
+        samples = exp_parameters.sample(key, sample_shape)
     assert samples.shape[:len(sample_shape)] == sample_shape
     sampled_exp_parameters = nat_parameters.sufficient_statistics(samples)  # pyright: ignore
     ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
