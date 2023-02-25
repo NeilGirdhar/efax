@@ -66,13 +66,12 @@ class ScipyGeneralizedDirichlet:
         return np.prod(terms, axis=-1)
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
-        if isinstance(size, int):
-            size = (size,)
+        sample_size: tuple[int, ...] = (((size,) if isinstance(size, int) else tuple(size))
+                                        + self.alpha.shape)
         if random_state is None:
             random_state = np.random.default_rng()
         dimensions = self.alpha.shape[-1]
-        beta_samples = random_state.beta(self.alpha, self.beta,
-                                         size=(tuple(size) + self.alpha.shape))
+        beta_samples = random_state.beta(self.alpha, self.beta, size=sample_size)
         q = np.zeros(beta_samples.shape[:-1])
         for i in range(dimensions):
             beta_samples[..., i] *= 1 - q

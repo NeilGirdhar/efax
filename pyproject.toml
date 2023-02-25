@@ -87,12 +87,14 @@ min-similarity-lines = 10
 ignore-imports = 'yes'
 
 [tool.pyright]
+include = ["efax", "tests"]
 stubPath = ""
 reportMissingSuperCall = true
 reportUnnecessaryTypeIgnoreComment = true
 
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'
+files = ["efax", "tests"]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true

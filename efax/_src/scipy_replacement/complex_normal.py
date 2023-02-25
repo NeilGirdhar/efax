@@ -21,7 +21,7 @@ class ScipyComplexNormalUnvectorized:
         self.mean: NumpyComplexArray = np.asarray(mean)
         self.variance: NumpyRealArray = np.asarray(variance)
         self.pseudo_variance: NumpyComplexArray = np.asarray(pseudo_variance)
-        if not issubclass(self.variance.dtype.type, np.floating):
+        if not np.issubdtype(self.variance.dtype, np.floating):
             msg = f"The variance {self.variance} has non-real dtype {self.variance.dtype}."
             raise TypeError(msg)
         if np.any(np.abs(self.pseudo_variance) > self.variance):

@@ -285,7 +285,7 @@ The tests can be run using :bash:`pytest . -n auto`.
 There are a few tools to clean and check the source:
 
 - :bash:`ruff .`
-- :bash:`pyright .`
-- :bash:`mypy .`
+- :bash:`pyright`
+- :bash:`mypy`
 - :bash:`isort .`
 - :bash:`pylint efax tests`
