@@ -99,8 +99,8 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
         return ss.nbinom(self.r, 1.0 / (1.0 + p.mean / p.failures))
 
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NegativeBinomialEP:
-        return NegativeBinomialEP(self.r * np.ones(shape, dtype=jnp.int_),
-                                  rng.exponential(size=shape))
+        return NegativeBinomialEP(rng.exponential(size=shape),
+                                  self.r * np.ones(shape, dtype=jnp.int_))
 
 
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, RealArray]):

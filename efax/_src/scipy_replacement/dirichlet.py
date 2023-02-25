@@ -12,7 +12,8 @@ __all__ = ['ScipyDirichlet', 'ScipyGeneralizedDirichlet']
 
 
 # pylint: disable=protected-access
-class ScipyDirichletFixRVsAndPDF(ss._multivariate.dirichlet_frozen):  # noqa: SLF001
+mvd: type = ss._multivariate.dirichlet_frozen  # noqa: SLF001
+class ScipyDirichletFixRVsAndPDF(mvd):  # pyright: ignore
     """This class repairs dirichlet.
 
     See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.

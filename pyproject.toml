@@ -89,8 +89,32 @@ ignore-imports = 'yes'
 [tool.pyright]
 include = ["efax", "tests"]
 stubPath = ""
+reportCallInDefaultInitializer = true
+reportIncompatibleMethodOverride = true
+reportIncompatibleVariableOverride = true
+reportInconsistentConstructor = true
+reportMatchNotExhaustive = true
+reportMissingParameterType = true
 reportMissingSuperCall = true
-reportUnnecessaryTypeIgnoreComment = true
+reportMissingTypeArgument = true
+reportOverlappingOverload = true
+reportPrivateImportUsage = true
+reportShadowedImports = true
+reportUninitializedInstanceVariable = true
+reportUnknownArgumentType = false
+reportUnknownLambdaType = false
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+reportUnnecessaryContains = true
+reportUnnecessaryIsInstance = true
+reportUnnecessaryTypeIgnoreComment = false
+reportUntypedBaseClass = true
+reportUntypedClassDecorator = true
+reportUntypedFunctionDecorator = true
+reportUntypedNamedTuple = true
 
 [tool.mypy]
 plugins = 'tjax.mypy_plugin'

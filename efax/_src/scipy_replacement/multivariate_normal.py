@@ -13,7 +13,7 @@ __all__ = ['ScipyMultivariateNormal']
 
 # pylint: disable=protected-access
 mvn: type = ss._multivariate.multivariate_normal_frozen  # noqa: SLF001
-class ScipyMultivariateNormalUnvectorized(mvn):
+class ScipyMultivariateNormalUnvectorized(mvn):  # pyright: ignore
     """This class repairs multivariate_normal.
 
     See https://github.com/scipy/scipy/issues/7689.

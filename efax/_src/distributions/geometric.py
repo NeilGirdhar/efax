@@ -13,7 +13,6 @@ __all__ = ['GeometricNP', 'GeometricEP']
 @dataclass
 class GeometricNP(NBCommonNP['GeometricEP']):
     log_not_p: RealArray = distribution_parameter(ScalarSupport())
-    failures = 1
 
     # Implemented methods --------------------------------------------------------------------------
     def to_exp(self) -> GeometricEP:
@@ -25,11 +24,13 @@ class GeometricNP(NBCommonNP['GeometricEP']):
     def expected_carrier_measure(self) -> RealArray:
         return jnp.zeros(self.log_not_p.shape)
 
+    def _failures(self) -> int:
+        return 1
+
 
 @dataclass
 class GeometricEP(NBCommonEP[GeometricNP]):
     mean: RealArray = distribution_parameter(ScalarSupport())
-    failures = 1
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
@@ -38,3 +39,6 @@ class GeometricEP(NBCommonEP[GeometricNP]):
 
     def to_nat(self) -> GeometricNP:
         return GeometricNP(self._log_not_p())
+
+    def _failures(self) -> int:
+        return 1

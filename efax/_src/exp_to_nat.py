@@ -84,7 +84,7 @@ class ExpToNatIteratedFunction(
                                                 tuple[Any, SP],
                                                 SP,
                                                 SP,
-                                                NP],
+                                                SP],
         Generic[NP, SP]):
     transform: GradientTransformation[Any, SP] = field()
 
