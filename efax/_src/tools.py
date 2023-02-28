@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING, Any
 import jax.numpy as jnp
 import numpy as np
 from tensorflow_probability.substrates import jax as tfp
-from tjax import ComplexArray, ComplexNumeric, NumpyRealArray, RealArray, RealNumeric
+from tjax import ComplexArray, NumpyComplexArray, NumpyRealArray, RealArray, RealNumeric
 
 __all__: list[str] = []
 
 
-def np_abs_square(x: ComplexNumeric) -> RealArray:
+def np_abs_square(x: NumpyComplexArray) -> NumpyRealArray:
     return np.square(x.real) + np.square(x.imag)  # pyright: ignore
 
 
