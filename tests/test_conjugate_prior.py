@@ -15,8 +15,10 @@ from .distribution_info import DistributionInfo
 
 
 def test_conjugate_prior(generator: Generator,
-                         cp_distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+                         cp_distribution_info: DistributionInfo[Any, Any, Any],
+                         distribution_name: None | str) -> None:
     """Test that the conjugate prior actually matches the distribution."""
+    cp_distribution_info.skip_if_deselected(distribution_name)
     shape = (4, 3)
     n = 100.0 * np.ones(shape)
 
@@ -45,9 +47,11 @@ def test_conjugate_prior(generator: Generator,
 
 
 def test_generalized_conjugate_prior(generator: Generator,
-                                     gcp_distribution_info: DistributionInfo[Any, Any, Any]
+                                     gcp_distribution_info: DistributionInfo[Any, Any, Any],
+                                     distribution_name: None | str
                                      ) -> None:
     """Same as test_conjugate_prior, but with generalized_conjugate_prior_distribution."""
+    gcp_distribution_info.skip_if_deselected(distribution_name)
     shape = (4, 3)
 
     # Choose a random distribution.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import NumpyComplexArray, NumpyRealArray, Shape
@@ -44,6 +45,7 @@ def build_mvcn(generator: Generator,
 
 
 # Tests --------------------------------------------------------------------------------------------
+@pytest.mark.nondistribution()
 def test_univariate_rvs(generator: Generator) -> None:
     shape = (3, 2)
     rvs_shape = (50, 100)
@@ -63,6 +65,7 @@ def test_univariate_rvs(generator: Generator) -> None:
                     atol=2e-2)
 
 
+@pytest.mark.nondistribution()
 def test_multivariate_rvs(generator: Generator) -> None:
     shape = (3, 5)
     rvs_shape = (1800, 1700)
@@ -86,6 +89,7 @@ def test_multivariate_rvs(generator: Generator) -> None:
                     atol=5e-1)
 
 
+@pytest.mark.nondistribution()
 def test_univariate_multivariate_consistency(generator: Generator) -> None:
     mv = build_mvcn(generator, (), 1, polarization=0.5)
     component = mv.access_object(())

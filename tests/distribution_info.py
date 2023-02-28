@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
+import pytest
 from numpy.random import Generator, default_rng
 from tjax import ComplexArray, Shape
 
@@ -58,6 +59,19 @@ class DistributionInfo(Generic[NP, EP, Domain]):
 
     def nat_class(self) -> type[NP]:
         return type(self.nat_parameter_generator(default_rng(), ()))
+
+    @classmethod
+    def name(cls) -> str:
+        return cls.__name__.removesuffix('Info')
+
+    @classmethod
+    def tests_selected(cls, distribution_name: None | str) -> bool:
+        return distribution_name is None or cls.name() == distribution_name
+
+    @classmethod
+    def skip_if_deselected(cls, distribution_name: None | str) -> None:
+        if not cls.tests_selected(distribution_name):
+            pytest.skip(f"Deselected {cls.name()}")
 
     # Magic methods --------------------------------------------------------------------------------
     def __init_subclass__(cls, **kwargs: Any) -> None:

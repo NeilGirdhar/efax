@@ -46,17 +46,35 @@ def _configure_numpy() -> Generator[None, None, None]:
             yield
 
 
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers", "nondistribution: mark a test as not related to a particular distribution")
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    if config.getoption("--distribution") is None:
+        return
+    skip_non_distribution = pytest.mark.skip(reason="Distribution selected")
+    for item in items:
+        if "nondistribution" in item.keywords:
+            item.add_marker(skip_non_distribution)
+
+
 _all_infos = create_infos()
 
 
+@pytest.fixture()
+def distribution_name(request: Any) -> None | str:
+    return request.config.getoption("--distribution")
+
+
 @pytest.fixture(scope='session', params=_all_infos)
-def distribution_info(request: Any  # pylint: disable=inconsistent-return-statements
-                      ) -> DistributionInfo[Any, Any, Any] | None:
+def distribution_info(request: Any) -> DistributionInfo[Any, Any, Any]:
     distribution_name: str | None = request.config.getoption('--distribution')
-    info_name = type(request.param).__name__.removesuffix('Info')
-    if distribution_name is None or info_name == distribution_name:
-        return request.param
-    pytest.skip(f"Deselected {info_name}")
+    info = request.param
+    assert isinstance(info, DistributionInfo)
+    info.skip_if_deselected(distribution_name)
+    return request.param
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:

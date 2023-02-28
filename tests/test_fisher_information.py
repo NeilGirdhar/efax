@@ -9,10 +9,12 @@ from tjax import assert_tree_allclose
 
 from efax import MultivariateNormalNP
 
+from .create_info import MultivariateNormalInfo
 from .distribution_info import DistributionInfo
 
 
-def test_mvn_fisher_information() -> None:
+def test_mvn_fisher_information(distribution_name: None | str) -> None:
+    MultivariateNormalInfo.skip_if_deselected(distribution_name)
     m = MultivariateNormalNP(jnp.zeros(2), -0.5 * jnp.eye(2))
 
     # pylint: disable=protected-access
@@ -32,7 +34,8 @@ def test_mvn_fisher_information() -> None:
                          MultivariateNormalNP(2.0, 8.0))  # type: ignore[arg-type]
 
 
-def test_mvn_fisher_information_b() -> None:
+def test_mvn_fisher_information_b(distribution_name: None | str) -> None:
+    MultivariateNormalInfo.skip_if_deselected(distribution_name)
     m = MultivariateNormalNP(np.asarray([3.0, 5.0]), np.asarray([[-0.5, 0.0], [0.0, -0.8]]))
 
     # pylint: disable=protected-access

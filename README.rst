@@ -281,7 +281,10 @@ It's not hard to add a new distribution.  The steps are:
 - Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.)
 
 Implementation should respect PEP8.
-The tests can be run using :bash:`pytest . -n auto`.
+The tests can be run using :bash:`pytest . -n auto`.  Specific distributions can be run with
+:bash:`pytest . -n auto --distribution=Gamma` where the names match the class names in
+`create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.
+
 There are a few tools to clean and check the source:
 
 - :bash:`ruff .`

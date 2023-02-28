@@ -23,12 +23,14 @@ def test_maximum_likelihood_estimation(generator: Generator,
                                        key: KeyArray,
                                        sampling_distribution_info: DistributionInfo[Any, Any, Any],
                                        *,
+                                       distribution_name: None | str,
                                        natural: bool) -> None:
     """Test that sampling is consistent with maximum likelihood estimation.
 
     This tests samples variates from either natural or expectation parametrizations.  Calculates the
     mean of the sufficient statistics, and verifies that it equals the expectation parameters.
     """
+    sampling_distribution_info.skip_if_deselected(distribution_name)
     distribution_shape = (4,)
     sample_shape = (1024, 32)
     sample_axes = tuple(range(len(sample_shape)))
