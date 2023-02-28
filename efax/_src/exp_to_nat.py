@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any, Generic, TypeVar
 
 import jax.numpy as jnp
-from jax import jit
 from jax.tree_util import tree_map
+from tjax import jit
 from tjax.dataclasses import dataclass, field
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import Adam, GradientTransformation

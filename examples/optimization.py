@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from jax import grad, jit, lax
+from jax import grad, lax
 from jax.tree_util import tree_map, tree_reduce
-from tjax import BooleanNumeric, RealArray, print_generic
+from tjax import BooleanNumeric, RealArray, jit, print_generic
 
 from efax import BernoulliEP, BernoulliNP
 

@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
-from jax import grad, jit, jvp, vjp
+from jax import grad, jvp, vjp
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_tree_allclose, zero_tangent_like
+from tjax import assert_tree_allclose, jit, zero_tangent_like
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
