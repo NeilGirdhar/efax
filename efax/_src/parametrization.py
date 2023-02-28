@@ -7,7 +7,7 @@ from itertools import count
 from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
-from tjax import ComplexArray, RealArray, Shape, custom_jvp, jit
+from tjax import ComplexArray, RealArray, Shape, custom_jvp_method, jit
 from tjax.dataclasses import dataclass
 from typing_extensions import Self
 
@@ -43,7 +43,7 @@ class Parametrization:
                 setattr(cls, name, method)
                 continue
 
-            method_jvp: Any = custom_jvp(method)
+            method_jvp: Any = custom_jvp_method(method)
 
             def ln_jvp(primals: tuple[NaturalParametrization[Any, Any]],
                        tangents: tuple[NaturalParametrization[Any, Any]]) -> tuple[RealArray,
