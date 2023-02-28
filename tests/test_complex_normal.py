@@ -25,8 +25,8 @@ def build_uvcn(generator: Generator, shape: Shape) -> ScipyComplexNormal:
 def build_mvcn(generator: Generator,
                shape: Shape,
                dimensions: int,
-               polarization: float = 0.98,
-               regularization: float = 0.01) -> ScipyComplexMultivariateNormal:
+               polarization: float = 0.98
+               ) -> ScipyComplexMultivariateNormal:
     directions = 3
     weights = np.asarray(range(directions)) + 1.5
     mean = random_complex_array(generator, (*shape, dimensions))
