@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
+from jax.random import KeyArray, chisquare
 from jax.scipy import special as jss
 from tjax import RealArray, Shape
 from tjax.dataclasses import dataclass
@@ -8,12 +9,13 @@ from tjax.dataclasses import dataclass
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
+from ..samplable import Samplable
 
 __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
 
 @dataclass
-class ChiSquareNP(NaturalParametrization['ChiSquareEP', RealArray]):
+class ChiSquareNP(NaturalParametrization['ChiSquareEP', RealArray], Samplable):
     """The chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.
@@ -38,6 +40,12 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP', RealArray]):
 
     def sufficient_statistics(self, x: RealArray) -> ChiSquareEP:
         return ChiSquareEP(jnp.log(x))
+
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+        if shape is not None:
+            shape += self.shape
+        degrees_of_freedom = (self.k_over_two_minus_one + 1.0) * 2.0
+        return chisquare(key, degrees_of_freedom, shape)
 
 
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
