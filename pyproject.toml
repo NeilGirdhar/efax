@@ -31,7 +31,7 @@ jax = '>=0.4.5'
 numpy = '>=1.22'
 scipy = '^1.4'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.27.0'
+tjax = '>=0.28.0'
 
 [tool.poetry.group.dev.dependencies]
 isort = '>=5.8'
@@ -117,7 +117,6 @@ reportUntypedFunctionDecorator = true
 reportUntypedNamedTuple = true
 
 [tool.mypy]
-plugins = 'tjax.mypy_plugin'
 files = ["efax", "tests"]
 check_untyped_defs = true
 disallow_any_generics = true
