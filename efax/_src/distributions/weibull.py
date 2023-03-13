@@ -3,7 +3,7 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -15,34 +15,34 @@ __all__ = ['WeibullNP', 'WeibullEP']
 
 
 @dataclass
-class WeibullNP(NaturalParametrization['WeibullEP', RealArray]):
-    concentration: RealArray = distribution_parameter(ScalarSupport(), fixed=True)
+class WeibullNP(NaturalParametrization['WeibullEP', JaxRealArray]):
+    concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
     # eta = -scale^-concentration
-    eta: RealArray = distribution_parameter(ScalarSupport())
+    eta: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.eta.shape
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         return -jnp.log(-self.eta) - jnp.log(self.concentration)
 
     def to_exp(self) -> WeibullEP:
         return WeibullEP(self.concentration, -1.0 / self.eta)
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return (self.concentration - 1.0) * jnp.log(x)
 
-    def sufficient_statistics(self, x: RealArray) -> WeibullEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> WeibullEP:
         return WeibullEP(jnp.broadcast_to(self.concentration, x.shape), x ** self.concentration)
 
 
 @dataclass
 class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
-    concentration: RealArray = distribution_parameter(ScalarSupport(), fixed=True)
+    concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
     # chi = scale^concentration
-    chi: RealArray = distribution_parameter(ScalarSupport())
+    chi: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -56,12 +56,12 @@ class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
     def to_nat(self) -> WeibullNP:
         return WeibullNP(self.concentration, -1.0 / self.chi)
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         k = self.concentration
         one_minus_one_over_k = 1.0 - 1.0 / k
         return one_minus_one_over_k * jnp.log(self.chi) - jnp.euler_gamma * one_minus_one_over_k
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         else:

@@ -7,7 +7,7 @@ from itertools import count
 from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
-from tjax import ComplexArray, RealArray, Shape, custom_jvp_method, jit
+from tjax import JaxComplexArray, JaxRealArray, Shape, custom_jvp_method, jit
 from tjax.dataclasses import dataclass
 from typing_extensions import Self
 
@@ -46,8 +46,8 @@ class Parametrization:
             method_jvp: Any = custom_jvp_method(method)
 
             def ln_jvp(primals: tuple[NaturalParametrization[Any, Any]],
-                       tangents: tuple[NaturalParametrization[Any, Any]]) -> tuple[RealArray,
-                                                                                   RealArray]:
+                       tangents: tuple[NaturalParametrization[Any, Any]]) -> tuple[JaxRealArray,
+                                                                                   JaxRealArray]:
                 q, = primals
                 q_dot, = tangents
                 y = q.log_normalizer()
@@ -66,13 +66,13 @@ class Parametrization:
                              for name, value, _ in self.parameters_name_value_support()}
         return type(self)(**sliced_parameters, **fixed_parameters)
 
-    def flattened(self) -> RealArray:
+    def flattened(self) -> JaxRealArray:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
                        for name, value, support in self.parameters_name_value_support()))
 
     @classmethod
-    def unflattened(cls, flattened: RealArray, **kwargs: Any) -> Self:
+    def unflattened(cls, flattened: JaxRealArray, **kwargs: Any) -> Self:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
@@ -101,7 +101,7 @@ class Parametrization:
                 for field in fields(self)
                 if field.metadata['fixed']}
 
-    def parameters_value_support(self) -> Iterable[tuple[ComplexArray, Support]]:
+    def parameters_value_support(self) -> Iterable[tuple[JaxComplexArray, Support]]:
         """The value and support of each variable parameter."""
         for field in fields(self):
             value = getattr(self, field.name)
@@ -113,7 +113,7 @@ class Parametrization:
                 raise TypeError
             yield value, support
 
-    def parameters_name_value(self) -> Iterable[tuple[str, ComplexArray]]:
+    def parameters_name_value(self) -> Iterable[tuple[str, JaxComplexArray]]:
         """The name and value of each variable parameter."""
         for field in fields(self):
             name = field.name
@@ -123,7 +123,7 @@ class Parametrization:
                 continue
             yield name, value
 
-    def parameters_name_value_support(self) -> Iterable[tuple[str, ComplexArray, Support]]:
+    def parameters_name_value_support(self) -> Iterable[tuple[str, JaxComplexArray, Support]]:
         """The name, value, and support of each variable parameter."""
         for field in fields(self):
             name = field.name

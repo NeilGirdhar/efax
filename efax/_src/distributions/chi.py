@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import jax.numpy as jnp
 from jax.scipy import special as jss
-from tjax import Array, RealArray
+from tjax import Array, JaxRealArray
 from tjax.dataclasses import dataclass
 
 from ..parameter import ScalarSupport, distribution_parameter
@@ -14,8 +14,8 @@ __all__ = ['ChiNP', 'ChiEP']
 
 
 @dataclass
-class ChiNP(TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', RealArray]):
-    k_over_two_minus_one: RealArray = distribution_parameter(ScalarSupport())
+class ChiNP(TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
+    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def base_distribution(self) -> ChiSquareNP:
@@ -24,16 +24,16 @@ class ChiNP(TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP',
     def create_expectation(self, expectation_parametrization: ChiSquareEP) -> ChiEP:
         return ChiEP(expectation_parametrization.mean_log)
 
-    def sample_to_base_sample(self, x: Array) -> RealArray:
+    def sample_to_base_sample(self, x: Array) -> JaxRealArray:
         return jnp.square(x)
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.log(2.0 * x) - jnp.square(x) * 0.5
 
 
 @dataclass
 class ChiEP(TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
-    mean_log: RealArray = distribution_parameter(ScalarSupport())
+    mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
@@ -46,7 +46,7 @@ class ChiEP(TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiN
     def create_natural(self, natural_parametrization: ChiSquareNP) -> ChiNP:
         return ChiNP(natural_parametrization.k_over_two_minus_one)
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         q = self.to_nat()
         k_over_two = q.k_over_two_minus_one + 1.0
         return -1.0 * k_over_two + 0.5 * jss.digamma(k_over_two) + 1.5 * jnp.log(2.0)

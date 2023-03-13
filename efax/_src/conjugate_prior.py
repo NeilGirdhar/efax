@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Generic
 
-from tjax import ComplexArray, RealArray
+from tjax import JaxComplexArray, JaxRealArray
 
 from .expectation_parametrization import NP, ExpectationParametrization
 from .multidimensional import Multidimensional
@@ -13,7 +13,7 @@ __all__ = ['HasConjugatePrior', 'HasGeneralizedConjugatePrior']
 
 class HasConjugatePrior(ExpectationParametrization[NP], Generic[NP]):
     # Abstract methods -----------------------------------------------------------------------------
-    def conjugate_prior_distribution(self, n: RealArray) -> NaturalParametrization[Any, Any]:
+    def conjugate_prior_distribution(self, n: JaxRealArray) -> NaturalParametrization[Any, Any]:
         """The conjugate prior distribution.
 
         Args:
@@ -21,14 +21,14 @@ class HasConjugatePrior(ExpectationParametrization[NP], Generic[NP]):
         """
         raise NotImplementedError
 
-    def conjugate_prior_observation(self) -> ComplexArray:
+    def conjugate_prior_observation(self) -> JaxComplexArray:
         """An observation of the conjugate prior corresponding to this distribution."""
         raise NotImplementedError
 
 
 class HasGeneralizedConjugatePrior(HasConjugatePrior[NP], Multidimensional, Generic[NP]):
     # Abstract methods -----------------------------------------------------------------------------
-    def generalized_conjugate_prior_distribution(self, n: RealArray
+    def generalized_conjugate_prior_distribution(self, n: JaxRealArray
                                                  ) -> NaturalParametrization[Any, Any]:
         """A generalization of the conjugate prior distribution.
 

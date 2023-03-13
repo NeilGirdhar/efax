@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
-import numpy as np
 from jax import grad, vmap
 from jax.tree_util import tree_map
 from numpy.random import Generator
@@ -20,7 +19,7 @@ def test_conjugate_prior(generator: Generator,
     """Test that the conjugate prior actually matches the distribution."""
     cp_distribution_info.skip_if_deselected(distribution_name)
     shape = (4, 3)
-    n = 100.0 * np.ones(shape)
+    n = 100.0 * jnp.ones(shape)
 
     # Choose a random distribution.
     p = cp_distribution_info.exp_parameter_generator(generator, shape=shape)
@@ -59,7 +58,7 @@ def test_generalized_conjugate_prior(generator: Generator,
     assert isinstance(p, HasGeneralizedConjugatePrior)
 
     # Find its conjugate prior at that point with many observations.
-    n = 100.0 * np.ones((*shape, p.dimensions()))
+    n = 100.0 * jnp.ones((*shape, p.dimensions()))
     gcp_q = p.generalized_conjugate_prior_distribution(n)
 
     assert gcp_q.shape == p.shape

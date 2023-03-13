@@ -3,7 +3,7 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..samplable import Samplable
@@ -24,13 +24,13 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
     def to_exp(self) -> BetaEP:
         return BetaEP(self._exp_helper())
 
-    def sufficient_statistics(self, x: RealArray) -> BetaEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> BetaEP:
         return BetaEP(jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1))
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         return jax.random.beta(key,
@@ -46,5 +46,5 @@ class BetaEP(DirichletCommonEP[BetaNP]):
     def natural_parametrization_cls(cls) -> type[BetaNP]:
         return BetaNP
 
-    def search_to_natural(self, search_parameters: RealArray) -> BetaNP:
+    def search_to_natural(self, search_parameters: JaxRealArray) -> BetaNP:
         return BetaNP(self._transform_nat_helper(search_parameters))

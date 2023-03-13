@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 
 import jax.numpy as jnp
-from tjax import ComplexArray, RealArray, Shape, abs_square
+from tjax import JaxComplexArray, JaxRealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -14,17 +14,17 @@ __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 
 @dataclass
-class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
-    mean_times_precision: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
-    precision: RealArray = distribution_parameter(ScalarSupport())
-    pseudo_precision: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', JaxComplexArray]):
+    mean_times_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    precision: JaxRealArray = distribution_parameter(ScalarSupport())
+    pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         _, s, mu = self._r_s_mu()
         det_s = s
         det_h = -self.precision
@@ -39,13 +39,13 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
         u = (r * s).conjugate()
         return ComplexNormalEP(mu, s + abs_square(mu), u + jnp.square(mu))
 
-    def carrier_measure(self, x: ComplexArray) -> RealArray:
+    def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
-    def sufficient_statistics(self, x: ComplexArray) -> ComplexNormalEP:
+    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexNormalEP:
         return ComplexNormalEP(x, abs_square(x), jnp.square(x))
 
-    def _r_s_mu(self) -> tuple[ComplexArray, RealArray, ComplexArray]:
+    def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
         r = -self.pseudo_precision / self.precision
         s = 1.0 / ((abs_square(r) - 1.0) * self.precision)
         k = self.pseudo_precision / self.precision
@@ -56,9 +56,9 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', ComplexArray]):
 
 @dataclass
 class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
-    mean: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
-    second_moment: RealArray = distribution_parameter(ScalarSupport())
-    pseudo_second_moment: ComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    mean: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
+    pseudo_second_moment: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -82,5 +82,5 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
                                        + pseudo_precision * self.mean)
         return ComplexNormalNP(mean_times_precision, precision, pseudo_precision)
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)

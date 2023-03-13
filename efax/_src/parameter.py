@@ -4,7 +4,7 @@ from math import comb, sqrt
 from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
-from tjax import Array, RealArray, Shape
+from tjax import JaxArray, JaxRealArray, Shape
 from tjax.dataclasses import field
 
 __all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',
@@ -15,10 +15,10 @@ class Field:
     def num_elements(self, support_num_element: int) -> int:
         raise NotImplementedError
 
-    def flattened(self, x: Array) -> RealArray:
+    def flattened(self, x: JaxArray) -> JaxRealArray:
         raise NotImplementedError
 
-    def unflattened(self, y: RealArray) -> Array:
+    def unflattened(self, y: JaxRealArray) -> JaxArray:
         raise NotImplementedError
 
 
@@ -26,10 +26,10 @@ class RealField(Field):
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element
 
-    def flattened(self, x: Array) -> RealArray:
+    def flattened(self, x: JaxArray) -> JaxRealArray:
         return x
 
-    def unflattened(self, y: RealArray) -> Array:
+    def unflattened(self, y: JaxRealArray) -> JaxArray:
         return y
 
 
@@ -37,10 +37,10 @@ class ComplexField(Field):
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element * 2
 
-    def flattened(self, x: Array) -> RealArray:
+    def flattened(self, x: JaxArray) -> JaxRealArray:
         return jnp.concatenate([x.real, x.imag], axis=-1)
 
-    def unflattened(self, y: RealArray) -> Array:
+    def unflattened(self, y: JaxRealArray) -> JaxArray:
         assert y.shape[-1] % 2 == 0
         n = y.shape[-1] // 2
         return y[..., :n] + 1j * y[..., n:]
@@ -64,10 +64,10 @@ class Support:
     def num_elements(self, dimensions: int) -> int:
         raise NotImplementedError
 
-    def flattened(self, x: Array) -> RealArray:
+    def flattened(self, x: JaxArray) -> JaxRealArray:
         raise NotImplementedError
 
-    def unflattened(self, y: RealArray, dimensions: int) -> Array:
+    def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         raise NotImplementedError
 
 
@@ -81,10 +81,10 @@ class ScalarSupport(Support):
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(1)
 
-    def flattened(self, x: Array) -> RealArray:
+    def flattened(self, x: JaxArray) -> JaxRealArray:
         return self.field.flattened(jnp.reshape(x, (*x.shape, 1)))
 
-    def unflattened(self, y: RealArray, dimensions: int) -> Array:
+    def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         assert x.shape[-1] == 1
         return jnp.reshape(x, x.shape[:-1])
@@ -100,10 +100,10 @@ class VectorSupport(Support):
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(dimensions)
 
-    def flattened(self, x: Array) -> RealArray:
+    def flattened(self, x: JaxArray) -> JaxRealArray:
         return self.field.flattened(x)
 
-    def unflattened(self, y: RealArray, dimensions: int) -> Array:
+    def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         assert x.shape[-1] == dimensions
         return x
@@ -125,13 +125,13 @@ class SymmetricMatrixSupport(Support):
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(comb(dimensions + 1, 2))
 
-    def flattened(self, x: Array) -> RealArray:
+    def flattened(self, x: JaxArray) -> JaxRealArray:
         dimensions = x.shape[-1]
         assert x.shape[-2] == dimensions
         index = (..., *jnp.triu_indices(dimensions))
         return self.field.flattened(x[index])
 
-    def unflattened(self, y: RealArray, dimensions: int) -> Array:
+    def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         k = x.shape[-1]
         sqrt_discriminant = sqrt(1 + 8 * k)
@@ -160,11 +160,11 @@ class SquareMatrixSupport(Support):
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(dimensions ** 2)
 
-    def flattened(self, x: Array) -> Array:
+    def flattened(self, x: JaxArray) -> JaxArray:
         y = jnp.reshape(x, (*x.shape[:-2], -1))
         return self.field.flattened(y)
 
-    def unflattened(self, y: Array, dimensions: int) -> Array:
+    def unflattened(self, y: JaxArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 

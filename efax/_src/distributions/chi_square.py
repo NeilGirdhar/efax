@@ -3,7 +3,7 @@ from __future__ import annotations
 import jax.numpy as jnp
 from jax.random import KeyArray, chisquare
 from jax.scipy import special as jss
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
@@ -15,19 +15,19 @@ __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
 
 @dataclass
-class ChiSquareNP(NaturalParametrization['ChiSquareEP', RealArray], Samplable):
+class ChiSquareNP(NaturalParametrization['ChiSquareEP', JaxRealArray], Samplable):
     """The chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.
     """
-    k_over_two_minus_one: RealArray = distribution_parameter(ScalarSupport())
+    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.k_over_two_minus_one.shape
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         k_over_two = self.k_over_two_minus_one + 1.0
         return jss.gammaln(k_over_two) - k_over_two * jnp.log(0.5)
 
@@ -35,13 +35,13 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP', RealArray], Samplable):
         k_over_two = self.k_over_two_minus_one + 1.0
         return ChiSquareEP(jss.digamma(k_over_two) - jnp.log(0.5))
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return -x * 0.5
 
-    def sufficient_statistics(self, x: RealArray) -> ChiSquareEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> ChiSquareEP:
         return ChiSquareEP(jnp.log(x))
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         degrees_of_freedom = (self.k_over_two_minus_one + 1.0) * 2.0
@@ -51,7 +51,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP', RealArray], Samplable):
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
 class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
-    mean_log: RealArray = distribution_parameter(ScalarSupport())
+    mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
@@ -62,7 +62,7 @@ class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
     def shape(self) -> Shape:
         return self.mean_log.shape
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         q = self.to_nat()
         k_over_two = q.k_over_two_minus_one + 1.0
         return -k_over_two

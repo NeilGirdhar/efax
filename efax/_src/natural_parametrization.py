@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
 
 import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
-from tjax import ComplexArray, RealArray, jit
+from tjax import JaxComplexArray, JaxRealArray, jit
 from typing_extensions import Self
 
 from .parametrization import Parametrization
@@ -18,7 +18,7 @@ __all__ = ['NaturalParametrization']
 
 
 EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
-Domain = TypeVar('Domain', bound=ComplexArray)
+Domain = TypeVar('Domain', bound=JaxComplexArray)
 
 
 class NaturalParametrization(Parametrization, Generic[EP, Domain]):
@@ -28,7 +28,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
     # Abstract methods -----------------------------------------------------------------------------
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         """Returns: The log-normalizer."""
         raise NotImplementedError
 
@@ -36,7 +36,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         """Returns: The corresponding expectation parameters."""
         raise NotImplementedError
 
-    def carrier_measure(self, x: Domain) -> RealArray:
+    def carrier_measure(self, x: Domain) -> JaxRealArray:
         """The corresponding carrier measure.
 
         Args:
@@ -61,13 +61,13 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     @jit
     @final
-    def entropy(self) -> RealArray:
+    def entropy(self) -> JaxRealArray:
         """The Shannon entropy."""
         return self.to_exp().cross_entropy(self)
 
     @jit
     @final
-    def pdf(self, x: Domain) -> RealArray:
+    def pdf(self, x: Domain) -> JaxRealArray:
         """The distribution's density or mass function at x.
 
         Args:
@@ -117,7 +117,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         return replace(self, **kwargs)
 
     @final
-    def jeffreys_prior(self) -> RealArray:
+    def jeffreys_prior(self) -> JaxRealArray:
         fisher_matrix = self._fisher_information_matrix()
         return jnp.sqrt(jnp.linalg.det(fisher_matrix))
 
@@ -139,17 +139,18 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         return expectation_parameters, f_vjp(vector)
 
     @final
-    def kl_divergence(self, q: Self) -> RealArray:
+    def kl_divergence(self, q: Self) -> JaxRealArray:
         return self.to_exp().kl_divergence(q, self_nat=self)
 
     # Private methods ------------------------------------------------------------------------------
     @classmethod
-    def _flat_log_normalizer(cls, flattened_parameters: RealArray, **kwargs: Any) -> RealArray:
+    def _flat_log_normalizer(cls, flattened_parameters: JaxRealArray, **kwargs: Any
+                             ) -> JaxRealArray:
         distribution = cls.unflattened(flattened_parameters, **kwargs)
         return distribution.log_normalizer()
 
     @jit
-    def _fisher_information_matrix(self: NaturalParametrization[EP, Domain]) -> RealArray:
+    def _fisher_information_matrix(self: NaturalParametrization[EP, Domain]) -> JaxRealArray:
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
         for _ in range(len(self.shape)):
             fisher_info_f = vmap(fisher_info_f)

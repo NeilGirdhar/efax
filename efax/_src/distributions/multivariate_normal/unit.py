@@ -5,7 +5,7 @@ import math
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ...conjugate_prior import HasGeneralizedConjugatePrior
@@ -20,35 +20,35 @@ __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 
 @dataclass
-class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP', RealArray],
+class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray],
                                Multidimensional,
                                Samplable):
     """The multivariate normal distribution with unit variance.
 
     This is a curved exponential family.
     """
-    mean: RealArray = distribution_parameter(VectorSupport())
+    mean: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         return 0.5 * (jnp.sum(jnp.square(self.mean), axis=-1)
                       + self.dimensions() * math.log(math.pi * 2.0))
 
     def to_exp(self) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(self.mean)
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         # The second moment of a delta distribution at x.
         return -0.5 * jnp.sum(jnp.square(x), axis=-1)
 
-    def sufficient_statistics(self, x: RealArray) -> MultivariateUnitNormalEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.mean.shape
         else:
@@ -64,7 +64,7 @@ class MultivariateUnitNormalEP(
         HasGeneralizedConjugatePrior[MultivariateUnitNormalNP],
         Multidimensional,
         Samplable):
-    mean: RealArray = distribution_parameter(VectorSupport())
+    mean: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -78,23 +78,23 @@ class MultivariateUnitNormalEP(
     def to_nat(self) -> MultivariateUnitNormalNP:
         return MultivariateUnitNormalNP(self.mean)
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
         return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + self.dimensions())
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         return self.to_nat().sample(key, shape)
 
-    def conjugate_prior_distribution(self, n: RealArray) -> IsotropicNormalNP:
+    def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
         negative_half_precision = -0.5 * n * jnp.ones(self.shape)
         return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
 
-    def generalized_conjugate_prior_distribution(self, n: RealArray
+    def generalized_conjugate_prior_distribution(self, n: JaxRealArray
                                                  ) -> MultivariateDiagonalNormalNP:
         negative_half_precision = -0.5 * n
         return MultivariateDiagonalNormalNP(n * self.mean, negative_half_precision)
 
-    def conjugate_prior_observation(self) -> RealArray:
+    def conjugate_prior_observation(self) -> JaxRealArray:
         return self.mean
 
     def dimensions(self) -> int:

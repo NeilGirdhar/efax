@@ -5,7 +5,7 @@ import jax.numpy as jnp
 from jax.nn import softplus
 from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import RealArray, Shape, inverse_softplus
+from tjax import JaxRealArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
@@ -17,16 +17,16 @@ __all__ = ['GammaNP', 'GammaEP']
 
 
 @dataclass
-class GammaNP(NaturalParametrization['GammaEP', RealArray], Samplable):
-    negative_rate: RealArray = distribution_parameter(ScalarSupport())
-    shape_minus_one: RealArray = distribution_parameter(ScalarSupport())
+class GammaNP(NaturalParametrization['GammaEP', JaxRealArray], Samplable):
+    negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
+    shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.negative_rate.shape
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         shape = self.shape_minus_one + 1.0
         return jss.gammaln(shape) - shape * jnp.log(-self.negative_rate)
 
@@ -35,22 +35,22 @@ class GammaNP(NaturalParametrization['GammaEP', RealArray], Samplable):
         return GammaEP(-shape / self.negative_rate,
                        jss.digamma(shape) - jnp.log(-self.negative_rate))
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
-    def sufficient_statistics(self, x: RealArray) -> GammaEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> GammaEP:
         return GammaEP(x, jnp.log(x))
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         return -jax.random.gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
 
 
 @dataclass
-class GammaEP(ExpToNat[GammaNP, RealArray]):
-    mean: RealArray = distribution_parameter(ScalarSupport())
-    mean_log: RealArray = distribution_parameter(ScalarSupport())
+class GammaEP(ExpToNat[GammaNP, JaxRealArray]):
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -61,15 +61,15 @@ class GammaEP(ExpToNat[GammaNP, RealArray]):
     def natural_parametrization_cls(cls) -> type[GammaNP]:
         return GammaNP
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
-    def search_to_natural(self, search_parameters: RealArray) -> GammaNP:
+    def search_to_natural(self, search_parameters: JaxRealArray) -> GammaNP:
         shape = softplus(search_parameters)
         rate = shape / self.mean
         return GammaNP(-rate, shape - 1.0)
 
-    def search_gradient(self, search_parameters: RealArray) -> RealArray:
+    def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         shape = softplus(search_parameters)
         log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
         return log_mean_minus_mean_log - jnp.log(shape) + jss.digamma(shape)
@@ -77,7 +77,7 @@ class GammaEP(ExpToNat[GammaNP, RealArray]):
         # where polygamma(1) is trigamma
 
     # Overridden methods ---------------------------------------------------------------------------
-    def initial_search_parameters(self) -> RealArray:
+    def initial_search_parameters(self) -> JaxRealArray:
         log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
         initial_shape = (
             (3.0 - log_mean_minus_mean_log

@@ -70,10 +70,10 @@ def distribution_name(request: Any) -> None | str:
 
 @pytest.fixture(scope='session', params=_all_infos)
 def distribution_info(request: Any) -> DistributionInfo[Any, Any, Any]:
-    distribution_name: str | None = request.config.getoption('--distribution')
+    distribution_name_option: str | None = request.config.getoption('--distribution')
     info = request.param
     assert isinstance(info, DistributionInfo)
-    info.skip_if_deselected(distribution_name)
+    info.skip_if_deselected(distribution_name_option)
     return request.param
 
 

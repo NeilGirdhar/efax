@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, TypeVar
 
-from tjax import ComplexArray, RealArray, Shape
+from tjax import JaxComplexArray, JaxRealArray, Shape
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import EP, NaturalParametrization
@@ -12,7 +12,7 @@ __all__: list[str] = []
 
 TEP = TypeVar('TEP', bound=ExpectationParametrization[Any])
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
-Domain = TypeVar('Domain', bound=ComplexArray)
+Domain = TypeVar('Domain', bound=JaxComplexArray)
 
 
 class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
@@ -33,7 +33,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
     def shape(self) -> Shape:
         return self.base_distribution().shape
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         """The log-normalizer."""
         return self.base_distribution().log_normalizer()
 

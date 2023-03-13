@@ -4,7 +4,7 @@ import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasConjugatePrior
@@ -17,30 +17,30 @@ __all__ = ['PoissonNP', 'PoissonEP']
 
 
 @dataclass
-class PoissonNP(NaturalParametrization['PoissonEP', RealArray]):
-    log_mean: RealArray = distribution_parameter(ScalarSupport())
+class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
+    log_mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.log_mean.shape
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         return jnp.exp(self.log_mean)
 
     def to_exp(self) -> PoissonEP:
         return PoissonEP(jnp.exp(self.log_mean))
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return -jss.gammaln(x + 1)
 
-    def sufficient_statistics(self, x: RealArray) -> PoissonEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> PoissonEP:
         return PoissonEP(x)
 
 
 @dataclass
 class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
-    mean: RealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -57,15 +57,15 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
     # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of
     #   lambda ** k * log(k!) / k! = lambda ** k * log Gamma(k+1) / Gamma(k+1)
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
         return jax.random.poisson(key, self.mean, shape)
 
-    def conjugate_prior_distribution(self, n: RealArray) -> GammaNP:
+    def conjugate_prior_distribution(self, n: JaxRealArray) -> GammaNP:
         return GammaNP(-n, n * self.mean)
 
-    def conjugate_prior_observation(self) -> RealArray:
+    def conjugate_prior_observation(self) -> JaxRealArray:
         return self.mean

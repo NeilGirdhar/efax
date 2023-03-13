@@ -10,7 +10,7 @@ from __future__ import annotations
 import jax.numpy as jnp
 from jax.nn import softplus
 from jax.scipy.special import digamma
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..exp_to_nat import ExpToNat
@@ -23,17 +23,17 @@ __all__ = ['GeneralizedDirichletNP', 'GeneralizedDirichletEP']
 
 
 @dataclass
-class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', RealArray],
+class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
                              Multidimensional):
-    alpha_minus_one: RealArray = distribution_parameter(VectorSupport())
-    gamma: RealArray = distribution_parameter(VectorSupport())
+    alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
+    gamma: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.alpha_minus_one.shape[:-1]
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         alpha, beta = self.alpha_beta()
         return jnp.sum(betaln(alpha, beta), axis=-1)
 
@@ -51,19 +51,19 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Re
         alpha_bar = alpha_bar_direct + alpha_bar_indirect
         return GeneralizedDirichletEP(alpha_bar, gamma_bar)
 
-    def sufficient_statistics(self, x: RealArray) -> GeneralizedDirichletEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> GeneralizedDirichletEP:
         cs_x = jnp.cumsum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
         return GeneralizedDirichletEP(jnp.log(x), jnp.log(1.0 - cs_x))
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape[:len(x.shape) - 1])
 
     def dimensions(self) -> int:
         return self.alpha_minus_one.shape[-1]
 
     # New methods ----------------------------------------------------------------------------------
-    def alpha_beta(self) -> tuple[RealArray, RealArray]:
+    def alpha_beta(self) -> tuple[JaxRealArray, JaxRealArray]:
         alpha = self.alpha_minus_one + 1.0
         # cs_alpha[i] = sum_{j>=i} alpha[j]
         # cs_gamma[i] = sum_{j>=i} gamma[j]
@@ -77,11 +77,11 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Re
 
 
 @dataclass
-class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, RealArray], Multidimensional):
+class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, JaxRealArray], Multidimensional):
     # E({log(x_i)}_i)
-    mean_log_probability: RealArray = distribution_parameter(VectorSupport())
+    mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
     # E({log(1-∑_{j≤i} x_j)}_i)
-    mean_log_cumulative_probability: RealArray = distribution_parameter(VectorSupport())
+    mean_log_cumulative_probability: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -92,20 +92,20 @@ class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, RealArray], Multid
     def natural_parametrization_cls(cls) -> type[GeneralizedDirichletNP]:
         return GeneralizedDirichletNP
 
-    def search_to_natural(self, search_parameters: RealArray) -> GeneralizedDirichletNP:
+    def search_to_natural(self, search_parameters: JaxRealArray) -> GeneralizedDirichletNP:
         # Run Newton's method on the whole real hyperspace.
         n = self.dimensions()
         positive_search_parameters = softplus(search_parameters)
         return GeneralizedDirichletNP(positive_search_parameters[..., :n] - 1.0,
                                       positive_search_parameters[..., n:])
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
-    def initial_search_parameters(self) -> RealArray:
+    def initial_search_parameters(self) -> JaxRealArray:
         return jnp.zeros((*self.shape, self.dimensions() * 2))
 
-    def search_gradient(self, search_parameters: RealArray) -> RealArray:
+    def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).flattened()
 
     def dimensions(self) -> int:

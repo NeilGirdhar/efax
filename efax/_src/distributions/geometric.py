@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from tjax import RealArray
+from tjax import JaxRealArray
 from tjax.dataclasses import dataclass
 
 from ..parameter import ScalarSupport, distribution_parameter
@@ -12,16 +12,16 @@ __all__ = ['GeometricNP', 'GeometricEP']
 
 @dataclass
 class GeometricNP(NBCommonNP['GeometricEP']):
-    log_not_p: RealArray = distribution_parameter(ScalarSupport())
+    log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     def to_exp(self) -> GeometricEP:
         return GeometricEP(self._mean())
 
-    def sufficient_statistics(self, x: RealArray) -> GeometricEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> GeometricEP:
         return GeometricEP(x)
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.log_not_p.shape)
 
     def _failures(self) -> int:
@@ -30,7 +30,7 @@ class GeometricNP(NBCommonNP['GeometricEP']):
 
 @dataclass
 class GeometricEP(NBCommonEP[GeometricNP]):
-    mean: RealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod

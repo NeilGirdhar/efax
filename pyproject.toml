@@ -4,7 +4,7 @@ build-backend = 'poetry.core.masonry.api'
 
 [tool.poetry]
 name = 'efax'
-version = "1.12.1"
+version = "1.13.1"
 description = "Exponential families for JAX"
 license = 'MIT'
 authors = ['Neil Girdhar <mistersheik@gmail.com>']
@@ -31,7 +31,7 @@ jax = '>=0.4.5'
 numpy = '>=1.22'
 scipy = '^1.4'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.28.0'
+tjax = '>=0.28.4'
 
 [tool.poetry.group.dev.dependencies]
 isort = '>=5.8'
@@ -87,7 +87,7 @@ min-similarity-lines = 10
 ignore-imports = 'yes'
 
 [tool.pyright]
-include = ["efax", "tests"]
+include = ["efax", "tests", "examples"]
 stubPath = ""
 reportCallInDefaultInitializer = true
 reportIncompatibleMethodOverride = true
@@ -117,7 +117,7 @@ reportUntypedFunctionDecorator = true
 reportUntypedNamedTuple = true
 
 [tool.mypy]
-files = ["efax", "tests"]
+files = ["efax", "tests", "examples"]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -141,7 +141,7 @@ module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
 ignore_missing_imports = true
 
 [tool.ruff]
-select = ["F", "E", "W", "I", "N", "D", "UP", "YTT", "ANN", "S", "BLE", "FBT", "B", "A", "C4",
+select = ["F", "E", "W", "I", "N", "D", "UP", "YTT", "ANN", "S", "BLE", "FBT", "B", "A", "C40",
     "EM", "EXE", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "RSE", "RET", "SLF", "SIM",
     "TID", "PTH", "PGH", "PL", "TRY", "NPY", "RUF"]
 ignore = ["B008", "B011", "D100", "D101", "D102", "D107", "S101", "D103", "D105",

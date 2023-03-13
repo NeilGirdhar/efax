@@ -4,7 +4,7 @@ import operator
 from typing import Any, Generic, TypeVar, final
 
 from jax.tree_util import tree_map
-from tjax import RealArray, jit
+from tjax import JaxRealArray, jit
 
 from .natural_parametrization import NaturalParametrization
 from .parametrization import Parametrization
@@ -34,7 +34,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         """The corresponding natural parameters."""
         raise NotImplementedError
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         """The expected carrier measure of the distribution.
 
         This is the missing term from the inner product between the observed distribution and the
@@ -45,7 +45,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
     # Final methods --------------------------------------------------------------------------------
     @jit
     @final
-    def cross_entropy(self, q: NP) -> RealArray:
+    def cross_entropy(self, q: NP) -> JaxRealArray:
         """The cross entropy.
 
         Args:
@@ -57,7 +57,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
 
     @jit
     @final
-    def entropy(self) -> RealArray:
+    def entropy(self) -> JaxRealArray:
         """The Shannon entropy.
 
         This can be quite slow since it depends on a conversion to natural parameters.
@@ -66,7 +66,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
 
     @jit
     @final
-    def kl_divergence(self, q: NP, *, self_nat: None | NP = None) -> RealArray:
+    def kl_divergence(self, q: NP, *, self_nat: None | NP = None) -> JaxRealArray:
         """The Kullback-Leibler divergence.
 
         This can be quite slow since it depends on a conversion to natural parameters.

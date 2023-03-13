@@ -3,19 +3,19 @@ from __future__ import annotations
 import jax.numpy as jnp
 from jax import grad, lax
 from jax.tree_util import tree_map, tree_reduce
-from tjax import BooleanNumeric, RealArray, jit, print_generic
+from tjax import JaxBooleanArray, JaxRealArray, jit, print_generic
 
 from efax import BernoulliEP, BernoulliNP
 
 
-def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> RealArray:
+def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> JaxRealArray:
     return jnp.sum(p.cross_entropy(q))
 
 
 gce = jit(grad(cross_entropy_loss, 1))
 
 
-def apply(x: RealArray, x_bar: RealArray) -> RealArray:
+def apply(x: JaxRealArray, x_bar: JaxRealArray) -> JaxRealArray:
     return x - 1e-4 * x_bar
 
 
@@ -24,7 +24,7 @@ def body_fun(q: BernoulliNP) -> BernoulliNP:
     return tree_map(apply, q, q_bar)
 
 
-def cond_fun(q: BernoulliNP) -> BooleanNumeric:
+def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
     q_bar = gce(some_p, q)
     total = tree_reduce(jnp.sum,
                         tree_map(lambda x: jnp.sum(jnp.square(x)), q_bar))

@@ -27,8 +27,8 @@ def test_mvn_fisher_information(distribution_name: None | str) -> None:
 
     assert_tree_allclose(
         m.fisher_information_diagonal(),
-        MultivariateNormalNP(np.asarray([1.0, 1.0]),
-                             np.asarray([[2., 4.], [4., 2.]])))
+        MultivariateNormalNP(jnp.asarray([1.0, 1.0]),
+                             jnp.asarray([[2., 4.], [4., 2.]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
                          MultivariateNormalNP(2.0, 8.0))  # type: ignore[arg-type]
@@ -36,20 +36,20 @@ def test_mvn_fisher_information(distribution_name: None | str) -> None:
 
 def test_mvn_fisher_information_b(distribution_name: None | str) -> None:
     MultivariateNormalInfo.skip_if_deselected(distribution_name)
-    m = MultivariateNormalNP(np.asarray([3.0, 5.0]), np.asarray([[-0.5, 0.0], [0.0, -0.8]]))
+    m = MultivariateNormalNP(jnp.asarray([3.0, 5.0]), jnp.asarray([[-0.5, 0.0], [0.0, -0.8]]))
 
     # pylint: disable=protected-access
     assert_tree_allclose(m._fisher_information_matrix(),  # noqa: SLF001
-                         np.asarray([[1., -0., 6., 6.25, -0.],
-                                     [-0., 0.625, -0., 3.75, 3.90625],
-                                     [6., 0., 38., 37.5, 0.],
-                                     [6.25, 3.75, 37.5, 64.062, 23.4375],
-                                     [0., 3.90625, 0., 23.4375, 25.1953]]))
+                         jnp.asarray([[1., -0., 6., 6.25, -0.],
+                                      [-0., 0.625, -0., 3.75, 3.90625],
+                                      [6., 0., 38., 37.5, 0.],
+                                      [6.25, 3.75, 37.5, 64.062, 23.4375],
+                                      [0., 3.90625, 0., 23.4375, 25.1953]]))
 
     assert_tree_allclose(
         m.fisher_information_diagonal(),
-        MultivariateNormalNP(np.asarray([1.0, 0.625]),
-                             np.asarray([[38., 64.062], [64.062, 25.1953]])))
+        MultivariateNormalNP(jnp.asarray([1.0, 0.625]),
+                             jnp.asarray([[38., 64.062], [64.062, 25.1953]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
                          MultivariateNormalNP(1.625, 127.258))  # type: ignore[arg-type]

@@ -6,7 +6,7 @@ import numpy as np
 from jax.nn import one_hot
 from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..conjugate_prior import HasGeneralizedConjugatePrior
@@ -21,16 +21,16 @@ __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
-class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidimensional,
+class MultinomialNP(NaturalParametrization['MultinomialEP', JaxRealArray], Multidimensional,
                     Samplable):
-    log_odds: RealArray = distribution_parameter(VectorSupport())
+    log_odds: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.log_odds.shape[:-1]
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
@@ -42,13 +42,13 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
         log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return MultinomialEP(jnp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape[:-1])
 
-    def sufficient_statistics(self, x: RealArray) -> MultinomialEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> MultinomialEP:
         return MultinomialEP(x)
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         return one_hot(jax.random.categorical(key, self.log_odds, shape=shape),
@@ -58,7 +58,7 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
         return self.log_odds.shape[-1]
 
     # New methods ----------------------------------------------------------------------------------
-    def nat_to_probability(self) -> RealArray:
+    def nat_to_probability(self) -> JaxRealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
@@ -66,14 +66,14 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', RealArray], Multidim
         final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
         return jnp.append(p, final_p, axis=-1)
 
-    def nat_to_surprisal(self) -> RealArray:
+    def nat_to_surprisal(self) -> JaxRealArray:
         total_p = self.nat_to_probability()
         return -jnp.log(total_p)
 
 
 @dataclass
 class MultinomialEP(HasGeneralizedConjugatePrior[MultinomialNP], Multidimensional):
-    probability: RealArray = distribution_parameter(VectorSupport())
+    probability: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -88,15 +88,15 @@ class MultinomialEP(HasGeneralizedConjugatePrior[MultinomialNP], Multidimensiona
         p_k = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
         return MultinomialNP(jnp.log(self.probability / p_k))
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
-    def conjugate_prior_distribution(self, n: RealArray) -> DirichletNP:
+    def conjugate_prior_distribution(self, n: JaxRealArray) -> DirichletNP:
         reshaped_n = n[..., np.newaxis]
         final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
         return DirichletNP(reshaped_n * jnp.append(self.probability, final_p, axis=-1))
 
-    def generalized_conjugate_prior_distribution(self, n: RealArray) -> GeneralizedDirichletNP:
+    def generalized_conjugate_prior_distribution(self, n: JaxRealArray) -> GeneralizedDirichletNP:
         final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
         all_p = jnp.append(self.probability, final_p, axis=-1)
         alpha = n * all_p
@@ -105,7 +105,7 @@ class MultinomialEP(HasGeneralizedConjugatePrior[MultinomialNP], Multidimensiona
         gamma = -jnp.diff(beta, append=1.0) - alpha_roll
         return GeneralizedDirichletNP(alpha - 1.0, gamma)
 
-    def conjugate_prior_observation(self) -> RealArray:
+    def conjugate_prior_observation(self) -> JaxRealArray:
         return self.probability
 
     def dimensions(self) -> int:

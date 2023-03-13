@@ -5,13 +5,13 @@ from typing import Any, Generic, TypeVar
 
 import pytest
 from numpy.random import Generator, default_rng
-from tjax import ComplexArray, Shape
+from tjax import NumpyComplexArray, Shape
 
 from efax import ExpectationParametrization, NaturalParametrization
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 EP = TypeVar('EP', bound=ExpectationParametrization[Any])
-Domain = TypeVar('Domain', bound=ComplexArray)
+Domain = TypeVar('Domain', bound=NumpyComplexArray)
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):

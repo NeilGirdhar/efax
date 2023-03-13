@@ -4,7 +4,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from jax.random import KeyArray
-from tjax import RealArray, Shape
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -16,16 +16,16 @@ __all__ = ['NormalNP', 'NormalEP']
 
 
 @dataclass
-class NormalNP(NaturalParametrization['NormalEP', RealArray]):
-    mean_times_precision: RealArray = distribution_parameter(ScalarSupport())
-    negative_half_precision: RealArray = distribution_parameter(ScalarSupport())
+class NormalNP(NaturalParametrization['NormalEP', JaxRealArray]):
+    mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
+    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
-    def log_normalizer(self) -> RealArray:
+    def log_normalizer(self) -> JaxRealArray:
         return (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
                 + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
 
@@ -34,17 +34,17 @@ class NormalNP(NaturalParametrization['NormalEP', RealArray]):
         second_moment = jnp.square(mean) - 0.5 / self.negative_half_precision
         return NormalEP(mean, second_moment)
 
-    def carrier_measure(self, x: RealArray) -> RealArray:
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
-    def sufficient_statistics(self, x: RealArray) -> NormalEP:
+    def sufficient_statistics(self, x: JaxRealArray) -> NormalEP:
         return NormalEP(x, jnp.square(x))
 
 
 @dataclass
 class NormalEP(ExpectationParametrization[NormalNP], Samplable):
-    mean: RealArray = distribution_parameter(ScalarSupport())
-    second_moment: RealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
     @property
@@ -58,10 +58,10 @@ class NormalEP(ExpectationParametrization[NormalNP], Samplable):
     def to_nat(self) -> NormalNP:
         return NormalNP(self.mean / self.variance(), -0.5 / self.variance())
 
-    def expected_carrier_measure(self) -> RealArray:
+    def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> RealArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         else:
@@ -70,5 +70,5 @@ class NormalEP(ExpectationParametrization[NormalNP], Samplable):
         return jax.random.normal(key, shape) * deviation + self.mean
 
     # New methods ----------------------------------------------------------------------------------
-    def variance(self) -> RealArray:
+    def variance(self) -> JaxRealArray:
         return self.second_moment - jnp.square(self.mean)
