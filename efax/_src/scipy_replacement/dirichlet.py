@@ -11,6 +11,9 @@ from .shaped_distribution import ShapedDistribution
 __all__ = ['ScipyDirichlet', 'ScipyGeneralizedDirichlet']
 
 
+scipy_beta = scipy.special.beta  # pyright: ignore
+
+
 # pylint: disable=protected-access
 mvd: type = ss._multivariate.dirichlet_frozen  # noqa: SLF001
 class ScipyDirichletFixRVsAndPDF(mvd):  # pyright: ignore
@@ -62,8 +65,7 @@ class ScipyGeneralizedDirichlet:
         alpha_roll[..., -1] = 0.0
         gamma = -np.diff(self.beta, append=1.0) - alpha_roll
         cs_x = np.cumsum(x, axis=-1)
-        terms = x ** (self.alpha - 1.0) * (1.0 - cs_x) ** gamma / scipy.special.beta(self.alpha,
-                                                                                     self.beta)
+        terms = x ** (self.alpha - 1.0) * (1.0 - cs_x) ** gamma / scipy_beta(self.alpha, self.beta)
         return np.prod(terms, axis=-1)
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:

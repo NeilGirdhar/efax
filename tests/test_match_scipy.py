@@ -82,7 +82,7 @@ def test_maximum_likelihood_estimation(generator: Generator,
     nat_parameters = exp_parameters.to_nat()
     # Generate variates from the corresponding scipy distribution.
     scipy_distribution = distribution_info.exp_to_scipy_distribution(
-        exp_parameters)  # type: ignore[arg-type]
+        exp_parameters)  # type: ignore[arg-type] # pyright: ignore
     x = scipy_distribution.rvs(random_state=generator, size=70000)
     # Convert the variates to sufficient statistics.
     my_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(x))

@@ -31,7 +31,7 @@ def test_mvn_fisher_information(distribution_name: None | str) -> None:
                              jnp.asarray([[2., 4.], [4., 2.]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
-                         MultivariateNormalNP(2.0, 8.0))  # type: ignore[arg-type]
+                         MultivariateNormalNP(jnp.asarray(2.0), jnp.asarray(8.0)))
 
 
 def test_mvn_fisher_information_b(distribution_name: None | str) -> None:
@@ -52,7 +52,7 @@ def test_mvn_fisher_information_b(distribution_name: None | str) -> None:
                              jnp.asarray([[38., 64.062], [64.062, 25.1953]])))
 
     assert_tree_allclose(m.fisher_information_trace(),
-                         MultivariateNormalNP(1.625, 127.258))  # type: ignore[arg-type]
+                         MultivariateNormalNP(jnp.asarray(1.625), jnp.asarray(127.258)))
 
 
 def test_fisher_information_is_convex(generator: Generator,

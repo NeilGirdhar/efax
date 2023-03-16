@@ -107,8 +107,8 @@ class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
                          variance: NumpyRealNumeric,
                          angle: NumpyRealNumeric,
                          polarization: NumpyComplexNumeric) -> Self:
-        r: NumpyComplexArray = (polarization *
-                                np.exp(1j * 2 * np.pi * angle * 2))  # type: ignore[assignment]
+        polarization_np: NumpyComplexArray = np.asarray(polarization)
+        r: NumpyComplexArray = polarization_np * np.exp(1j * 2 * np.pi * angle * 2)
         mean_array = np.asarray(mean)
         variance_array = np.asarray(variance)
         pseudo_variance_array = np.asarray(r * variance)

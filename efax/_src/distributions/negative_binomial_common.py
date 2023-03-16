@@ -23,7 +23,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
         return self.log_not_p.shape
 
     def log_normalizer(self) -> JaxRealArray:
-        return -self._failures() * jnp.log1p(-jnp.exp(self.log_not_p))  # type: ignore[return-value]
+        return -self._failures() * jnp.log1p(-jnp.exp(self.log_not_p))
 
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         a = x + self._failures() - 1
@@ -32,7 +32,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
 
     # Private methods ------------------------------------------------------------------------------
     def _mean(self) -> JaxRealArray:
-        return self._failures() / jnp.expm1(-self.log_not_p)  # type: ignore[return-value]
+        return self._failures() / jnp.expm1(-self.log_not_p)
 
     # Private abstract methods ---------------------------------------------------------------------
     def _failures(self) -> int | JaxIntegralArray:

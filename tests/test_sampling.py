@@ -65,6 +65,6 @@ def test_maximum_likelihood_estimation(generator: Generator,
         nat_parameters = exp_parameters.to_nat()  # type: ignore[attr-defined]
         samples = exp_parameters.sample(key, sample_shape)
     assert samples.shape[:len(sample_shape)] == sample_shape
-    sampled_exp_parameters = nat_parameters.sufficient_statistics(samples)  # pyright: ignore
+    sampled_exp_parameters = nat_parameters.sufficient_statistics(samples)
     ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
     assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)
