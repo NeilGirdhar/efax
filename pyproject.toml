@@ -48,10 +48,6 @@ line_length = 100
 multi_line_output = 0
 skip_glob = ['.pytype/*.py']
 
-[tool.pycodestyle]
-max-line-length = 100
-exclude = ['__init__.py', '__pycache__']
-
 [tool.pylint.master]
 jobs = 0
 extension-pkg-whitelist = [
