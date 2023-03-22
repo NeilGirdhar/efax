@@ -5,6 +5,7 @@ from jax.random import KeyArray, chisquare
 from jax.scipy import special as jss
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
@@ -27,20 +28,25 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP', JaxRealArray], Samplable
     def shape(self) -> Shape:
         return self.k_over_two_minus_one.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         k_over_two = self.k_over_two_minus_one + 1.0
         return jss.gammaln(k_over_two) - k_over_two * jnp.log(0.5)
 
+    @override
     def to_exp(self) -> ChiSquareEP:
         k_over_two = self.k_over_two_minus_one + 1.0
         return ChiSquareEP(jss.digamma(k_over_two) - jnp.log(0.5))
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return -x * 0.5
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> ChiSquareEP:
         return ChiSquareEP(jnp.log(x))
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
@@ -55,6 +61,7 @@ class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
 
     # Implemented methods --------------------------------------------------------------------------
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[ChiSquareNP]:
         return ChiSquareNP
 
@@ -62,16 +69,20 @@ class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
     def shape(self) -> Shape:
         return self.mean_log.shape
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         q = self.to_nat()
         k_over_two = q.k_over_two_minus_one + 1.0
         return -k_over_two
 
+    @override
     def initial_search_parameters(self) -> ChiSquareNP:
         return ChiSquareNP(jnp.zeros(self.mean_log.shape))
 
+    @override
     def search_to_natural(self, search_parameters: ChiSquareNP) -> ChiSquareNP:
         return search_parameters
 
+    @override
     def search_gradient(self, search_parameters: ChiSquareNP) -> ChiSquareNP:
         return self._natural_gradient(search_parameters)

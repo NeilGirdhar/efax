@@ -5,6 +5,7 @@ import math
 import jax.numpy as jnp
 from tjax import JaxComplexArray, JaxRealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
@@ -24,6 +25,7 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', JaxComplexArray]
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         _, s, mu = self._r_s_mu()
         det_s = s
@@ -34,14 +36,17 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', JaxComplexArray]
                 - 0.5 * jnp.log(det_h)
                 + math.log(math.pi))
 
+    @override
     def to_exp(self) -> ComplexNormalEP:
         r, s, mu = self._r_s_mu()
         u = (r * s).conjugate()
         return ComplexNormalEP(mu, s + abs_square(mu), u + jnp.square(mu))
 
+    @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
+    @override
     def sufficient_statistics(self, x: JaxComplexArray) -> ComplexNormalEP:
         return ComplexNormalEP(x, abs_square(x), jnp.square(x))
 
@@ -66,9 +71,11 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
         return self.mean.shape
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[ComplexNormalNP]:
         return ComplexNormalNP
 
+    @override
     def to_nat(self) -> ComplexNormalNP:
         variance = self.second_moment - abs_square(self.mean)
         pseudo_variance = self.pseudo_second_moment - jnp.square(self.mean)
@@ -82,5 +89,6 @@ class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
                                        + pseudo_precision * self.mean)
         return ComplexNormalNP(mean_times_precision, precision, pseudo_precision)
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)

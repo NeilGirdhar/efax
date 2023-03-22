@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import scipy.stats as ss
 from tjax import NumpyRealArray
+from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 
@@ -11,6 +12,7 @@ __all__ = ['ScipyVonMises']
 
 class ScipyVonMises(ShapedDistribution[ss.vonmises]):
     """This class allows distributions having a non-empty shape."""
+    @override
     def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None):
         if loc is None:
             loc = np.zeros_like(kappa)

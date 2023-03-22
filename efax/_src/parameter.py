@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 import jax.numpy as jnp
 from tjax import JaxArray, JaxRealArray, Shape
 from tjax.dataclasses import field
+from typing_extensions import override
 
 __all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',
            'SquareMatrixSupport']
@@ -23,23 +24,29 @@ class Field:
 
 
 class RealField(Field):
+    @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element
 
+    @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
         return x
 
+    @override
     def unflattened(self, y: JaxRealArray) -> JaxArray:
         return y
 
 
 class ComplexField(Field):
+    @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element * 2
 
+    @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
         return jnp.concatenate([x.real, x.imag], axis=-1)
 
+    @override
     def unflattened(self, y: JaxRealArray) -> JaxArray:
         assert y.shape[-1] % 2 == 0
         n = y.shape[-1] // 2
@@ -51,6 +58,7 @@ complex_field = ComplexField()
 
 
 class Support:
+    @override
     def __init__(self, *, is_complex: bool = False):
         super().__init__()
         self.field = complex_field if is_complex else real_field
@@ -72,18 +80,23 @@ class Support:
 
 
 class ScalarSupport(Support):
+    @override
     def axes(self) -> int:
         return 0
 
+    @override
     def shape(self, dimensions: int) -> Shape:
         return ()
 
+    @override
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(1)
 
+    @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
         return self.field.flattened(jnp.reshape(x, (*x.shape, 1)))
 
+    @override
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         assert x.shape[-1] == 1
@@ -91,18 +104,23 @@ class ScalarSupport(Support):
 
 
 class VectorSupport(Support):
+    @override
     def axes(self) -> int:
         return 1
 
+    @override
     def shape(self, dimensions: int) -> Shape:
         return (dimensions,)
 
+    @override
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(dimensions)
 
+    @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
         return self.field.flattened(x)
 
+    @override
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         assert x.shape[-1] == dimensions
@@ -110,27 +128,33 @@ class VectorSupport(Support):
 
 
 class SymmetricMatrixSupport(Support):
+    @override
     def __init__(self, *, hermitian: bool = False, **kwargs: Any):
         if hermitian:
             kwargs.setdefault('is_complex', True)
         super().__init__(**kwargs)
         self.hermitian = hermitian
 
+    @override
     def axes(self) -> int:
         return 2
 
+    @override
     def shape(self, dimensions: int) -> Shape:
         return (dimensions, dimensions)
 
+    @override
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(comb(dimensions + 1, 2))
 
+    @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
         dimensions = x.shape[-1]
         assert x.shape[-2] == dimensions
         index = (..., *jnp.triu_indices(dimensions))
         return self.field.flattened(x[index])
 
+    @override
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         k = x.shape[-1]
@@ -151,19 +175,24 @@ class SymmetricMatrixSupport(Support):
 
 
 class SquareMatrixSupport(Support):
+    @override
     def axes(self) -> int:
         return 2
 
+    @override
     def shape(self, dimensions: int) -> Shape:
         return (dimensions, dimensions)
 
+    @override
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(dimensions ** 2)
 
+    @override
     def flattened(self, x: JaxArray) -> JaxArray:
         y = jnp.reshape(x, (*x.shape[:-2], -1))
         return self.field.flattened(y)
 
+    @override
     def unflattened(self, y: JaxArray, dimensions: int) -> JaxArray:
         x = self.field.unflattened(y)
         return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))

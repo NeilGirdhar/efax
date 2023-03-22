@@ -6,6 +6,7 @@ import numpy as np
 from jax.random import KeyArray
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
 from ...multidimensional import Multidimensional
@@ -31,6 +32,7 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP', JaxRea
     def shape(self) -> Shape:
         return self.mean_times_precision.shape[:-1]
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         eta = self.mean_times_precision
         h_inv = jnp.linalg.inv(self.negative_half_precision)
@@ -38,6 +40,7 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP', JaxRea
         _, ld = jnp.linalg.slogdet(-self.negative_half_precision)
         return -0.25 * a - 0.5 * ld + 0.5 * self.dimensions() * jnp.log(np.pi)
 
+    @override
     def to_exp(self) -> MultivariateNormalEP:
         h_inv = jnp.linalg.inv(self.negative_half_precision)
         h_inv_times_eta: JaxRealArray = jnp.einsum(
@@ -46,12 +49,15 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP', JaxRea
         second_moment = 0.25 * _broadcasted_outer(h_inv_times_eta) - 0.5 * h_inv
         return MultivariateNormalEP(mean, second_moment)
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape[:-1])
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> MultivariateNormalEP:
         return MultivariateNormalEP(x, _broadcasted_outer(x))
 
+    @override
     def dimensions(self) -> int:
         return self.mean_times_precision.shape[-1]
 
@@ -67,17 +73,21 @@ class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Mul
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
+    @override
     def to_nat(self) -> MultivariateNormalNP:
         precision = jnp.linalg.inv(self.variance())
         mean_times_precision = jnp.einsum("...ij,...j->...i", precision, self.mean)
         return MultivariateNormalNP(mean_times_precision, -0.5 * precision)
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         return self.to_variance_parametrization().sample(key, shape)
 
+    @override
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
@@ -99,10 +109,7 @@ class MultivariateNormalVP(Samplable, Multidimensional):
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
-    @classmethod
-    def natural_parametrization_cls(cls) -> type[MultivariateNormalNP]:
-        return MultivariateNormalNP
-
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
@@ -110,6 +117,7 @@ class MultivariateNormalVP(Samplable, Multidimensional):
             shape = self.shape
         return jax.random.multivariate_normal(key, self.mean, self.variance, shape)
 
+    @override
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 

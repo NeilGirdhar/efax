@@ -9,6 +9,7 @@ from jax.random import KeyArray
 from jax.scipy import special as jss
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
 from ..multidimensional import Multidimensional
@@ -32,16 +33,19 @@ class DirichletCommonNP(NaturalParametrization[EP, JaxRealArray], Samplable, Mul
     def shape(self) -> Shape:
         return self.alpha_minus_one.shape[:-1]
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         q = self.alpha_minus_one
         return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
                 - jss.gammaln(jnp.sum(q, axis=-1) + self.dimensions()))
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
         return jax.random.dirichlet(key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
 
+    @override
     def dimensions(self) -> int:
         return self.alpha_minus_one.shape[-1]
 
@@ -63,15 +67,19 @@ class DirichletCommonEP(ExpToNat[NP, JaxRealArray], Multidimensional, Generic[NP
     def shape(self) -> Shape:
         return self.mean_log_probability.shape[:-1]
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def initial_search_parameters(self) -> JaxRealArray:
         return jnp.zeros(self.mean_log_probability.shape)
 
+    @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).alpha_minus_one
 
+    @override
     def dimensions(self) -> int:
         return self.mean_log_probability.shape[-1]
 

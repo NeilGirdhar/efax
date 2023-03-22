@@ -6,6 +6,7 @@ import numpy as np
 from jax.random import KeyArray
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
 from ...multidimensional import Multidimensional
@@ -29,22 +30,27 @@ class MultivariateDiagonalNormalNP(NaturalParametrization['MultivariateDiagonalN
     def shape(self) -> Shape:
         return self.mean_times_precision.shape[:-1]
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         components = (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
                       + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
         return jnp.sum(components, axis=-1)
 
+    @override
     def to_exp(self) -> MultivariateDiagonalNormalEP:
         mean = -self.mean_times_precision / (2.0 * self.negative_half_precision)
         second_moment = jnp.square(mean) - 0.5 / self.negative_half_precision
         return MultivariateDiagonalNormalEP(mean, second_moment)
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape[:-1])
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> MultivariateDiagonalNormalEP:
         return MultivariateDiagonalNormalEP(x, jnp.square(x))
 
+    @override
     def dimensions(self) -> int:
         return self.mean_times_precision.shape[-1]
 
@@ -62,18 +68,23 @@ class MultivariateDiagonalNormalEP(ExpectationParametrization[MultivariateDiagon
         return self.mean.shape[:-1]
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[MultivariateDiagonalNormalNP]:
         return MultivariateDiagonalNormalNP
 
+    @override
     def to_nat(self) -> MultivariateDiagonalNormalNP:
         return MultivariateDiagonalNormalNP(self.mean / self.variance(), -0.5 / self.variance())
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         return self.to_variance_parametrization().sample(key, shape)
 
+    @override
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
@@ -95,6 +106,7 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.mean.shape
@@ -103,6 +115,7 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
         deviation = jnp.sqrt(self.variance)
         return jax.random.normal(key, shape) * deviation + self.mean
 
+    @override
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 

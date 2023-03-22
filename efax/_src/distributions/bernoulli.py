@@ -7,6 +7,7 @@ from jax.random import KeyArray
 from jax.scipy import special as jss
 from tjax import BooleanArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..conjugate_prior import HasConjugatePrior
 from ..natural_parametrization import NaturalParametrization
@@ -26,15 +27,19 @@ class BernoulliNP(NaturalParametrization['BernoulliEP', JaxRealArray]):
     def shape(self) -> Shape:
         return self.log_odds.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return jnp.logaddexp(self.log_odds, 0.0)
 
+    @override
     def to_exp(self) -> BernoulliEP:
         return BernoulliEP(jss.expit(self.log_odds))
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> BernoulliEP:
         return BernoulliEP(x)
 
@@ -59,23 +64,29 @@ class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
         return self.probability.shape
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[BernoulliNP]:
         return BernoulliNP
 
+    @override
     def to_nat(self) -> BernoulliNP:
         return BernoulliNP(jss.logit(self.probability))
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> BooleanArray:
         if shape is not None:
             shape += self.shape
         return jax.random.bernoulli(key, self.probability, shape)
 
+    @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaNP:
         reshaped_n = n[..., np.newaxis]
         return BetaNP(reshaped_n * jnp.stack([self.probability, (1.0 - self.probability)], axis=-1))
 
+    @override
     def conjugate_prior_observation(self) -> JaxRealArray:
         return self.probability

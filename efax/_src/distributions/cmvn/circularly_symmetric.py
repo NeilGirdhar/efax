@@ -7,6 +7,7 @@ import jax.numpy as jnp
 from jax.random import KeyArray
 from tjax import JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
 from ...multidimensional import Multidimensional
@@ -44,23 +45,29 @@ class ComplexCircularlySymmetricNormalNP(
     def shape(self) -> Shape:
         return self.negative_precision.shape[:-2]
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         log_det_s = jnp.log(jnp.linalg.det(-self.negative_precision).real)
         return -log_det_s + self.dimensions() * math.log(math.pi)
 
+    @override
     def to_exp(self) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(
             jnp.linalg.inv(-self.negative_precision).conjugate())
 
+    @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
         return jnp.zeros(x.shape[:-1])
 
+    @override
     def sufficient_statistics(self, x: JaxComplexArray) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(_broadcasted_outer_c(x))
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         return self.to_exp().sample(key, shape)
 
+    @override
     def dimensions(self) -> int:
         return self.negative_precision.shape[-1]
 
@@ -78,16 +85,20 @@ class ComplexCircularlySymmetricNormalEP(
         return self.variance.shape[:-2]
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[ComplexCircularlySymmetricNormalNP]:
         return ComplexCircularlySymmetricNormalNP
 
+    @override
     def to_nat(self) -> ComplexCircularlySymmetricNormalNP:
         return ComplexCircularlySymmetricNormalNP(
             -jnp.linalg.inv(self.variance).conjugate())
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         n = self.dimensions()
         if shape is not None:
@@ -100,6 +111,7 @@ class ComplexCircularlySymmetricNormalEP(
                                                 shape)
         return xy_rvs[..., :n] + 1j * xy_rvs[..., n:]
 
+    @override
     def dimensions(self) -> int:
         return self.variance.shape[-1]
 

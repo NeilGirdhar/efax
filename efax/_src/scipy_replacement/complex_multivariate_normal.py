@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
+from typing_extensions import override
 
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
@@ -14,6 +15,7 @@ __all__ = ['ScipyComplexMultivariateNormal']
 
 class ScipyComplexMultivariateNormalUnvectorized:
     """Represents a multivariate complex normal distribution."""
+    @override
     def __init__(self,
                  mean: NumpyComplexArray,
                  variance: NumpyComplexArray,
@@ -85,6 +87,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
 class ScipyComplexMultivariateNormal(
         ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]):
     """This class allows distributions having a non-empty shape."""
+    @override
     def __init__(self,
                  mean: NumpyComplexArray | None = None,
                  variance: NumpyComplexArray | None = None,

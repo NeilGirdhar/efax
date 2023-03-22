@@ -7,6 +7,7 @@ import jax.numpy as jnp
 from jax.random import KeyArray
 from tjax import JaxComplexArray, JaxRealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
 from ...multidimensional import Multidimensional
@@ -39,22 +40,28 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
     def shape(self) -> Shape:
         return self.two_mean_conjugate.shape[:-1]
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         mean_conjugate = self.two_mean_conjugate * 0.5
         return jnp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
 
+    @override
     def to_exp(self) -> ComplexMultivariateUnitNormalEP:
         return ComplexMultivariateUnitNormalEP(self.two_mean_conjugate.conjugate() * 0.5)
 
+    @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
         return -jnp.sum(abs_square(x), axis=-1)
 
+    @override
     def sufficient_statistics(self, x: JaxComplexArray) -> ComplexMultivariateUnitNormalEP:
         return ComplexMultivariateUnitNormalEP(x)
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         return self.to_exp().sample(key, shape)
 
+    @override
     def dimensions(self) -> int:
         return self.two_mean_conjugate.shape[-1]
 
@@ -71,16 +78,20 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
         return self.mean.shape[:-1]
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[ComplexMultivariateUnitNormalNP]:
         return ComplexMultivariateUnitNormalNP
 
+    @override
     def to_nat(self) -> ComplexMultivariateUnitNormalNP:
         return ComplexMultivariateUnitNormalNP(self.mean.conjugate() * 2.0)
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
         return -(jnp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         if shape is not None:
             shape += self.mean.shape
@@ -97,5 +108,6 @@ class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivar
     # def conjugate_prior_observation(self) -> JaxComplexArray:
     #     return self.mean
 
+    @override
     def dimensions(self) -> int:
         return self.mean.shape[-1]

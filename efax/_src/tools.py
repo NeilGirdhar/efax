@@ -8,6 +8,7 @@ import jax.numpy as jnp
 import numpy as np
 from tensorflow_probability.substrates import jax as tfp
 from tjax import JaxComplexArray, JaxRealArray, NumpyComplexArray, NumpyRealArray
+from typing_extensions import override
 
 __all__: list[str] = []
 
@@ -50,6 +51,7 @@ def vectorized_triu(m: NumpyRealArray, k: int = 0) -> NumpyRealArray:
     return retval
 
 
+@override
 def create_diagonal(m: NumpyRealArray) -> NumpyRealArray:
     """A vectorized version of diagonal.
 

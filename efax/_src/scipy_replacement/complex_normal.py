@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyComplexNumeric, NumpyRealArray, NumpyRealNumeric, ShapeLike
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
@@ -13,6 +13,7 @@ __all__ = ['ScipyComplexNormal']
 
 class ScipyComplexNormalUnvectorized:
     """Represents an array of univariate complex normal distributions."""
+    @override
     def __init__(self,
                  mean: NumpyComplexNumeric,
                  variance: NumpyRealNumeric,
@@ -73,6 +74,7 @@ class ScipyComplexNormalUnvectorized:
 
 class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
     """This class allows distributions having a non-empty shape."""
+    @override
     def __init__(self,
                  mean: NumpyComplexArray | None = None,
                  variance: NumpyRealArray | None = None,

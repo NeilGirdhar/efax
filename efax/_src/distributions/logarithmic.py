@@ -4,6 +4,7 @@ import jax.numpy as jnp
 from jax.nn import softplus
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
@@ -25,9 +26,11 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
     def shape(self) -> Shape:
         return self.log_probability.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return jnp.log(-jnp.log1p(-jnp.exp(self.log_probability)))
 
+    @override
     def to_exp(self) -> LogarithmicEP:
         probability = jnp.exp(self.log_probability)
         chi = jnp.where(self.log_probability < log_probability_floor, 1.0,
@@ -36,9 +39,11 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
                                                  * jnp.log1p(-probability))))
         return LogarithmicEP(chi)
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return -jnp.log(x)
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> LogarithmicEP:
         return LogarithmicEP(x)
 
@@ -53,22 +58,27 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray]):
         return self.chi.shape
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[LogarithmicNP]:
         return LogarithmicNP
 
     # The expected_carrier_measure is unknown.
 
+    @override
     def initial_search_parameters(self) -> JaxRealArray:
         return jnp.zeros(self.chi.shape)
 
+    @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> LogarithmicNP:
         # Run Newton's method on the whole real line.
         return LogarithmicNP(-softplus(-search_parameters))
 
+    @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).log_probability
 
     # Overridden methods ---------------------------------------------------------------------------
+    @override
     def to_nat(self) -> LogarithmicNP:
         z: LogarithmicNP = super().to_nat()
         return LogarithmicNP(jnp.where(self.chi < 1.0,  # noqa: PLR2004

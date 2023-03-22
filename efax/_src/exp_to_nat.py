@@ -8,6 +8,7 @@ from tjax import jit
 from tjax.dataclasses import dataclass, field
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import Adam, GradientTransformation
+from typing_extensions import override
 
 from .expectation_parametrization import ExpectationParametrization
 from .natural_parametrization import NaturalParametrization
@@ -26,6 +27,7 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
     """
     # Implemented methods --------------------------------------------------------------------------
     @jit
+    @override
     def to_nat(self) -> NP:
         iterated_function = ExpToNatIteratedFunction[NP, SP](minimum_iterations=1000,
                                                              maximum_iterations=1000,
@@ -88,6 +90,7 @@ class ExpToNatIteratedFunction(
         Generic[NP, SP]):
     transform: GradientTransformation[Any, SP] = field()
 
+    @override
     def sampled_state(self, theta: ExpToNat[NP, SP], state: tuple[Any, SP]) -> tuple[Any, SP]:
         current_gt_state, search_parameters = state
         search_gradient = theta.search_gradient(search_parameters)
@@ -97,6 +100,7 @@ class ExpToNatIteratedFunction(
         new_search_parameters = tree_map(jnp.add, search_parameters, transformed_gradient)
         return new_gt_state, new_search_parameters
 
+    @override
     def sampled_state_trajectory(
             self,
             theta: ExpToNat[NP, SP],
@@ -105,16 +109,19 @@ class ExpToNatIteratedFunction(
         _, trajectory = sampled_state
         return sampled_state, trajectory
 
+    @override
     def extract_comparand(self, state: tuple[Any, SP]) -> SP:
         _, search_parameters = state
         return search_parameters
 
+    @override
     def extract_differentiand(self,
                               theta: ExpToNat[NP, SP],
                               state: tuple[Any, SP]) -> SP:
         _, search_parameters = state
         return search_parameters
 
+    @override
     def implant_differentiand(self,
                               theta: ExpToNat[NP, SP],
                               state: tuple[Any, SP],

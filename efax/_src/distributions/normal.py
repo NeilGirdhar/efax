@@ -6,6 +6,7 @@ import numpy as np
 from jax.random import KeyArray
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
@@ -25,18 +26,22 @@ class NormalNP(NaturalParametrization['NormalEP', JaxRealArray]):
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
                 + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
 
+    @override
     def to_exp(self) -> NormalEP:
         mean = -self.mean_times_precision / (2.0 * self.negative_half_precision)
         second_moment = jnp.square(mean) - 0.5 / self.negative_half_precision
         return NormalEP(mean, second_moment)
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> NormalEP:
         return NormalEP(x, jnp.square(x))
 
@@ -52,15 +57,19 @@ class NormalEP(ExpectationParametrization[NormalNP], Samplable):
         return self.mean.shape
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[NormalNP]:
         return NormalNP
 
+    @override
     def to_nat(self) -> NormalNP:
         return NormalNP(self.mean / self.variance(), -0.5 / self.variance())
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape

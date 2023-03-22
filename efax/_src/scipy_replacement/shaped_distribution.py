@@ -6,6 +6,7 @@ import numpy as np
 import numpy.typing as npt
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyRealArray, Shape
+from typing_extensions import override
 
 __all__: list[str] = []
 
@@ -15,6 +16,7 @@ T = TypeVar('T')
 
 class ShapedDistribution(Generic[T]):
     """Allow a distributions with shape."""
+    @override
     def __init__(self,
                  shape: Shape,
                  rvs_shape: Shape,

@@ -5,13 +5,14 @@ import scipy.special
 import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
+from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 
 __all__ = ['ScipyDirichlet', 'ScipyGeneralizedDirichlet']
 
 
-scipy_beta = scipy.special.beta  # pyright: ignore
+scipy_beta = scipy.special.beta
 
 
 # pylint: disable=protected-access
@@ -37,6 +38,7 @@ class ScipyDirichletFixRVsAndPDF(mvd):  # pyright: ignore
 
 class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
     """This class allows distributions having a non-empty shape."""
+    @override
     def __init__(self, alpha: NumpyRealArray):
         shape = alpha[..., -1].shape
         rvs_shape = (alpha.shape[-1],)
@@ -46,6 +48,7 @@ class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
             objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 
+    @override
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
         x = x.astype(np.float64)
         y = np.sum(x, axis=-1)
@@ -55,6 +58,7 @@ class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
 
 
 class ScipyGeneralizedDirichlet:
+    @override
     def __init__(self, alpha: NumpyRealArray, beta: NumpyRealArray):
         super().__init__()
         self.alpha = alpha

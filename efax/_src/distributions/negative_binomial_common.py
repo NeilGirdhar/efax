@@ -6,6 +6,7 @@ import jax.numpy as jnp
 from jax.scipy.special import gammaln
 from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import EP, NaturalParametrization
@@ -22,9 +23,11 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
     def shape(self) -> Shape:
         return self.log_not_p.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return -self._failures() * jnp.log1p(-jnp.exp(self.log_not_p))
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         a = x + self._failures() - 1
         # Return log(a choose x).

@@ -7,6 +7,7 @@ from jax.random import KeyArray
 from jax.scipy import special as jss
 from tjax import JaxRealArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
@@ -26,21 +27,26 @@ class GammaNP(NaturalParametrization['GammaEP', JaxRealArray], Samplable):
     def shape(self) -> Shape:
         return self.negative_rate.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         shape = self.shape_minus_one + 1.0
         return jss.gammaln(shape) - shape * jnp.log(-self.negative_rate)
 
+    @override
     def to_exp(self) -> GammaEP:
         shape = self.shape_minus_one + 1.0
         return GammaEP(-shape / self.negative_rate,
                        jss.digamma(shape) - jnp.log(-self.negative_rate))
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape)
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> GammaEP:
         return GammaEP(x, jnp.log(x))
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
@@ -58,17 +64,21 @@ class GammaEP(ExpToNat[GammaNP, JaxRealArray]):
         return self.mean.shape
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[GammaNP]:
         return GammaNP
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> GammaNP:
         shape = softplus(search_parameters)
         rate = shape / self.mean
         return GammaNP(-rate, shape - 1.0)
 
+    @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         shape = softplus(search_parameters)
         log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
@@ -77,6 +87,7 @@ class GammaEP(ExpToNat[GammaNP, JaxRealArray]):
         # where polygamma(1) is trigamma
 
     # Overridden methods ---------------------------------------------------------------------------
+    @override
     def initial_search_parameters(self) -> JaxRealArray:
         log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
         initial_shape = (

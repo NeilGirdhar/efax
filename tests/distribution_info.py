@@ -6,6 +6,7 @@ from typing import Any, Generic, TypeVar
 import pytest
 from numpy.random import Generator, default_rng
 from tjax import NumpyComplexArray, Shape
+from typing_extensions import override
 
 from efax import ExpectationParametrization, NaturalParametrization
 
@@ -74,6 +75,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
             pytest.skip(f"Deselected {cls.name()}")
 
     # Magic methods --------------------------------------------------------------------------------
+    @override
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
 

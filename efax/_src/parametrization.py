@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 import jax.numpy as jnp
 from tjax import JaxComplexArray, JaxRealArray, Shape, custom_jvp_method, jit
 from tjax.dataclasses import dataclass
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 from .parameter import Support
 from .tools import parameters_dot_product
@@ -20,6 +20,7 @@ __all__ = ['Parametrization']
 @dataclass
 class Parametrization:
     # Magic methods --------------------------------------------------------------------------------
+    @override
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 

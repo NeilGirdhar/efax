@@ -12,6 +12,7 @@ from jax.nn import softplus
 from jax.scipy.special import digamma
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
 from ..multidimensional import Multidimensional
@@ -33,10 +34,12 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Ja
     def shape(self) -> Shape:
         return self.alpha_minus_one.shape[:-1]
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         alpha, beta = self.alpha_beta()
         return jnp.sum(betaln(alpha, beta), axis=-1)
 
+    @override
     def to_exp(self) -> GeneralizedDirichletEP:
         # Given a log-normalizer y.
         # alpha_bar_direct = d y / d alpha = betaln'(alpha, beta) = digamma(alpha) - digamma(alpha +
@@ -51,14 +54,17 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Ja
         alpha_bar = alpha_bar_direct + alpha_bar_indirect
         return GeneralizedDirichletEP(alpha_bar, gamma_bar)
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> GeneralizedDirichletEP:
         cs_x = jnp.cumsum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
         return GeneralizedDirichletEP(jnp.log(x), jnp.log(1.0 - cs_x))
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.zeros(x.shape[:len(x.shape) - 1])
 
+    @override
     def dimensions(self) -> int:
         return self.alpha_minus_one.shape[-1]
 
@@ -89,9 +95,11 @@ class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, JaxRealArray], Mul
         return self.mean_log_probability.shape[:-1]
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[GeneralizedDirichletNP]:
         return GeneralizedDirichletNP
 
+    @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> GeneralizedDirichletNP:
         # Run Newton's method on the whole real hyperspace.
         n = self.dimensions()
@@ -99,14 +107,18 @@ class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, JaxRealArray], Mul
         return GeneralizedDirichletNP(positive_search_parameters[..., :n] - 1.0,
                                       positive_search_parameters[..., n:])
 
+    @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
 
+    @override
     def initial_search_parameters(self) -> JaxRealArray:
         return jnp.zeros((*self.shape, self.dimensions() * 2))
 
+    @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).flattened()
 
+    @override
     def dimensions(self) -> int:
         return self.mean_log_probability.shape[-1]

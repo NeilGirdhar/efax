@@ -6,6 +6,7 @@ from jax.random import KeyArray
 from jax.scipy import special as jss
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
+from typing_extensions import override
 
 from ..conjugate_prior import HasConjugatePrior
 from ..natural_parametrization import NaturalParametrization
@@ -25,15 +26,19 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
     def shape(self) -> Shape:
         return self.log_mean.shape
 
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return jnp.exp(self.log_mean)
 
+    @override
     def to_exp(self) -> PoissonEP:
         return PoissonEP(jnp.exp(self.log_mean))
 
+    @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return -jss.gammaln(x + 1)
 
+    @override
     def sufficient_statistics(self, x: JaxRealArray) -> PoissonEP:
         return PoissonEP(x)
 
@@ -48,15 +53,18 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
         return self.mean.shape
 
     @classmethod
+    @override
     def natural_parametrization_cls(cls) -> type[PoissonNP]:
         return PoissonNP
 
+    @override
     def to_nat(self) -> PoissonNP:
         return PoissonNP(jnp.log(self.mean))
 
     # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of
     #   lambda ** k * log(k!) / k! = lambda ** k * log Gamma(k+1) / Gamma(k+1)
 
+    @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
@@ -64,8 +72,10 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
             shape = self.shape
         return jax.random.poisson(key, self.mean, shape)
 
+    @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> GammaNP:
         return GammaNP(-n, n * self.mean)
 
+    @override
     def conjugate_prior_observation(self) -> JaxRealArray:
         return self.mean
