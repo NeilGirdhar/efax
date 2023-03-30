@@ -45,8 +45,6 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
             density = scipy_distribution.pdf(x)
         except AttributeError:
             density = scipy_distribution.pmf(x)
-        except NotImplementedError:
-            continue
 
         if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
             atol = 1e-5
