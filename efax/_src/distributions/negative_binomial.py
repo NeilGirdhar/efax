@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from tjax import JaxIntegralArray, JaxRealArray
+from jax.random import KeyArray, split
+from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..parameter import ScalarSupport, distribution_parameter
+from ..samplable import Samplable
+from .gamma import GammaNP
 from .negative_binomial_common import NBCommonEP, NBCommonNP
+from .poisson import PoissonEP
 
 __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP']
 
@@ -31,7 +35,7 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
 
 
 @dataclass
-class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
+class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP], Samplable):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     failures: JaxIntegralArray = distribution_parameter(ScalarSupport(), fixed=True)
 
@@ -48,3 +52,14 @@ class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP]):
     @override
     def _failures(self) -> JaxIntegralArray:
         return self.failures
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        gamma_key, poisson_key = split(key)
+        r = self._failures()
+        negative_rate = -r / self.mean
+        shape_minus_one = r - 1.0
+        g = GammaNP(negative_rate, shape_minus_one)
+        lambda_ = g.sample(gamma_key, shape)
+        p = PoissonEP(lambda_)
+        return p.sample(poisson_key)
