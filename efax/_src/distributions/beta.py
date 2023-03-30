@@ -38,10 +38,8 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.beta(key,
-                               1.0 + self.alpha_minus_one[..., 0],
-                               1.0 + self.alpha_minus_one[..., 1],
-                               shape)
+        alpha = 1.0 + self.alpha_minus_one
+        return jax.random.beta(key, alpha[..., 0], alpha[..., 1], shape)
 
 
 @dataclass
