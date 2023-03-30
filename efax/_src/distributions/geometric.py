@@ -3,11 +3,13 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
-from tjax import JaxRealArray
+from jax.random import geometric
+from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
@@ -47,6 +49,7 @@ class GeometricNP(HasEntropyNP['GeometricEP'],
 
 @dataclass
 class GeometricEP(HasEntropyEP[GeometricNP],
+                  Samplable,
                   NBCommonEP[GeometricNP],
                   ExpectationParametrization[GeometricNP]):
     """The expectation parameters of the geometric distribution.
@@ -71,6 +74,13 @@ class GeometricEP(HasEntropyEP[GeometricNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.mean.shape)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        if shape is not None:
+            shape += self.shape
+        p = 1.0 / self.mean
+        return geometric(key, p, shape)
 
     @override
     def _failures(self) -> int:
