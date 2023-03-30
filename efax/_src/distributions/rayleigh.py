@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
+from jax.random import KeyArray, rayleigh
 from tjax import Array, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                   TransformedNaturalParametrization)
@@ -15,7 +17,8 @@ __all__ = ['RayleighNP', 'RayleighEP']
 
 
 @dataclass
-class RayleighNP(HasEntropyNP,
+class RayleighNP(Samplable,
+                 HasEntropyNP,
                  TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP',
                                                    JaxRealArray]):
     # eta = -1 / (2 * sigma^2)
@@ -46,9 +49,17 @@ class RayleighNP(HasEntropyNP,
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         return jnp.log(x) + jnp.log(2)
 
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        if shape is not None:
+            shape += self.shape
+        sigma = jnp.sqrt(-0.5 / self.eta)
+        return rayleigh(key, sigma, shape)
+
 
 @dataclass
-class RayleighEP(HasEntropyEP[RayleighNP],
+class RayleighEP(Samplable,
+                 HasEntropyEP[RayleighNP],
                  TransformedExpectationParametrization[ExponentialEP, ExponentialNP, RayleighNP]):
     # chi = 2 * sigma^2
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
@@ -78,3 +89,10 @@ class RayleighEP(HasEntropyEP[RayleighNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return 0.5 * jnp.log(self.chi * 0.5) + (1.5 * jnp.log(2.0) - 0.5 * jnp.euler_gamma)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        if shape is not None:
+            shape += self.shape
+        sigma = jnp.sqrt(0.5 * self.chi)
+        return rayleigh(key, sigma, shape)
