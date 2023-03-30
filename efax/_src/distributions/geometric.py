@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from tjax import JaxRealArray
+from jax.random import KeyArray, geometric
+from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP
@@ -32,6 +34,7 @@ class GeometricNP(HasEntropyNP,
 
 @dataclass
 class GeometricEP(HasEntropyEP[GeometricNP],
+                  Samplable,
                   NBCommonEP[GeometricNP]):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -47,6 +50,13 @@ class GeometricEP(HasEntropyEP[GeometricNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.mean.shape)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        if shape is not None:
+            shape += self.shape
+        p = 1.0 / self.mean
+        return geometric(key, p, shape)
 
     @override
     def _failures(self) -> int:
