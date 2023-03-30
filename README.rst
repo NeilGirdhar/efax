@@ -90,7 +90,7 @@ Every :python:`NaturalParametrization` has methods:
 
 - :python:`sufficient_statistics` to produce the sufficient statistics given an observation (used in
   maximum likelihood estimation),
-- :python:`pdf`, which is the density or mass function,
+- :python:`pdf` and :python:`log_pdf`, which is the density or mass function and its logarithm,
 - :python:`fisher_information`, which is the Fisher information matrix, and
 - :python:`entropy`, which is the Shannon entropy.
 

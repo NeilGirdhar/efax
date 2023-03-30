@@ -73,9 +73,18 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         Args:
             x: The sample.
         """
+        return jnp.exp(self.log_pdf(x))
+
+    @jit
+    @final
+    def log_pdf(self, x: Domain) -> JaxRealArray:
+        """The distribution's density or mass function at x.
+
+        Args:
+            x: The sample.
+        """
         tx = self.sufficient_statistics(x)
-        return jnp.exp(parameters_dot_product(self, tx) - self.log_normalizer()
-                       + self.carrier_measure(x))
+        return parameters_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 
     @final
     def fisher_information_diagonal(self: NaturalParametrization[EP, Domain]) -> (
