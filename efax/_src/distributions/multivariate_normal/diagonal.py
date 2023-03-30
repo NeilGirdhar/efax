@@ -120,6 +120,15 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
         return self.mean.shape[-1]
 
     # New methods ----------------------------------------------------------------------------------
+    def pdf(self, x: JaxRealArray) -> JaxRealArray:
+        return self.to_nat().pdf(x)
+
     def to_exp(self) -> MultivariateDiagonalNormalEP:
         second_moment = self.variance + jnp.square(self.mean)
         return MultivariateDiagonalNormalEP(self.mean, second_moment)
+
+    def to_nat(self) -> MultivariateDiagonalNormalNP:
+        precision = 1.0 / self.variance
+        mean_times_precision = self.mean * precision
+        negative_half_precision = -0.5 * precision
+        return MultivariateDiagonalNormalNP(mean_times_precision, negative_half_precision)
