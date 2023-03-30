@@ -84,7 +84,8 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
 
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> GeometricEP:
-        return GeometricEP(jnp.asarray(rng.exponential(size=shape)))
+        p = rng.uniform(size=shape)
+        return GeometricEP(jnp.asarray(1.0 / p))
 
     @override
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyRealArray:
