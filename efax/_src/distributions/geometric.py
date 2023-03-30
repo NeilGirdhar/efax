@@ -24,9 +24,6 @@ class GeometricNP(NBCommonNP['GeometricEP']):
     def sufficient_statistics(self, x: JaxRealArray) -> GeometricEP:
         return GeometricEP(x)
 
-    def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.log_not_p.shape)
-
     @override
     def _failures(self) -> int:
         return 1
@@ -45,6 +42,10 @@ class GeometricEP(NBCommonEP[GeometricNP]):
     @override
     def to_nat(self) -> GeometricNP:
         return GeometricNP(self._log_not_p())
+
+    @override
+    def expected_carrier_measure(self) -> JaxRealArray:
+        return jnp.zeros(self.mean.shape)
 
     @override
     def _failures(self) -> int:
