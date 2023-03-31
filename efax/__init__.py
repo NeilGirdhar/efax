@@ -15,8 +15,9 @@ from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP
                                  MultivariateNormalNP, MultivariateNormalVP,
                                  MultivariateUnitNormalEP, MultivariateUnitNormalNP,
                                  NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP,
-                                 PoissonEP, PoissonNP, RayleighEP, RayleighNP, VonMisesFisherEP,
-                                 VonMisesFisherNP, WeibullEP, WeibullNP)
+                                 PoissonEP, PoissonNP, RayleighEP, RayleighNP, UnitNormalEP,
+                                 UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
+                                 WeibullNP)
 from ._src.interfaces import (HasConjugatePrior, HasGeneralizedConjugatePrior, Multidimensional,
                               Samplable)
 from ._src.mixins import HasEntropyEP, HasEntropyNP
@@ -43,4 +44,4 @@ __all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedCon
            'RayleighNP', 'VonMisesFisherEP', 'VonMisesFisherNP', 'WeibullEP', 'WeibullNP',
            'ScipyComplexMultivariateNormal', 'ScipyComplexNormal', 'ScipyDirichlet',
            'ScipyGeneralizedDirichlet', 'ScipyMultivariateNormal', 'ScipyVonMises',
-           'HasEntropyNP', 'HasEntropyEP']
+           'HasEntropyNP', 'HasEntropyEP', 'UnitNormalNP', 'UnitNormalEP']

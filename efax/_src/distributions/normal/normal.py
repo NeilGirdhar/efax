@@ -8,11 +8,11 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..interfaces.samplable import Samplable
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ...expectation_parametrization import ExpectationParametrization
+from ...interfaces.samplable import Samplable
+from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from ...natural_parametrization import NaturalParametrization
+from ...parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['NormalNP', 'NormalEP']
 

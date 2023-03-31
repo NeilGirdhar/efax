@@ -21,7 +21,8 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP,
                   RayleighEP, RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal,
                   ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises,
-                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
+                  UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
+                  WeibullNP)
 from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vectorized_triu
 
 from .distribution_info import DistributionInfo
@@ -139,6 +140,17 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
         mean = rng.normal(scale=4.0, size=shape)
         variance = rng.exponential(size=shape)
         return NormalEP(jnp.asarray(mean), jnp.asarray(mean ** 2 + variance))
+
+
+class UnitNormalInfo(DistributionInfo[UnitNormalNP, UnitNormalEP, NumpyRealArray]):
+    @override
+    def exp_to_scipy_distribution(self, p: UnitNormalEP) -> Any:
+        return ss.norm(p.mean, 1.0)
+
+    @override
+    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> UnitNormalEP:
+        mean = rng.normal(scale=4.0, size=shape)
+        return UnitNormalEP(jnp.asarray(mean))
 
 
 class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVarianceNormalNP,
@@ -460,6 +472,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
 
     # Continuous
     normal = NormalInfo()
+    unit_normal = UnitNormalInfo()
     complex_normal = ComplexNormalInfo()
     cmvn_unit = ComplexMultivariateUnitNormalInfo(dimensions=4)
     cmvn_cs = ComplexCircularlySymmetricNormalInfo(dimensions=3)
@@ -473,10 +486,10 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
     weibull = WeibullInfo()
-    continuous: list[DistributionInfo[Any, Any, Any]] = [normal, complex_normal, cmvn_unit, cmvn_cs,
-                                                         exponential, rayleigh, gamma, beta,
-                                                         dirichlet, gen_dirichlet, von_mises,
-                                                         chi_square, chi, weibull]
+    continuous: list[DistributionInfo[Any, Any, Any]] = [normal, unit_normal, complex_normal,
+                                                         cmvn_unit, cmvn_cs, exponential, rayleigh,
+                                                         gamma, beta, dirichlet, gen_dirichlet,
+                                                         von_mises, chi_square, chi, weibull]
 
     # Multivariate normal
     multivariate_fixed_variance_normal = MultivariateFixedVarianceNormalInfo(dimensions=5,
