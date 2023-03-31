@@ -23,6 +23,7 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.log_mean.shape
 
@@ -49,6 +50,7 @@ class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape
 

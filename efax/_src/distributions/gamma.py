@@ -25,6 +25,7 @@ class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Sam
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.negative_rate.shape
 
@@ -61,6 +62,7 @@ class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape
 

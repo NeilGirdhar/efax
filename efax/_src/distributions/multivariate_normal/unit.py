@@ -34,6 +34,7 @@ class MultivariateUnitNormalNP(HasEntropyNP,
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
@@ -78,6 +79,7 @@ class MultivariateUnitNormalEP(
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 

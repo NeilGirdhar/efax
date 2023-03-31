@@ -24,6 +24,7 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
@@ -54,6 +55,7 @@ class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Sam
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape
 

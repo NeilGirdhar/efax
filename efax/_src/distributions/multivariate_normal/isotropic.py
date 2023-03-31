@@ -26,6 +26,7 @@ class IsotropicNormalNP(HasEntropyNP,
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.negative_half_precision.shape
 
@@ -64,6 +65,7 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 

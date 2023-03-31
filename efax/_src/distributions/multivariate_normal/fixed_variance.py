@@ -36,6 +36,7 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean_times_precision.shape[:-1]
 
@@ -81,6 +82,7 @@ class MultivariateFixedVarianceNormalEP(
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 

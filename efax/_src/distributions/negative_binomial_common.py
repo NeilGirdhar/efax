@@ -20,6 +20,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.log_not_p.shape
 
@@ -51,6 +52,7 @@ class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape
 

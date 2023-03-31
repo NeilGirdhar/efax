@@ -23,6 +23,7 @@ class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', Ja
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean_times_precision.shape
 
@@ -68,6 +69,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], ExpectationParametrization[
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape
 

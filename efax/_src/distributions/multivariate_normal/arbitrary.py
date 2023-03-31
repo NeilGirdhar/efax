@@ -31,6 +31,7 @@ class MultivariateNormalNP(HasEntropyNP,
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean_times_precision.shape[:-1]
 
@@ -73,6 +74,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 
@@ -109,6 +111,7 @@ class MultivariateNormalVP(Samplable, Multidimensional):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 

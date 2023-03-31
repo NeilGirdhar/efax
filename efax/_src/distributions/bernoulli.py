@@ -24,6 +24,7 @@ class BernoulliNP(HasEntropyNP):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.log_odds.shape
 
@@ -60,6 +61,7 @@ class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior[BernoulliNP], Sam
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.probability.shape
 

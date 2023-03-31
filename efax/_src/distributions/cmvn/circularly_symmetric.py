@@ -44,6 +44,7 @@ class ComplexCircularlySymmetricNormalNP(
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.negative_precision.shape[:-2]
 
@@ -84,6 +85,7 @@ class ComplexCircularlySymmetricNormalEP(
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.variance.shape[:-2]
 

@@ -39,6 +39,7 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.two_mean_conjugate.shape[:-1]
 
@@ -77,6 +78,7 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
 

@@ -30,6 +30,7 @@ class MultinomialNP(HasEntropyNP,
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.log_odds.shape[:-1]
 
@@ -87,6 +88,7 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.probability.shape[:-1]
 

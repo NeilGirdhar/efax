@@ -23,6 +23,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.log_probability.shape
 
@@ -54,6 +55,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray]):
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.chi.shape
 

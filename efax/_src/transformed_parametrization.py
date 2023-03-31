@@ -31,6 +31,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.base_distribution().shape
 
@@ -64,6 +65,7 @@ class TransformedExpectationParametrization(ExpectationParametrization[TNP], Gen
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.base_distribution().shape
 

@@ -32,6 +32,7 @@ class DirichletCommonNP(HasEntropyNP,
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.alpha_minus_one.shape[:-1]
 
@@ -68,6 +69,7 @@ class DirichletCommonEP(HasEntropyEP[NP],
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean_log_probability.shape[:-1]
 

@@ -23,6 +23,7 @@ class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRea
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.negative_rate.shape
 
@@ -57,6 +58,7 @@ class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior[ExponentialNP
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean.shape
 

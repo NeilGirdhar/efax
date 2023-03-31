@@ -26,6 +26,7 @@ class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArr
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.k_over_two_minus_one.shape
 
@@ -67,6 +68,7 @@ class ChiSquareEP(HasEntropyEP[ChiSquareNP], ExpToNat[ChiSquareNP, ChiSquareNP])
         return ChiSquareNP
 
     @property
+    @override
     def shape(self) -> Shape:
         return self.mean_log.shape
 

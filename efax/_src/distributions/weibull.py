@@ -24,6 +24,7 @@ class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray])
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.eta.shape
 
@@ -52,6 +53,7 @@ class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], 
 
     # Implemented methods --------------------------------------------------------------------------
     @property
+    @override
     def shape(self) -> Shape:
         return self.chi.shape
 
