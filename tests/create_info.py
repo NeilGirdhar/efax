@@ -12,7 +12,7 @@ from typing_extensions import override
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,
                   ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP, ComplexNormalEP,
-                  UnitNormalNP, UnitNormalEP, ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
+                  ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
                   GammaNP, GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
                   IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP, LogarithmicNP,
                   MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
@@ -21,7 +21,8 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP,
                   RayleighEP, RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal,
                   ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises,
-                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
+                  UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
+                  WeibullNP)
 from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vectorized_triu
 
 from .distribution_info import DistributionInfo
