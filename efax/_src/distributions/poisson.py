@@ -21,7 +21,6 @@ __all__ = ['PoissonNP', 'PoissonEP']
 class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
     log_mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -48,7 +47,6 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
 class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

@@ -34,7 +34,6 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -80,7 +79,6 @@ class MultivariateFixedVarianceNormalEP(
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

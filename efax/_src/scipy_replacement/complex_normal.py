@@ -33,7 +33,6 @@ class ScipyComplexNormalUnvectorized:
             msg = "Shape mismatch."
             raise ValueError(msg)
 
-    # New methods ----------------------------------------------------------------------------------
     def pdf(self, z: NumpyComplexNumeric, out: None = None) -> NumpyRealNumeric:
         zr = np.stack([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
@@ -56,7 +55,6 @@ class ScipyComplexNormalUnvectorized:
         mv_cov = self._multivariate_normal_cov()
         return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)
 
-    # Private methods ------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> NumpyRealArray:
         return np.stack([self.mean.real, self.mean.imag], axis=-1)
 

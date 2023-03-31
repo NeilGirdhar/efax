@@ -16,7 +16,6 @@ Domain = TypeVar('Domain', bound=NumpyComplexArray)
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):
-    # New methods ----------------------------------------------------------------------------------
     def exp_to_scipy_distribution(self, p: EP) -> Any:
         """Produce a corresponding scipy distribution from expectation parameters.
 
@@ -74,7 +73,6 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         if not cls.tests_selected(distribution_name):
             pytest.skip(f"Deselected {cls.name()}")
 
-    # Magic methods --------------------------------------------------------------------------------
     @override
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)

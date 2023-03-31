@@ -21,7 +21,6 @@ log_probability_ceiling = -1e-7
 class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
     log_probability: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -53,7 +52,6 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
 class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray]):
     chi: JaxRealArray = distribution_parameter(ScalarSupport())  # - odds / log(1-p)
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -79,7 +77,6 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray]):
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         return self._natural_gradient(self.search_to_natural(search_parameters)).log_probability
 
-    # Overridden methods ---------------------------------------------------------------------------
     @override
     def to_nat(self) -> LogarithmicNP:
         z: LogarithmicNP = super().to_nat()

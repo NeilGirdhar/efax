@@ -20,7 +20,6 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
     log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
     failures: JaxIntegralArray = distribution_parameter(ScalarSupport(), fixed=True)
 
-    # Implemented methods --------------------------------------------------------------------------
     @override
     def to_exp(self) -> NegativeBinomialEP:
         return NegativeBinomialEP(self._mean(), self.failures)
@@ -39,7 +38,6 @@ class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP], Samplable):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     failures: JaxIntegralArray = distribution_parameter(ScalarSupport(), fixed=True)
 
-    # Implemented methods --------------------------------------------------------------------------
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[NegativeBinomialNP]:

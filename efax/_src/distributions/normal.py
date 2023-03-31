@@ -22,7 +22,6 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -53,7 +52,6 @@ class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Sam
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -81,6 +79,5 @@ class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Sam
         deviation = jnp.sqrt(self.variance())
         return jax.random.normal(key, shape) * deviation + self.mean
 
-    # New methods ----------------------------------------------------------------------------------
     def variance(self) -> JaxRealArray:
         return self.second_moment - jnp.square(self.mean)

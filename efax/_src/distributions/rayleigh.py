@@ -21,7 +21,6 @@ class RayleighNP(HasEntropyNP,
     # eta = -1 / (2 * sigma^2)
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @override
     def base_distribution(self) -> ExponentialNP:
         return ExponentialNP(self.eta)
@@ -45,7 +44,6 @@ class RayleighEP(HasEntropyEP[RayleighNP],
     # chi = 2 * sigma^2
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[RayleighNP]:

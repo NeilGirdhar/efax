@@ -20,7 +20,6 @@ __all__ = ['Parametrization']
 
 @dataclass
 class Parametrization:
-    # Magic methods --------------------------------------------------------------------------------
     @override
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
@@ -61,7 +60,6 @@ class Parametrization:
 
             setattr(cls, name, method_jvp)
 
-    # New methods ----------------------------------------------------------------------------------
     def __getitem__(self, key: Any) -> Self:
         fixed_parameters = self.fixed_parameters_mapping()
         sliced_parameters = {name: value[key]

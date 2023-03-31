@@ -20,7 +20,6 @@ class ChiNP(HasEntropyNP,
             TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
     k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @override
     def base_distribution(self) -> ChiSquareNP:
         return ChiSquareNP(self.k_over_two_minus_one)
@@ -43,7 +42,6 @@ class ChiEP(HasEntropyEP[ChiNP],
             TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[ChiNP]:

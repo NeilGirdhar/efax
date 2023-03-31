@@ -17,7 +17,6 @@ class GeometricNP(HasEntropyNP,
                   NBCommonNP['GeometricEP']):
     log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @override
     def to_exp(self) -> GeometricEP:
         return GeometricEP(self._mean())
@@ -36,7 +35,6 @@ class GeometricEP(HasEntropyEP[GeometricNP],
                   NBCommonEP[GeometricNP]):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[GeometricNP]:

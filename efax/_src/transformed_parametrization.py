@@ -32,7 +32,6 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
     def sample_to_base_sample(self, x: Domain) -> Domain:
         raise NotImplementedError
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -67,7 +66,6 @@ class TransformedExpectationParametrization(ExpectationParametrization[TNP], Gen
     def create_natural(self, natural_parametrization: NP) -> TNP:
         raise NotImplementedError
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

@@ -45,7 +45,6 @@ class ScipyComplexMultivariateNormalUnvectorized:
             msg = "The pseudo-variance is not symmetric."
             raise ValueError(msg)
 
-    # New methods ----------------------------------------------------------------------------------
     def pdf(self, z: NumpyComplexArray, out: None = None) -> np.floating[Any]:
         zr = np.concatenate([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
@@ -68,7 +67,6 @@ class ScipyComplexMultivariateNormalUnvectorized:
         mv_cov = self._multivariate_normal_cov()
         return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)
 
-    # Private methods ------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> NumpyRealArray:
         """Return the mean of a corresponding real distribution with double the size."""
         return np.concatenate([self.mean.real, self.mean.imag])

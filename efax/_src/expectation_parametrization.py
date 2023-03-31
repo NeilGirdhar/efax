@@ -36,7 +36,6 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         """The corresponding natural parameters."""
         raise NotImplementedError
 
-    # Final methods --------------------------------------------------------------------------------
     @jit
     @final
     def kl_divergence(self, q: NP, *, self_nat: None | NP = None) -> JaxRealArray:

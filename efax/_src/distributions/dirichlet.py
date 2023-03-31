@@ -12,7 +12,6 @@ __all__ = ['DirichletNP', 'DirichletEP']
 
 @dataclass
 class DirichletNP(DirichletCommonNP['DirichletEP']):
-    # Implemented methods --------------------------------------------------------------------------
     @override
     def to_exp(self) -> DirichletEP:
         return DirichletEP(self._exp_helper())
@@ -29,7 +28,6 @@ class DirichletNP(DirichletCommonNP['DirichletEP']):
 
 @dataclass
 class DirichletEP(DirichletCommonEP[DirichletNP]):
-    # Implemented methods --------------------------------------------------------------------------
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[DirichletNP]:

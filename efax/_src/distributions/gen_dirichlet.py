@@ -31,7 +31,6 @@ class GeneralizedDirichletNP(HasEntropyNP,
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
     gamma: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -71,7 +70,6 @@ class GeneralizedDirichletNP(HasEntropyNP,
     def dimensions(self) -> int:
         return self.alpha_minus_one.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def alpha_beta(self) -> tuple[JaxRealArray, JaxRealArray]:
         alpha = self.alpha_minus_one + 1.0
         # cs_alpha[i] = sum_{j>=i} alpha[j]
@@ -93,7 +91,6 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
     # E({log(1-∑_{j≤i} x_j)}_i)
     mean_log_cumulative_probability: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

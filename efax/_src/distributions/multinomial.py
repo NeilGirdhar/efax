@@ -28,7 +28,6 @@ class MultinomialNP(HasEntropyNP,
                     Samplable):
     log_odds: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -67,7 +66,6 @@ class MultinomialNP(HasEntropyNP,
     def dimensions(self) -> int:
         return self.log_odds.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def nat_to_probability(self) -> JaxRealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
@@ -86,7 +84,6 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
                     HasGeneralizedConjugatePrior[MultinomialNP], Multidimensional):
     probability: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

@@ -29,7 +29,6 @@ class MultivariateNormalNP(HasEntropyNP,
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -72,7 +71,6 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     second_moment: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -96,7 +94,6 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def variance(self) -> JaxRealArray:
         return self.second_moment - _broadcasted_outer(self.mean)
 
@@ -109,7 +106,6 @@ class MultivariateNormalVP(Samplable, Multidimensional):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -127,7 +123,6 @@ class MultivariateNormalVP(Samplable, Multidimensional):
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def to_exp(self) -> MultivariateNormalEP:
         second_moment = self.variance + _broadcasted_outer(self.mean)
         return MultivariateNormalEP(self.mean, second_moment)

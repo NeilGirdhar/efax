@@ -32,7 +32,6 @@ class MultivariateUnitNormalNP(HasEntropyNP,
     """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -77,7 +76,6 @@ class MultivariateUnitNormalEP(
         Samplable):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

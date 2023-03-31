@@ -21,7 +21,6 @@ __all__ = ['ExponentialNP', 'ExponentialEP']
 class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRealArray], Samplable):
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -56,7 +55,6 @@ class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRea
 class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior[ExponentialNP], Samplable):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

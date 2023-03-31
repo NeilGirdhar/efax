@@ -23,7 +23,6 @@ class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Sam
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
     shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -60,7 +59,6 @@ class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -89,7 +87,6 @@ class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
         # gradient is 1.0 / shape - jss.polygamma(1, shape)
         # where polygamma(1) is trigamma
 
-    # Overridden methods ---------------------------------------------------------------------------
     @override
     def initial_search_parameters(self) -> JaxRealArray:
         log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log

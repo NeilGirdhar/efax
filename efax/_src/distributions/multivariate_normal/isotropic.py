@@ -24,7 +24,6 @@ class IsotropicNormalNP(HasEntropyNP,
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -63,7 +62,6 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     total_second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -98,7 +96,6 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def variance(self) -> JaxRealArray:
         dimensions = self.dimensions()
         return (self.total_second_moment - jnp.sum(jnp.square(self.mean), axis=-1)) / dimensions

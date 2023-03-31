@@ -26,7 +26,6 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
 
     It uses Newton's method with a Jacobian to invert the gradient log-normalizer.
     """
-    # Implemented methods --------------------------------------------------------------------------
     @jit
     @override
     def to_nat(self) -> NP:
@@ -44,7 +43,6 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
         _, final_search_parameters = final_state
         return self.search_to_natural(final_search_parameters)
 
-    # Non-final methods ----------------------------------------------------------------------------
     def _zero_natural_parameters(self) -> NP:
         """A convenience method for implementing initial_search_parameters."""
         fixed_parameters = self.fixed_parameters_mapping()
@@ -70,7 +68,6 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
     def search_gradient(self, search_parameters: SP) -> SP:
         raise NotImplementedError
 
-    # Private methods ------------------------------------------------------------------------------
     def _natural_gradient(self, natural_parameters: NP) -> NP:
         """The natural gradient.
 

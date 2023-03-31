@@ -27,7 +27,6 @@ class MultivariateDiagonalNormalNP(HasEntropyNP,
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -66,7 +65,6 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     second_moment: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -93,7 +91,6 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def variance(self) -> JaxRealArray:
         return self.second_moment - jnp.square(self.mean)
 
@@ -106,7 +103,6 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -125,7 +121,6 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def pdf(self, x: JaxRealArray) -> JaxRealArray:
         return self.to_nat().pdf(x)
 

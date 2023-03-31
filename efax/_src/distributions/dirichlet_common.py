@@ -30,7 +30,6 @@ class DirichletCommonNP(HasEntropyNP,
                         Generic[EP]):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -52,7 +51,6 @@ class DirichletCommonNP(HasEntropyNP,
     def dimensions(self) -> int:
         return self.alpha_minus_one.shape[-1]
 
-    # Private methods ------------------------------------------------------------------------------
     def _exp_helper(self) -> JaxRealArray:
         q = self.alpha_minus_one
         return jss.digamma(q + 1.0) - jss.digamma(jnp.sum(q, axis=-1, keepdims=True) + q.shape[-1])
@@ -67,7 +65,6 @@ class DirichletCommonEP(HasEntropyEP[NP],
                         Multidimensional, Generic[NP]):
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -89,7 +86,6 @@ class DirichletCommonEP(HasEntropyEP[NP],
     def dimensions(self) -> int:
         return self.mean_log_probability.shape[-1]
 
-    # Private methods ------------------------------------------------------------------------------
     @classmethod
     def _transform_nat_helper(cls, search_parameters: JaxRealArray) -> JaxRealArray:
         # Run Newton's method on the whole real hyperspace.

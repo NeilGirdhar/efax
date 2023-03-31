@@ -24,7 +24,6 @@ class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArr
     """
     k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -61,7 +60,6 @@ class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArr
 class ChiSquareEP(HasEntropyEP[ChiSquareNP], ExpToNat[ChiSquareNP, ChiSquareNP]):
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[ChiSquareNP]:

@@ -42,7 +42,6 @@ class ComplexCircularlySymmetricNormalNP(
     # eta = 0
     # Leta = 0
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -83,7 +82,6 @@ class ComplexCircularlySymmetricNormalEP(
         Samplable):
     variance: JaxComplexArray = distribution_parameter(SymmetricMatrixSupport(hermitian=True))
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -120,7 +118,6 @@ class ComplexCircularlySymmetricNormalEP(
     def dimensions(self) -> int:
         return self.variance.shape[-1]
 
-    # Private method -------------------------------------------------------------------------------
     def _multivariate_normal_mean(self) -> JaxRealArray:
         """Return the mean of a corresponding real distribution with double the size."""
         n = self.dimensions()

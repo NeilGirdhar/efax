@@ -37,7 +37,6 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
     # eta = 2mean.conjugate()
     # Leta = mean.conjugate()
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -76,7 +75,6 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
                                       Samplable):
     mean: JaxComplexArray = distribution_parameter(VectorSupport(is_complex=True))
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

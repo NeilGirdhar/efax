@@ -21,7 +21,6 @@ class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', Ja
     precision: JaxRealArray = distribution_parameter(ScalarSupport())
     pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -67,7 +66,6 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], ExpectationParametrization[
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
     pseudo_second_moment: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

@@ -19,7 +19,6 @@ __all__: list[str] = []
 class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
     log_not_p: JaxRealArray
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -35,11 +34,9 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
         # Return log(a choose x).
         return gammaln(a + 1) - gammaln(x + 1) - gammaln(a - x + 1)
 
-    # Private methods ------------------------------------------------------------------------------
     def _mean(self) -> JaxRealArray:
         return self._failures() / jnp.expm1(-self.log_not_p)
 
-    # Private abstract methods ---------------------------------------------------------------------
     @abstractmethod
     def _failures(self) -> int | JaxIntegralArray:
         raise NotImplementedError
@@ -52,7 +49,6 @@ NP = TypeVar('NP', bound=NBCommonNP[Any])
 class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
     mean: JaxRealArray
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -61,11 +57,9 @@ class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaPrimeNP:
     #     return BetaPrimeNP(n * self._failures() * (self.mean, jnp.ones_like(self.mean)))
 
-    # Private methods ------------------------------------------------------------------------------
     def _log_not_p(self) -> JaxRealArray:
         return -jnp.log1p(self._failures() / self.mean)
 
-    # Private abstract methods ---------------------------------------------------------------------
     @abstractmethod
     def _failures(self) -> int | JaxIntegralArray:
         raise NotImplementedError

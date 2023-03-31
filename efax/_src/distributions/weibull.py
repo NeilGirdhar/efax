@@ -22,7 +22,6 @@ class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray])
     # eta = -scale^-concentration
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -51,7 +50,6 @@ class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], 
     # chi = scale^concentration
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

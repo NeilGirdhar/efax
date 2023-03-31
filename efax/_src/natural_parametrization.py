@@ -58,7 +58,6 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         """
         raise NotImplementedError
 
-    # Final methods --------------------------------------------------------------------------------
     @classmethod
     def expectation_parametrization_cls(cls) -> type[EP]:
         return get_type_hints(cls.to_exp)['return']
@@ -149,7 +148,6 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     def kl_divergence(self, q: Self) -> JaxRealArray:
         return self.to_exp().kl_divergence(q, self_nat=self)
 
-    # Private methods ------------------------------------------------------------------------------
     @classmethod
     def _flat_log_normalizer(cls, flattened_parameters: JaxRealArray, **kwargs: Any
                              ) -> JaxRealArray:

@@ -24,7 +24,6 @@ class VonMisesFisherNP(HasEntropyNP,
                        Multidimensional):
     mean_times_concentration: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -60,7 +59,6 @@ class VonMisesFisherNP(HasEntropyNP,
     def dimensions(self) -> int:
         return self.mean_times_concentration.shape[-1]
 
-    # New methods ----------------------------------------------------------------------------------
     def to_kappa_angle(self) -> tuple[JaxRealArray, JaxRealArray]:
         if self.dimensions() != 2:  # noqa: PLR2004
             raise ValueError
@@ -77,7 +75,6 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
                        ExpToNat[VonMisesFisherNP, JaxRealArray], Multidimensional):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:

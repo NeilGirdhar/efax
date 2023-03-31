@@ -22,7 +22,6 @@ __all__ = ['BernoulliNP', 'BernoulliEP']
 class BernoulliNP(HasEntropyNP):
     log_odds: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
@@ -44,7 +43,6 @@ class BernoulliNP(HasEntropyNP):
     def sufficient_statistics(self, x: JaxRealArray) -> BernoulliEP:
         return BernoulliEP(x)
 
-    # New methods ----------------------------------------------------------------------------------
     def nat_to_probability(self) -> JaxRealArray:
         p = jss.expit(self.log_odds)
         final_p = 1.0 - p
@@ -59,7 +57,6 @@ class BernoulliNP(HasEntropyNP):
 class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior[BernoulliNP], Samplable):
     probability: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    # Implemented methods --------------------------------------------------------------------------
     @property
     @override
     def shape(self) -> Shape:
