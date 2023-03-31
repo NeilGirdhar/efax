@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from math import comb, sqrt
 from typing import TYPE_CHECKING, Any
 
@@ -13,12 +14,15 @@ __all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport'
 
 
 class Field:
+    @abstractmethod
     def num_elements(self, support_num_element: int) -> int:
         raise NotImplementedError
 
+    @abstractmethod
     def flattened(self, x: JaxArray) -> JaxRealArray:
         raise NotImplementedError
 
+    @abstractmethod
     def unflattened(self, y: JaxRealArray) -> JaxArray:
         raise NotImplementedError
 
@@ -63,18 +67,23 @@ class Support:
         super().__init__()
         self.field = complex_field if is_complex else real_field
 
+    @abstractmethod
     def axes(self) -> int:
         raise NotImplementedError
 
+    @abstractmethod
     def shape(self, dimensions: int) -> Shape:
         raise NotImplementedError
 
+    @abstractmethod
     def num_elements(self, dimensions: int) -> int:
         raise NotImplementedError
 
+    @abstractmethod
     def flattened(self, x: JaxArray) -> JaxRealArray:
         raise NotImplementedError
 
+    @abstractmethod
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
         raise NotImplementedError
 

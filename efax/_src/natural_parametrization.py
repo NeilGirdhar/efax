@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
 
@@ -27,15 +28,17 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
-    # Abstract methods -----------------------------------------------------------------------------
+    @abstractmethod
     def log_normalizer(self) -> JaxRealArray:
         """Returns: The log-normalizer."""
         raise NotImplementedError
 
+    @abstractmethod
     def to_exp(self) -> EP:
         """Returns: The corresponding expectation parameters."""
         raise NotImplementedError
 
+    @abstractmethod
     def carrier_measure(self, x: Domain) -> JaxRealArray:
         """The corresponding carrier measure.
 
@@ -45,6 +48,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def sufficient_statistics(self, x: Domain) -> EP:
         """The corresponding sufficient statistics.
 

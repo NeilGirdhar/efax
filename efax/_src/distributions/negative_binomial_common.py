@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import Any, Generic, TypeVar
 
 import jax.numpy as jnp
@@ -39,6 +40,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
         return self._failures() / jnp.expm1(-self.log_not_p)
 
     # Private abstract methods ---------------------------------------------------------------------
+    @abstractmethod
     def _failures(self) -> int | JaxIntegralArray:
         raise NotImplementedError
 
@@ -64,5 +66,6 @@ class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
         return -jnp.log1p(self._failures() / self.mean)
 
     # Private abstract methods ---------------------------------------------------------------------
+    @abstractmethod
     def _failures(self) -> int | JaxIntegralArray:
         raise NotImplementedError

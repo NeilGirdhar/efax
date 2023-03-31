@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import Any, Generic, TypeVar
 
 import jax.numpy as jnp
@@ -50,11 +51,12 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
         cls = type(self).natural_parametrization_cls()
         return cls.unflattened(jnp.zeros_like(self.flattened()), **fixed_parameters)
 
-    # Abstract methods -----------------------------------------------------------------------------
+    @abstractmethod
     def initial_search_parameters(self) -> SP:
         """Returns: The initial value of the parameters that Newton's method runs on."""
         raise NotImplementedError
 
+    @abstractmethod
     def search_to_natural(self, search_parameters: SP) -> NP:
         """Convert the search parameters to the natural parametrization.
 
@@ -64,6 +66,7 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def search_gradient(self, search_parameters: SP) -> SP:
         raise NotImplementedError
 

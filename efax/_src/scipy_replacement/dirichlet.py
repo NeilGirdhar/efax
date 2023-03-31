@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from abc import abstractmethod
+
 import numpy as np
 import scipy.special
 import scipy.stats as ss
@@ -85,5 +87,6 @@ class ScipyGeneralizedDirichlet:
             q += beta_samples[..., i]
         return beta_samples
 
+    @abstractmethod
     def entropy(self) -> NumpyRealArray:
         raise NotImplementedError

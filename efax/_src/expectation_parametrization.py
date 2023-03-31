@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import operator
+from abc import abstractmethod
 from typing import Any, Generic, TypeVar, final
 
 from jax.tree_util import tree_map
@@ -25,11 +26,12 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
     distributed observations into the maximum likelihood distribution.  In the expectation
     parametrization, this is an expected value.
     """
-    # Abstract methods -----------------------------------------------------------------------------
     @classmethod
+    @abstractmethod
     def natural_parametrization_cls(cls) -> type[NP]:
         raise NotImplementedError
 
+    @abstractmethod
     def to_nat(self) -> NP:
         """The corresponding natural parameters."""
         raise NotImplementedError

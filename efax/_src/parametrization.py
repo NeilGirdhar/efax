@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from collections.abc import Iterable
 from dataclasses import fields
 from functools import partial, reduce
@@ -149,8 +150,8 @@ class Parametrization:
                 raise TypeError
             yield field.name, support
 
-    # Abstract methods -----------------------------------------------------------------------------
     @property
+    @abstractmethod
     def shape(self) -> Shape:
         raise NotImplementedError
 
