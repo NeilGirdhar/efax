@@ -184,6 +184,12 @@ EFAX supports the following distributions:
     - with unit variance
     - with arbitrary parameters
 
+- gamma (and related):
+
+  - Wishart
+  - gamma
+  - inverse gamma
+
 - on a finite set:
 
   - Bernoulli
@@ -203,9 +209,7 @@ EFAX supports the following distributions:
   - chi
   - chi-square
   - exponential
-  - gamma
   - inverse Gaussian
-  - inverse gamma
 
 - on the simplex:
 
