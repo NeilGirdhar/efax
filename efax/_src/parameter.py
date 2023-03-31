@@ -238,7 +238,3 @@ def distribution_parameter(support: Support,
     if static and not fixed:
         raise ValueError
     return field(static=static, metadata={'support': support, 'fixed': fixed})
-
-
-if TYPE_CHECKING:
-    pass
