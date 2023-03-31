@@ -84,6 +84,11 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
     def domain_support(self) -> VectorSupport:
         return VectorSupport()
 
+    @classmethod
+    @override
+    def natural_parametrization_cls(cls) -> type[MultivariateNormalNP]:
+        return MultivariateNormalNP
+
     @override
     def to_nat(self) -> MultivariateNormalNP:
         precision = jnp.linalg.inv(self.variance())
