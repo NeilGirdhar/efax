@@ -50,11 +50,13 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     @abstractmethod
     def sufficient_statistics(self, x: Domain) -> EP:
-        """The corresponding sufficient statistics.
+        """The sufficient statistics corresponding to an observation.
+
+        This is typically used in maximum likelihood estimation.
 
         Args:
             x: The sample.
-        Returns: These are conveniently stored as expectation parameters.
+        Returns: The sufficient statistics, stored as expectation parameters.
         """
         raise NotImplementedError
 

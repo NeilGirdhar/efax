@@ -25,6 +25,12 @@ main functions used in machine learning.  An example of why this matters is that
 way to implement cross entropy between X and Y relies on X being in the expectation parametrization
 and Y in the natural parametrization.
 
+----
+
+.. contents::
+
+----
+
 Framework
 =========
 Representation
@@ -81,30 +87,50 @@ Important methods
 -----------------
 EFAX aims to provide the main methods used in machine learning.
 
-Every :python:`Parametrization` has methods to flatten and unflatten the parameters into a single
-array: :python:`flattened` and :python:`unflattened`.  Typically, array-valued signals in a machine
-learning model would be unflattened into a distribution object, operated on, and then flattened
-before being sent back to the model.  Flattening is careful with distributions with symmetric (or Hermitian) matrix-valued parameters.  It only stores the upper triangular elements.
+Every :python:`Parametrization` has methods:
+
+- :python:`flattened` and :python:`unflattened` to flatten and unflatten the parameters into a
+  single array.  Typically, array-valued signals in a machine learning model would be unflattened
+  into a distribution object, operated on, and then flattened before being sent back to the model.
+  Flattening is careful with distributions with symmetric (or Hermitian) matrix-valued parameters.
+  It only stores the upper triangular elements.  And,
+- :python:`shape`, which supports broadcasting.
 
 Every :python:`NaturalParametrization` has methods:
 
+- :python:`to_exp` to convert itself to expectation parameters.
 - :python:`sufficient_statistics` to produce the sufficient statistics given an observation (used in
   maximum likelihood estimation),
 - :python:`pdf` and :python:`log_pdf`, which is the density or mass function and its logarithm,
 - :python:`fisher_information`, which is the Fisher information matrix, and
-- :python:`entropy`, which is the Shannon entropy.
+- :python:`kl_divergence`, which is the KL divergence.
 
 Every :python:`ExpectationParametrization` has methods:
 
-- :python:`cross_entropy` that is an efficient cross entropy armed with a numerically optimized
-  custom JAX gradient.  This is possible because the gradient of the cross entropy is the difference
-  of expectation parameters plus the expected carrier measure.
+- :python:`to_nat` to convert itself to natural parameters, and
+- :python:`kl_divergence`, which is the KL divergence.
 
-Numerical optimization
-----------------------
-Because of the nature of the log-normalizer and carrier measure, some methods for some distributions
-require numerical optimization.  These are the conversion from expectation parameters to natural
-ones, the entropy, and the cross entropy.
+Some parametrizations inherit from these interfaces:
+
+- :python:`HasConjugatePrior` can produce the conjugate prior,
+- :python:`HasGeneralizedConjugatePrior` can produce a generalization of the conjugate prior,
+- :python:`Multidimensional` distributions have a integer number of `dimensions`, and
+- :python:`Samplable` distributions support sampling.
+
+Some parametrizations inherit from these public mixins:
+
+- :python:`HasEntropyEP` is an expectation parametrization with an entropy and cross entropy, and
+- :python:`HasEntropyNP` is a natural parametrization with an entropy,  (The cross entropy is not
+  efficient.)
+
+Some parametrizations inherit from these private mixins:
+
+- :python:`ExpToNat` implements the conversion from expectation to natural parameters when no
+  analytical solution is possible.  It uses Newton's method with a Jacobian to invert the gradient
+  log-normalizer.
+- :python:`TransformedNaturalParametrization` produces a natural parametrization by relating it to
+  an existing natural parametrization.  And similarly for
+  :python:`TransformedExpectationParametrization`.
 
 Distributions
 =============
@@ -278,7 +304,7 @@ It's not hard to add a new distribution.  The steps are:
   analytical solution, then there's a mixin that implements a numerical solution.  This can be seen
   in the Dirichlet distribution.
 
-- Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.)
+- Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.
 
 Implementation should respect PEP8.
 The tests can be run using :bash:`pytest . -n auto`.  Specific distributions can be run with
