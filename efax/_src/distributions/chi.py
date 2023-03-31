@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import jax.numpy as jnp
 from jax.scipy import special as jss
-from tjax import Array, JaxRealArray
+from tjax import Array, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -19,6 +19,15 @@ __all__ = ['ChiNP', 'ChiEP']
 class ChiNP(HasEntropyNP,
             TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
     k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.k_over_two_minus_one.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @override
     def base_distribution(self) -> ChiSquareNP:
@@ -41,6 +50,15 @@ class ChiNP(HasEntropyNP,
 class ChiEP(HasEntropyEP[ChiNP],
             TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.mean_log.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

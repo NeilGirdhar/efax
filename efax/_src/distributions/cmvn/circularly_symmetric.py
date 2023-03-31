@@ -13,7 +13,7 @@ from ...expectation_parametrization import ExpectationParametrization
 from ...has_entropy import HasEntropyEP, HasEntropyNP
 from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import SymmetricMatrixSupport, distribution_parameter
+from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
 from ...samplable import Samplable
 
 __all__ = ['ComplexCircularlySymmetricNormalNP', 'ComplexCircularlySymmetricNormalEP']
@@ -46,6 +46,10 @@ class ComplexCircularlySymmetricNormalNP(
     @override
     def shape(self) -> Shape:
         return self.negative_precision.shape[:-2]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport(is_complex=True)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -86,6 +90,10 @@ class ComplexCircularlySymmetricNormalEP(
     @override
     def shape(self) -> Shape:
         return self.variance.shape[:-2]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport(is_complex=True)
 
     @classmethod
     @override

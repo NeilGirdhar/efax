@@ -11,6 +11,8 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose
 
+from efax import Multidimensional
+
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
@@ -37,14 +39,21 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
     for _ in range(10):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
-        x = np.asarray(scipy_distribution.rvs(random_state=generator))
-        my_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(x))
-        my_density = nat_parameters.pdf(my_x)
+        scipy_x = np.asarray(scipy_distribution.rvs(random_state=generator))
+        efax_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(scipy_x))
 
+        # Verify that the sufficient statistics have the right shape.
+        dimensions = (nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional)
+                      else 0)
+        ideal_shape = nat_parameters.domain_support().shape(dimensions)
+        assert efax_x.shape == ideal_shape
+
+        # Verify that the density matches scipy.
+        efax_density = np.asarray(nat_parameters.pdf(efax_x))
         try:
-            density = scipy_distribution.pdf(x)
+            scipy_density = scipy_distribution.pdf(scipy_x)
         except AttributeError:
-            density = scipy_distribution.pmf(x)
+            scipy_density = scipy_distribution.pmf(scipy_x)
 
         if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
             atol = 1e-5
@@ -52,7 +61,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         else:
             atol = 1e-5
             rtol = 1e-4
-        assert_allclose(my_density, density, rtol=rtol, atol=atol)
+        assert_allclose(efax_density, scipy_density, rtol=rtol, atol=atol)
 
 
 def test_maximum_likelihood_estimation(generator: Generator,
@@ -72,18 +81,18 @@ def test_maximum_likelihood_estimation(generator: Generator,
     else:
         atol = 1e-4
         rtol = 2e-2
+    n = 70000
     # Generate a distribution with expectation and natural parameters.
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
     nat_parameters = exp_parameters.to_nat()
     # Generate variates from the corresponding scipy distribution.
     scipy_distribution = distribution_info.exp_to_scipy_distribution(
         exp_parameters)  # type: ignore[arg-type] # pyright: ignore
-    x = scipy_distribution.rvs(random_state=generator, size=70000)
+    x = scipy_distribution.rvs(random_state=generator, size=n)
     # Convert the variates to sufficient statistics.
     my_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(x))
     sufficient_stats = nat_parameters.sufficient_statistics(my_x)
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
     calculated_parameters = tree_map(partial(np.mean, axis=0), sufficient_stats)
-
     assert_tree_allclose(exp_parameters, calculated_parameters, rtol=rtol, atol=atol)

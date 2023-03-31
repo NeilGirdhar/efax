@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from tjax import Array, JaxRealArray
+from tjax import Array, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -20,6 +20,15 @@ class RayleighNP(HasEntropyNP,
                                                    JaxRealArray]):
     # eta = -1 / (2 * sigma^2)
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.eta.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @override
     def base_distribution(self) -> ExponentialNP:
@@ -43,6 +52,15 @@ class RayleighEP(HasEntropyEP[RayleighNP],
                  TransformedExpectationParametrization[ExponentialEP, ExponentialNP, RayleighNP]):
     # chi = 2 * sigma^2
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.chi.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

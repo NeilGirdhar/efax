@@ -9,7 +9,7 @@ from tjax import JaxArray, JaxRealArray, Shape
 from tjax.dataclasses import field
 from typing_extensions import override
 
-__all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SymmetricMatrixSupport',
+__all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SimplexSupport', 'SymmetricMatrixSupport',
            'SquareMatrixSupport']
 
 
@@ -124,6 +124,30 @@ class VectorSupport(Support):
     @override
     def num_elements(self, dimensions: int) -> int:
         return self.field.num_elements(dimensions)
+
+    @override
+    def flattened(self, x: JaxArray) -> JaxRealArray:
+        return self.field.flattened(x)
+
+    @override
+    def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
+        x = self.field.unflattened(y)
+        assert x.shape[-1] == dimensions
+        return x
+
+
+class SimplexSupport(Support):
+    @override
+    def axes(self) -> int:
+        return 1
+
+    @override
+    def shape(self, dimensions: int) -> Shape:
+        return (dimensions - 1,)
+
+    @override
+    def num_elements(self, dimensions: int) -> int:
+        return self.field.num_elements(dimensions - 1)
 
     @override
     def flattened(self, x: JaxArray) -> JaxRealArray:

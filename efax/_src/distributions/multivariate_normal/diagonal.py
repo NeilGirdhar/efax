@@ -33,6 +33,10 @@ class MultivariateDiagonalNormalNP(HasEntropyNP,
         return self.mean_times_precision.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         components = (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
                       + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
@@ -69,6 +73,10 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @classmethod
     @override
@@ -107,6 +115,10 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

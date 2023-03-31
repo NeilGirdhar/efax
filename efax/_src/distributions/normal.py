@@ -28,6 +28,10 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
         return self.mean_times_precision.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
                 + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
@@ -56,6 +60,10 @@ class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Sam
     @override
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

@@ -30,6 +30,10 @@ class VonMisesFisherNP(HasEntropyNP,
         return self.mean_times_concentration.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         half_k = self.dimensions() * 0.5
         kappa = jnp.linalg.norm(self.mean_times_concentration, 2, axis=-1)
@@ -79,6 +83,10 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @classmethod
     @override

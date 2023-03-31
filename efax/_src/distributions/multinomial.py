@@ -34,6 +34,10 @@ class MultinomialNP(HasEntropyNP,
         return self.log_odds.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
@@ -88,6 +92,10 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
     @override
     def shape(self) -> Shape:
         return self.probability.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @classmethod
     @override

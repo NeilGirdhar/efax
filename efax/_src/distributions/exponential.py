@@ -27,6 +27,10 @@ class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRea
         return self.negative_rate.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return -jnp.log(-self.negative_rate)
 
@@ -59,6 +63,10 @@ class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior[ExponentialNP
     @override
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

@@ -11,6 +11,7 @@ from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import EP, NaturalParametrization
+from ..parameter import ScalarSupport
 
 __all__: list[str] = []
 
@@ -23,6 +24,10 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
     @override
     def shape(self) -> Shape:
         return self.log_not_p.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -53,6 +58,10 @@ class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
     @override
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaPrimeNP:
     #     return BetaPrimeNP(n * self._failures() * (self.mean, jnp.ones_like(self.mean)))

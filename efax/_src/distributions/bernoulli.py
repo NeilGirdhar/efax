@@ -28,6 +28,10 @@ class BernoulliNP(HasEntropyNP):
         return self.log_odds.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return jnp.logaddexp(self.log_odds, 0.0)
 
@@ -61,6 +65,10 @@ class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior[BernoulliNP], Sam
     @override
     def shape(self) -> Shape:
         return self.probability.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

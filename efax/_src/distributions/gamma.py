@@ -29,6 +29,10 @@ class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Sam
         return self.negative_rate.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         shape = self.shape_minus_one + 1.0
         return jss.gammaln(shape) - shape * jnp.log(-self.negative_rate)
@@ -63,6 +67,10 @@ class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
     @override
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

@@ -5,6 +5,7 @@ from tjax import JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..parameter import SimplexSupport
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 __all__ = ['DirichletNP', 'DirichletEP']
@@ -12,6 +13,10 @@ __all__ = ['DirichletNP', 'DirichletEP']
 
 @dataclass
 class DirichletNP(DirichletCommonNP['DirichletEP']):
+    @override
+    def domain_support(self) -> SimplexSupport:
+        return SimplexSupport()
+
     @override
     def to_exp(self) -> DirichletEP:
         return DirichletEP(self._exp_helper())
@@ -28,6 +33,10 @@ class DirichletNP(DirichletCommonNP['DirichletEP']):
 
 @dataclass
 class DirichletEP(DirichletCommonEP[DirichletNP]):
+    @override
+    def domain_support(self) -> SimplexSupport:
+        return SimplexSupport()
+
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[DirichletNP]:

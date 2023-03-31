@@ -43,6 +43,10 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
         return self.two_mean_conjugate.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport(is_complex=True)
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         mean_conjugate = self.two_mean_conjugate * 0.5
         return jnp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
@@ -79,6 +83,10 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport(is_complex=True)
 
     @classmethod
     @override

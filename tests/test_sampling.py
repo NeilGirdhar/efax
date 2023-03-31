@@ -10,7 +10,7 @@ from jax.tree_util import tree_map
 from numpy.random import Generator
 from tjax import assert_tree_allclose
 
-from efax import Samplable
+from efax import Multidimensional, Samplable
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
                           ComplexNormalInfo, GammaInfo, IsotropicNormalInfo,
@@ -64,7 +64,15 @@ def test_maximum_likelihood_estimation(generator: Generator,
         assert isinstance(exp_parameters, Samplable)
         nat_parameters = exp_parameters.to_nat()  # type: ignore[attr-defined]
         samples = exp_parameters.sample(key, sample_shape)
-    assert samples.shape[:len(sample_shape)] == sample_shape
+
+    # Verify that the samples have the right shape.
+    dimensions = nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional) else 0
+    ideal_shape = (*sample_shape, *distribution_shape,
+                   *nat_parameters.domain_support().shape(dimensions))
+    assert samples.shape == ideal_shape
+
+
+    # Verify the maximum likelihood estimate.
     sampled_exp_parameters = nat_parameters.sufficient_statistics(samples)
     ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
     assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)

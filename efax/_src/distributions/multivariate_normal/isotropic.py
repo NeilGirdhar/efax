@@ -30,6 +30,10 @@ class IsotropicNormalNP(HasEntropyNP,
         return self.negative_half_precision.shape
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         eta = self.mean_times_precision
         return 0.5 * (-0.5 * jnp.sum(jnp.square(eta), axis=-1) / self.negative_half_precision
@@ -66,6 +70,10 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @classmethod
     @override

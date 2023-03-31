@@ -27,6 +27,10 @@ class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', Ja
         return self.mean_times_precision.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport(is_complex=True)
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         _, s, mu = self._r_s_mu()
         det_s = s
@@ -70,6 +74,10 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], ExpectationParametrization[
     @override
     def shape(self) -> Shape:
         return self.mean.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport(is_complex=True)
 
     @classmethod
     @override

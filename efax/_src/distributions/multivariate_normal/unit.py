@@ -38,6 +38,10 @@ class MultivariateUnitNormalNP(HasEntropyNP,
         return self.mean.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return 0.5 * (jnp.sum(jnp.square(self.mean), axis=-1)
                       + self.dimensions() * math.log(math.pi * 2.0))
@@ -80,6 +84,10 @@ class MultivariateUnitNormalEP(
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @classmethod
     @override

@@ -28,6 +28,10 @@ class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray])
         return self.eta.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return -jnp.log(-self.eta) - jnp.log(self.concentration)
 
@@ -54,6 +58,10 @@ class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], 
     @override
     def shape(self) -> Shape:
         return self.chi.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

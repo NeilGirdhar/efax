@@ -7,6 +7,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..parameter import ScalarSupport
 from ..samplable import Samplable
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
@@ -21,6 +22,10 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
     [0, 1] represents the Bernoulli probability that outcome 0 (out of {0, 1}) is realized.  In this
     way, the Beta class coincides with a special case of the Dirichlet class.
     """
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
     @override
     def to_exp(self) -> BetaEP:
         return BetaEP(self._exp_helper())
@@ -43,6 +48,10 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
 
 @dataclass
 class BetaEP(DirichletCommonEP[BetaNP]):
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[BetaNP]:

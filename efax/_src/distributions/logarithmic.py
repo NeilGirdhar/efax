@@ -27,6 +27,10 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
         return self.log_probability.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         return jnp.log(-jnp.log1p(-jnp.exp(self.log_probability)))
 
@@ -56,6 +60,10 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray]):
     @override
     def shape(self) -> Shape:
         return self.chi.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @classmethod
     @override

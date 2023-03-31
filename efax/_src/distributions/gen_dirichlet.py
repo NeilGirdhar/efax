@@ -37,6 +37,10 @@ class GeneralizedDirichletNP(HasEntropyNP,
         return self.alpha_minus_one.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         alpha, beta = self.alpha_beta()
         return jnp.sum(betaln(alpha, beta), axis=-1)
@@ -95,6 +99,10 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
     @override
     def shape(self) -> Shape:
         return self.mean_log_probability.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @classmethod
     @override

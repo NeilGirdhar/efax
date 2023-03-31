@@ -153,6 +153,10 @@ class Parametrization:
     def shape(self) -> Shape:
         raise NotImplementedError
 
+    @abstractmethod
+    def domain_support(self) -> Support:
+        raise NotImplementedError
+
 
 if TYPE_CHECKING:
     from .natural_parametrization import NaturalParametrization

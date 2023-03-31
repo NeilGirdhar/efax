@@ -35,6 +35,10 @@ class MultivariateNormalNP(HasEntropyNP,
         return self.mean_times_precision.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         eta = self.mean_times_precision
         h_inv = jnp.linalg.inv(self.negative_half_precision)
@@ -77,6 +81,10 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
         return self.mean.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def to_nat(self) -> MultivariateNormalNP:
         precision = jnp.linalg.inv(self.variance())
         mean_times_precision = jnp.einsum("...ij,...j->...i", precision, self.mean)
@@ -110,6 +118,10 @@ class MultivariateNormalVP(Samplable, Multidimensional):
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

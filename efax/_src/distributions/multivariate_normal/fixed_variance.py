@@ -40,6 +40,10 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
         return self.mean_times_precision.shape[:-1]
 
     @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         eta = self.mean_times_precision
         return 0.5 * (jnp.sum(jnp.square(eta), axis=-1) * self.variance
@@ -83,6 +87,10 @@ class MultivariateFixedVarianceNormalEP(
     @override
     def shape(self) -> Shape:
         return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> VectorSupport:
+        return VectorSupport()
 
     @classmethod
     @override

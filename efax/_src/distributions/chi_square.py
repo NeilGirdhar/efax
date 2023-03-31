@@ -30,6 +30,10 @@ class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArr
         return self.k_over_two_minus_one.shape
 
     @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
     def log_normalizer(self) -> JaxRealArray:
         k_over_two = self.k_over_two_minus_one + 1.0
         return jss.gammaln(k_over_two) - k_over_two * jnp.log(0.5)
@@ -69,6 +73,10 @@ class ChiSquareEP(HasEntropyEP[ChiSquareNP], ExpToNat[ChiSquareNP, ChiSquareNP])
     @override
     def shape(self) -> Shape:
         return self.mean_log.shape
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
