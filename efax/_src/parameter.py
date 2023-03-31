@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from math import comb, sqrt
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import jax.numpy as jnp
 from tjax import JaxArray, JaxRealArray, Shape
