@@ -26,11 +26,11 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   RayleighEP, RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal,
                   ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution,
                   ScipyLogNormal, ScipyMultivariateNormal, ScipySoftplusNormal, ScipyVonMises,
-                  ScipyVonMisesFisher, SoftplusNormalEP, SoftplusNormalNP, Structure,
+                  ScipyVonMisesFisher, ScipyWishart, SoftplusNormalEP, SoftplusNormalNP, Structure,
                   SubDistributionInfo, UnitVarianceLogNormalEP, UnitVarianceLogNormalNP,
                   UnitVarianceNormalEP, UnitVarianceNormalNP, UnitVarianceSoftplusNormalEP,
                   UnitVarianceSoftplusNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
-                  WeibullNP)
+                  WeibullNP, WishartEP, WishartNP)
 
 from .distribution_info import DistributionInfo
 
@@ -622,6 +622,22 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
         return WeibullNP
 
 
+class WishartInfo(DistributionInfo[WishartNP, WishartEP, NumpyRealArray]):
+    @override
+    def nat_to_scipy_distribution(self, q: WishartNP) -> Any:
+        degrees_of_freedom = np.asarray(2.0 * q.df_offset + q.dimensions() + 1)
+        scale = np.asarray(q.to_exp().mean)
+        return ScipyWishart(df=degrees_of_freedom, scale=scale)
+
+    @override
+    def exp_class(self) -> type[WishartEP]:
+        return WishartEP
+
+    @override
+    def nat_class(self) -> type[WishartNP]:
+        return WishartNP
+
+
 def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     return [
             BernoulliInfo(),
@@ -657,4 +673,5 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             VonMisesFisherInfo(dimensions=5),
             VonMisesInfo(),
             WeibullInfo(),
+            WishartInfo(),
             ]

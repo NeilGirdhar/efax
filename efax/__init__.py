@@ -42,6 +42,7 @@ from ._src.distributions.softplus_normal.unit_variance import (UnitVarianceSoftp
                                                                UnitVarianceSoftplusNormalNP)
 from ._src.distributions.von_mises import VonMisesFisherEP, VonMisesFisherNP
 from ._src.distributions.weibull import WeibullEP, WeibullNP
+from ._src.distributions.wishart import WishartEP, WishartNP
 from ._src.expectation_parametrization import ExpectationParametrization
 from ._src.interfaces.conjugate_prior import HasConjugatePrior, HasGeneralizedConjugatePrior
 from ._src.interfaces.multidimensional import Multidimensional
@@ -63,6 +64,7 @@ from ._src.scipy_replacement.log_normal import ScipyLogNormal
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.softplus_normal import ScipySoftplusNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
+from ._src.scipy_replacement.wishart import ScipyWishart
 from ._src.structure import Flattener, MaximumLikelihoodEstimator, Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
 from ._src.transform.joint import JointDistribution, JointDistributionE, JointDistributionN
@@ -157,6 +159,7 @@ __all__ = [
     'ScipySoftplusNormal',
     'ScipyVonMises',
     'ScipyVonMisesFisher',
+    'ScipyWishart',
     'SimpleDistribution',
     'SoftplusNormalEP',
     'SoftplusNormalNP',
@@ -176,6 +179,8 @@ __all__ = [
     'VonMisesFisherNP',
     'WeibullEP',
     'WeibullNP',
+    'WishartEP',
+    'WishartNP',
     'flat_dict_of_observations',
     'flat_dict_of_parameters',
     'flatten_mapping',
