@@ -6,8 +6,8 @@ from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..interfaces.samplable import Samplable
 from ..parameter import ScalarSupport, distribution_parameter
-from ..samplable import Samplable
 from .gamma import GammaNP
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 from .poisson import PoissonEP

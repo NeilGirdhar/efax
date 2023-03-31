@@ -5,7 +5,7 @@ from abc import abstractmethod
 from jax.random import KeyArray
 from tjax import Array, Shape
 
-from .parametrization import Parametrization
+from ..parametrization import Parametrization
 
 __all__ = ['Samplable']
 

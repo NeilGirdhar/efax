@@ -5,7 +5,7 @@ from tjax import JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..has_entropy import HasEntropyEP, HasEntropyNP
+from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 

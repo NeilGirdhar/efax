@@ -8,9 +8,9 @@ from tjax import JaxRealArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..exp_to_nat import ExpToNat
-from ..has_entropy import HasEntropyEP, HasEntropyNP
-from ..multidimensional import Multidimensional
+from ..interfaces.multidimensional import Multidimensional
+from ..mixins.exp_to_nat import ExpToNat
+from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..tools import iv_ratio, log_ive

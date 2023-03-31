@@ -7,8 +7,8 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..interfaces.samplable import Samplable
 from ..parameter import ScalarSupport
-from ..samplable import Samplable
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 __all__ = ['BetaNP', 'BetaEP']

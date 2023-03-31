@@ -9,10 +9,10 @@ from tjax import BooleanArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..conjugate_prior import HasConjugatePrior
-from ..has_entropy import HasEntropyEP, HasEntropyNP
+from ..interfaces.conjugate_prior import HasConjugatePrior
+from ..interfaces.samplable import Samplable
+from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..parameter import ScalarSupport, distribution_parameter
-from ..samplable import Samplable
 from .beta import BetaNP
 
 __all__ = ['BernoulliNP', 'BernoulliEP']

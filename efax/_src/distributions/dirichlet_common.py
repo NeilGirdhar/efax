@@ -11,12 +11,12 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..exp_to_nat import ExpToNat
-from ..has_entropy import HasEntropyEP, HasEntropyNP
-from ..multidimensional import Multidimensional
+from ..interfaces.multidimensional import Multidimensional
+from ..interfaces.samplable import Samplable
+from ..mixins.exp_to_nat import ExpToNat
+from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
-from ..samplable import Samplable
 
 __all__: list[str] = []
 

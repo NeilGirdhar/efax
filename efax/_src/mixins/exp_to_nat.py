@@ -11,8 +11,8 @@ from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingS
 from tjax.gradient import Adam, GradientTransformation
 from typing_extensions import override
 
-from .expectation_parametrization import ExpectationParametrization
-from .natural_parametrization import NaturalParametrization
+from ..expectation_parametrization import ExpectationParametrization
+from ..natural_parametrization import NaturalParametrization
 
 __all__: list[str] = []
 

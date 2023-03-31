@@ -6,7 +6,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..exp_to_nat import ExpToNat
+from ..mixins.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 

@@ -6,8 +6,8 @@ from typing import Any, Generic, TypeVar
 from tjax import JaxComplexArray, JaxRealArray, Shape
 from typing_extensions import override
 
-from .expectation_parametrization import ExpectationParametrization
-from .natural_parametrization import EP, NaturalParametrization
+from ..expectation_parametrization import ExpectationParametrization
+from ..natural_parametrization import EP, NaturalParametrization
 
 __all__: list[str] = []
 

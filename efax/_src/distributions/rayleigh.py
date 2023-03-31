@@ -5,10 +5,10 @@ from tjax import Array, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..has_entropy import HasEntropyEP, HasEntropyNP
+from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,
+                                                  TransformedNaturalParametrization)
 from ..parameter import ScalarSupport, distribution_parameter
-from ..transformed_parametrization import (TransformedExpectationParametrization,
-                                           TransformedNaturalParametrization)
 from .exponential import ExponentialEP, ExponentialNP
 
 __all__ = ['RayleighNP', 'RayleighEP']

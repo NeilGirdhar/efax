@@ -5,9 +5,9 @@ from typing import Any, Generic
 
 from tjax import JaxComplexArray, JaxRealArray
 
-from .expectation_parametrization import NP, ExpectationParametrization
-from .multidimensional import Multidimensional
-from .natural_parametrization import NaturalParametrization
+from ..expectation_parametrization import NP, ExpectationParametrization
+from ..interfaces.multidimensional import Multidimensional
+from ..natural_parametrization import NaturalParametrization
 
 __all__ = ['HasConjugatePrior', 'HasGeneralizedConjugatePrior']
 

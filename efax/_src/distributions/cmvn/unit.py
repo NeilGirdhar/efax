@@ -10,11 +10,11 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
-from ...has_entropy import HasEntropyEP, HasEntropyNP
-from ...multidimensional import Multidimensional
+from ...interfaces.multidimensional import Multidimensional
+from ...interfaces.samplable import Samplable
+from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import VectorSupport, distribution_parameter
-from ...samplable import Samplable
 
 __all__ = ['ComplexMultivariateUnitNormalNP', 'ComplexMultivariateUnitNormalEP']
 

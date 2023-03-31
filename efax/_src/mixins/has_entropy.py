@@ -5,9 +5,9 @@ from typing import Any, TypeVar, final
 
 from tjax import JaxRealArray, jit
 
-from .expectation_parametrization import ExpectationParametrization
-from .natural_parametrization import NaturalParametrization
-from .tools import parameters_dot_product
+from ..expectation_parametrization import ExpectationParametrization
+from ..natural_parametrization import NaturalParametrization
+from ..tools import parameters_dot_product
 
 __all__ = ['HasEntropyEP', 'HasEntropyNP']
 

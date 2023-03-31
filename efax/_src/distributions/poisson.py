@@ -8,10 +8,10 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..conjugate_prior import HasConjugatePrior
+from ..interfaces.conjugate_prior import HasConjugatePrior
+from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
-from ..samplable import Samplable
 from .gamma import GammaNP
 
 __all__ = ['PoissonNP', 'PoissonEP']

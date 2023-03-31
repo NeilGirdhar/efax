@@ -7,11 +7,11 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..exp_to_nat import ExpToNat
-from ..has_entropy import HasEntropyEP, HasEntropyNP
+from ..interfaces.samplable import Samplable
+from ..mixins.exp_to_nat import ExpToNat
+from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
-from ..samplable import Samplable
 
 __all__ = ['ChiSquareNP', 'ChiSquareEP']
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from .parametrization import Parametrization
+from ..parametrization import Parametrization
 
 __all__ = ['Multidimensional']
 
