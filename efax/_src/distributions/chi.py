@@ -6,6 +6,7 @@ from tjax import Array, JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..parameter import ScalarSupport, distribution_parameter
 from ..transformed_parametrization import (TransformedExpectationParametrization,
                                            TransformedNaturalParametrization)
@@ -15,7 +16,8 @@ __all__ = ['ChiNP', 'ChiEP']
 
 
 @dataclass
-class ChiNP(TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
+class ChiNP(HasEntropyNP,
+            TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
     k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -37,7 +39,8 @@ class ChiNP(TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP',
 
 
 @dataclass
-class ChiEP(TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
+class ChiEP(HasEntropyEP[ChiNP],
+            TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

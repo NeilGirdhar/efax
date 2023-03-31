@@ -8,6 +8,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..conjugate_prior import HasConjugatePrior
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from ..samplable import Samplable
@@ -17,7 +18,7 @@ __all__ = ['ExponentialNP', 'ExponentialEP']
 
 
 @dataclass
-class ExponentialNP(NaturalParametrization['ExponentialEP', JaxRealArray], Samplable):
+class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRealArray], Samplable):
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -51,7 +52,7 @@ class ExponentialNP(NaturalParametrization['ExponentialEP', JaxRealArray], Sampl
 
 
 @dataclass
-class ExponentialEP(HasConjugatePrior[ExponentialNP], Samplable):
+class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior[ExponentialNP], Samplable):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

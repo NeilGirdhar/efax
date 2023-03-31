@@ -8,6 +8,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 
@@ -15,7 +16,7 @@ __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 
 @dataclass
-class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', JaxComplexArray]):
+class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', JaxComplexArray]):
     mean_times_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
     precision: JaxRealArray = distribution_parameter(ScalarSupport())
     pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
@@ -60,7 +61,7 @@ class ComplexNormalNP(NaturalParametrization['ComplexNormalEP', JaxComplexArray]
 
 
 @dataclass
-class ComplexNormalEP(ExpectationParametrization[ComplexNormalNP]):
+class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], ExpectationParametrization[ComplexNormalNP]):
     mean: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
     pseudo_second_moment: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))

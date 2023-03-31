@@ -10,7 +10,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..conjugate_prior import HasConjugatePrior
-from ..natural_parametrization import NaturalParametrization
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..parameter import ScalarSupport, distribution_parameter
 from ..samplable import Samplable
 from .beta import BetaNP
@@ -19,7 +19,7 @@ __all__ = ['BernoulliNP', 'BernoulliEP']
 
 
 @dataclass
-class BernoulliNP(NaturalParametrization['BernoulliEP', JaxRealArray]):
+class BernoulliNP(HasEntropyNP):
     log_odds: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class BernoulliNP(NaturalParametrization['BernoulliEP', JaxRealArray]):
 
 
 @dataclass
-class BernoulliEP(HasConjugatePrior[BernoulliNP], Samplable):
+class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior[BernoulliNP], Samplable):
     probability: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

@@ -5,6 +5,7 @@ from tjax import JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 
@@ -12,7 +13,8 @@ __all__ = ['GeometricNP', 'GeometricEP']
 
 
 @dataclass
-class GeometricNP(NBCommonNP['GeometricEP']):
+class GeometricNP(HasEntropyNP,
+                  NBCommonNP['GeometricEP']):
     log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
@@ -30,7 +32,8 @@ class GeometricNP(NBCommonNP['GeometricEP']):
 
 
 @dataclass
-class GeometricEP(NBCommonEP[GeometricNP]):
+class GeometricEP(HasEntropyEP[GeometricNP],
+                  NBCommonEP[GeometricNP]):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------

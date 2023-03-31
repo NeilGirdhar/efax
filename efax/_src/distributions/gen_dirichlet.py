@@ -15,6 +15,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
@@ -24,7 +25,8 @@ __all__ = ['GeneralizedDirichletNP', 'GeneralizedDirichletEP']
 
 
 @dataclass
-class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
+class GeneralizedDirichletNP(HasEntropyNP,
+                             NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
                              Multidimensional):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
     gamma: JaxRealArray = distribution_parameter(VectorSupport())
@@ -83,7 +85,8 @@ class GeneralizedDirichletNP(NaturalParametrization['GeneralizedDirichletEP', Ja
 
 
 @dataclass
-class GeneralizedDirichletEP(ExpToNat[GeneralizedDirichletNP, JaxRealArray], Multidimensional):
+class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
+                             ExpToNat[GeneralizedDirichletNP, JaxRealArray], Multidimensional):
     # E({log(x_i)}_i)
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
     # E({log(1-∑_{j≤i} x_j)}_i)

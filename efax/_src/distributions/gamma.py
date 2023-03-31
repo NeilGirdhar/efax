@@ -10,6 +10,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from ..samplable import Samplable
@@ -18,7 +19,7 @@ __all__ = ['GammaNP', 'GammaEP']
 
 
 @dataclass
-class GammaNP(NaturalParametrization['GammaEP', JaxRealArray], Samplable):
+class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Samplable):
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
     shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -54,7 +55,7 @@ class GammaNP(NaturalParametrization['GammaEP', JaxRealArray], Samplable):
 
 
 @dataclass
-class GammaEP(ExpToNat[GammaNP, JaxRealArray]):
+class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 

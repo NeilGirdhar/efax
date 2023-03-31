@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import Any
 
 import numpy as np
 from numpy.random import Generator
+
+from efax import HasEntropyEP, HasEntropyNP
 
 from .distribution_info import DistributionInfo
 
@@ -30,12 +31,12 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
     check(q)
 
     assert q.log_normalizer().shape == shape
-    with suppress(NotImplementedError):
+    if isinstance(p, HasEntropyEP):
         assert p.cross_entropy(q).shape == shape
-    with suppress(NotImplementedError):
+    if isinstance(q, HasEntropyNP):
         assert q.entropy().shape == shape
     assert q.carrier_measure(x).shape == shape
-    with suppress(NotImplementedError):
+    if isinstance(p, HasEntropyEP):
         assert p.expected_carrier_measure().shape == shape
     assert q.pdf(x).shape == shape
 

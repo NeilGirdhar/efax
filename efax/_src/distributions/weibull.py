@@ -8,6 +8,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from ..samplable import Samplable
@@ -16,7 +17,7 @@ __all__ = ['WeibullNP', 'WeibullEP']
 
 
 @dataclass
-class WeibullNP(NaturalParametrization['WeibullEP', JaxRealArray]):
+class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray]):
     concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
     # eta = -scale^-concentration
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
@@ -44,7 +45,7 @@ class WeibullNP(NaturalParametrization['WeibullEP', JaxRealArray]):
 
 
 @dataclass
-class WeibullEP(ExpectationParametrization[WeibullNP], Samplable):
+class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], Samplable):
     concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
     # chi = scale^concentration
     chi: JaxRealArray = distribution_parameter(ScalarSupport())

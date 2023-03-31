@@ -9,6 +9,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...has_entropy import HasEntropyEP, HasEntropyNP
 from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
@@ -22,7 +23,8 @@ def _broadcasted_outer(x: JaxRealArray) -> JaxRealArray:
 
 
 @dataclass
-class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP', JaxRealArray],
+class MultivariateNormalNP(HasEntropyNP,
+                           NaturalParametrization['MultivariateNormalEP', JaxRealArray],
                            Multidimensional):
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
@@ -63,7 +65,8 @@ class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP', JaxRea
 
 
 @dataclass
-class MultivariateNormalEP(ExpectationParametrization[MultivariateNormalNP], Multidimensional,
+class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
+                           ExpectationParametrization[MultivariateNormalNP], Multidimensional,
                            Samplable):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     second_moment: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())

@@ -1,6 +1,7 @@
 from .conjugate_prior import *
 from .distributions import *
 from .expectation_parametrization import *
+from .has_entropy import *
 from .multidimensional import *
 from .natural_parametrization import *
 from .parameter import *

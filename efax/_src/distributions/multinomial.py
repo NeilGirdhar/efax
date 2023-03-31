@@ -11,6 +11,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..conjugate_prior import HasGeneralizedConjugatePrior
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
@@ -22,7 +23,8 @@ __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
-class MultinomialNP(NaturalParametrization['MultinomialEP', JaxRealArray], Multidimensional,
+class MultinomialNP(HasEntropyNP,
+                    NaturalParametrization['MultinomialEP', JaxRealArray], Multidimensional,
                     Samplable):
     log_odds: JaxRealArray = distribution_parameter(VectorSupport())
 
@@ -79,7 +81,8 @@ class MultinomialNP(NaturalParametrization['MultinomialEP', JaxRealArray], Multi
 
 
 @dataclass
-class MultinomialEP(HasGeneralizedConjugatePrior[MultinomialNP], Multidimensional):
+class MultinomialEP(HasEntropyEP[MultinomialNP],
+                    HasGeneralizedConjugatePrior[MultinomialNP], Multidimensional):
     probability: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------

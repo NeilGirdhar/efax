@@ -12,6 +12,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
@@ -24,7 +25,8 @@ EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
 
 
 @dataclass
-class DirichletCommonNP(NaturalParametrization[EP, JaxRealArray], Samplable, Multidimensional,
+class DirichletCommonNP(HasEntropyNP,
+                        NaturalParametrization[EP, JaxRealArray], Samplable, Multidimensional,
                         Generic[EP]):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
 
@@ -59,7 +61,9 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 
 @dataclass
-class DirichletCommonEP(ExpToNat[NP, JaxRealArray], Multidimensional, Generic[NP]):
+class DirichletCommonEP(HasEntropyEP[NP],
+                        ExpToNat[NP, JaxRealArray],
+                        Multidimensional, Generic[NP]):
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------

@@ -61,12 +61,6 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     @jit
     @final
-    def entropy(self) -> JaxRealArray:
-        """The Shannon entropy."""
-        return self.to_exp().cross_entropy(self)
-
-    @jit
-    @final
     def pdf(self, x: Domain) -> JaxRealArray:
         """The distribution's density or mass function at x.
 

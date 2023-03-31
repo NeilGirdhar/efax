@@ -10,6 +10,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...conjugate_prior import HasGeneralizedConjugatePrior
+from ...has_entropy import HasEntropyEP, HasEntropyNP
 from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import VectorSupport, distribution_parameter
@@ -21,7 +22,8 @@ __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 
 @dataclass
-class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray],
+class MultivariateUnitNormalNP(HasEntropyNP,
+                               NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray],
                                Multidimensional,
                                Samplable):
     """The multivariate normal distribution with unit variance.
@@ -68,6 +70,7 @@ class MultivariateUnitNormalNP(NaturalParametrization['MultivariateUnitNormalEP'
 
 @dataclass
 class MultivariateUnitNormalEP(
+        HasEntropyEP[MultivariateUnitNormalNP],
         HasGeneralizedConjugatePrior[MultivariateUnitNormalNP],
         Multidimensional,
         Samplable):

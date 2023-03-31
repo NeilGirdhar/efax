@@ -10,6 +10,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...conjugate_prior import HasGeneralizedConjugatePrior
+from ...has_entropy import HasEntropyEP, HasEntropyNP
 from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, VectorSupport, distribution_parameter
@@ -21,7 +22,8 @@ __all__ = ['MultivariateFixedVarianceNormalNP', 'MultivariateFixedVarianceNormal
 
 
 @dataclass
-class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixedVarianceNormalEP',
+class MultivariateFixedVarianceNormalNP(HasEntropyNP,
+                                        NaturalParametrization['MultivariateFixedVarianceNormalEP',
                                                                JaxRealArray],
                                         Multidimensional,
                                         Samplable):
@@ -70,6 +72,7 @@ class MultivariateFixedVarianceNormalNP(NaturalParametrization['MultivariateFixe
 
 @dataclass
 class MultivariateFixedVarianceNormalEP(
+        HasEntropyEP[MultivariateFixedVarianceNormalNP],
         HasGeneralizedConjugatePrior[MultivariateFixedVarianceNormalNP],
         Multidimensional,
         Samplable):

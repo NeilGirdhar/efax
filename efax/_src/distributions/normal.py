@@ -9,6 +9,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from ..samplable import Samplable
@@ -17,7 +18,7 @@ __all__ = ['NormalNP', 'NormalEP']
 
 
 @dataclass
-class NormalNP(NaturalParametrization['NormalEP', JaxRealArray]):
+class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -47,7 +48,7 @@ class NormalNP(NaturalParametrization['NormalEP', JaxRealArray]):
 
 
 @dataclass
-class NormalEP(ExpectationParametrization[NormalNP], Samplable):
+class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Samplable):
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
 

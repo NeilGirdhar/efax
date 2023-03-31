@@ -10,6 +10,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...has_entropy import HasEntropyEP, HasEntropyNP
 from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import SymmetricMatrixSupport, distribution_parameter
@@ -24,6 +25,7 @@ def _broadcasted_outer_c(x: JaxComplexArray) -> JaxComplexArray:
 
 @dataclass
 class ComplexCircularlySymmetricNormalNP(
+        HasEntropyNP,
         NaturalParametrization['ComplexCircularlySymmetricNormalEP', JaxComplexArray],
         Multidimensional,
         Samplable):
@@ -74,6 +76,7 @@ class ComplexCircularlySymmetricNormalNP(
 
 @dataclass
 class ComplexCircularlySymmetricNormalEP(
+        HasEntropyEP[ComplexCircularlySymmetricNormalNP],
         ExpectationParametrization[ComplexCircularlySymmetricNormalNP],
         Multidimensional,
         Samplable):

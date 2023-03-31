@@ -5,6 +5,7 @@ from tjax import Array, JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..parameter import ScalarSupport, distribution_parameter
 from ..transformed_parametrization import (TransformedExpectationParametrization,
                                            TransformedNaturalParametrization)
@@ -14,7 +15,8 @@ __all__ = ['RayleighNP', 'RayleighEP']
 
 
 @dataclass
-class RayleighNP(TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP',
+class RayleighNP(HasEntropyNP,
+                 TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP',
                                                    JaxRealArray]):
     # eta = -1 / (2 * sigma^2)
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
@@ -38,7 +40,8 @@ class RayleighNP(TransformedNaturalParametrization[ExponentialNP, ExponentialEP,
 
 
 @dataclass
-class RayleighEP(TransformedExpectationParametrization[ExponentialEP, ExponentialNP, RayleighNP]):
+class RayleighEP(HasEntropyEP[RayleighNP],
+                 TransformedExpectationParametrization[ExponentialEP, ExponentialNP, RayleighNP]):
     # chi = 2 * sigma^2
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
 

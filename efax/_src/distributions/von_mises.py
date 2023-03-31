@@ -9,6 +9,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
@@ -18,7 +19,8 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 
 @dataclass
-class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', JaxRealArray],
+class VonMisesFisherNP(HasEntropyNP,
+                       NaturalParametrization['VonMisesFisherEP', JaxRealArray],
                        Multidimensional):
     mean_times_concentration: JaxRealArray = distribution_parameter(VectorSupport())
 
@@ -70,7 +72,8 @@ class VonMisesFisherNP(NaturalParametrization['VonMisesFisherEP', JaxRealArray],
 
 
 @dataclass
-class VonMisesFisherEP(ExpToNat[VonMisesFisherNP, JaxRealArray], Multidimensional):
+class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
+                       ExpToNat[VonMisesFisherNP, JaxRealArray], Multidimensional):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
     # Implemented methods --------------------------------------------------------------------------

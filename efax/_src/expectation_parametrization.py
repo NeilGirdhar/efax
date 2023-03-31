@@ -34,36 +34,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         """The corresponding natural parameters."""
         raise NotImplementedError
 
-    def expected_carrier_measure(self) -> JaxRealArray:
-        """The expected carrier measure of the distribution.
-
-        This is the missing term from the inner product between the observed distribution and the
-        predicted distribution.  Often, it is just jnp.zeros(self.shape).
-        """
-        raise NotImplementedError
-
     # Final methods --------------------------------------------------------------------------------
-    @jit
-    @final
-    def cross_entropy(self, q: NP) -> JaxRealArray:
-        """The cross entropy.
-
-        Args:
-            q: The natural parameters of the prediction.
-        """
-        return (-parameters_dot_product(q, self)
-                + q.log_normalizer()
-                - self.expected_carrier_measure())
-
-    @jit
-    @final
-    def entropy(self) -> JaxRealArray:
-        """The Shannon entropy.
-
-        This can be quite slow since it depends on a conversion to natural parameters.
-        """
-        return self.cross_entropy(self.to_nat())
-
     @jit
     @final
     def kl_divergence(self, q: NP, *, self_nat: None | NP = None) -> JaxRealArray:

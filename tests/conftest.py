@@ -10,10 +10,9 @@ from jax.experimental import enable_x64
 from jax.random import KeyArray, PRNGKey
 from numpy.random import Generator as NumpyGenerator
 
-from efax import HasConjugatePrior, HasGeneralizedConjugatePrior, Samplable
+from efax import HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior, Samplable
 
-from .create_info import (GeneralizedDirichletInfo, LogarithmicInfo, NegativeBinomialInfo,
-                          PoissonInfo, create_infos)
+from .create_info import GeneralizedDirichletInfo, create_infos
 from .distribution_info import DistributionInfo
 
 
@@ -98,7 +97,6 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if 'entropy_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
-             if not isinstance(info,
-                               (PoissonInfo, NegativeBinomialInfo, LogarithmicInfo,
-                                GeneralizedDirichletInfo))]
+             if issubclass(info.exp_class(), HasEntropyEP)
+             if not isinstance(info, GeneralizedDirichletInfo)]
         metafunc.parametrize("entropy_distribution_info", q)

@@ -10,6 +10,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...has_entropy import HasEntropyEP, HasEntropyNP
 from ...multidimensional import Multidimensional
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import VectorSupport, distribution_parameter
@@ -19,7 +20,8 @@ __all__ = ['ComplexMultivariateUnitNormalNP', 'ComplexMultivariateUnitNormalEP']
 
 
 @dataclass
-class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariateUnitNormalEP',
+class ComplexMultivariateUnitNormalNP(HasEntropyNP,
+                                      NaturalParametrization['ComplexMultivariateUnitNormalEP',
                                                              JaxComplexArray],
                                       Multidimensional,
                                       Samplable):
@@ -67,7 +69,8 @@ class ComplexMultivariateUnitNormalNP(NaturalParametrization['ComplexMultivariat
 
 
 @dataclass
-class ComplexMultivariateUnitNormalEP(ExpectationParametrization[ComplexMultivariateUnitNormalNP],
+class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormalNP],
+                                      ExpectationParametrization[ComplexMultivariateUnitNormalNP],
                                       Multidimensional,
                                       Samplable):
     mean: JaxComplexArray = distribution_parameter(VectorSupport(is_complex=True))

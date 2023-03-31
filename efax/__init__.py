@@ -1,6 +1,7 @@
-from ._src import (ExpectationParametrization, HasConjugatePrior, HasGeneralizedConjugatePrior,
-                   Multidimensional, NaturalParametrization, Samplable, ScalarSupport,
-                   SquareMatrixSupport, Support, SymmetricMatrixSupport, VectorSupport)
+from ._src import (ExpectationParametrization, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
+                   HasGeneralizedConjugatePrior, Multidimensional, NaturalParametrization,
+                   Samplable, ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
+                   VectorSupport)
 from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP,
                                  ChiSquareEP, ChiSquareNP, ComplexCircularlySymmetricNormalEP,
                                  ComplexCircularlySymmetricNormalNP,
@@ -40,4 +41,5 @@ __all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedCon
            'NegativeBinomialNP', 'NormalEP', 'NormalNP', 'PoissonEP', 'PoissonNP', 'RayleighEP',
            'RayleighNP', 'VonMisesFisherEP', 'VonMisesFisherNP', 'WeibullEP', 'WeibullNP',
            'ScipyComplexMultivariateNormal', 'ScipyComplexNormal', 'ScipyDirichlet',
-           'ScipyGeneralizedDirichlet', 'ScipyMultivariateNormal', 'ScipyVonMises']
+           'ScipyGeneralizedDirichlet', 'ScipyMultivariateNormal', 'ScipyVonMises',
+           'HasEntropyNP', 'HasEntropyEP']

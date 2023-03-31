@@ -8,6 +8,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..exp_to_nat import ExpToNat
+from ..has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from ..samplable import Samplable
@@ -16,7 +17,7 @@ __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
 
 @dataclass
-class ChiSquareNP(NaturalParametrization['ChiSquareEP', JaxRealArray], Samplable):
+class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArray], Samplable):
     """The chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.
@@ -56,7 +57,7 @@ class ChiSquareNP(NaturalParametrization['ChiSquareEP', JaxRealArray], Samplable
 
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
-class ChiSquareEP(ExpToNat[ChiSquareNP, ChiSquareNP]):
+class ChiSquareEP(HasEntropyEP[ChiSquareNP], ExpToNat[ChiSquareNP, ChiSquareNP]):
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     # Implemented methods --------------------------------------------------------------------------
