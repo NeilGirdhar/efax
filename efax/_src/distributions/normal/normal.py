@@ -14,7 +14,7 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, distribution_parameter
 
-__all__ = ['NormalNP', 'NormalEP']
+__all__ = ['NormalNP', 'NormalEP', 'NormalVP']
 
 
 @dataclass
@@ -89,3 +89,40 @@ class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Sam
 
     def variance(self) -> JaxRealArray:
         return self.second_moment - jnp.square(self.mean)
+
+
+@dataclass
+class NormalVP(Samplable):
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    variance: JaxRealArray = distribution_parameter(ScalarSupport())
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        if shape is not None:
+            shape += self.mean.shape
+        else:
+            shape = self.mean.shape
+        deviation = jnp.sqrt(self.variance)
+        return jax.random.normal(key, shape) * deviation + self.mean
+
+    def pdf(self, x: JaxRealArray) -> JaxRealArray:
+        return self.to_nat().pdf(x)
+
+    def to_exp(self) -> NormalEP:
+        second_moment = self.variance + jnp.square(self.mean)
+        return NormalEP(self.mean, second_moment)
+
+    def to_nat(self) -> NormalNP:
+        precision = 1.0 / self.variance
+        mean_times_precision = self.mean * precision
+        negative_half_precision = -0.5 * precision
+        return NormalNP(mean_times_precision, negative_half_precision)

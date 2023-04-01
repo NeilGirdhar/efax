@@ -9,15 +9,12 @@ from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP
                                  GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP,
                                  GeometricNP, IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP,
                                  LogarithmicNP, MultinomialEP, MultinomialNP,
-                                 MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
-                                 MultivariateDiagonalNormalVP, MultivariateFixedVarianceNormalEP,
+                                 MultivariateFixedVarianceNormalEP,
                                  MultivariateFixedVarianceNormalNP, MultivariateNormalEP,
-                                 MultivariateNormalNP, MultivariateNormalVP,
-                                 MultivariateUnitNormalEP, MultivariateUnitNormalNP,
-                                 NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP,
-                                 PoissonEP, PoissonNP, RayleighEP, RayleighNP, UnitNormalEP,
-                                 UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
-                                 WeibullNP)
+                                 MultivariateNormalNP, MultivariateNormalVP, NegativeBinomialEP,
+                                 NegativeBinomialNP, NormalEP, NormalNP, NormalVP, PoissonEP,
+                                 PoissonNP, RayleighEP, RayleighNP, UnitNormalEP, UnitNormalNP,
+                                 VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 from ._src.interfaces import (HasConjugatePrior, HasGeneralizedConjugatePrior, Multidimensional,
                               Samplable)
 from ._src.mixins import HasEntropyEP, HasEntropyNP
@@ -35,13 +32,11 @@ __all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedCon
            'DirichletNP', 'ExponentialEP', 'ExponentialNP', 'GammaEP', 'GammaNP',
            'GeneralizedDirichletEP', 'GeneralizedDirichletNP', 'GeometricEP', 'GeometricNP',
            'IsotropicNormalEP', 'IsotropicNormalNP', 'LogarithmicEP', 'LogarithmicNP',
-           'MultinomialEP', 'MultinomialNP', 'MultivariateDiagonalNormalEP',
-           'MultivariateDiagonalNormalNP', 'MultivariateDiagonalNormalVP',
-           'MultivariateFixedVarianceNormalEP', 'MultivariateFixedVarianceNormalNP',
-           'MultivariateNormalEP', 'MultivariateNormalNP', 'MultivariateNormalVP',
-           'MultivariateUnitNormalEP', 'MultivariateUnitNormalNP', 'NegativeBinomialEP',
-           'NegativeBinomialNP', 'NormalEP', 'NormalNP', 'PoissonEP', 'PoissonNP', 'RayleighEP',
-           'RayleighNP', 'VonMisesFisherEP', 'VonMisesFisherNP', 'WeibullEP', 'WeibullNP',
+           'MultinomialEP', 'MultinomialNP', 'MultivariateFixedVarianceNormalEP',
+           'MultivariateFixedVarianceNormalNP', 'MultivariateNormalEP', 'MultivariateNormalNP',
+           'MultivariateNormalVP', 'NormalVP', 'NegativeBinomialEP', 'NegativeBinomialNP',
+           'NormalEP', 'NormalNP', 'PoissonEP', 'PoissonNP', 'RayleighEP', 'RayleighNP',
+           'VonMisesFisherEP', 'VonMisesFisherNP', 'WeibullEP', 'WeibullNP',
            'ScipyComplexMultivariateNormal', 'ScipyComplexNormal', 'ScipyDirichlet',
-           'ScipyGeneralizedDirichlet', 'ScipyMultivariateNormal', 'ScipyVonMises',
-           'HasEntropyNP', 'HasEntropyEP', 'UnitNormalNP', 'UnitNormalEP']
+           'ScipyGeneralizedDirichlet', 'ScipyMultivariateNormal', 'ScipyVonMises', 'HasEntropyNP',
+           'HasEntropyEP', 'UnitNormalNP', 'UnitNormalEP']
