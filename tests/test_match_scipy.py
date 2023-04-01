@@ -13,7 +13,7 @@ from tjax import assert_tree_allclose
 
 from efax import Multidimensional
 
-from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
+from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo, GeometricInfo,
                           MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
 
@@ -21,7 +21,7 @@ from .distribution_info import DistributionInfo
 def test_entropy(generator: Generator, entropy_distribution_info: DistributionInfo[Any, Any, Any]
                  ) -> None:
     """Test that the entropy calculation matches scipy's."""
-    shape = (3, 2)
+    shape = (7, 13)
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
     scipy_distribution = entropy_distribution_info.nat_to_scipy_distribution(nat_parameters)
     rtol = (1e-3
@@ -31,6 +31,10 @@ def test_entropy(generator: Generator, entropy_distribution_info: DistributionIn
             else 2.0e-5)
     my_entropy = nat_parameters.entropy()
     scipy_entropy = scipy_distribution.entropy()
+    if isinstance(entropy_distribution_info, GeometricInfo):
+        # Work around https://github.com/scipy/scipy/issues/18226
+        p = 1.0 / (1.0 + nat_parameters.to_exp().mean)
+        scipy_entropy = -np.log(p) - np.log1p(-p) * (1.0-p) / p
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
 
 
