@@ -12,8 +12,9 @@ from typing_extensions import override
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,
                   ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP, ComplexNormalEP,
-                  ComplexNormalNP, DirichletEP, DirichletNP, ExponentialEP, ExponentialNP, GammaEP,
-                  GammaNP, GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
+                  ComplexNormalNP, ComplexUnitNormalEP, ComplexUnitNormalNP, DirichletEP,
+                  DirichletNP, ExponentialEP, ExponentialNP, GammaEP, GammaNP,
+                  GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
                   IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP, LogarithmicNP,
                   MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
                   MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
@@ -80,7 +81,7 @@ class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, NumpyRealArray]):
 class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: GeometricEP) -> Any:
-        # p is inverse odds
+        # Scipy uses a different definition geometric distribution.  The parameter pis inverse odds.
         return ss.geom(1.0 / (1.0 + p.mean))
 
     @override
@@ -257,6 +258,22 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
         mean = rng.normal(size=(*shape, self.dimensions))
         second_moment = covariance + mean[..., :, np.newaxis] * mean[..., np.newaxis, :]
         return MultivariateNormalEP(jnp.asarray(mean), jnp.asarray(second_moment))
+
+
+class ComplexUnitNormalInfo(DistributionInfo[ComplexUnitNormalNP, ComplexUnitNormalEP,
+                                             NumpyComplexArray]):
+    @override
+    def exp_to_scipy_distribution(self, p: ComplexUnitNormalEP) -> Any:
+        mean = np.asarray(p.mean)
+        variance = np.ones_like(mean.real)
+        pseudo_variance = np.zeros_like(mean)
+        return ScipyComplexNormal(mean, variance, pseudo_variance)
+
+    @override
+    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> ComplexUnitNormalEP:
+        mean = rng.normal(size=shape) + 1j * rng.normal(size=shape)
+        mean_j = jnp.asarray(mean)
+        return ComplexUnitNormalEP(mean_j)
 
 
 class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, NumpyComplexArray]):
@@ -473,6 +490,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     # Continuous
     normal = NormalInfo()
     unit_normal = UnitNormalInfo()
+    complex_unit_normal = ComplexUnitNormalInfo()
     complex_normal = ComplexNormalInfo()
     cmvn_unit = ComplexMultivariateUnitNormalInfo(dimensions=4)
     cmvn_cs = ComplexCircularlySymmetricNormalInfo(dimensions=3)
@@ -486,10 +504,11 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     chi_square = ChiSquareInfo()
     chi = ChiInfo()
     weibull = WeibullInfo()
-    continuous: list[DistributionInfo[Any, Any, Any]] = [normal, unit_normal, complex_normal,
-                                                         cmvn_unit, cmvn_cs, exponential, rayleigh,
-                                                         gamma, beta, dirichlet, gen_dirichlet,
-                                                         von_mises, chi_square, chi, weibull]
+    continuous: list[DistributionInfo[Any, Any, Any]] = [normal, unit_normal, complex_unit_normal,
+                                                         complex_normal, cmvn_unit, cmvn_cs,
+                                                         exponential, rayleigh, gamma, beta,
+                                                         dirichlet, gen_dirichlet, von_mises,
+                                                         chi_square, chi, weibull]
 
     # Multivariate normal
     multivariate_fixed_variance_normal = MultivariateFixedVarianceNormalInfo(dimensions=5,

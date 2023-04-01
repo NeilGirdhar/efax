@@ -7,10 +7,10 @@ from tjax import JaxComplexArray, JaxRealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ...expectation_parametrization import ExpectationParametrization
+from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from ...natural_parametrization import NaturalParametrization
+from ...parameter import ScalarSupport, distribution_parameter
 
 __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 

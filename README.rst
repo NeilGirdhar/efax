@@ -138,11 +138,15 @@ EFAX supports the following distributions:
 
 - normal:
 
-  - univariate:
+  - univariate real:
 
     - with fixed unit variance
     - with arbitrary variance
-    - complex
+
+  - univariate complex
+
+    - with fixed unit variance and zero pseudo-variance
+    - with arbitrary variance
 
   - multivariate real:
 
@@ -154,7 +158,7 @@ EFAX supports the following distributions:
 
   - multivariate complex:
 
-    - with unit variance and zero pseudo-variance
+    - with fixed unit variance and zero pseudo-variance
     - circularly symmetric
 
 - on a finite set:
