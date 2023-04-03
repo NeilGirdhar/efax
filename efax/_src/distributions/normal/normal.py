@@ -114,6 +114,9 @@ class NormalVP(Samplable):
         deviation = jnp.sqrt(self.variance)
         return jax.random.normal(key, shape) * deviation + self.mean
 
+    def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
+        return self.to_nat().log_pdf(x)
+
     def pdf(self, x: JaxRealArray) -> JaxRealArray:
         return self.to_nat().pdf(x)
 
