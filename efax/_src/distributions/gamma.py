@@ -14,8 +14,9 @@ from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
+from ..parametrization import Parametrization
 
-__all__ = ['GammaNP', 'GammaEP']
+__all__ = ['GammaNP', 'GammaEP', 'GammaVP']
 
 
 @dataclass
@@ -56,6 +57,13 @@ class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Sam
         if shape is not None:
             shape += self.shape
         return -jax.random.gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
+
+    def to_var(self) -> GammaVP:
+        rate = -self.negative_rate
+        shape = self.shape_minus_one + 1.0
+        mean = shape / rate
+        variance = mean / rate
+        return GammaVP(mean, variance)
 
 
 @dataclass
@@ -103,3 +111,28 @@ class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
              + jnp.sqrt((log_mean_minus_mean_log - 3.0) ** 2 + 24.0 * log_mean_minus_mean_log))
             / (12.0 * log_mean_minus_mean_log))
         return inverse_softplus(initial_shape)
+
+
+@dataclass
+class GammaVP(Parametrization):
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    variance: JaxRealArray = distribution_parameter(ScalarSupport())
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.mean.shape[:-1]
+
+    @override
+    def domain_support(self) -> ScalarSupport:
+        return ScalarSupport()
+
+    def to_nat(self) -> GammaNP:
+        # mean = s/r
+        # var = s/r^2
+        rate = self.mean / self.variance
+        shape = self.mean * rate
+        return GammaNP(-rate, shape - 1.0)
+
+    def to_exp(self) -> GammaEP:
+        return self.to_nat().to_exp()
