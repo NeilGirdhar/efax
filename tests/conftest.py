@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import subprocess
 from collections.abc import Generator
 from typing import Any
 
@@ -34,16 +33,6 @@ def generator() -> NumpyGenerator:
 @pytest.fixture()
 def key() -> KeyArray:
     return PRNGKey(123)
-
-
-@pytest.fixture(scope='session')
-def _configure_numpy() -> Generator[None, None, None]:
-    line_width = [int(x)
-                  for x in subprocess.check_output(['stty', 'size']).decode().split()][1]
-
-    with np.errstate(all='raise'):
-        with np.printoptions(precision=10, linewidth=line_width):
-            yield
 
 
 def pytest_configure(config: pytest.Config) -> None:
