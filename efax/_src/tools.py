@@ -67,7 +67,13 @@ log_ive = tfp.math.log_bessel_ive
 def _parameter_dot_product(x: JaxComplexArray, y: JaxComplexArray, n_axes: int) -> JaxRealArray:
     """Returns the real component of the dot product of the final n_axes axes of two arrays."""
     axes = tuple(range(-n_axes, 0))
-    return jnp.sum(x * y, axis=axes).real
+    z = jnp.zeros_like(x)
+    product = jnp.where(x == 0.0,  # noqa: PLR2004
+                        z,
+                        jnp.where(y == 0.0,  # noqa: PLR2004
+                                  z,
+                                  x * y))
+    return jnp.sum(product, axis=axes).real
 
 
 if TYPE_CHECKING:
