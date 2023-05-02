@@ -13,6 +13,11 @@ __all__ = ['DirichletNP', 'DirichletEP']
 
 @dataclass
 class DirichletNP(DirichletCommonNP['DirichletEP']):
+    """The natural parametrization of the Dirichlet distribution.
+
+    Args:
+        alpha_minus_one: The shape parameters alpha.
+    """
     @override
     def domain_support(self) -> SimplexSupport:
         return SimplexSupport()
@@ -33,6 +38,11 @@ class DirichletNP(DirichletCommonNP['DirichletEP']):
 
 @dataclass
 class DirichletEP(DirichletCommonEP[DirichletNP]):
+    """The expectation parametrization of the Dirichlet distribution.
+
+    Args:
+        mean_log_probability: An array with final dimension [E(log(x_i))]_i.
+    """
     @override
     def domain_support(self) -> SimplexSupport:
         return SimplexSupport()

@@ -17,6 +17,13 @@ __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 @dataclass
 class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', JaxComplexArray]):
+    """The natural parametrization of the complex normal distribution.
+
+    Args:
+        mean_times_precision: E(x) / Var(x).
+        precision: 1 / Var(x).
+        pseudo_precision: 1 / E(x^2 - E(x)^2).
+    """
     mean_times_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
     precision: JaxRealArray = distribution_parameter(ScalarSupport())
     pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
@@ -66,6 +73,13 @@ class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', Ja
 
 @dataclass
 class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], ExpectationParametrization[ComplexNormalNP]):
+    """The expectation parametrization of the complex normal distribution.
+
+    Args:
+        mean: E(x).
+        second_moment: E(x * conjugate(x)).
+        pseudo_second_moment: E(x^2).
+    """
     mean: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
     pseudo_second_moment: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))

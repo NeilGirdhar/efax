@@ -26,9 +26,12 @@ class MultivariateUnitNormalNP(HasEntropyNP,
                                NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray],
                                Multidimensional,
                                Samplable):
-    """The multivariate normal distribution with unit variance.
+    """The natural parametrization of the multivariate normal distribution with unit variance.
 
     This is a curved exponential family.
+
+    Args:
+        mean: E(x).
     """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
@@ -78,6 +81,13 @@ class MultivariateUnitNormalEP(
         HasGeneralizedConjugatePrior[MultivariateUnitNormalNP],
         Multidimensional,
         Samplable):
+    """The expectation parametrization of the multivariate normal distribution with unit variance.
+
+    This is a curved exponential family.
+
+    Args:
+        mean: E(x).
+    """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property

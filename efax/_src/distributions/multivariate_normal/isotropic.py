@@ -21,6 +21,12 @@ __all__ = ['IsotropicNormalNP', 'IsotropicNormalEP']
 class IsotropicNormalNP(HasEntropyNP,
                         NaturalParametrization['IsotropicNormalEP', JaxRealArray],
                         Multidimensional):
+    """The natural parametrization of the multivariate normal distribution with Var(x) = kI.
+
+    Args:
+        mean_times_precision: E(x) / Var(x).
+        negative_half_precision: -0.5 / Var(x).
+    """
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -63,6 +69,12 @@ class IsotropicNormalNP(HasEntropyNP,
 @dataclass
 class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
                         ExpectationParametrization[IsotropicNormalNP], Samplable, Multidimensional):
+    """The expectation parametrization of the multivariate normal distribution with Var(x) = kI.
+
+    Args:
+        mean: E(x).
+        variance: Var(x).
+    """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     total_second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
 

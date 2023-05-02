@@ -28,6 +28,9 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.
 
     This is a curved exponential family.
+
+    Args:
+        two_mean_conjugate: 2 * E(conjugate(x)).
     """
     two_mean_conjugate: JaxComplexArray = distribution_parameter(VectorSupport(is_complex=True))
     # S = I, U = 0
@@ -77,6 +80,13 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
                                       ExpectationParametrization[ComplexMultivariateUnitNormalNP],
                                       Multidimensional,
                                       Samplable):
+    """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.
+
+    This is a curved exponential family.
+
+    Args:
+        mean: E(x).
+    """
     mean: JaxComplexArray = distribution_parameter(VectorSupport(is_complex=True))
 
     @property

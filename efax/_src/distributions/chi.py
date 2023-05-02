@@ -18,6 +18,11 @@ __all__ = ['ChiNP', 'ChiEP']
 @dataclass
 class ChiNP(HasEntropyNP,
             TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
+    """The natural parametrization of the chi distribution.
+
+    Args:
+        k_over_two_minus_one: k/2 - 1 where k is the shape parameter.
+    """
     k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -49,6 +54,11 @@ class ChiNP(HasEntropyNP,
 @dataclass
 class ChiEP(HasEntropyEP[ChiNP],
             TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
+    """The expectation parametrization of the chi distribution.
+
+    Args:
+        mean_log: E(log(x)).
+    """
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property

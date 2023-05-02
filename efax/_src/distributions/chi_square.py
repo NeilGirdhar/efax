@@ -18,9 +18,12 @@ __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
 @dataclass
 class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArray], Samplable):
-    """The chi-square distribution with k degrees of freedom.
+    """The natural parameters of the chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.
+
+    Args:
+        k_over_two_minus_one: k/2 - 1.
     """
     k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -62,6 +65,13 @@ class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArr
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
 class ChiSquareEP(HasEntropyEP[ChiSquareNP], ExpToNat[ChiSquareNP, ChiSquareNP]):
+    """The expectation parameters of the chi-square distribution with k degrees of freedom.
+
+    This is the gamma distribution with shape k/2 and rate 1/2.
+
+    Args:
+        mean_log: E(log(x)).
+    """
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @classmethod

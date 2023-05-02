@@ -15,10 +15,13 @@ __all__ = ['GeometricNP', 'GeometricEP']
 @dataclass
 class GeometricNP(HasEntropyNP,
                   NBCommonNP['GeometricEP']):
-    """The geometric distribution.
+    """The natural parameters of the geometric distribution.
 
     Models the number of Bernoulli trials having probability p until one failures.  Thus, it has
     support {0, ...}.
+
+    Args:
+        log_not_p: log(1-p).
     """
     log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -38,6 +41,14 @@ class GeometricNP(HasEntropyNP,
 @dataclass
 class GeometricEP(HasEntropyEP[GeometricNP],
                   NBCommonEP[GeometricNP]):
+    """The expectation parameters of the geometric distribution.
+
+    Models the number of Bernoulli trials having probability p until one failures.  Thus, it has
+    support {0, ...}.
+
+    Args:
+        mean: E(x).
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @classmethod

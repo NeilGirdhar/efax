@@ -18,8 +18,13 @@ __all__ = ['WeibullNP', 'WeibullEP']
 
 @dataclass
 class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray]):
+    """The natural parametrization of the Weibull distribution.
+
+    Args:
+        concentration: The fixed shape parameter k.
+        eta: -scale ^ -concentration.
+    """
     concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
-    # eta = -scale^-concentration
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -50,8 +55,13 @@ class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray])
 
 @dataclass
 class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], Samplable):
+    """The expectation parametrization of the Weibull distribution.
+
+    Args:
+        concentration: The fixed shape parameter k.
+        chi: scale ^ concentration.
+    """
     concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
-    # chi = scale^concentration
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property

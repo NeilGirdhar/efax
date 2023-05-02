@@ -19,6 +19,11 @@ log_probability_ceiling = -1e-7
 
 @dataclass
 class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
+    """The natural parametrization of the logarithmic distribution.
+
+    Args:
+        log_probability: log(p).
+    """
     log_probability: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -54,7 +59,12 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
 
 @dataclass
 class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray]):
-    chi: JaxRealArray = distribution_parameter(ScalarSupport())  # - odds / log(1-p)
+    """The expectation parametrization of the logarithmic distribution.
+
+    Args:
+        chi: -(p / (1-p)) * log(1-p).
+    """
+    chi: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
     @override

@@ -22,6 +22,11 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 class VonMisesFisherNP(HasEntropyNP,
                        NaturalParametrization['VonMisesFisherEP', JaxRealArray],
                        Multidimensional):
+    """The natural parametrization of the von Mises-Fisher distribution.
+
+    Args:
+        mean_times_concentration: E(x) times the concentration kappa.
+    """
     mean_times_concentration: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property
@@ -77,6 +82,11 @@ class VonMisesFisherNP(HasEntropyNP,
 @dataclass
 class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
                        ExpToNat[VonMisesFisherNP, JaxRealArray], Multidimensional):
+    """The expectation parametrization of the von Mises-Fisher distribution.
+
+    Args:
+        mean: E(x).
+    """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property

@@ -16,11 +16,14 @@ __all__ = ['BetaNP', 'BetaEP']
 
 @dataclass
 class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
-    """The Beta distribution.
+    """The natural parametrization of the beta distribution.
 
     The best way to interpret the parameters of the beta distribution are that an observation x in
     [0, 1] represents the Bernoulli probability that outcome 0 (out of {0, 1}) is realized.  In this
     way, the Beta class coincides with a special case of the Dirichlet class.
+
+    Args:
+        alpha_minus_one: The shape parameters alpha, beta in an array with final dimension 2.
     """
     @override
     def domain_support(self) -> ScalarSupport:
@@ -48,6 +51,15 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
 
 @dataclass
 class BetaEP(DirichletCommonEP[BetaNP]):
+    """The expectation parametrization of the beta distribution.
+
+    The best way to interpret the parameters of the beta distribution are that an observation x in
+    [0, 1] represents the Bernoulli probability that outcome 0 (out of {0, 1}) is realized.  In this
+    way, the Beta class coincides with a special case of the Dirichlet class.
+
+    Args:
+        mean_log_probability: An array with final dimension [E(log(x)), E(log(1-x))].
+    """
     @override
     def domain_support(self) -> ScalarSupport:
         return ScalarSupport()

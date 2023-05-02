@@ -27,9 +27,13 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
                                                                JaxRealArray],
                                         Multidimensional,
                                         Samplable):
-    """The multivariate normal distribution with fixed variance.
+    """The natural parametrization of the multivariate normal distribution with fixed variance.
 
     This is a curved exponential family.
+
+    Args:
+        mean_times_precision: E(x) / Var(x).
+        variance: The fixed variance, Var(x).
     """
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
@@ -80,6 +84,14 @@ class MultivariateFixedVarianceNormalEP(
         HasGeneralizedConjugatePrior[MultivariateFixedVarianceNormalNP],
         Multidimensional,
         Samplable):
+    """The expectation parametrization of the multivariate normal distribution with fixed variance.
+
+    This is a curved exponential family.
+
+    Args:
+        mean: E(x).
+        variance: The fixed variance, Var(x).
+    """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
 

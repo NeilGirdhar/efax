@@ -26,6 +26,11 @@ __all__ = ['MultinomialNP', 'MultinomialEP']
 class MultinomialNP(HasEntropyNP,
                     NaturalParametrization['MultinomialEP', JaxRealArray], Multidimensional,
                     Samplable):
+    """The natural parametrization of the multinomial distribution.
+
+    Args:
+        log_odds: [log(p_i / p_n)]_{i in 1...n-1}.
+    """
     log_odds: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property
@@ -86,6 +91,11 @@ class MultinomialNP(HasEntropyNP,
 @dataclass
 class MultinomialEP(HasEntropyEP[MultinomialNP],
                     HasGeneralizedConjugatePrior[MultinomialNP], Multidimensional):
+    """The expectation parametrization of the multinomial distribution.
+
+    Args:
+        log_odds: The probability vector with the final element omitted, i.e., [p_i]_{i in 1...n-1}.
+    """
     probability: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property

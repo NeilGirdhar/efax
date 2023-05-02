@@ -19,6 +19,12 @@ __all__ = ['NormalNP', 'NormalEP', 'NormalVP']
 
 @dataclass
 class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
+    """The natural parametrization of the normal distribution.
+
+    Args:
+        mean_times_precision: The mean times the precision.
+        negative_half_precision: -0.5 times the precision.
+    """
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -53,6 +59,12 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
 
 @dataclass
 class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Samplable):
+    """The expectation parametrization of the normal distribution.
+
+    Args:
+        mean: The mean.
+        second_moment: The second moment.
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -93,6 +105,12 @@ class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Sam
 
 @dataclass
 class NormalVP(Samplable):
+    """The variance parametrization of the normal distribution.
+
+    Args:
+        mean: The mean.
+        variance: The variance.
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     variance: JaxRealArray = distribution_parameter(ScalarSupport())
 

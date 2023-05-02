@@ -23,9 +23,12 @@ __all__ = ['UnitNormalNP', 'UnitNormalEP']
 class UnitNormalNP(HasEntropyNP,
                    NaturalParametrization['UnitNormalEP', JaxRealArray],
                    Samplable):
-    """The normal distribution with unit variance.
+    """The natural parametrization of the normal distribution with unit variance.
 
     This is a curved exponential family.
+
+    Args:
+        mean: E(x).
     """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -68,6 +71,13 @@ class UnitNormalNP(HasEntropyNP,
 class UnitNormalEP(HasEntropyEP[UnitNormalNP],
                    HasConjugatePrior[UnitNormalNP],
                    Samplable):
+    """The expectation parametrization of the normal distribution with unit variance.
+
+    This is a curved exponential family.
+
+    Args:
+        mean: E(x).
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property

@@ -21,6 +21,12 @@ __all__ = ['GammaNP', 'GammaEP', 'GammaVP']
 
 @dataclass
 class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Samplable):
+    """The natural parametrization of the Gamma distribution.
+
+    Args:
+        negative_rate: The negative rate.
+        shape_minus_one: The shape minus one.
+    """
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
     shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -68,6 +74,12 @@ class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Sam
 
 @dataclass
 class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
+    """The expectation parametrization of the Gamma distribution.
+
+    Args:
+        mean: The mean: E(x).
+        mean_log: The mean of the log: E(log(x)).
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -115,6 +127,12 @@ class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
 
 @dataclass
 class GammaVP(Parametrization):
+    """The variance parametrization of the Gamma distribution.
+
+    Args:
+        mean: The mean.
+        variance: The variance.
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     variance: JaxRealArray = distribution_parameter(ScalarSupport())
 

@@ -20,6 +20,11 @@ __all__ = ['BernoulliNP', 'BernoulliEP']
 
 @dataclass
 class BernoulliNP(HasEntropyNP):
+    """The natural parametrization of the Bernoulli distribution.
+
+    Args:
+        log_odds: log(p / (1-p)).
+    """
     log_odds: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -59,6 +64,11 @@ class BernoulliNP(HasEntropyNP):
 
 @dataclass
 class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior[BernoulliNP], Samplable):
+    """The expectation parametrization of the Bernoulli distribution.
+
+    Args:
+        probability: p.
+    """
     probability: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property

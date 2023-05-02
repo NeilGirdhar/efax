@@ -19,6 +19,11 @@ __all__ = ['ExponentialNP', 'ExponentialEP']
 
 @dataclass
 class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRealArray], Samplable):
+    """The natural parametrization of the exponential distribution.
+
+    Args:
+        negative_rate: -lambda where lambda is the rate.
+    """
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -57,6 +62,11 @@ class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRea
 
 @dataclass
 class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior[ExponentialNP], Samplable):
+    """The expectation parametrization of the exponential distribution.
+
+    Args:
+        mean: E(x) = 1/lambda where lambda is the rate.
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property

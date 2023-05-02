@@ -21,9 +21,12 @@ __all__ = ['ComplexUnitNormalNP', 'ComplexUnitNormalEP']
 class ComplexUnitNormalNP(HasEntropyNP,
                           NaturalParametrization['ComplexUnitNormalEP', JaxComplexArray],
                           Samplable):
-    """The complex normal distribution with unit variance, and zero pseudo-variance.
+    """The natural parametrization of the complex unit normal distribution.
 
-    This is a curved exponential family.
+    It has unit variance, and zero pseudo-variance. This is a curved exponential family.
+
+    Args:
+        two_mean_conjugate: 2 * E(conjugate(x)).
     """
     two_mean_conjugate: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
     # S = I, U = 0
@@ -68,6 +71,13 @@ class ComplexUnitNormalNP(HasEntropyNP,
 class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
                           ExpectationParametrization[ComplexUnitNormalNP],
                           Samplable):
+    """The expectation parametrization of the complex unit normal distribution.
+
+    It has unit variance, and zero pseudo-variance. This is a curved exponential family.
+
+    Args:
+        mean: E(x).
+    """
     mean: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
 
     @property

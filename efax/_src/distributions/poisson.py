@@ -19,6 +19,11 @@ __all__ = ['PoissonNP', 'PoissonEP']
 
 @dataclass
 class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
+    """The natural parametrization of the Poisson distribution.
+
+    Args:
+        log_mean: log(E(x)).
+    """
     log_mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -49,6 +54,11 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
 
 @dataclass
 class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
+    """The expectation parametrization of the Poisson distribution.
+
+    Args:
+        mean: E(x).
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property

@@ -29,9 +29,12 @@ class ComplexCircularlySymmetricNormalNP(
         NaturalParametrization['ComplexCircularlySymmetricNormalEP', JaxComplexArray],
         Multidimensional,
         Samplable):
-    """The complex multivariate normal distribution with zero mean and and zero pseudo-variance.
+    """The natural parameters of the circularly symmetric complex multivariate normal distribution.
 
-    This is a curved exponential family.
+    This has zero mean and and zero pseudo-variance. This is a curved exponential family.
+
+    Args:
+        negative_precision: -1/Var(x).
     """
     negative_precision: JaxComplexArray = distribution_parameter(
         SymmetricMatrixSupport(hermitian=True))
@@ -84,6 +87,13 @@ class ComplexCircularlySymmetricNormalEP(
         ExpectationParametrization[ComplexCircularlySymmetricNormalNP],
         Multidimensional,
         Samplable):
+    """The expectation parameters of the circularly symmetric complex normal distribution.
+
+    This has zero mean and and zero pseudo-variance. This is a curved exponential family.
+
+    Args:
+        variance: Var(x).
+    """
     variance: JaxComplexArray = distribution_parameter(SymmetricMatrixSupport(hermitian=True))
 
     @property

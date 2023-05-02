@@ -17,9 +17,13 @@ __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP']
 
 @dataclass
 class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
-    """The negative binomial distribution.
+    """The natural parametrization of the negative binomial distribution.
 
     Models the number of Bernoulli trials having probability p until r failures.
+
+    Args:
+        log_not_p: log(1-p).
+        failures: r.
     """
     log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
     failures: JaxIntegralArray = distribution_parameter(ScalarSupport(), fixed=True)
@@ -39,6 +43,14 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
 
 @dataclass
 class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP], Samplable):
+    """The expectation parametrization of the negative binomial distribution.
+
+    Models the number of Bernoulli trials x having probability p until r failures.
+
+    Args:
+        mean: E(x).
+        failures: r.
+    """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     failures: JaxIntegralArray = distribution_parameter(ScalarSupport(), fixed=True)
 

@@ -18,7 +18,11 @@ __all__ = ['RayleighNP', 'RayleighEP']
 class RayleighNP(HasEntropyNP,
                  TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP',
                                                    JaxRealArray]):
-    # eta = -1 / (2 * sigma^2)
+    """The natural parametrization of the Rayleigh distribution.
+
+    Args:
+        eta: -1 / (2 * sigma^2).
+    """
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -50,7 +54,11 @@ class RayleighNP(HasEntropyNP,
 @dataclass
 class RayleighEP(HasEntropyEP[RayleighNP],
                  TransformedExpectationParametrization[ExponentialEP, ExponentialNP, RayleighNP]):
-    # chi = 2 * sigma^2
+    """The expectation parametrization of the Rayleigh distribution.
+
+    Args:
+        chi: 2 * sigma^2.
+    """
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property

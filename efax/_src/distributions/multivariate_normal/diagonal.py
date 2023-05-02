@@ -24,6 +24,12 @@ class MultivariateDiagonalNormalNP(HasEntropyNP,
                                    NaturalParametrization['MultivariateDiagonalNormalEP',
                                                           JaxRealArray],
                                    Multidimensional):
+    """The natural parametrization of the normal distribution with diagonal variance.
+
+    Args:
+        mean_times_precision: E(x) / Var(x).
+        negative_half_precision: The diagonal elements of -0.5 / Var(x).
+    """
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(VectorSupport())
 
@@ -66,6 +72,12 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
                                    ExpectationParametrization[MultivariateDiagonalNormalNP],
                                    Multidimensional,
                                    Samplable):
+    """The expectation parametrization of the normal distribution with diagonal variance.
+
+    Args:
+        mean: E(x).
+        second moment: The diagonal elements of E(x^2).
+    """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     second_moment: JaxRealArray = distribution_parameter(VectorSupport())
 
@@ -108,6 +120,12 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
 
 @dataclass
 class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
+    """The variance parametrization of the normal distribution with diagonal variance.
+
+    Args:
+        mean: E(x).
+        variance: The diagonal elements of Var(x).
+    """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(VectorSupport())
 
