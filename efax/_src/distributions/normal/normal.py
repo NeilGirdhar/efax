@@ -56,6 +56,9 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
     def sufficient_statistics(self, x: JaxRealArray) -> NormalEP:
         return NormalEP(x, jnp.square(x))
 
+    def to_var(self) -> NormalVP:
+        return self.to_exp().to_var()
+
 
 @dataclass
 class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Samplable):
@@ -101,6 +104,9 @@ class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Sam
 
     def variance(self) -> JaxRealArray:
         return self.second_moment - jnp.square(self.mean)
+
+    def to_var(self) -> NormalVP:
+        return NormalVP(self.mean, self.variance())
 
 
 @dataclass
