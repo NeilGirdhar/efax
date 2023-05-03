@@ -14,10 +14,11 @@ from .tools import parameters_dot_product
 __all__ = ['ExpectationParametrization']
 
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any, Any])
+FixedParameters = TypeVar('FixedParameters')
 
 
-class ExpectationParametrization(Parametrization, Generic[NP]):
+class ExpectationParametrization(Parametrization[FixedParameters], Generic[NP, FixedParameters]):
     """The expectation parametrization of an exponential family distribution.
 
     This class also doubles as the sufficient statistics of an exponential family distribution.

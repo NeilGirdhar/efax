@@ -8,6 +8,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
@@ -18,7 +19,7 @@ __all__ = ['PoissonNP', 'PoissonEP']
 
 
 @dataclass
-class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
+class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray, None]):
     """The natural parametrization of the Poisson distribution.
 
     Args:
@@ -48,12 +49,16 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
         return -jss.gammaln(x + 1)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> PoissonEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> PoissonEP:
         return PoissonEP(x)
 
 
 @dataclass
-class PoissonEP(HasConjugatePrior[PoissonNP], Samplable):
+class PoissonEP(HasConjugatePrior,
+                Samplable,
+                ExpectationParametrization[PoissonNP, None]):
     """The expectation parametrization of the Poisson distribution.
 
     Args:

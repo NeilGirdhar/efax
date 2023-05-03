@@ -17,11 +17,11 @@ from ..natural_parametrization import NaturalParametrization
 __all__: list[str] = []
 
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any, Any])
 SP = TypeVar('SP', bound=Any)
 
 
-class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
+class ExpToNat(ExpectationParametrization[NP, Any], Generic[NP, SP]):
     """This mixin implements the conversion from expectation to natural parameters.
 
     It uses Newton's method with a Jacobian to invert the gradient log-normalizer.
@@ -45,9 +45,9 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
 
     def _zero_natural_parameters(self) -> NP:
         """A convenience method for implementing initial_search_parameters."""
-        fixed_parameters = self.fixed_parameters_mapping()
+        fixed_parameters = self.fixed_parameters()
         cls = type(self).natural_parametrization_cls()
-        return cls.unflattened(jnp.zeros_like(self.flattened()), **fixed_parameters)
+        return cls.unflattened(jnp.zeros_like(self.flattened()), fixed_parameters)
 
     @abstractmethod
     def initial_search_parameters(self) -> SP:
@@ -76,7 +76,8 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
         """
         expectation_parameters: ExpToNat[NP, SP] = natural_parameters.to_exp()
         exp_difference: ExpToNat[NP, SP] = tree_map(jnp.subtract, expectation_parameters, self)
-        return type(natural_parameters).unflattened(exp_difference.flattened())
+        return type(natural_parameters).unflattened(exp_difference.flattened(),
+                                                    self.fixed_parameters())
 
 
 @dataclass

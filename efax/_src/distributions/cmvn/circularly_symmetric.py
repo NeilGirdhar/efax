@@ -26,7 +26,7 @@ def _broadcasted_outer_c(x: JaxComplexArray) -> JaxComplexArray:
 @dataclass
 class ComplexCircularlySymmetricNormalNP(
         HasEntropyNP,
-        NaturalParametrization['ComplexCircularlySymmetricNormalEP', JaxComplexArray],
+        NaturalParametrization['ComplexCircularlySymmetricNormalEP', JaxComplexArray, None],
         Multidimensional,
         Samplable):
     """The natural parameters of the circularly symmetric complex multivariate normal distribution.
@@ -69,7 +69,9 @@ class ComplexCircularlySymmetricNormalNP(
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexCircularlySymmetricNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxComplexArray, fixed_parameters: None = None
+                              ) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(_broadcasted_outer_c(x))
 
     @override
@@ -84,7 +86,7 @@ class ComplexCircularlySymmetricNormalNP(
 @dataclass
 class ComplexCircularlySymmetricNormalEP(
         HasEntropyEP[ComplexCircularlySymmetricNormalNP],
-        ExpectationParametrization[ComplexCircularlySymmetricNormalNP],
+        ExpectationParametrization[ComplexCircularlySymmetricNormalNP, None],
         Multidimensional,
         Samplable):
     """The expectation parameters of the circularly symmetric complex normal distribution.

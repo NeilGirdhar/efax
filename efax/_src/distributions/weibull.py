@@ -17,7 +17,12 @@ __all__ = ['WeibullNP', 'WeibullEP']
 
 
 @dataclass
-class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray]):
+class FixedConcentration:
+    concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
+
+
+@dataclass
+class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray, None]):
     """The natural parametrization of the Weibull distribution.
 
     Args:
@@ -49,12 +54,21 @@ class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray])
         return (self.concentration - 1.0) * jnp.log(x)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> WeibullEP:
-        return WeibullEP(jnp.broadcast_to(self.concentration, x.shape), x ** self.concentration)
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray,
+                              fixed_parameters: FixedConcentration
+                              ) -> WeibullEP:
+        concentration = fixed_parameters.concentration
+        return WeibullEP(jnp.broadcast_to(concentration, x.shape), x ** concentration)
+
+    @override
+    @classmethod
+    def fixed_parameters_cls(cls) -> None:
+        return None
 
 
 @dataclass
-class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], Samplable):
+class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP, None], Samplable):
     """The expectation parametrization of the Weibull distribution.
 
     Args:
@@ -96,3 +110,8 @@ class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], 
             shape = self.shape
         lambda_ = self.chi ** (1.0 / self.concentration)
         return jax.random.weibull_min(key, lambda_, self.concentration, shape)
+
+    @override
+    @classmethod
+    def fixed_parameters_cls(cls) -> None:
+        return None

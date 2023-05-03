@@ -7,7 +7,8 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..interfaces.samplable import Samplable
+from ..expectation_parametrization import ExpectationParametrization
+from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
@@ -15,7 +16,9 @@ __all__ = ['BetaNP', 'BetaEP']
 
 
 @dataclass
-class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
+class BetaNP(DirichletCommonNP,
+             NaturalParametrization['BetaEP', JaxRealArray, None]
+             ):
     """The natural parametrization of the beta distribution.
 
     The best way to interpret the parameters of the beta distribution are that an observation x in
@@ -34,7 +37,9 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
         return BetaEP(self._exp_helper())
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> BetaEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> BetaEP:
         return BetaEP(jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1))
 
     @override
@@ -50,7 +55,8 @@ class BetaNP(DirichletCommonNP['BetaEP'], Samplable):
 
 
 @dataclass
-class BetaEP(DirichletCommonEP[BetaNP]):
+class BetaEP(DirichletCommonEP[BetaNP],
+             ExpectationParametrization[BetaNP, None]):
     """The expectation parametrization of the beta distribution.
 
     The best way to interpret the parameters of the beta distribution are that an observation x in

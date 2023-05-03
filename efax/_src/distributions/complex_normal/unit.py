@@ -19,7 +19,7 @@ __all__ = ['ComplexUnitNormalNP', 'ComplexUnitNormalEP']
 
 @dataclass
 class ComplexUnitNormalNP(HasEntropyNP,
-                          NaturalParametrization['ComplexUnitNormalEP', JaxComplexArray],
+                          NaturalParametrization['ComplexUnitNormalEP', JaxComplexArray, None],
                           Samplable):
     """The natural parametrization of the complex unit normal distribution.
 
@@ -59,7 +59,9 @@ class ComplexUnitNormalNP(HasEntropyNP,
         return -abs_square(x)
 
     @override
-    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexUnitNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxComplexArray, fixed_parameters: None = None
+                              ) -> ComplexUnitNormalEP:
         return ComplexUnitNormalEP(x)
 
     @override
@@ -69,7 +71,7 @@ class ComplexUnitNormalNP(HasEntropyNP,
 
 @dataclass
 class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
-                          ExpectationParametrization[ComplexUnitNormalNP],
+                          ExpectationParametrization[ComplexUnitNormalNP, None],
                           Samplable):
     """The expectation parametrization of the complex unit normal distribution.
 

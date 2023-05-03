@@ -24,7 +24,7 @@ def _broadcasted_outer(x: JaxRealArray) -> JaxRealArray:
 
 @dataclass
 class MultivariateNormalNP(HasEntropyNP,
-                           NaturalParametrization['MultivariateNormalEP', JaxRealArray],
+                           NaturalParametrization['MultivariateNormalEP', JaxRealArray, None],
                            Multidimensional):
     """The natural parametrization of the multivariate normal distribution.
 
@@ -66,7 +66,9 @@ class MultivariateNormalNP(HasEntropyNP,
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> MultivariateNormalEP:
         return MultivariateNormalEP(x, _broadcasted_outer(x))
 
     @override
@@ -76,7 +78,7 @@ class MultivariateNormalNP(HasEntropyNP,
 
 @dataclass
 class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
-                           ExpectationParametrization[MultivariateNormalNP], Multidimensional,
+                           ExpectationParametrization[MultivariateNormalNP, None], Multidimensional,
                            Samplable):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     second_moment: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
@@ -119,6 +121,11 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
     def to_variance_parametrization(self) -> MultivariateNormalVP:
         return MultivariateNormalVP(self.mean, self.variance())
 
+    @override
+    @classmethod
+    def fixed_parameters_cls(cls) -> None:
+        return None
+
 
 @dataclass
 class MultivariateNormalVP(Samplable, Multidimensional):
@@ -155,3 +162,8 @@ class MultivariateNormalVP(Samplable, Multidimensional):
     def to_exp(self) -> MultivariateNormalEP:
         second_moment = self.variance + _broadcasted_outer(self.mean)
         return MultivariateNormalEP(self.mean, second_moment)
+
+    @override
+    @classmethod
+    def fixed_parameters_cls(cls) -> None:
+        return None

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from ...expectation_parametrization import ExpectationParametrization
 
 import math
 
@@ -23,7 +24,8 @@ __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 @dataclass
 class MultivariateUnitNormalNP(HasEntropyNP,
-                               NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray],
+                               NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray,
+                                                      None],
                                Multidimensional,
                                Samplable):
     """The natural parametrization of the multivariate normal distribution with unit variance.
@@ -59,7 +61,9 @@ class MultivariateUnitNormalNP(HasEntropyNP,
         return -0.5 * jnp.sum(jnp.square(x), axis=-1)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateUnitNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
     @override
@@ -78,9 +82,10 @@ class MultivariateUnitNormalNP(HasEntropyNP,
 @dataclass
 class MultivariateUnitNormalEP(
         HasEntropyEP[MultivariateUnitNormalNP],
-        HasGeneralizedConjugatePrior[MultivariateUnitNormalNP],
-        Multidimensional,
-        Samplable):
+        HasGeneralizedConjugatePrior,
+        Samplable,
+        ExpectationParametrization[MultivariateUnitNormalNP, None],
+        Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with unit variance.
 
     This is a curved exponential family.

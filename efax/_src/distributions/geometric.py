@@ -5,7 +5,9 @@ from tjax import JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 
@@ -14,10 +16,11 @@ __all__ = ['GeometricNP', 'GeometricEP']
 
 @dataclass
 class GeometricNP(HasEntropyNP,
-                  NBCommonNP['GeometricEP']):
+                  NBCommonNP,
+                  NaturalParametrization['GeometricEP', JaxRealArray, None]):
     """The natural parameters of the geometric distribution.
 
-    Models the number of Bernoulli trials having probability p until one failures.  Thus, it has
+    Models the number of Bernoulli trials having probability p until one failure.  Thus, it has
     support {0, ...}.
 
     Args:
@@ -30,7 +33,9 @@ class GeometricNP(HasEntropyNP,
         return GeometricEP(self._mean())
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> GeometricEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> GeometricEP:
         return GeometricEP(x)
 
     @override
@@ -40,10 +45,11 @@ class GeometricNP(HasEntropyNP,
 
 @dataclass
 class GeometricEP(HasEntropyEP[GeometricNP],
-                  NBCommonEP[GeometricNP]):
+                  NBCommonEP,
+                  ExpectationParametrization[GeometricNP, None]):
     """The expectation parameters of the geometric distribution.
 
-    Models the number of Bernoulli trials having probability p until one failures.  Thus, it has
+    Models the number of Bernoulli trials having probability p until one failure.  Thus, it has
     support {0, ...}.
 
     Args:

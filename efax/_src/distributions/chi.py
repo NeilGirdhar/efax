@@ -17,7 +17,8 @@ __all__ = ['ChiNP', 'ChiEP']
 
 @dataclass
 class ChiNP(HasEntropyNP,
-            TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
+            TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray,
+                                              None]):
     """The natural parametrization of the chi distribution.
 
     Args:
@@ -35,15 +36,22 @@ class ChiNP(HasEntropyNP,
         return ScalarSupport()
 
     @override
+    @classmethod
+    def base_distribution_cls(cls) -> type[ChiSquareNP]:
+        return ChiSquareNP
+
+    @override
     def base_distribution(self) -> ChiSquareNP:
         return ChiSquareNP(self.k_over_two_minus_one)
 
     @override
-    def create_expectation(self, expectation_parametrization: ChiSquareEP) -> ChiEP:
+    @classmethod
+    def create_expectation(cls, expectation_parametrization: ChiSquareEP) -> ChiEP:
         return ChiEP(expectation_parametrization.mean_log)
 
     @override
-    def sample_to_base_sample(self, x: Array) -> JaxRealArray:
+    @classmethod
+    def sample_to_base_sample(cls, x: Array, fixed_parameters: None) -> JaxRealArray:
         return jnp.square(x)
 
     @override
@@ -53,7 +61,7 @@ class ChiNP(HasEntropyNP,
 
 @dataclass
 class ChiEP(HasEntropyEP[ChiNP],
-            TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
+            TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP, None]):
     """The expectation parametrization of the chi distribution.
 
     Args:
@@ -74,6 +82,11 @@ class ChiEP(HasEntropyEP[ChiNP],
     @override
     def natural_parametrization_cls(cls) -> type[ChiNP]:
         return ChiNP
+
+    @override
+    @classmethod
+    def base_distribution_cls(cls) -> type[ChiSquareEP]:
+        return ChiSquareEP
 
     @override
     def base_distribution(self) -> ChiSquareEP:

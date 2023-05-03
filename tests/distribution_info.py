@@ -10,8 +10,8 @@ from typing_extensions import override
 
 from efax import ExpectationParametrization, NaturalParametrization
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
-EP = TypeVar('EP', bound=ExpectationParametrization[Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any, Any])
+EP = TypeVar('EP', bound=ExpectationParametrization[Any, Any])
 Domain = TypeVar('Domain', bound=NumpyComplexArray)
 
 

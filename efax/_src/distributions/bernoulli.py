@@ -9,9 +9,11 @@ from tjax import BooleanArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from .beta import BetaNP
 
@@ -19,7 +21,8 @@ __all__ = ['BernoulliNP', 'BernoulliEP']
 
 
 @dataclass
-class BernoulliNP(HasEntropyNP):
+class BernoulliNP(HasEntropyNP,
+                  NaturalParametrization['BernoulliEP', JaxRealArray, None]):
     """The natural parametrization of the Bernoulli distribution.
 
     Args:
@@ -49,7 +52,9 @@ class BernoulliNP(HasEntropyNP):
         return jnp.zeros(x.shape)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> BernoulliEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> BernoulliEP:
         return BernoulliEP(x)
 
     def nat_to_probability(self) -> JaxRealArray:
@@ -63,7 +68,10 @@ class BernoulliNP(HasEntropyNP):
 
 
 @dataclass
-class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior[BernoulliNP], Samplable):
+class BernoulliEP(HasEntropyEP[BernoulliNP],
+                  HasConjugatePrior,
+                  Samplable,
+                  ExpectationParametrization[BernoulliNP, None]):
     """The expectation parametrization of the Bernoulli distribution.
 
     Args:

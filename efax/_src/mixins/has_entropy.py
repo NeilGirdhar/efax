@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, TypeVar, final
+from typing import Any, Generic, TypeVar, final
 
 from tjax import JaxRealArray, jit
 
@@ -12,10 +12,10 @@ from ..tools import parameters_dot_product
 __all__ = ['HasEntropyEP', 'HasEntropyNP']
 
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+NP = TypeVar('NP', bound=NaturalParametrization[Any, Any, Any])
 
 
-class HasEntropyEP(ExpectationParametrization[NP]):
+class HasEntropyEP(ExpectationParametrization[NP, Any], Generic[NP]):
     @abstractmethod
     def expected_carrier_measure(self) -> JaxRealArray:
         """The expected carrier measure of the distribution.
@@ -47,8 +47,7 @@ class HasEntropyEP(ExpectationParametrization[NP]):
         return self.cross_entropy(self.to_nat())
 
 
-
-class HasEntropyNP(NaturalParametrization[HasEntropyEP[Any], Any]):
+class HasEntropyNP(NaturalParametrization[HasEntropyEP[Any], Any, Any]):
     @jit
     @final
     def entropy(self) -> JaxRealArray:

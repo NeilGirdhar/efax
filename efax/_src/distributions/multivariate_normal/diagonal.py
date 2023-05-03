@@ -22,7 +22,8 @@ __all__ = ['MultivariateDiagonalNormalNP', 'MultivariateDiagonalNormalEP',
 @dataclass
 class MultivariateDiagonalNormalNP(HasEntropyNP,
                                    NaturalParametrization['MultivariateDiagonalNormalEP',
-                                                          JaxRealArray],
+                                                          JaxRealArray,
+                                                          None],
                                    Multidimensional):
     """The natural parametrization of the normal distribution with diagonal variance.
 
@@ -59,7 +60,9 @@ class MultivariateDiagonalNormalNP(HasEntropyNP,
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateDiagonalNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> MultivariateDiagonalNormalEP:
         return MultivariateDiagonalNormalEP(x, jnp.square(x))
 
     @override
@@ -69,7 +72,7 @@ class MultivariateDiagonalNormalNP(HasEntropyNP,
 
 @dataclass
 class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
-                                   ExpectationParametrization[MultivariateDiagonalNormalNP],
+                                   ExpectationParametrization[MultivariateDiagonalNormalNP, None],
                                    Multidimensional,
                                    Samplable):
     """The expectation parametrization of the normal distribution with diagonal variance.

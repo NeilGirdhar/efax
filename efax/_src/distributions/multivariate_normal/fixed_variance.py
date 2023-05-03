@@ -9,6 +9,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
@@ -22,9 +23,15 @@ __all__ = ['MultivariateFixedVarianceNormalNP', 'MultivariateFixedVarianceNormal
 
 
 @dataclass
+class FixedVariance:
+    variance: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
+
+
+@dataclass
 class MultivariateFixedVarianceNormalNP(HasEntropyNP,
                                         NaturalParametrization['MultivariateFixedVarianceNormalEP',
-                                                               JaxRealArray],
+                                                               JaxRealArray,
+                                                               FixedVariance],
                                         Multidimensional,
                                         Samplable):
     """The natural parametrization of the multivariate normal distribution with fixed variance.
@@ -64,9 +71,12 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
         return -0.5 * jnp.sum(jnp.square(x), axis=-1) / self.variance
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateFixedVarianceNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: FixedVariance
+                              ) -> MultivariateFixedVarianceNormalEP:
         shape = x.shape[:-1]
-        variance = jnp.broadcast_to(self.variance, shape)
+        # TODO: remove this
+        variance = jnp.broadcast_to(fixed_parameters.variance, shape)
         return MultivariateFixedVarianceNormalEP(x, variance=variance)
 
     @override
@@ -81,9 +91,10 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
 @dataclass
 class MultivariateFixedVarianceNormalEP(
         HasEntropyEP[MultivariateFixedVarianceNormalNP],
-        HasGeneralizedConjugatePrior[MultivariateFixedVarianceNormalNP],
-        Multidimensional,
-        Samplable):
+        HasGeneralizedConjugatePrior,
+        Samplable,
+        ExpectationParametrization[MultivariateFixedVarianceNormalNP, FixedVariance],
+        Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with fixed variance.
 
     This is a curved exponential family.

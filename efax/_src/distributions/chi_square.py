@@ -7,6 +7,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -17,7 +18,9 @@ __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
 
 @dataclass
-class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArray], Samplable):
+class ChiSquareNP(HasEntropyNP,
+                  Samplable,
+                  NaturalParametrization['ChiSquareEP', JaxRealArray, None]):
     """The natural parameters of the chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.
@@ -51,7 +54,9 @@ class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArr
         return -x * 0.5
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> ChiSquareEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> ChiSquareEP:
         return ChiSquareEP(jnp.log(x))
 
     @override
@@ -64,7 +69,9 @@ class ChiSquareNP(HasEntropyNP, NaturalParametrization['ChiSquareEP', JaxRealArr
 
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
-class ChiSquareEP(HasEntropyEP[ChiSquareNP], ExpToNat[ChiSquareNP, ChiSquareNP]):
+class ChiSquareEP(HasEntropyEP[ChiSquareNP],
+                  ExpToNat[ChiSquareNP, ChiSquareNP],
+                  ExpectationParametrization[ChiSquareNP, None]):
     """The expectation parameters of the chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.

@@ -14,6 +14,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -26,7 +27,7 @@ __all__ = ['GeneralizedDirichletNP', 'GeneralizedDirichletEP']
 
 @dataclass
 class GeneralizedDirichletNP(HasEntropyNP,
-                             NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
+                             NaturalParametrization['GeneralizedDirichletEP', JaxRealArray, None],
                              Multidimensional):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
     gamma: JaxRealArray = distribution_parameter(VectorSupport())
@@ -61,7 +62,9 @@ class GeneralizedDirichletNP(HasEntropyNP,
         return GeneralizedDirichletEP(alpha_bar, gamma_bar)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> GeneralizedDirichletEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> GeneralizedDirichletEP:
         cs_x = jnp.cumsum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
         return GeneralizedDirichletEP(jnp.log(x), jnp.log(1.0 - cs_x))
@@ -89,7 +92,9 @@ class GeneralizedDirichletNP(HasEntropyNP,
 
 @dataclass
 class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
-                             ExpToNat[GeneralizedDirichletNP, JaxRealArray], Multidimensional):
+                             ExpToNat[GeneralizedDirichletNP, JaxRealArray],
+                             ExpectationParametrization[GeneralizedDirichletNP, None],
+                             Multidimensional):
     # E({log(x_i)}_i)
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
     # E({log(1-∑_{j≤i} x_j)}_i)

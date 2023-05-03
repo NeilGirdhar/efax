@@ -8,6 +8,7 @@ from tjax import JaxRealArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -20,7 +21,7 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 @dataclass
 class VonMisesFisherNP(HasEntropyNP,
-                       NaturalParametrization['VonMisesFisherEP', JaxRealArray],
+                       NaturalParametrization['VonMisesFisherEP', JaxRealArray, None],
                        Multidimensional):
     """The natural parametrization of the von Mises-Fisher distribution.
 
@@ -61,7 +62,9 @@ class VonMisesFisherNP(HasEntropyNP,
         return jnp.zeros(self.shape)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> VonMisesFisherEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> VonMisesFisherEP:
         return VonMisesFisherEP(x)
 
     @override
@@ -84,7 +87,9 @@ class VonMisesFisherNP(HasEntropyNP,
 
 @dataclass
 class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
-                       ExpToNat[VonMisesFisherNP, JaxRealArray], Multidimensional):
+                       ExpToNat[VonMisesFisherNP, JaxRealArray],
+                       Multidimensional,
+                       ExpectationParametrization[VonMisesFisherNP, None]):
     """The expectation parametrization of the von Mises-Fisher distribution.
 
     Args:

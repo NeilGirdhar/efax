@@ -19,7 +19,7 @@ __all__ = ['IsotropicNormalNP', 'IsotropicNormalEP']
 
 @dataclass
 class IsotropicNormalNP(HasEntropyNP,
-                        NaturalParametrization['IsotropicNormalEP', JaxRealArray],
+                        NaturalParametrization['IsotropicNormalEP', JaxRealArray, None],
                         Multidimensional):
     """The natural parametrization of the multivariate normal distribution with Var(x) = kI.
 
@@ -58,7 +58,9 @@ class IsotropicNormalNP(HasEntropyNP,
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> IsotropicNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> IsotropicNormalEP:
         return IsotropicNormalEP(x, jnp.sum(jnp.square(x), axis=-1))
 
     @override
@@ -68,7 +70,9 @@ class IsotropicNormalNP(HasEntropyNP,
 
 @dataclass
 class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
-                        ExpectationParametrization[IsotropicNormalNP], Samplable, Multidimensional):
+                        ExpectationParametrization[IsotropicNormalNP, None],
+                        Samplable,
+                        Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with Var(x) = kI.
 
     Args:

@@ -18,7 +18,7 @@ __all__ = ['NormalNP', 'NormalEP', 'NormalVP']
 
 
 @dataclass
-class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
+class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray, None]):
     """The natural parametrization of the normal distribution.
 
     Args:
@@ -53,7 +53,9 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
         return jnp.zeros(x.shape)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> NormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None
+                              ) -> NormalEP:
         return NormalEP(x, jnp.square(x))
 
     def to_var(self) -> NormalVP:
@@ -61,7 +63,9 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
 
 
 @dataclass
-class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Samplable):
+class NormalEP(HasEntropyEP[NormalNP],
+               ExpectationParametrization[NormalNP, None],
+               Samplable):
     """The expectation parametrization of the normal distribution.
 
     Args:

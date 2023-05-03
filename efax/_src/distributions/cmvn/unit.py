@@ -22,7 +22,7 @@ __all__ = ['ComplexMultivariateUnitNormalNP', 'ComplexMultivariateUnitNormalEP']
 @dataclass
 class ComplexMultivariateUnitNormalNP(HasEntropyNP,
                                       NaturalParametrization['ComplexMultivariateUnitNormalEP',
-                                                             JaxComplexArray],
+                                                             JaxComplexArray, None],
                                       Multidimensional,
                                       Samplable):
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.
@@ -63,7 +63,9 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
         return -jnp.sum(abs_square(x), axis=-1)
 
     @override
-    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexMultivariateUnitNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxComplexArray, fixed_parameters: None = None
+                              ) -> ComplexMultivariateUnitNormalEP:
         return ComplexMultivariateUnitNormalEP(x)
 
     @override
@@ -77,7 +79,8 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
 
 @dataclass
 class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormalNP],
-                                      ExpectationParametrization[ComplexMultivariateUnitNormalNP],
+                                      ExpectationParametrization[ComplexMultivariateUnitNormalNP,
+                                                                 None],
                                       Multidimensional,
                                       Samplable):
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.

@@ -17,7 +17,7 @@ def np_abs_square(x: NumpyComplexArray) -> NumpyRealArray:
     return np.square(x.real) + np.square(x.imag)  # pyright: ignore
 
 
-def parameters_dot_product(x: NaturalParametrization[Any, Any], y: Any) -> JaxRealArray:
+def parameters_dot_product(x: NaturalParametrization[Any, Any, Any], y: Any) -> JaxRealArray:
     def dotted_fields() -> Iterable[JaxRealArray]:
         for (x_value, x_support), (y_value, y_support) in zip(x.parameters_value_support(),
                                                               y.parameters_value_support(),

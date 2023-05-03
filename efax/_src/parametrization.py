@@ -5,12 +5,12 @@ from collections.abc import Iterable
 from dataclasses import fields
 from functools import partial, reduce
 from itertools import count
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic
 
 import jax.numpy as jnp
 from tjax import JaxComplexArray, JaxRealArray, Shape, custom_jvp_method, jit
-from tjax.dataclasses import dataclass
-from typing_extensions import Self, override
+from tjax.dataclasses import as_shallow_dict, dataclass
+from typing_extensions import Self, TypeVar, override
 
 from .parameter import Support
 from .tools import parameters_dot_product
@@ -18,8 +18,11 @@ from .tools import parameters_dot_product
 __all__ = ['Parametrization']
 
 
+FixedParameters = TypeVar('FixedParameters')
+
+
 @dataclass
-class Parametrization:
+class Parametrization(Generic[FixedParameters]):
     @override
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
@@ -28,7 +31,6 @@ class Parametrization:
         for name in ['log_normalizer',
                      'to_exp',
                      'carrier_measure',
-                     'sufficient_statistics',
                      'cross_entropy',
                      'expected_carrier_measure']:
             super_cls = super(cls, cls)
@@ -46,9 +48,9 @@ class Parametrization:
 
             method_jvp: Any = custom_jvp_method(method)
 
-            def ln_jvp(primals: tuple[NaturalParametrization[Any, Any]],
-                       tangents: tuple[NaturalParametrization[Any, Any]]) -> tuple[JaxRealArray,
-                                                                                   JaxRealArray]:
+            def ln_jvp(primals: tuple[NaturalParametrization[Any, Any, Any]],
+                       tangents: tuple[NaturalParametrization[Any, Any, Any]],
+                       ) -> tuple[JaxRealArray, JaxRealArray]:
                 q, = primals
                 q_dot, = tangents
                 y = q.log_normalizer()
@@ -61,18 +63,17 @@ class Parametrization:
             setattr(cls, name, method_jvp)
 
     def __getitem__(self, key: Any) -> Self:
-        fixed_parameters = self.fixed_parameters_mapping()
-        sliced_parameters = {name: value[key]
-                             for name, value, _ in self.parameters_name_value_support()}
-        return type(self)(**sliced_parameters, **fixed_parameters)
+        parameters = {field.name: getattr(self, field.name)[key]
+                      for field in fields(self)}
+        return type(self)(**parameters)
 
     def flattened(self) -> JaxRealArray:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
-                       for name, value, support in self.parameters_name_value_support()))
+                       for _, value, support in self.parameters_name_value_support()))
 
     @classmethod
-    def unflattened(cls, flattened: JaxRealArray, **kwargs: Any) -> Self:
+    def unflattened(cls, flattened: JaxRealArray, fixed_parameters: FixedParameters) -> Self:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
@@ -88,6 +89,7 @@ class Parametrization:
                 raise ValueError
 
         # Unflatten.
+        kwargs = {} if fixed_parameters is None else as_shallow_dict(fixed_parameters)
         consumed = 0
         for name, support in cls.parameters_name_support():
             k = support.num_elements(dimensions)
@@ -96,10 +98,11 @@ class Parametrization:
 
         return cls(**kwargs)
 
-    def fixed_parameters_mapping(self) -> dict[str, Any]:
-        return {field.name: getattr(self, field.name)
-                for field in fields(self)
-                if field.metadata['fixed']}
+    def fixed_parameters(self) -> FixedParameters:
+        fixed_parameters_mapping = {field.name: getattr(self, field.name)
+                                    for field in fields(self)
+                                    if field.metadata['fixed']}
+        return self.fixed_parameters_cls()(**fixed_parameters_mapping)
 
     def parameters_value_support(self) -> Iterable[tuple[JaxComplexArray, Support]]:
         """The value and support of each variable parameter."""
@@ -157,6 +160,10 @@ class Parametrization:
     def domain_support(self) -> Support:
         raise NotImplementedError
 
+    @classmethod
+    @abstractmethod
+    def fixed_parameters_cls(cls) -> type[FixedParameters]:
+        raise NotImplementedError
 
 if TYPE_CHECKING:
     from .natural_parametrization import NaturalParametrization

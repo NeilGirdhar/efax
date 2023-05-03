@@ -9,6 +9,7 @@ from tjax import JaxRealArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -20,7 +21,9 @@ __all__ = ['GammaNP', 'GammaEP', 'GammaVP']
 
 
 @dataclass
-class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Samplable):
+class GammaNP(HasEntropyNP,
+              Samplable,
+              NaturalParametrization['GammaEP', JaxRealArray, None]):
     """The natural parametrization of the Gamma distribution.
 
     Args:
@@ -55,7 +58,9 @@ class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Sam
         return jnp.zeros(x.shape)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> GammaEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> GammaEP:
         return GammaEP(x, jnp.log(x))
 
     @override
@@ -73,7 +78,9 @@ class GammaNP(HasEntropyNP, NaturalParametrization['GammaEP', JaxRealArray], Sam
 
 
 @dataclass
-class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
+class GammaEP(HasEntropyEP[GammaNP],
+              ExpToNat[GammaNP, JaxRealArray],
+              ExpectationParametrization[GammaNP, None]):
     """The expectation parametrization of the Gamma distribution.
 
     Args:
@@ -126,7 +133,7 @@ class GammaEP(HasEntropyEP[GammaNP], ExpToNat[GammaNP, JaxRealArray]):
 
 
 @dataclass
-class GammaVP(Parametrization):
+class GammaVP(Parametrization[None]):
     """The variance parametrization of the Gamma distribution.
 
     Args:

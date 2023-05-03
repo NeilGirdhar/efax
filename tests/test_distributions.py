@@ -26,14 +26,16 @@ def test_conversion(generator: Generator,
         original_ep = distribution_info.exp_parameter_generator(generator, shape=shape)
         intermediate_np = original_ep.to_nat()
         final_ep = intermediate_np.to_exp()
+
+        # Check round trip.
         assert_tree_allclose(final_ep, original_ep, atol=atol, rtol=1e-4)
-        original_fixed = original_ep.fixed_parameters_mapping()
-        intermediate_fixed = intermediate_np.fixed_parameters_mapping()
-        final_fixed = final_ep.fixed_parameters_mapping()
-        assert original_fixed.keys() == intermediate_fixed.keys() == final_fixed.keys()
-        for name, value in original_fixed.items():
-            assert_allclose(value, intermediate_fixed[name])
-            assert_allclose(value, final_fixed[name])
+
+        # Check fixed parameters.
+        original_fixed = original_ep.fixed_parameters()
+        intermediate_fixed = intermediate_np.fixed_parameters()
+        final_fixed = final_ep.fixed_parameters()
+        assert_tree_allclose(original_fixed, intermediate_fixed)
+        assert_tree_allclose(original_fixed, final_fixed)
 
 
 def test_gradient_log_normalizer(generator: Generator,

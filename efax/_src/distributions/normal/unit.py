@@ -9,6 +9,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.conjugate_prior import HasConjugatePrior
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -21,7 +22,7 @@ __all__ = ['UnitNormalNP', 'UnitNormalEP']
 
 @dataclass
 class UnitNormalNP(HasEntropyNP,
-                   NaturalParametrization['UnitNormalEP', JaxRealArray],
+                   NaturalParametrization['UnitNormalEP', JaxRealArray, None],
                    Samplable):
     """The natural parametrization of the normal distribution with unit variance.
 
@@ -55,7 +56,10 @@ class UnitNormalNP(HasEntropyNP,
         return -0.5 * jnp.square(x)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> UnitNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray,
+                              fixed_parameters: None = None
+                              ) -> UnitNormalEP:
         return UnitNormalEP(x)
 
     @override
@@ -69,8 +73,9 @@ class UnitNormalNP(HasEntropyNP,
 
 @dataclass
 class UnitNormalEP(HasEntropyEP[UnitNormalNP],
-                   HasConjugatePrior[UnitNormalNP],
-                   Samplable):
+                   HasConjugatePrior,
+                   Samplable,
+                   ExpectationParametrization[UnitNormalNP, None]):
     """The expectation parametrization of the normal distribution with unit variance.
 
     This is a curved exponential family.

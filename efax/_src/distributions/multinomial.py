@@ -10,6 +10,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ..interfaces.multidimensional import Multidimensional
 from ..interfaces.samplable import Samplable
@@ -24,8 +25,8 @@ __all__ = ['MultinomialNP', 'MultinomialEP']
 
 @dataclass
 class MultinomialNP(HasEntropyNP,
-                    NaturalParametrization['MultinomialEP', JaxRealArray], Multidimensional,
-                    Samplable):
+                    Samplable,
+                    NaturalParametrization['MultinomialEP', JaxRealArray, None], Multidimensional):
     """The natural parametrization of the multinomial distribution.
 
     Args:
@@ -61,7 +62,9 @@ class MultinomialNP(HasEntropyNP,
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultinomialEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, fixed_parameters: None = None
+                              ) -> MultinomialEP:
         return MultinomialEP(x)
 
     @override
@@ -90,7 +93,9 @@ class MultinomialNP(HasEntropyNP,
 
 @dataclass
 class MultinomialEP(HasEntropyEP[MultinomialNP],
-                    HasGeneralizedConjugatePrior[MultinomialNP], Multidimensional):
+                    HasGeneralizedConjugatePrior,
+                    ExpectationParametrization[MultinomialNP, None],
+                    Multidimensional):
     """The expectation parametrization of the multinomial distribution.
 
     Args:

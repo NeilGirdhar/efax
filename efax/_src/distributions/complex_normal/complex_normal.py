@@ -16,7 +16,8 @@ __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
 
 @dataclass
-class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', JaxComplexArray]):
+class ComplexNormalNP(HasEntropyNP,
+                      NaturalParametrization['ComplexNormalEP', JaxComplexArray, None]):
     """The natural parametrization of the complex normal distribution.
 
     Args:
@@ -59,7 +60,9 @@ class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', Ja
         return jnp.zeros(x.shape)
 
     @override
-    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxComplexArray, fixed_parameters: None = None
+                              ) -> ComplexNormalEP:
         return ComplexNormalEP(x, abs_square(x), jnp.square(x))
 
     def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
@@ -72,7 +75,8 @@ class ComplexNormalNP(HasEntropyNP, NaturalParametrization['ComplexNormalEP', Ja
 
 
 @dataclass
-class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], ExpectationParametrization[ComplexNormalNP]):
+class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
+                      ExpectationParametrization[ComplexNormalNP, None]):
     """The expectation parametrization of the complex normal distribution.
 
     Args:
