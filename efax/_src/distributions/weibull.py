@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
@@ -49,8 +51,13 @@ class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray])
         return (self.concentration - 1.0) * jnp.log(x)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> WeibullEP:
-        return WeibullEP(jnp.broadcast_to(self.concentration, x.shape), x ** self.concentration)
+    @classmethod
+    def sufficient_statistics(cls,
+                              x: JaxRealArray,
+                              **fixed_parameters: Any
+                              ) -> WeibullEP:
+        concentration = fixed_parameters['concentration']
+        return WeibullEP(jnp.broadcast_to(concentration, x.shape), x ** concentration)
 
 
 @dataclass

@@ -22,7 +22,8 @@ EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
 Domain = TypeVar('Domain', bound=JaxComplexArray)
 
 
-class NaturalParametrization(Parametrization, Generic[EP, Domain]):
+class NaturalParametrization(Parametrization,
+                             Generic[EP, Domain]):
     """The natural parametrization of an exponential family distribution.
 
     The motivation for the natural parametrization is combining and scaling independent predictive
@@ -48,14 +49,16 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def sufficient_statistics(self, x: Domain) -> EP:
+    def sufficient_statistics(cls, x: Domain, **fixed_parameters: Any) -> EP:
         """The sufficient statistics corresponding to an observation.
 
         This is typically used in maximum likelihood estimation.
 
         Args:
-            x: The sample.
+            x: The samples.
+            fixed_parameters: The fixed parameters of the expectation parametrization.
         Returns: The sufficient statistics, stored as expectation parameters.
         """
         raise NotImplementedError
@@ -82,12 +85,11 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         Args:
             x: The sample.
         """
-        tx = self.sufficient_statistics(x)
+        tx = self.sufficient_statistics(x, **self.fixed_parameters())
         return parameters_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 
     @final
-    def fisher_information_diagonal(self: NaturalParametrization[EP, Domain]) -> (
-            NaturalParametrization[EP, Domain]):
+    def fisher_information_diagonal(self) -> Self:
         """The diagonal elements of the Fisher information.
 
         Returns: The Fisher information stored in a NaturalParametrization object whose fields
@@ -97,11 +99,10 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         """
         fisher_matrix = self._fisher_information_matrix()
         fisher_diagonal = jnp.diagonal(fisher_matrix)
-        return type(self).unflattened(fisher_diagonal, **self.fixed_parameters_mapping())
+        return type(self).unflattened(fisher_diagonal, **self.fixed_parameters())
 
     @final
-    def fisher_information_trace(self: NaturalParametrization[EP, Domain]) -> (
-            NaturalParametrization[EP, Domain]):
+    def fisher_information_trace(self) -> Self:
         """The trace of the Fisher information.
 
         Returns: The trace of the Fisher information stored in a NaturalParametrization object whose
@@ -131,8 +132,7 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
 
     @jit
     @final
-    def apply_fisher_information(self: NaturalParametrization[EP, Domain],
-                                 vector: EP) -> tuple[EP, NaturalParametrization[EP, Domain]]:
+    def apply_fisher_information(self, vector: EP) -> tuple[EP, Self]:
         """Efficiently apply the Fisher information matrix to a vector.
 
         Args:
@@ -151,14 +151,16 @@ class NaturalParametrization(Parametrization, Generic[EP, Domain]):
         return self.to_exp().kl_divergence(q, self_nat=self)
 
     @classmethod
-    def _flat_log_normalizer(cls, flattened_parameters: JaxRealArray, **kwargs: Any
+    def _flat_log_normalizer(cls,
+                             flattened_parameters: JaxRealArray,
+                             **fixed_parameters: Any,
                              ) -> JaxRealArray:
-        distribution = cls.unflattened(flattened_parameters, **kwargs)
+        distribution = cls.unflattened(flattened_parameters, **fixed_parameters)
         return distribution.log_normalizer()
 
     @jit
-    def _fisher_information_matrix(self: NaturalParametrization[EP, Domain]) -> JaxRealArray:
+    def _fisher_information_matrix(self) -> JaxRealArray:
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
         for _ in range(len(self.shape)):
             fisher_info_f = vmap(fisher_info_f)
-        return fisher_info_f(self.flattened(), **self.fixed_parameters_mapping())
+        return fisher_info_f(self.flattened(), **self.fixed_parameters())

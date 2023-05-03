@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import jax
 import jax.numpy as jnp
@@ -69,7 +70,9 @@ class ComplexCircularlySymmetricNormalNP(
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexCircularlySymmetricNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: Any
+                              ) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(_broadcasted_outer_c(x))
 
     @override

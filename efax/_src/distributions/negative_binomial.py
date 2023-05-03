@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax.numpy as jnp
 from jax.random import KeyArray, split
 from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
+from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from .gamma import GammaNP
 from .negative_binomial_common import NBCommonEP, NBCommonNP
@@ -16,7 +20,8 @@ __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP']
 
 
 @dataclass
-class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
+class NegativeBinomialNP(NBCommonNP,
+                         NaturalParametrization['NegativeBinomialEP', JaxRealArray]):
     """The natural parametrization of the negative binomial distribution.
 
     Models the number of Bernoulli trials having probability p until r failures.
@@ -33,8 +38,10 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
         return NegativeBinomialEP(self._mean(), self.failures)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> NegativeBinomialEP:
-        return NegativeBinomialEP(x, jnp.broadcast_to(self.failures, x.shape))
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> NegativeBinomialEP:
+        return NegativeBinomialEP(x, jnp.broadcast_to(fixed_parameters['failures'], x.shape))
 
     @override
     def _failures(self) -> JaxIntegralArray:
@@ -42,7 +49,9 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP']):
 
 
 @dataclass
-class NegativeBinomialEP(NBCommonEP[NegativeBinomialNP], Samplable):
+class NegativeBinomialEP(Samplable,
+                         NBCommonEP,
+                         ExpectationParametrization[NegativeBinomialNP]):
     """The expectation parametrization of the negative binomial distribution.
 
     Models the number of Bernoulli trials x having probability p until r failures.

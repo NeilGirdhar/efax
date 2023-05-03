@@ -55,24 +55,32 @@ def test_maximum_likelihood_estimation(generator: Generator,
     if natural:
         nat_parameters = sampling_distribution_info.nat_parameter_generator(generator,
                                                                             distribution_shape)
+        nat_cls = type(nat_parameters)
         assert isinstance(nat_parameters, Samplable)
         exp_parameters = nat_parameters.to_exp()  # type: ignore[attr-defined]
         samples = nat_parameters.sample(key, sample_shape)
+        dimensions = (nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional)
+                      else 0)
+        fixed_parameters = nat_parameters.fixed_parameters()
+        support = nat_parameters.domain_support()
     else:
         exp_parameters = sampling_distribution_info.exp_parameter_generator(generator,
                                                                             distribution_shape)
         assert isinstance(exp_parameters, Samplable)
-        nat_parameters = exp_parameters.to_nat()  # type: ignore[attr-defined]
         samples = exp_parameters.sample(key, sample_shape)
+        dimensions = (exp_parameters.dimensions() if isinstance(exp_parameters, Multidimensional)
+                      else 0)
+        nat_cls = exp_parameters.natural_parametrization_cls()  # type: ignore[attr-defined]
+        fixed_parameters = exp_parameters.fixed_parameters()
+        support = exp_parameters.domain_support()
 
     # Verify that the samples have the right shape.
-    dimensions = nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional) else 0
-    ideal_shape = (*sample_shape, *distribution_shape,
-                   *nat_parameters.domain_support().shape(dimensions))
+    ideal_shape = (*sample_shape, *distribution_shape, *support.shape(dimensions))
     assert samples.shape == ideal_shape
 
-
     # Verify the maximum likelihood estimate.
-    sampled_exp_parameters = nat_parameters.sufficient_statistics(samples)
+    fixed_parameters = {name: jnp.broadcast_to(value, (*sample_shape, *distribution_shape))
+                        for name, value in fixed_parameters.items()}
+    sampled_exp_parameters = nat_cls.sufficient_statistics(samples, **fixed_parameters)
     ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
     assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)

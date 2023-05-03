@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax.numpy as jnp
 from tjax import JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
+from ..natural_parametrization import NaturalParametrization
 from ..parameter import SimplexSupport
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
@@ -12,7 +16,8 @@ __all__ = ['DirichletNP', 'DirichletEP']
 
 
 @dataclass
-class DirichletNP(DirichletCommonNP['DirichletEP']):
+class DirichletNP(DirichletCommonNP,
+                  NaturalParametrization['DirichletEP', JaxRealArray]):
     """The natural parametrization of the Dirichlet distribution.
 
     Args:
@@ -27,7 +32,9 @@ class DirichletNP(DirichletCommonNP['DirichletEP']):
         return DirichletEP(self._exp_helper())
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> DirichletEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> DirichletEP:
         one_minus_total_x = 1.0 - jnp.sum(x, axis=-1, keepdims=True)
         return DirichletEP(jnp.append(jnp.log(x), jnp.log(one_minus_total_x), axis=-1))
 
@@ -37,7 +44,8 @@ class DirichletNP(DirichletCommonNP['DirichletEP']):
 
 
 @dataclass
-class DirichletEP(DirichletCommonEP[DirichletNP]):
+class DirichletEP(DirichletCommonEP[DirichletNP],
+                  ExpectationParametrization[DirichletNP]):
     """The expectation parametrization of the Dirichlet distribution.
 
     Args:

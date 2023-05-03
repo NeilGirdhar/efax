@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
@@ -58,7 +60,9 @@ class IsotropicNormalNP(HasEntropyNP,
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> IsotropicNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> IsotropicNormalEP:
         return IsotropicNormalEP(x, jnp.sum(jnp.square(x), axis=-1))
 
     @override
@@ -68,7 +72,9 @@ class IsotropicNormalNP(HasEntropyNP,
 
 @dataclass
 class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
-                        ExpectationParametrization[IsotropicNormalNP], Samplable, Multidimensional):
+                        ExpectationParametrization[IsotropicNormalNP],
+                        Samplable,
+                        Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with Var(x) = kI.
 
     Args:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import Array, JaxRealArray, Shape
@@ -35,15 +37,22 @@ class ChiNP(HasEntropyNP,
         return ScalarSupport()
 
     @override
+    @classmethod
+    def base_distribution_cls(cls) -> type[ChiSquareNP]:
+        return ChiSquareNP
+
+    @override
     def base_distribution(self) -> ChiSquareNP:
         return ChiSquareNP(self.k_over_two_minus_one)
 
     @override
-    def create_expectation(self, expectation_parametrization: ChiSquareEP) -> ChiEP:
+    @classmethod
+    def create_expectation(cls, expectation_parametrization: ChiSquareEP) -> ChiEP:
         return ChiEP(expectation_parametrization.mean_log)
 
     @override
-    def sample_to_base_sample(self, x: Array) -> JaxRealArray:
+    @classmethod
+    def sample_to_base_sample(cls, x: Array, **fixed_parameters: Any) -> JaxRealArray:
         return jnp.square(x)
 
     @override
@@ -74,6 +83,11 @@ class ChiEP(HasEntropyEP[ChiNP],
     @override
     def natural_parametrization_cls(cls) -> type[ChiNP]:
         return ChiNP
+
+    @override
+    @classmethod
+    def base_distribution_cls(cls) -> type[ChiSquareEP]:
+        return ChiSquareEP
 
     @override
     def base_distribution(self) -> ChiSquareEP:

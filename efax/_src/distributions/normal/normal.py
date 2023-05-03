@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -53,7 +55,9 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
         return jnp.zeros(x.shape)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> NormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> NormalEP:
         return NormalEP(x, jnp.square(x))
 
     def to_var(self) -> NormalVP:
@@ -61,7 +65,9 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
 
 
 @dataclass
-class NormalEP(HasEntropyEP[NormalNP], ExpectationParametrization[NormalNP], Samplable):
+class NormalEP(HasEntropyEP[NormalNP],
+               ExpectationParametrization[NormalNP],
+               Samplable):
     """The expectation parametrization of the normal distribution.
 
     Args:

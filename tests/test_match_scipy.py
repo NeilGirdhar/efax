@@ -86,16 +86,19 @@ def test_maximum_likelihood_estimation(generator: Generator,
         atol = 1e-4
         rtol = 2e-2
     n = 70000
-    # Generate a distribution with expectation and natural parameters.
+    # Generate a distribution with expectation parameters.
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
-    nat_parameters = exp_parameters.to_nat()
     # Generate variates from the corresponding scipy distribution.
     scipy_distribution = distribution_info.exp_to_scipy_distribution(
         exp_parameters)  # type: ignore[arg-type] # pyright: ignore
-    x = scipy_distribution.rvs(random_state=generator, size=n)
+    scipy_x = scipy_distribution.rvs(random_state=generator, size=n)
     # Convert the variates to sufficient statistics.
-    my_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(x))
-    sufficient_stats = nat_parameters.sufficient_statistics(my_x)
+    efax_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(scipy_x))
+    fixed_parameters = exp_parameters.fixed_parameters()
+    fixed_parameters = {name: jnp.broadcast_to(value, efax_x.shape)
+                        for name, value in fixed_parameters.items()}
+    nat_cls = distribution_info.nat_class()
+    sufficient_stats = nat_cls.sufficient_statistics(efax_x, **fixed_parameters)
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
     calculated_parameters = tree_map(partial(np.mean, axis=0), sufficient_stats)

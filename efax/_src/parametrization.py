@@ -15,6 +15,9 @@ from typing_extensions import Self, override
 from .parameter import Support
 from .tools import parameters_dot_product
 
+if TYPE_CHECKING:
+    from .natural_parametrization import NaturalParametrization
+
 __all__ = ['Parametrization']
 
 
@@ -28,7 +31,6 @@ class Parametrization:
         for name in ['log_normalizer',
                      'to_exp',
                      'carrier_measure',
-                     'sufficient_statistics',
                      'cross_entropy',
                      'expected_carrier_measure']:
             super_cls = super(cls, cls)
@@ -47,8 +49,8 @@ class Parametrization:
             method_jvp: Any = custom_jvp_method(method)
 
             def ln_jvp(primals: tuple[NaturalParametrization[Any, Any]],
-                       tangents: tuple[NaturalParametrization[Any, Any]]) -> tuple[JaxRealArray,
-                                                                                   JaxRealArray]:
+                       tangents: tuple[NaturalParametrization[Any, Any]],
+                       ) -> tuple[JaxRealArray, JaxRealArray]:
                 q, = primals
                 q_dot, = tangents
                 y = q.log_normalizer()
@@ -61,18 +63,17 @@ class Parametrization:
             setattr(cls, name, method_jvp)
 
     def __getitem__(self, key: Any) -> Self:
-        fixed_parameters = self.fixed_parameters_mapping()
-        sliced_parameters = {name: value[key]
-                             for name, value, _ in self.parameters_name_value_support()}
-        return type(self)(**sliced_parameters, **fixed_parameters)
+        parameters = {field.name: getattr(self, field.name)[key]
+                      for field in fields(self)}
+        return type(self)(**parameters)
 
     def flattened(self) -> JaxRealArray:
         return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
-                       for name, value, support in self.parameters_name_value_support()))
+                       for _, value, support in self.parameters_name_value_support()))
 
     @classmethod
-    def unflattened(cls, flattened: JaxRealArray, **kwargs: Any) -> Self:
+    def unflattened(cls, flattened: JaxRealArray, **fixed_parameters: Any) -> Self:
         # Solve for dimensions.
         def total_elements(dimensions: int) -> int:
             return sum(support.num_elements(dimensions)
@@ -88,6 +89,7 @@ class Parametrization:
                 raise ValueError
 
         # Unflatten.
+        kwargs = fixed_parameters
         consumed = 0
         for name, support in cls.parameters_name_support():
             k = support.num_elements(dimensions)
@@ -96,10 +98,10 @@ class Parametrization:
 
         return cls(**kwargs)
 
-    def fixed_parameters_mapping(self) -> dict[str, Any]:
+    def fixed_parameters(self) -> dict[str, Any]:
         return {field.name: getattr(self, field.name)
-                for field in fields(self)
-                if field.metadata['fixed']}
+            for field in fields(self)
+            if field.metadata['fixed']}
 
     def parameters_value_support(self) -> Iterable[tuple[JaxComplexArray, Support]]:
         """The value and support of each variable parameter."""
@@ -156,7 +158,3 @@ class Parametrization:
     @abstractmethod
     def domain_support(self) -> Support:
         raise NotImplementedError
-
-
-if TYPE_CHECKING:
-    from .natural_parametrization import NaturalParametrization

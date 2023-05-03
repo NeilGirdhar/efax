@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, TypeVar
 
 import jax.numpy as jnp
 from jax.scipy.special import gammaln
@@ -10,14 +9,14 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
-from ..natural_parametrization import EP, NaturalParametrization
+from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport
 
 __all__: list[str] = []
 
 
 @dataclass
-class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
+class NBCommonNP(NaturalParametrization['NBCommonEP', JaxRealArray]):
     log_not_p: JaxRealArray
 
     @property
@@ -47,11 +46,8 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], Generic[EP]):
         raise NotImplementedError
 
 
-NP = TypeVar('NP', bound=NBCommonNP[Any])
-
-
 @dataclass
-class NBCommonEP(ExpectationParametrization[NP], Generic[NP]):
+class NBCommonEP(ExpectationParametrization[NBCommonNP]):
     mean: JaxRealArray
 
     @property
