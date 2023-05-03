@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax.numpy as jnp
 from jax.nn import softplus
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..mixins.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
@@ -53,12 +56,15 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
         return -jnp.log(x)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> LogarithmicEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> LogarithmicEP:
         return LogarithmicEP(x)
 
 
 @dataclass
-class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray]):
+class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray],
+                    ExpectationParametrization[LogarithmicNP]):
     """The expectation parametrization of the logarithmic distribution.
 
     Args:

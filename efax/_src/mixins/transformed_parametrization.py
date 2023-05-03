@@ -20,16 +20,23 @@ Domain = TypeVar('Domain', bound=JaxComplexArray)
 class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
                                         Generic[NP, EP, TEP, Domain]):
     """Produce a NaturalParametrization by relating it to some base distrubtion NP."""
+    @classmethod
+    @abstractmethod
+    def base_distribution_cls(cls) -> type[NP]:
+        raise NotImplementedError
+
     @abstractmethod
     def base_distribution(self) -> NP:
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def create_expectation(self, expectation_parametrization: EP) -> TEP:
+    def create_expectation(cls, expectation_parametrization: EP) -> TEP:
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def sample_to_base_sample(self, x: Domain) -> Domain:
+    def sample_to_base_sample(cls, x: Domain, **fixed_parameters: Any) -> Domain:
         raise NotImplementedError
 
     @property
@@ -48,16 +55,24 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
         return self.create_expectation(self.base_distribution().to_exp())
 
     @override
-    def sufficient_statistics(self, x: Domain) -> TEP:
-        y = self.sample_to_base_sample(x)
-        return self.create_expectation(self.base_distribution().sufficient_statistics(y))
+    @classmethod
+    def sufficient_statistics(cls, x: Domain, **fixed_parameters: Any) -> TEP:
+        y = cls.sample_to_base_sample(x, **fixed_parameters)
+        base_cls = cls.base_distribution_cls()
+        return cls.create_expectation(base_cls.sufficient_statistics(y, **fixed_parameters))
 
 
 TNP = TypeVar('TNP', bound=TransformedNaturalParametrization[Any, Any, Any, Any])
 
 
-class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):
+class TransformedExpectationParametrization(ExpectationParametrization[TNP],
+                                            Generic[EP, NP, TNP]):
     """Produce an ExpectationParametrization by relating it to some base distrubtion EP."""
+    @classmethod
+    @abstractmethod
+    def base_distribution_cls(cls) -> type[EP]:
+        raise NotImplementedError
+
     @abstractmethod
     def base_distribution(self) -> EP:
         raise NotImplementedError

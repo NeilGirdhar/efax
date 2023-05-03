@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax
 import jax.numpy as jnp
 from jax.random import KeyArray
@@ -7,6 +9,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -18,7 +21,9 @@ __all__ = ['ExponentialNP', 'ExponentialEP']
 
 
 @dataclass
-class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRealArray], Samplable):
+class ExponentialNP(HasEntropyNP,
+                    Samplable,
+                    NaturalParametrization['ExponentialEP', JaxRealArray]):
     """The natural parametrization of the exponential distribution.
 
     Args:
@@ -48,7 +53,9 @@ class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRea
         return jnp.zeros(x.shape)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> ExponentialEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> ExponentialEP:
         return ExponentialEP(x)
 
     @override
@@ -61,7 +68,10 @@ class ExponentialNP(HasEntropyNP, NaturalParametrization['ExponentialEP', JaxRea
 
 
 @dataclass
-class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior[ExponentialNP], Samplable):
+class ExponentialEP(HasEntropyEP[ExponentialNP],
+                    HasConjugatePrior,
+                    Samplable,
+                    ExpectationParametrization[ExponentialNP]):
     """The expectation parametrization of the exponential distribution.
 
     Args:

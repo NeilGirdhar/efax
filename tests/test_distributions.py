@@ -8,12 +8,17 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose, jit, zero_tangent_like
 
+from efax import ExpectationParametrization, NaturalParametrization
+
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
 
 
 def test_conversion(generator: Generator,
-                    distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+                    distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
+                                                        ExpectationParametrization[Any],
+                                                        Any]
+                    ) -> None:
     """Test that the conversion between the different parametrizations are consistent."""
     atol = (5e-3
             if isinstance(distribution_info, (GammaInfo, BetaInfo))
@@ -26,29 +31,35 @@ def test_conversion(generator: Generator,
         original_ep = distribution_info.exp_parameter_generator(generator, shape=shape)
         intermediate_np = original_ep.to_nat()
         final_ep = intermediate_np.to_exp()
+
+        # Check round trip.
         assert_tree_allclose(final_ep, original_ep, atol=atol, rtol=1e-4)
-        original_fixed = original_ep.fixed_parameters_mapping()
-        intermediate_fixed = intermediate_np.fixed_parameters_mapping()
-        final_fixed = final_ep.fixed_parameters_mapping()
-        assert original_fixed.keys() == intermediate_fixed.keys() == final_fixed.keys()
-        for name, value in original_fixed.items():
-            assert_allclose(value, intermediate_fixed[name])
-            assert_allclose(value, final_fixed[name])
+
+        # Check fixed parameters.
+        original_fixed = original_ep.fixed_parameters()
+        intermediate_fixed = intermediate_np.fixed_parameters()
+        final_fixed = final_ep.fixed_parameters()
+        assert_tree_allclose(original_fixed, intermediate_fixed)
+        assert_tree_allclose(original_fixed, final_fixed)
 
 
-def test_gradient_log_normalizer(generator: Generator,
-                                 distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+def test_gradient_log_normalizer(
+        generator: Generator,
+        distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
+                                            ExpectationParametrization[Any],
+                                            Any]
+        ) -> None:
     """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
     # pylint: disable=too-many-locals, disable=protected-access
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
-    original_ln = cls._original_log_normalizer
-    original_gln = jit(grad(cls._original_log_normalizer, allow_int=True))
+    original_ln = cls._original_log_normalizer  # type: ignore # pyright: ignore
+    original_gln = jit(grad(original_ln, allow_int=True))
     optimized_ln = cls.log_normalizer
     optimized_gln = jit(grad(optimized_ln, allow_int=True))
 
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
-        kw_nat_parameters = nat_parameters.fixed_parameters_mapping()
+        fixed_parameters = nat_parameters.fixed_parameters()
         exp_parameters = nat_parameters.to_exp()  # Regular transformation.
         nat_cls = type(nat_parameters)
         ep_cls = type(exp_parameters)
@@ -56,13 +67,13 @@ def test_gradient_log_normalizer(generator: Generator,
         # Original GLN.
         original_nat_parameters = original_gln(nat_parameters)
         f_original_nat_parameters = original_nat_parameters.flattened()
-        original_exp_parameters = ep_cls.unflattened(f_original_nat_parameters, **kw_nat_parameters)
+        original_exp_parameters = ep_cls.unflattened(f_original_nat_parameters, **fixed_parameters)
 
         # Optimized GLN.
         optimized_nat_parameters = optimized_gln(nat_parameters)
         f_optimized_nat_parameters = optimized_nat_parameters.flattened()
         optimized_exp_parameters = ep_cls.unflattened(f_optimized_nat_parameters,
-                                                      **kw_nat_parameters)
+                                                      **fixed_parameters)
 
         # Test primal evaluation.
         assert_tree_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)
@@ -71,7 +82,7 @@ def test_gradient_log_normalizer(generator: Generator,
         # Test JVP.
         ones_like_nat_parameters = nat_cls(
             **{name: zero_tangent_like(value)
-               for name, value in nat_parameters.fixed_parameters_mapping().items()},
+               for name, value in nat_parameters.fixed_parameters().items()},
             **{name: jnp.ones_like(value)
                for name, value in nat_parameters.parameters_name_value()})
         original_ln_of_nat, original_jvp = jvp(original_ln, (nat_parameters,),

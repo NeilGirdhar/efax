@@ -45,7 +45,7 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
 
     def _zero_natural_parameters(self) -> NP:
         """A convenience method for implementing initial_search_parameters."""
-        fixed_parameters = self.fixed_parameters_mapping()
+        fixed_parameters = self.fixed_parameters()
         cls = type(self).natural_parametrization_cls()
         return cls.unflattened(jnp.zeros_like(self.flattened()), **fixed_parameters)
 
@@ -76,7 +76,8 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP, SP]):
         """
         expectation_parameters: ExpToNat[NP, SP] = natural_parameters.to_exp()
         exp_difference: ExpToNat[NP, SP] = tree_map(jnp.subtract, expectation_parameters, self)
-        return type(natural_parameters).unflattened(exp_difference.flattened())
+        return type(natural_parameters).unflattened(exp_difference.flattened(),
+                                                    **self.fixed_parameters())
 
 
 @dataclass

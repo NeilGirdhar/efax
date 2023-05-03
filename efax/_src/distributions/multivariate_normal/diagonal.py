@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -59,7 +61,9 @@ class MultivariateDiagonalNormalNP(HasEntropyNP,
         return jnp.zeros(x.shape[:-1])
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateDiagonalNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> MultivariateDiagonalNormalEP:
         return MultivariateDiagonalNormalEP(x, jnp.square(x))
 
     @override

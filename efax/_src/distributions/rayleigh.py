@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import jax.numpy as jnp
 from tjax import Array, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
@@ -35,15 +37,23 @@ class RayleighNP(HasEntropyNP,
         return ScalarSupport()
 
     @override
+    @classmethod
+    def base_distribution_cls(cls) -> type[ExponentialNP]:
+        return ExponentialNP
+
+    @override
     def base_distribution(self) -> ExponentialNP:
         return ExponentialNP(self.eta)
 
     @override
-    def create_expectation(self, expectation_parametrization: ExponentialEP) -> RayleighEP:
+    @classmethod
+    def create_expectation(cls, expectation_parametrization: ExponentialEP) -> RayleighEP:
         return RayleighEP(expectation_parametrization.mean)
 
     @override
-    def sample_to_base_sample(self, x: Array) -> JaxRealArray:
+    @classmethod
+    def sample_to_base_sample(cls, x: Array, **fixed_parameters: Any
+                              ) -> JaxRealArray:
         return jnp.square(x)
 
     @override
@@ -74,6 +84,11 @@ class RayleighEP(HasEntropyEP[RayleighNP],
     @override
     def natural_parametrization_cls(cls) -> type[RayleighNP]:
         return RayleighNP
+
+    @override
+    @classmethod
+    def base_distribution_cls(cls) -> type[ExponentialEP]:
+        return ExponentialEP
 
     @override
     def base_distribution(self) -> ExponentialEP:

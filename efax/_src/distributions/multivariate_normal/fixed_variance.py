@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import jax
 import jax.numpy as jnp
@@ -9,6 +10,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
@@ -64,10 +66,10 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
         return -0.5 * jnp.sum(jnp.square(x), axis=-1) / self.variance
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateFixedVarianceNormalEP:
-        shape = x.shape[:-1]
-        variance = jnp.broadcast_to(self.variance, shape)
-        return MultivariateFixedVarianceNormalEP(x, variance=variance)
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> MultivariateFixedVarianceNormalEP:
+        return MultivariateFixedVarianceNormalEP(x, variance=fixed_parameters['variance'])
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -81,9 +83,10 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
 @dataclass
 class MultivariateFixedVarianceNormalEP(
         HasEntropyEP[MultivariateFixedVarianceNormalNP],
-        HasGeneralizedConjugatePrior[MultivariateFixedVarianceNormalNP],
-        Multidimensional,
-        Samplable):
+        HasGeneralizedConjugatePrior,
+        Samplable,
+        ExpectationParametrization[MultivariateFixedVarianceNormalNP],
+        Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with fixed variance.
 
     This is a curved exponential family.

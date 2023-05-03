@@ -7,6 +7,8 @@ and Computation, volume 97, pp165-181
 """
 from __future__ import annotations
 
+from typing import Any
+
 import jax.numpy as jnp
 from jax.nn import softplus
 from jax.scipy.special import digamma
@@ -14,6 +16,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -61,7 +64,9 @@ class GeneralizedDirichletNP(HasEntropyNP,
         return GeneralizedDirichletEP(alpha_bar, gamma_bar)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> GeneralizedDirichletEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> GeneralizedDirichletEP:
         cs_x = jnp.cumsum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
         return GeneralizedDirichletEP(jnp.log(x), jnp.log(1.0 - cs_x))
@@ -89,7 +94,9 @@ class GeneralizedDirichletNP(HasEntropyNP,
 
 @dataclass
 class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
-                             ExpToNat[GeneralizedDirichletNP, JaxRealArray], Multidimensional):
+                             ExpToNat[GeneralizedDirichletNP, JaxRealArray],
+                             ExpectationParametrization[GeneralizedDirichletNP],
+                             Multidimensional):
     # E({log(x_i)}_i)
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
     # E({log(1-∑_{j≤i} x_j)}_i)

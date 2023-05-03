@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import jax
 from jax.random import KeyArray
@@ -59,7 +60,9 @@ class ComplexUnitNormalNP(HasEntropyNP,
         return -abs_square(x)
 
     @override
-    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexUnitNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: Any
+                              ) -> ComplexUnitNormalEP:
         return ComplexUnitNormalEP(x)
 
     @override

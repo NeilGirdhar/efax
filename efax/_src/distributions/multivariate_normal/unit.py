@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import jax
 import jax.numpy as jnp
@@ -9,6 +10,7 @@ from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
@@ -59,7 +61,9 @@ class MultivariateUnitNormalNP(HasEntropyNP,
         return -0.5 * jnp.sum(jnp.square(x), axis=-1)
 
     @override
-    def sufficient_statistics(self, x: JaxRealArray) -> MultivariateUnitNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+                              ) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(x)
 
     @override
@@ -78,9 +82,10 @@ class MultivariateUnitNormalNP(HasEntropyNP,
 @dataclass
 class MultivariateUnitNormalEP(
         HasEntropyEP[MultivariateUnitNormalNP],
-        HasGeneralizedConjugatePrior[MultivariateUnitNormalNP],
-        Multidimensional,
-        Samplable):
+        HasGeneralizedConjugatePrior,
+        Samplable,
+        ExpectationParametrization[MultivariateUnitNormalNP],
+        Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with unit variance.
 
     This is a curved exponential family.

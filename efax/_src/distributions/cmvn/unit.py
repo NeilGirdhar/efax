@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import jax
 import jax.numpy as jnp
@@ -63,7 +64,9 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
         return -jnp.sum(abs_square(x), axis=-1)
 
     @override
-    def sufficient_statistics(self, x: JaxComplexArray) -> ComplexMultivariateUnitNormalEP:
+    @classmethod
+    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: Any
+                              ) -> ComplexMultivariateUnitNormalEP:
         return ComplexMultivariateUnitNormalEP(x)
 
     @override

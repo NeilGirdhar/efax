@@ -26,8 +26,9 @@ EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
 
 @dataclass
 class DirichletCommonNP(HasEntropyNP,
-                        NaturalParametrization[EP, JaxRealArray], Samplable, Multidimensional,
-                        Generic[EP]):
+                        Samplable,
+                        Multidimensional,
+                        NaturalParametrization['DirichletCommonEP[Any]', JaxRealArray]):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property
@@ -56,7 +57,7 @@ class DirichletCommonNP(HasEntropyNP,
         return jss.digamma(q + 1.0) - jss.digamma(jnp.sum(q, axis=-1, keepdims=True) + q.shape[-1])
 
 
-NP = TypeVar('NP', bound=DirichletCommonNP[Any])
+NP = TypeVar('NP', bound=DirichletCommonNP)
 
 
 @dataclass
