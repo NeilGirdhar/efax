@@ -10,7 +10,7 @@ from .shaped_distribution import ShapedDistribution
 __all__ = ['ScipyVonMises']
 
 
-class ScipyVonMises(ShapedDistribution[ss.vonmises]):
+class ScipyVonMises(ShapedDistribution[ss.vonmises]):  # pyright: ignore
     """This class allows distributions having a non-empty shape."""
     @override
     def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None):

@@ -17,19 +17,21 @@ scipy_beta = scipy.special.beta
 
 # pylint: disable=protected-access
 mvd: type = ss._multivariate.dirichlet_frozen  # noqa: SLF001
-class ScipyDirichletFixRVsAndPDF(mvd):  # pyright: ignore
+class ScipyDirichletFixRVsAndPDF(mvd):
     """This class repairs dirichlet.
 
     See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.
     """
+    @override
     def rvs(self,
             size: ShapeLike | None = None,
             random_state: Generator | None = None) -> NumpyRealArray:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
-        return super().rvs(size=size, random_state=random_state)
+        return super().rvs(size=size, random_state=random_state)  # pyright: ignore
 
+    @override
     def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
         if x.ndim == 2:  # noqa: PLR2004
             return super().pdf(x.T)

@@ -4,7 +4,7 @@ import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyRealArray, ShapeLike
-from typing_extensions import Self
+from typing_extensions import Self, override
 
 from .shaped_distribution import ShapedDistribution
 
@@ -13,15 +13,16 @@ __all__ = ['ScipyMultivariateNormal']
 
 # pylint: disable=protected-access
 mvn: type = ss._multivariate.multivariate_normal_frozen  # noqa: SLF001
-class ScipyMultivariateNormalUnvectorized(mvn):  # pyright: ignore
+class ScipyMultivariateNormalUnvectorized(mvn):
     """This class repairs multivariate_normal.
 
     See https://github.com/scipy/scipy/issues/7689.
     """
+    @override
     def rvs(self,
             size: ShapeLike | None = None,
             random_state: Generator | None = None) -> NumpyRealArray:
-        retval = super().rvs(size=size, random_state=random_state)
+        retval = super().rvs(size=size, random_state=random_state)  # pyright: ignore
         if size is None:
             size = ()
         elif isinstance(size, int):

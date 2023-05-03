@@ -65,7 +65,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
     def as_multivariate_normal(self) -> ScipyMultivariateNormalUnvectorized:
         mv_mean = self._multivariate_normal_mean()
         mv_cov = self._multivariate_normal_cov()
-        return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)
+        return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)  # pyright: ignore
 
     def _multivariate_normal_mean(self) -> NumpyRealArray:
         """Return the mean of a corresponding real distribution with double the size."""
