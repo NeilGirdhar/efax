@@ -50,7 +50,7 @@ class VonMisesFisherNP(HasEntropyNP,
     @override
     def to_exp(self) -> VonMisesFisherEP:
         q = self.mean_times_concentration
-        kappa: JaxRealArray = jnp.linalg.norm(q, 2, axis=-1, keepdims=True)
+        kappa: JaxRealArray = jnp.linalg.norm(q, axis=-1, keepdims=True)
         return VonMisesFisherEP(
             jnp.where(kappa == 0.0,  # noqa: PLR2004
                       q,
@@ -68,10 +68,13 @@ class VonMisesFisherNP(HasEntropyNP,
     def dimensions(self) -> int:
         return self.mean_times_concentration.shape[-1]
 
+    def kappa(self) -> JaxRealArray:
+        return jnp.linalg.norm(self.mean_times_concentration, axis=-1)
+
     def to_kappa_angle(self) -> tuple[JaxRealArray, JaxRealArray]:
         if self.dimensions() != 2:  # noqa: PLR2004
             raise ValueError
-        kappa: JaxRealArray = jnp.linalg.norm(self.mean_times_concentration, axis=-1)
+        kappa = self.kappa()
         angle = jnp.where(kappa == 0.0,  # noqa: PLR2004
                           0.0,
                           jnp.arctan2(self.mean_times_concentration[..., 1],
