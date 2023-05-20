@@ -10,9 +10,11 @@ from jax.experimental import enable_x64
 from jax.random import KeyArray, PRNGKey
 from numpy.random import Generator as NumpyGenerator
 
-from efax import HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior, Samplable
+from efax import (BooleanField, HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior,
+                  IntegralField, Samplable)
 
-from .create_info import GeneralizedDirichletInfo, create_infos
+from .create_info import (ComplexCircularlySymmetricNormalInfo, GeneralizedDirichletInfo,
+                          create_infos)
 from .distribution_info import DistributionInfo
 
 
@@ -76,6 +78,18 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              if issubclass(info.nat_class() if natural else info.exp_class(), Samplable)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_distribution_info", "natural"), p,
+                             ids=ids)
+    if ('sampling_wc_distribution_info' in metafunc.fixturenames
+            and 'natural' in metafunc.fixturenames):
+        p = [(info, natural)
+             for info in _all_infos
+             for natural in [False, True]
+             for cls in [info.nat_class() if natural else info.exp_class()]
+             if issubclass(cls, Samplable)
+             if not isinstance(cls.domain_support().field, (BooleanField, IntegralField))
+             if not isinstance(info, ComplexCircularlySymmetricNormalInfo)]
+        ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
+        metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
                              ids=ids)
     if 'cp_distribution_info' in metafunc.fixturenames:
         q = [info

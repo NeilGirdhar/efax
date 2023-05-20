@@ -5,12 +5,14 @@ from functools import partial
 from typing import Any
 
 import jax.numpy as jnp
+from jax import hessian, jacrev, vmap
 from jax.random import KeyArray
 from jax.tree_util import tree_map
 from numpy.random import Generator
-from tjax import assert_tree_allclose
+from tjax import JaxArray, JaxRealArray, assert_tree_allclose, vmap_split
 
 from efax import Multidimensional, Samplable
+from efax._src.parametrization import Parametrization
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
                           ComplexNormalInfo, GammaInfo, IsotropicNormalInfo,
@@ -84,3 +86,71 @@ def test_maximum_likelihood_estimation(generator: Generator,
     sampled_exp_parameters = nat_cls.sufficient_statistics(samples, **fixed_parameters)
     ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
     assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)
+
+
+def sample_using_flattened(flattened_parameters: JaxRealArray,
+                           parameters_type: type[Samplable],
+                           key: KeyArray,
+                           fixed_parameters: dict[str, Any]) -> JaxArray:
+    parameters = parameters_type.unflattened(flattened_parameters, **fixed_parameters)
+    support = parameters.domain_support()
+    ordinary_sample = parameters.sample(key)
+    return support.flattened(ordinary_sample)
+
+
+def calculate_jacobian(parameters: Parametrization,
+                       keys: KeyArray,
+                       ) -> JaxRealArray:
+    jacobian_sample = vmap(jacrev(sample_using_flattened, argnums=(0,)), in_axes=(0, None, 0, 0))
+    parameters_jacobian, = jacobian_sample(parameters.flattened(), type(parameters), keys,
+                                           parameters.fixed_parameters())
+    assert parameters_jacobian.shape[0: 1] == parameters.shape
+    parameters_jacobian = jnp.sum(parameters_jacobian, axis=0)
+    return jnp.sum(parameters_jacobian, axis=0)
+
+
+def calculate_curvature(parameters: Parametrization,
+                        keys: KeyArray,
+                        ) -> JaxRealArray:
+    # Calculate curvature.
+    hessian_sample = vmap(hessian(sample_using_flattened, argnums=(0,)), in_axes=(0, None, 0, 0))
+    parameters_hessian_x, = hessian_sample(parameters.flattened(), type(parameters), keys,
+                                           parameters.fixed_parameters())
+    parameters_hessian, = parameters_hessian_x
+
+    assert parameters_hessian.shape[0: 1] == parameters.shape
+    parameters_hessian = jnp.sum(parameters_hessian, axis=0)
+
+    assert parameters_hessian.shape[-2] == parameters_hessian.shape[-1]
+    diagonal_hessian = jnp.diagonal(parameters_hessian, axis1=-2, axis2=-1)
+    # There's one element for each sample element.  Just sum over the curvatures.
+    return jnp.sum(diagonal_hessian, axis=0)
+
+
+def test_sampling_cotangents(generator: Generator,
+                             key: KeyArray,
+                             sampling_wc_distribution_info: DistributionInfo[Any, Any, Any],
+                             *,
+                             distribution_name: None | str,
+                             natural: bool) -> None:
+    """Test that sampling is consistent with maximum likelihood estimation.
+
+    This tests samples variates from either natural or expectation parametrizations.  Calculates the
+    mean of the sufficient statistics, and verifies that it equals the expectation parameters.
+    """
+    info = sampling_wc_distribution_info
+    info.skip_if_deselected(distribution_name)
+    distribution_shape = (23,)
+    keys = vmap_split(key, distribution_shape)
+
+    parameters: Parametrization
+    if natural:
+        parameters = info.nat_parameter_generator(generator, distribution_shape)
+    else:
+        parameters = info.exp_parameter_generator(generator, distribution_shape)
+    jacobian = calculate_jacobian(parameters, keys)
+    if jnp.all(jacobian):
+        return
+    curvature = calculate_curvature(parameters, keys)
+    assert jacobian.shape == curvature.shape
+    assert jnp.all((jacobian !=0) | (curvature != 0))
