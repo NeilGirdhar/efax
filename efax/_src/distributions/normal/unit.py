@@ -40,7 +40,8 @@ class UnitNormalNP(HasEntropyNP,
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override
@@ -92,7 +93,8 @@ class UnitNormalEP(HasEntropyEP[UnitNormalNP],
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @classmethod

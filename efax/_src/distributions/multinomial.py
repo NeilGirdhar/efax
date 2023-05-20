@@ -42,7 +42,8 @@ class MultinomialNP(HasEntropyNP,
         return self.log_odds.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @override
@@ -111,7 +112,8 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
         return self.probability.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @classmethod

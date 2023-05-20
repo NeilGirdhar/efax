@@ -38,7 +38,8 @@ class IsotropicNormalNP(HasEntropyNP,
         return self.negative_half_precision.shape
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @override
@@ -90,7 +91,8 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
         return self.mean.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @classmethod

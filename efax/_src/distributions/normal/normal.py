@@ -36,7 +36,8 @@ class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
         return self.mean_times_precision.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override
@@ -83,7 +84,8 @@ class NormalEP(HasEntropyEP[NormalNP],
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @classmethod
@@ -132,7 +134,8 @@ class NormalVP(Samplable):
         return self.mean.shape[:-1]
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override

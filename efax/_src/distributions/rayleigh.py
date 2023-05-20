@@ -33,7 +33,8 @@ class RayleighNP(HasEntropyNP,
         return self.eta.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override
@@ -77,7 +78,8 @@ class RayleighEP(HasEntropyEP[RayleighNP],
         return self.chi.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @classmethod

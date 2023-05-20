@@ -53,7 +53,8 @@ class ComplexCircularlySymmetricNormalNP(
         return self.negative_precision.shape[:-2]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport(field=complex_field)
 
     @override
@@ -106,7 +107,8 @@ class ComplexCircularlySymmetricNormalEP(
         return self.variance.shape[:-2]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport(field=complex_field)
 
     @classmethod

@@ -40,7 +40,8 @@ class GeneralizedDirichletNP(HasEntropyNP,
         return self.alpha_minus_one.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @override
@@ -108,7 +109,8 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
         return self.mean_log_probability.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @classmethod

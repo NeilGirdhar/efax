@@ -38,7 +38,8 @@ class BernoulliNP(HasEntropyNP,
         return self.log_odds.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=boolean_field)
 
     @override
@@ -87,7 +88,8 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
         return self.probability.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=boolean_field)
 
     @classmethod

@@ -47,7 +47,8 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
         return self.two_mean_conjugate.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport(field=complex_field)
 
     @override
@@ -98,7 +99,8 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
         return self.mean.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport(field=complex_field)
 
     @classmethod

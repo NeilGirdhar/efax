@@ -41,7 +41,8 @@ class GammaNP(HasEntropyNP,
         return self.negative_rate.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override
@@ -98,7 +99,8 @@ class GammaEP(HasEntropyEP[GammaNP],
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @classmethod
@@ -151,7 +153,8 @@ class GammaVP(Parametrization):
         return self.mean.shape[:-1]
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     def to_nat(self) -> GammaNP:

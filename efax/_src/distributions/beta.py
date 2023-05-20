@@ -31,7 +31,8 @@ class BetaNP(DirichletCommonNP,
         alpha_minus_one: The shape parameters alpha, beta in an array with final dimension 2.
     """
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override
@@ -69,7 +70,8 @@ class BetaEP(DirichletCommonEP[BetaNP],
         mean_log_probability: An array with final dimension [E(log(x)), E(log(1-x))].
     """
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @classmethod

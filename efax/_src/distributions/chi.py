@@ -33,7 +33,8 @@ class ChiNP(HasEntropyNP,
         return self.k_over_two_minus_one.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override
@@ -76,7 +77,8 @@ class ChiEP(HasEntropyEP[ChiNP],
         return self.mean_log.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @classmethod

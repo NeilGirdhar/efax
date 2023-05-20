@@ -37,7 +37,8 @@ class ExponentialNP(HasEntropyNP,
         return self.negative_rate.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @override
@@ -85,7 +86,8 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport()
 
     @classmethod

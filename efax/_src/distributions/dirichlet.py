@@ -24,7 +24,8 @@ class DirichletNP(DirichletCommonNP,
         alpha_minus_one: The shape parameters alpha.
     """
     @override
-    def domain_support(self) -> SimplexSupport:
+    @classmethod
+    def domain_support(cls) -> SimplexSupport:
         return SimplexSupport()
 
     @override
@@ -52,7 +53,8 @@ class DirichletEP(DirichletCommonEP[DirichletNP],
         mean_log_probability: An array with final dimension [E(log(x_i))]_i.
     """
     @override
-    def domain_support(self) -> SimplexSupport:
+    @classmethod
+    def domain_support(cls) -> SimplexSupport:
         return SimplexSupport()
 
     @classmethod

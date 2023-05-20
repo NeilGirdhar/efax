@@ -37,7 +37,8 @@ class VonMisesFisherNP(HasEntropyNP,
         return self.mean_times_concentration.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @override
@@ -104,7 +105,8 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
         return self.mean.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @classmethod

@@ -155,6 +155,7 @@ class Parametrization:
     def shape(self) -> Shape:
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def domain_support(self) -> Support:
+    def domain_support(cls) -> Support:
         raise NotImplementedError

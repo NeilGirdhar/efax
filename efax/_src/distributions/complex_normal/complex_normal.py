@@ -37,7 +37,8 @@ class ComplexNormalNP(HasEntropyNP,
         return self.mean_times_precision.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=complex_field)
 
     @override
@@ -97,7 +98,8 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=complex_field)
 
     @classmethod

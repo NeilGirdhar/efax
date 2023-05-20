@@ -46,7 +46,8 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP,
         return self.mean_times_precision.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @override
@@ -104,7 +105,8 @@ class MultivariateFixedVarianceNormalEP(
         return self.mean.shape[:-1]
 
     @override
-    def domain_support(self) -> VectorSupport:
+    @classmethod
+    def domain_support(cls) -> VectorSupport:
         return VectorSupport()
 
     @classmethod

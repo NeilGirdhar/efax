@@ -43,7 +43,8 @@ class ComplexUnitNormalNP(HasEntropyNP,
         return self.two_mean_conjugate.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=complex_field)
 
     @override
@@ -89,7 +90,8 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=complex_field)
 
     @classmethod

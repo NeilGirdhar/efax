@@ -25,7 +25,8 @@ class NBCommonNP(NaturalParametrization['NBCommonEP', JaxRealArray]):
         return self.log_not_p.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=integral_field)
 
     @override
@@ -56,7 +57,8 @@ class NBCommonEP(ExpectationParametrization[NBCommonNP]):
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=integral_field)
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaPrimeNP:

@@ -35,7 +35,8 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
         return self.log_mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=integral_field)
 
     @override
@@ -74,7 +75,8 @@ class PoissonEP(HasConjugatePrior,
         return self.mean.shape
 
     @override
-    def domain_support(self) -> ScalarSupport:
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
         return ScalarSupport(field=integral_field)
 
     @classmethod
