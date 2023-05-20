@@ -5,12 +5,13 @@ from math import comb, sqrt
 from typing import Any
 
 import jax.numpy as jnp
-from tjax import JaxArray, JaxRealArray, Shape
+from tjax import JaxArray, JaxRealArray, Shape, float_dtype, int_dtype
 from tjax.dataclasses import field
 from typing_extensions import override
 
 __all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SimplexSupport', 'SymmetricMatrixSupport',
-           'SquareMatrixSupport']
+           'SquareMatrixSupport', 'Field', 'RealField', 'ComplexField', 'BooleanField',
+           'IntegralField']
 
 
 class Field:
@@ -57,15 +58,45 @@ class ComplexField(Field):
         return y[..., :n] + 1j * y[..., n:]
 
 
+class BooleanField(Field):
+    @override
+    def num_elements(self, support_num_element: int) -> int:
+        return support_num_element
+
+    @override
+    def flattened(self, x: JaxArray) -> JaxRealArray:
+        return jnp.asarray(x, dtype=float_dtype)
+
+    @override
+    def unflattened(self, y: JaxRealArray) -> JaxArray:
+        return jnp.asarray(y, dtype=jnp.bool_)
+
+
+class IntegralField(Field):
+    @override
+    def num_elements(self, support_num_element: int) -> int:
+        return support_num_element
+
+    @override
+    def flattened(self, x: JaxArray) -> JaxRealArray:
+        return jnp.asarray(x, dtype=float_dtype)
+
+    @override
+    def unflattened(self, y: JaxRealArray) -> JaxArray:
+        return jnp.asarray(y, dtype=int_dtype)
+
+
 real_field = RealField()
+integral_field = IntegralField()
 complex_field = ComplexField()
+boolean_field = BooleanField()
 
 
 class Support:
     @override
-    def __init__(self, *, is_complex: bool = False):
+    def __init__(self, *, field: Field = real_field):
         super().__init__()
-        self.field = complex_field if is_complex else real_field
+        self.field = field
 
     @abstractmethod
     def axes(self) -> int:
@@ -164,7 +195,7 @@ class SymmetricMatrixSupport(Support):
     @override
     def __init__(self, *, hermitian: bool = False, **kwargs: Any):
         if hermitian:
-            kwargs.setdefault('is_complex', True)
+            kwargs.setdefault('field', complex_field)
         super().__init__(**kwargs)
         self.hermitian = hermitian
 

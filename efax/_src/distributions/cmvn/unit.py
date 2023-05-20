@@ -15,7 +15,7 @@ from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import VectorSupport, distribution_parameter
+from ...parameter import VectorSupport, complex_field, distribution_parameter
 
 __all__ = ['ComplexMultivariateUnitNormalNP', 'ComplexMultivariateUnitNormalEP']
 
@@ -33,7 +33,7 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
     Args:
         two_mean_conjugate: 2 * E(conjugate(x)).
     """
-    two_mean_conjugate: JaxComplexArray = distribution_parameter(VectorSupport(is_complex=True))
+    two_mean_conjugate: JaxComplexArray = distribution_parameter(VectorSupport(field=complex_field))
     # S = I, U = 0
     # P = I, R = 0
     # H = -I, J = 0
@@ -48,7 +48,7 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
 
     @override
     def domain_support(self) -> VectorSupport:
-        return VectorSupport(is_complex=True)
+        return VectorSupport(field=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -90,7 +90,7 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
     Args:
         mean: E(x).
     """
-    mean: JaxComplexArray = distribution_parameter(VectorSupport(is_complex=True))
+    mean: JaxComplexArray = distribution_parameter(VectorSupport(field=complex_field))
 
     @property
     @override
@@ -99,7 +99,7 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
 
     @override
     def domain_support(self) -> VectorSupport:
-        return VectorSupport(is_complex=True)
+        return VectorSupport(field=complex_field)
 
     @classmethod
     @override

@@ -13,7 +13,7 @@ from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import ScalarSupport, distribution_parameter
+from ...parameter import ScalarSupport, complex_field, distribution_parameter
 
 __all__ = ['ComplexUnitNormalNP', 'ComplexUnitNormalEP']
 
@@ -29,7 +29,7 @@ class ComplexUnitNormalNP(HasEntropyNP,
     Args:
         two_mean_conjugate: 2 * E(conjugate(x)).
     """
-    two_mean_conjugate: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    two_mean_conjugate: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
     # S = I, U = 0
     # P = I, R = 0
     # H = -I, J = 0
@@ -44,7 +44,7 @@ class ComplexUnitNormalNP(HasEntropyNP,
 
     @override
     def domain_support(self) -> ScalarSupport:
-        return ScalarSupport(is_complex=True)
+        return ScalarSupport(field=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -81,7 +81,7 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
     Args:
         mean: E(x).
     """
-    mean: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    mean: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
 
     @property
     @override
@@ -90,7 +90,7 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
 
     @override
     def domain_support(self) -> ScalarSupport:
-        return ScalarSupport(is_complex=True)
+        return ScalarSupport(field=complex_field)
 
     @classmethod
     @override

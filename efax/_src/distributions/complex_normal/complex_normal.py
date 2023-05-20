@@ -11,7 +11,7 @@ from typing_extensions import override
 from ...expectation_parametrization import ExpectationParametrization
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import ScalarSupport, distribution_parameter
+from ...parameter import ScalarSupport, complex_field, distribution_parameter
 
 __all__ = ['ComplexNormalNP', 'ComplexNormalEP']
 
@@ -26,9 +26,10 @@ class ComplexNormalNP(HasEntropyNP,
         precision: 1 / Var(x).
         pseudo_precision: 1 / E(x^2 - E(x)^2).
     """
-    mean_times_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    mean_times_precision: JaxComplexArray = distribution_parameter(
+        ScalarSupport(field=complex_field))
     precision: JaxRealArray = distribution_parameter(ScalarSupport())
-    pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
 
     @property
     @override
@@ -37,7 +38,7 @@ class ComplexNormalNP(HasEntropyNP,
 
     @override
     def domain_support(self) -> ScalarSupport:
-        return ScalarSupport(is_complex=True)
+        return ScalarSupport(field=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -85,9 +86,10 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         second_moment: E(x * conjugate(x)).
         pseudo_second_moment: E(x^2).
     """
-    mean: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    mean: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
-    pseudo_second_moment: JaxComplexArray = distribution_parameter(ScalarSupport(is_complex=True))
+    pseudo_second_moment: JaxComplexArray = distribution_parameter(
+        ScalarSupport(field=complex_field))
 
     @property
     @override
@@ -96,7 +98,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
 
     @override
     def domain_support(self) -> ScalarSupport:
-        return ScalarSupport(is_complex=True)
+        return ScalarSupport(field=complex_field)
 
     @classmethod
     @override

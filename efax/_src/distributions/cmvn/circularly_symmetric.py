@@ -15,7 +15,8 @@ from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
+from ...parameter import (SymmetricMatrixSupport, VectorSupport, complex_field,
+                          distribution_parameter)
 
 __all__ = ['ComplexCircularlySymmetricNormalNP', 'ComplexCircularlySymmetricNormalEP']
 
@@ -53,7 +54,7 @@ class ComplexCircularlySymmetricNormalNP(
 
     @override
     def domain_support(self) -> VectorSupport:
-        return VectorSupport(is_complex=True)
+        return VectorSupport(field=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -106,7 +107,7 @@ class ComplexCircularlySymmetricNormalEP(
 
     @override
     def domain_support(self) -> VectorSupport:
-        return VectorSupport(is_complex=True)
+        return VectorSupport(field=complex_field)
 
     @classmethod
     @override
