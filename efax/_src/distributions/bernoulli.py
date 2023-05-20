@@ -7,7 +7,7 @@ import jax.numpy as jnp
 import numpy as np
 from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import BooleanArray, JaxRealArray, Shape
+from tjax import JaxBooleanArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -104,7 +104,7 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
         return jnp.zeros(self.shape)
 
     @override
-    def sample(self, key: KeyArray, shape: Shape | None = None) -> BooleanArray:
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxBooleanArray:
         if shape is not None:
             shape += self.shape
         return jax.random.bernoulli(key, self.probability, shape)
