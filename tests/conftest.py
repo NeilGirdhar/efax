@@ -74,20 +74,22 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              for info in _all_infos
              for natural in [False, True]
              if issubclass(info.nat_class() if natural else info.exp_class(), Samplable)]
-        metafunc.parametrize("sampling_distribution_info, natural", p)
+        ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
+        metafunc.parametrize(("sampling_distribution_info", "natural"), p,
+                             ids=ids)
     if 'cp_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
              if issubclass(info.exp_class(), HasConjugatePrior)]
-        metafunc.parametrize("cp_distribution_info", q)
+        metafunc.parametrize("cp_distribution_info", q, ids=[info.name() for info in q])
     if 'gcp_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
              if issubclass(info.exp_class(), HasGeneralizedConjugatePrior)]
-        metafunc.parametrize("gcp_distribution_info", q)
+        metafunc.parametrize("gcp_distribution_info", q, ids=[info.name() for info in q])
     if 'entropy_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
              if issubclass(info.exp_class(), HasEntropyEP)
              if not isinstance(info, GeneralizedDirichletInfo)]
-        metafunc.parametrize("entropy_distribution_info", q)
+        metafunc.parametrize("entropy_distribution_info", q, ids=[info.name() for info in q])
