@@ -5,6 +5,7 @@ from typing import Any
 
 import numpy as np
 import pytest
+from jax import enable_custom_prng
 from jax.experimental import enable_x64
 from jax.random import KeyArray, PRNGKey
 from numpy.random import Generator as NumpyGenerator
@@ -32,7 +33,8 @@ def generator() -> NumpyGenerator:
 
 @pytest.fixture()
 def key() -> KeyArray:
-    return PRNGKey(123)
+    with enable_custom_prng():
+        return PRNGKey(123)
 
 
 def pytest_configure(config: pytest.Config) -> None:
