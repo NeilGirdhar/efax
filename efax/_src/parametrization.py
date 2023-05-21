@@ -68,7 +68,7 @@ class Parametrization:
         return type(self)(**parameters)
 
     def flattened(self) -> JaxRealArray:
-        return reduce(partial(jnp.append, axis=-1),
+        return reduce(partial(jnp.append, axis=-1),  # pyright: ignore
                       (support.flattened(value)
                        for _, value, support in self.parameters_name_value_support()))
 
