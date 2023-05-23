@@ -55,7 +55,7 @@ class ComplexCircularlySymmetricNormalNP(
     @override
     @classmethod
     def domain_support(cls) -> VectorSupport:
-        return VectorSupport(field=complex_field)
+        return VectorSupport(ring=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -109,7 +109,7 @@ class ComplexCircularlySymmetricNormalEP(
     @override
     @classmethod
     def domain_support(cls) -> VectorSupport:
-        return VectorSupport(field=complex_field)
+        return VectorSupport(ring=complex_field)
 
     @classmethod
     @override

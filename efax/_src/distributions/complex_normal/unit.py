@@ -29,7 +29,7 @@ class ComplexUnitNormalNP(HasEntropyNP,
     Args:
         two_mean_conjugate: 2 * E(conjugate(x)).
     """
-    two_mean_conjugate: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
+    two_mean_conjugate: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
     # S = I, U = 0
     # P = I, R = 0
     # H = -I, J = 0
@@ -45,7 +45,7 @@ class ComplexUnitNormalNP(HasEntropyNP,
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=complex_field)
+        return ScalarSupport(ring=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -82,7 +82,7 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
     Args:
         mean: E(x).
     """
-    mean: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
+    mean: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
 
     @property
     @override
@@ -92,7 +92,7 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=complex_field)
+        return ScalarSupport(ring=complex_field)
 
     @classmethod
     @override

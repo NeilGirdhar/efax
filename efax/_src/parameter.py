@@ -10,11 +10,11 @@ from tjax.dataclasses import field
 from typing_extensions import override
 
 __all__ = ['Support', 'ScalarSupport', 'VectorSupport', 'SimplexSupport', 'SymmetricMatrixSupport',
-           'SquareMatrixSupport', 'Field', 'RealField', 'ComplexField', 'BooleanField',
-           'IntegralField']
+           'SquareMatrixSupport', 'Ring', 'RealField', 'ComplexField', 'BooleanRing',
+           'IntegralRing']
 
 
-class Field:
+class Ring:
     @abstractmethod
     def num_elements(self, support_num_element: int) -> int:
         raise NotImplementedError
@@ -28,7 +28,7 @@ class Field:
         raise NotImplementedError
 
 
-class RealField(Field):
+class RealField(Ring):
     @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element
@@ -42,7 +42,7 @@ class RealField(Field):
         return y
 
 
-class ComplexField(Field):
+class ComplexField(Ring):
     @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element * 2
@@ -58,7 +58,7 @@ class ComplexField(Field):
         return y[..., :n] + 1j * y[..., n:]
 
 
-class BooleanField(Field):
+class BooleanRing(Ring):
     @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element
@@ -72,7 +72,7 @@ class BooleanField(Field):
         return jnp.asarray(y, dtype=jnp.bool_)
 
 
-class IntegralField(Field):
+class IntegralRing(Ring):
     @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element
@@ -87,16 +87,16 @@ class IntegralField(Field):
 
 
 real_field = RealField()
-integral_field = IntegralField()
+integral_ring = IntegralRing()
 complex_field = ComplexField()
-boolean_field = BooleanField()
+boolean_ring = BooleanRing()
 
 
 class Support:
     @override
-    def __init__(self, *, field: Field = real_field):
+    def __init__(self, *, ring: Ring = real_field):
         super().__init__()
-        self.field = field
+        self.ring = ring
 
     @abstractmethod
     def axes(self) -> int:
@@ -130,15 +130,15 @@ class ScalarSupport(Support):
 
     @override
     def num_elements(self, dimensions: int) -> int:
-        return self.field.num_elements(1)
+        return self.ring.num_elements(1)
 
     @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
-        return self.field.flattened(jnp.reshape(x, (*x.shape, 1)))
+        return self.ring.flattened(jnp.reshape(x, (*x.shape, 1)))
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
-        x = self.field.unflattened(y)
+        x = self.ring.unflattened(y)
         assert x.shape[-1] == 1
         return jnp.reshape(x, x.shape[:-1])
 
@@ -154,15 +154,15 @@ class VectorSupport(Support):
 
     @override
     def num_elements(self, dimensions: int) -> int:
-        return self.field.num_elements(dimensions)
+        return self.ring.num_elements(dimensions)
 
     @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
-        return self.field.flattened(x)
+        return self.ring.flattened(x)
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
-        x = self.field.unflattened(y)
+        x = self.ring.unflattened(y)
         assert x.shape[-1] == dimensions
         return x
 
@@ -178,15 +178,15 @@ class SimplexSupport(Support):
 
     @override
     def num_elements(self, dimensions: int) -> int:
-        return self.field.num_elements(dimensions - 1)
+        return self.ring.num_elements(dimensions - 1)
 
     @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
-        return self.field.flattened(x)
+        return self.ring.flattened(x)
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
-        x = self.field.unflattened(y)
+        x = self.ring.unflattened(y)
         assert x.shape[-1] == dimensions
         return x
 
@@ -195,7 +195,7 @@ class SymmetricMatrixSupport(Support):
     @override
     def __init__(self, *, hermitian: bool = False, **kwargs: Any):
         if hermitian:
-            kwargs.setdefault('field', complex_field)
+            kwargs.setdefault('ring', complex_field)
         super().__init__(**kwargs)
         self.hermitian = hermitian
 
@@ -209,18 +209,18 @@ class SymmetricMatrixSupport(Support):
 
     @override
     def num_elements(self, dimensions: int) -> int:
-        return self.field.num_elements(comb(dimensions + 1, 2))
+        return self.ring.num_elements(comb(dimensions + 1, 2))
 
     @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
         dimensions = x.shape[-1]
         assert x.shape[-2] == dimensions
         index = (..., *jnp.triu_indices(dimensions))
-        return self.field.flattened(x[index])
+        return self.ring.flattened(x[index])
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int) -> JaxArray:
-        x = self.field.unflattened(y)
+        x = self.ring.unflattened(y)
         k = x.shape[-1]
         sqrt_discriminant = sqrt(1 + 8 * k)
         i_sqrt_discriminant = int(sqrt_discriminant)
@@ -249,16 +249,16 @@ class SquareMatrixSupport(Support):
 
     @override
     def num_elements(self, dimensions: int) -> int:
-        return self.field.num_elements(dimensions ** 2)
+        return self.ring.num_elements(dimensions ** 2)
 
     @override
     def flattened(self, x: JaxArray) -> JaxArray:
         y = jnp.reshape(x, (*x.shape[:-2], -1))
-        return self.field.flattened(y)
+        return self.ring.flattened(y)
 
     @override
     def unflattened(self, y: JaxArray, dimensions: int) -> JaxArray:
-        x = self.field.unflattened(y)
+        x = self.ring.unflattened(y)
         return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 
 

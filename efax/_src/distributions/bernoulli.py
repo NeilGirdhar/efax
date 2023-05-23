@@ -16,7 +16,7 @@ from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, boolean_field, distribution_parameter
+from ..parameter import ScalarSupport, boolean_ring, distribution_parameter
 from .beta import BetaNP
 
 __all__ = ['BernoulliNP', 'BernoulliEP']
@@ -40,7 +40,7 @@ class BernoulliNP(HasEntropyNP,
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=boolean_field)
+        return ScalarSupport(ring=boolean_ring)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -90,7 +90,7 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=boolean_field)
+        return ScalarSupport(ring=boolean_ring)
 
     @classmethod
     @override

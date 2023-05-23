@@ -27,9 +27,9 @@ class ComplexNormalNP(HasEntropyNP,
         pseudo_precision: 1 / E(x^2 - E(x)^2).
     """
     mean_times_precision: JaxComplexArray = distribution_parameter(
-        ScalarSupport(field=complex_field))
+        ScalarSupport(ring=complex_field))
     precision: JaxRealArray = distribution_parameter(ScalarSupport())
-    pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
+    pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
 
     @property
     @override
@@ -39,7 +39,7 @@ class ComplexNormalNP(HasEntropyNP,
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=complex_field)
+        return ScalarSupport(ring=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -87,10 +87,10 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         second_moment: E(x * conjugate(x)).
         pseudo_second_moment: E(x^2).
     """
-    mean: JaxComplexArray = distribution_parameter(ScalarSupport(field=complex_field))
+    mean: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
     pseudo_second_moment: JaxComplexArray = distribution_parameter(
-        ScalarSupport(field=complex_field))
+        ScalarSupport(ring=complex_field))
 
     @property
     @override
@@ -100,7 +100,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=complex_field)
+        return ScalarSupport(ring=complex_field)
 
     @classmethod
     @override

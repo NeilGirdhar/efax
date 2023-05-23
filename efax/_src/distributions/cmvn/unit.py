@@ -33,7 +33,7 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
     Args:
         two_mean_conjugate: 2 * E(conjugate(x)).
     """
-    two_mean_conjugate: JaxComplexArray = distribution_parameter(VectorSupport(field=complex_field))
+    two_mean_conjugate: JaxComplexArray = distribution_parameter(VectorSupport(ring=complex_field))
     # S = I, U = 0
     # P = I, R = 0
     # H = -I, J = 0
@@ -49,7 +49,7 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP,
     @override
     @classmethod
     def domain_support(cls) -> VectorSupport:
-        return VectorSupport(field=complex_field)
+        return VectorSupport(ring=complex_field)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -91,7 +91,7 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
     Args:
         mean: E(x).
     """
-    mean: JaxComplexArray = distribution_parameter(VectorSupport(field=complex_field))
+    mean: JaxComplexArray = distribution_parameter(VectorSupport(ring=complex_field))
 
     @property
     @override
@@ -101,7 +101,7 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
     @override
     @classmethod
     def domain_support(cls) -> VectorSupport:
-        return VectorSupport(field=complex_field)
+        return VectorSupport(ring=complex_field)
 
     @classmethod
     @override

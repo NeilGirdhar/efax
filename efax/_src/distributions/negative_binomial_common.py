@@ -10,7 +10,7 @@ from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, integral_field
+from ..parameter import ScalarSupport, integral_ring
 
 __all__: list[str] = []
 
@@ -27,7 +27,7 @@ class NBCommonNP(NaturalParametrization['NBCommonEP', JaxRealArray]):
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=integral_field)
+        return ScalarSupport(ring=integral_ring)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -59,7 +59,7 @@ class NBCommonEP(ExpectationParametrization[NBCommonNP]):
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=integral_field)
+        return ScalarSupport(ring=integral_ring)
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaPrimeNP:
     #     return BetaPrimeNP(n * self._failures() * (self.mean, jnp.ones_like(self.mean)))

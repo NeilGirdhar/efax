@@ -14,7 +14,7 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter, integral_field
+from ..parameter import ScalarSupport, distribution_parameter, integral_ring
 from .gamma import GammaNP
 
 __all__ = ['PoissonNP', 'PoissonEP']
@@ -37,7 +37,7 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=integral_field)
+        return ScalarSupport(ring=integral_ring)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -77,7 +77,7 @@ class PoissonEP(HasConjugatePrior,
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport(field=integral_field)
+        return ScalarSupport(ring=integral_ring)
 
     @classmethod
     @override

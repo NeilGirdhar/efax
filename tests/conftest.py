@@ -10,8 +10,8 @@ from jax.experimental import enable_x64
 from jax.random import KeyArray, PRNGKey
 from numpy.random import Generator as NumpyGenerator
 
-from efax import (BooleanField, HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior,
-                  IntegralField, Samplable)
+from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior,
+                  IntegralRing, Samplable)
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, GeneralizedDirichletInfo,
                           create_infos)
@@ -86,7 +86,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              for natural in [False, True]
              for cls in [info.nat_class() if natural else info.exp_class()]
              if issubclass(cls, Samplable)
-             if not isinstance(cls.domain_support().field, (BooleanField, IntegralField))
+             if not isinstance(cls.domain_support().ring, (BooleanRing, IntegralRing))
              if not isinstance(info, ComplexCircularlySymmetricNormalInfo)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
