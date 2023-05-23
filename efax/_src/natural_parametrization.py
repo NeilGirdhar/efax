@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
 
 import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
-from tjax import JaxComplexArray, JaxRealArray, jit
+from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
+                  abstract_jit, jit)
 from typing_extensions import Self
 
 from .parametrization import Parametrization
@@ -22,23 +23,40 @@ EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
 Domain = TypeVar('Domain', bound=JaxComplexArray)
 
 
+def log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
+                       tangents: tuple[NaturalParametrization[Any, Any]],
+                       ) -> tuple[JaxRealArray, JaxRealArray]:
+    """The log-normalizer's special JVP vastly improves numerical stability."""
+    q, = primals
+    q_dot, = tangents
+    y = q.log_normalizer()
+    p = q.to_exp()
+    y_dot = parameters_dot_product(q_dot, p)
+    return y, y_dot
+
+
 class NaturalParametrization(Parametrization,
+                             JaxAbstractClass,
                              Generic[EP, Domain]):
     """The natural parametrization of an exponential family distribution.
 
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
+    @abstract_custom_jvp(log_normalizer_jvp)
+    @abstract_jit
     @abstractmethod
     def log_normalizer(self) -> JaxRealArray:
         """Returns: The log-normalizer."""
         raise NotImplementedError
 
+    @abstract_jit
     @abstractmethod
     def to_exp(self) -> EP:
         """Returns: The corresponding expectation parameters."""
         raise NotImplementedError
 
+    @abstract_jit
     @abstractmethod
     def carrier_measure(self, x: Domain) -> JaxRealArray:
         """The corresponding carrier measure.

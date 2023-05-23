@@ -31,7 +31,7 @@ jax = '>=0.4.5'
 numpy = '>=1.22'
 scipy = '^1.4'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.29.1'
+tjax = '>=0.29.2'
 
 [tool.poetry.group.dev.dependencies]
 isort = '>=5.8'
