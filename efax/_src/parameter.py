@@ -5,7 +5,8 @@ from math import comb, sqrt
 from typing import Any
 
 import jax.numpy as jnp
-from tjax import JaxArray, JaxRealArray, Shape, float_dtype, int_dtype
+from jax.dtypes import canonicalize_dtype
+from tjax import JaxArray, JaxRealArray, Shape
 from tjax.dataclasses import field
 from typing_extensions import override
 
@@ -65,7 +66,7 @@ class BooleanRing(Ring):
 
     @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
-        return jnp.asarray(x, dtype=float_dtype)
+        return jnp.asarray(x, dtype=canonicalize_dtype(float))
 
     @override
     def unflattened(self, y: JaxRealArray) -> JaxArray:
@@ -79,11 +80,11 @@ class IntegralRing(Ring):
 
     @override
     def flattened(self, x: JaxArray) -> JaxRealArray:
-        return jnp.asarray(x, dtype=float_dtype)
+        return jnp.asarray(x, dtype=canonicalize_dtype(float))
 
     @override
     def unflattened(self, y: JaxRealArray) -> JaxArray:
-        return jnp.asarray(y, dtype=int_dtype)
+        return jnp.asarray(y, dtype=canonicalize_dtype(int))
 
 
 real_field = RealField()

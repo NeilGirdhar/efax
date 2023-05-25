@@ -5,6 +5,7 @@ from typing import Any
 import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
+from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyRealArray, Shape
 from typing_extensions import override
@@ -27,8 +28,6 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
 from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vectorized_triu
 
 from .distribution_info import DistributionInfo
-
-int_dtype = jnp.asarray(1).dtype
 
 
 def dirichlet_parameter_generator(n: int, rng: Generator, shape: Shape) -> NumpyRealArray:
@@ -118,7 +117,7 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> NegativeBinomialEP:
         return NegativeBinomialEP(jnp.asarray(rng.exponential(size=shape)),
-                                  self.r * jnp.ones(shape, dtype=int_dtype))
+                                  self.r * jnp.ones(shape, dtype=canonicalize_dtype(int)))
 
 
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, NumpyRealArray]):
