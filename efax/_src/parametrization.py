@@ -25,7 +25,7 @@ class Parametrization(JaxAbstractClass):
         return type(self)(**parameters)
 
     def flattened(self) -> JaxRealArray:
-        return reduce(partial(jnp.append, axis=-1),  # pyright: ignore
+        return reduce(partial(jnp.append, axis=-1),
                       (support.flattened(value)
                        for _, value, support in self.parameters_name_value_support()))
 
