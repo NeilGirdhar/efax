@@ -19,7 +19,7 @@ class ScipyMultivariateNormalUnvectorized(mvn):
     See https://github.com/scipy/scipy/issues/7689.
     """
     @override
-    def rvs(self,
+    def rvs(self,  # type: ignore[misc]
             size: ShapeLike | None = None,
             random_state: Generator | None = None) -> NumpyRealArray:
         retval = super().rvs(size=size, random_state=random_state)  # pyright: ignore
