@@ -23,7 +23,7 @@ class ScipyDirichletFixRVsAndPDF(mvd):
     See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.
     """
     @override
-    def rvs(self,
+    def rvs(self,  # type: ignore[misc]
             size: ShapeLike | None = None,
             random_state: Generator | None = None) -> NumpyRealArray:
         if size is None:
@@ -32,7 +32,7 @@ class ScipyDirichletFixRVsAndPDF(mvd):
         return super().rvs(size=size, random_state=random_state)  # pyright: ignore
 
     @override
-    def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
+    def pdf(self, x: NumpyRealArray) -> NumpyRealArray:  # type: ignore[misc]
         if x.ndim == 2:  # noqa: PLR2004
             return super().pdf(x.T)
         return super().pdf(x)
