@@ -6,10 +6,10 @@ from typing import Any
 
 import jax.numpy as jnp
 from jax import hessian, jacrev, vmap
-from jax.random import KeyArray
+from jax.random import KeyArray, split
 from jax.tree_util import tree_map
 from numpy.random import Generator
-from tjax import JaxArray, JaxRealArray, assert_tree_allclose, vmap_split
+from tjax import JaxArray, JaxRealArray, assert_tree_allclose
 
 from efax import Multidimensional, Samplable
 from efax._src.parametrization import Parametrization
@@ -141,7 +141,7 @@ def test_sampling_cotangents(generator: Generator,
     info = sampling_wc_distribution_info
     info.skip_if_deselected(distribution_name)
     distribution_shape = (23,)
-    keys = vmap_split(key, distribution_shape)
+    keys = split(key, distribution_shape)
 
     parameters: Parametrization
     if natural:
