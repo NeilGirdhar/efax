@@ -246,10 +246,11 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
     @override
     def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
         # Correct numerical errors introduced by various conversions.
-        v = np.asarray(p.variance())
+        mean = np.asarray(p.mean, dtype=np.float64)
+        v = np.asarray(p.variance(), dtype=np.float64)
         v_transpose = v.swapaxes(-1, -2)
         covariance = vectorized_tril(v) + vectorized_triu(v_transpose, 1)
-        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
+        return ScipyMultivariateNormal.from_mc(mean=mean, cov=covariance)
 
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateNormalEP:
@@ -263,7 +264,7 @@ class ComplexUnitNormalInfo(DistributionInfo[ComplexUnitNormalNP, ComplexUnitNor
                                              NumpyComplexArray]):
     @override
     def exp_to_scipy_distribution(self, p: ComplexUnitNormalEP) -> Any:
-        mean = np.asarray(p.mean)
+        mean = np.asarray(p.mean, dtype=np.complex128)
         variance = np.ones_like(mean.real)
         pseudo_variance = np.zeros_like(mean)
         return ScipyComplexNormal(mean, variance, pseudo_variance)
@@ -278,9 +279,9 @@ class ComplexUnitNormalInfo(DistributionInfo[ComplexUnitNormalNP, ComplexUnitNor
 class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, NumpyComplexArray]):
     @override
     def exp_to_scipy_distribution(self, p: ComplexNormalEP) -> Any:
-        mean = np.asarray(p.mean)
-        second_moment = np.asarray(p.second_moment)
-        pseudo_second_moment = np.asarray(p.pseudo_second_moment)
+        mean = np.asarray(p.mean, dtype=np.complex128)
+        second_moment = np.asarray(p.second_moment, dtype=np.float64)
+        pseudo_second_moment = np.asarray(p.pseudo_second_moment, dtype=np.complex128)
         return ScipyComplexNormal(mean,
                                   second_moment - np_abs_square(mean),
                                   pseudo_second_moment - np.square(mean))
@@ -391,7 +392,7 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
 
     @override
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:
-        return ScipyDirichlet(np.asarray(q.alpha_minus_one) + 1.0)
+        return ScipyDirichlet(np.asarray(q.alpha_minus_one, dtype=np.float64) + 1.0)
 
     @override
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> DirichletNP:

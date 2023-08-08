@@ -53,7 +53,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         assert efax_x.shape == ideal_shape
 
         # Verify that the density matches scipy.
-        efax_density = np.asarray(nat_parameters.pdf(efax_x))
+        efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
         try:
             scipy_density = scipy_distribution.pdf(scipy_x)
         except AttributeError:
