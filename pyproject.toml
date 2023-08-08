@@ -60,6 +60,7 @@ disable = [
     'duplicate-code',
     'invalid-name',
     'invalid-unary-operand-type',
+    'line-too-long',
     'missing-docstring',
     'no-member',
     'too-few-public-methods',
@@ -70,7 +71,8 @@ disable = [
     'too-many-locals',
     'too-many-return-statements',
     'too-many-statements',
-    'unused-argument']
+    'unused-argument',
+    'unused-import']
 enable= [
     'useless-suppression',
     'use-symbolic-message-instead']
