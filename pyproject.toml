@@ -86,6 +86,7 @@ ignore-imports = 'yes'
 
 [tool.pyright]
 include = ["efax", "tests", "examples"]
+exclude = ["efax/_src/gamma_generator.py"]
 stubPath = ""
 enableTypeIgnoreComments = false
 reportCallInDefaultInitializer = true
@@ -141,15 +142,11 @@ module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
 ignore_missing_imports = true
 
 [tool.ruff]
-select = ["F", "E", "W", "C90", "I", "N", "D", "UP", "YTT", "ANN", "ASYNC", "S", "BLE", "FBT", "B",
-    "A", "COM", "CPY", "C4", "DTZ", "T10", "EM", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE",
-    "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF",  "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH",
-    # "TD", 
-    "FIX", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "RUF"]
-ignore = ["B008", "B011", "D100", "D101", "D102", "D107", "S101", "D103", "D105",
-    "SIM117", "ANN101", "ANN102", "ANN401", "TID252", "FBT003", "I001", "G004",
-    "PT013", "PT015", "PGH003", "COM812", "Q000", "TCH001", "TCH002", "TCH003", "ERA001", "ARG001",
-    "ARG002", "ARG003", "ARG004", "FIX002", "PD008", "PERF203"]
+select = ["ALL"]
+ignore = ["B011", "D100", "D101", "D102", "D107", "D103", "D105", "S101", "ANN101",
+       "ANN102", "ANN401", "TID252", "FBT003", "I001", "G004", "PT015", "PGH003", "COM812",
+       "Q000", "TCH001", "TCH002", "TCH003", "ERA001", "ARG001", "ARG002", "ARG003", "ARG004",
+       "FIX002", "TD", "PD008"]
 line-length = 100
 target-version = "py38"
 extend-exclude = ["__init__.py", "examples"]
