@@ -1,6 +1,6 @@
 from ._src import (BooleanRing, ComplexField, ExpectationParametrization, IntegralRing,
                    NaturalParametrization, RealField, Ring, ScalarSupport, SquareMatrixSupport,
-                   Support, SymmetricMatrixSupport, VectorSupport)
+                   Support, SymmetricMatrixSupport, VectorSupport, random_gamma)
 from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP,
                                  ChiSquareEP, ChiSquareNP, ComplexCircularlySymmetricNormalEP,
                                  ComplexCircularlySymmetricNormalNP,
@@ -48,4 +48,4 @@ __all__ = ['ExpectationParametrization', 'HasConjugatePrior', 'HasGeneralizedCon
            'ScipyComplexNormal', 'ScipyDirichlet', 'ScipyGeneralizedDirichlet',
            'ScipyMultivariateNormal', 'ScipyVonMises', 'HasEntropyNP', 'HasEntropyEP',
            'UnitNormalNP', 'UnitNormalEP', 'Ring', 'IntegralRing', 'BooleanRing', 'RealField',
-           'ComplexField']
+           'ComplexField', 'random_gamma']

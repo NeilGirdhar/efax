@@ -149,8 +149,6 @@ def test_sampling_cotangents(generator: Generator,
     else:
         parameters = info.exp_parameter_generator(generator, distribution_shape)
     jacobian = calculate_jacobian(parameters, keys)
-    if jnp.all(jacobian):
-        return
     curvature = calculate_curvature(parameters, keys)
     assert jacobian.shape == curvature.shape
     assert jnp.all((jacobian !=0) | (curvature != 0))

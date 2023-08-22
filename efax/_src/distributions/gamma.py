@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import jax
 import jax.numpy as jnp
 from jax.nn import softplus
 from jax.random import KeyArray
@@ -12,6 +11,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..gamma_generator import random_gamma
 from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -70,7 +70,7 @@ class GammaNP(HasEntropyNP,
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        return -jax.random.gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
+        return -random_gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
 
     def to_var(self) -> GammaVP:
         rate = -self.negative_rate

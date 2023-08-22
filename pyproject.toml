@@ -86,6 +86,7 @@ ignore-imports = 'yes'
 
 [tool.pyright]
 include = ["efax", "tests", "examples"]
+exclude = ["efax/_src/gamma_generator.py"]
 stubPath = ""
 enableTypeIgnoreComments = false
 reportCallInDefaultInitializer = true
@@ -134,6 +135,7 @@ warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
+exclude = ["efax/_src/gamma_generator.py"]
 
 [[tool.mypy.overrides]]
 module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
@@ -149,6 +151,7 @@ ignore = ["B011", "D100", "D101", "D102", "D107", "D103", "D105", "S101", "ANN10
 line-length = 100
 target-version = "py38"
 extend-exclude = ["__init__.py", "examples"]
+exclude = ["efax/_src/gamma_generator.py"]
 
 [tool.ruff.flake8-annotations]
 mypy-init-return = true
