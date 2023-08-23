@@ -20,7 +20,7 @@ __all__ = ['NormalNP', 'NormalEP', 'NormalVP']
 
 
 @dataclass
-class NormalNP(HasEntropyNP, NaturalParametrization['NormalEP', JaxRealArray]):
+class NormalNP(HasEntropyNP['NormalEP'], NaturalParametrization['NormalEP', JaxRealArray]):
     """The natural parametrization of the normal distribution.
 
     Args:

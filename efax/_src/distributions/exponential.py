@@ -21,7 +21,7 @@ __all__ = ['ExponentialNP', 'ExponentialEP']
 
 
 @dataclass
-class ExponentialNP(HasEntropyNP,
+class ExponentialNP(HasEntropyNP['ExponentialEP'],
                     Samplable,
                     NaturalParametrization['ExponentialEP', JaxRealArray]):
     """The natural parametrization of the exponential distribution.

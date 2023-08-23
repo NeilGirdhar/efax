@@ -28,7 +28,7 @@ __all__ = ['GeneralizedDirichletNP', 'GeneralizedDirichletEP']
 
 
 @dataclass
-class GeneralizedDirichletNP(HasEntropyNP,
+class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
                              NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
                              Multidimensional):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())

@@ -20,7 +20,7 @@ __all__ = ['IsotropicNormalNP', 'IsotropicNormalEP']
 
 
 @dataclass
-class IsotropicNormalNP(HasEntropyNP,
+class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
                         NaturalParametrization['IsotropicNormalEP', JaxRealArray],
                         Multidimensional):
     """The natural parametrization of the multivariate normal distribution with Var(x) = kI.

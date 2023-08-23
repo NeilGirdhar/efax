@@ -18,7 +18,7 @@ __all__ = ['ChiNP', 'ChiEP']
 
 
 @dataclass
-class ChiNP(HasEntropyNP,
+class ChiNP(HasEntropyNP['ChiEP'],
             TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
     """The natural parametrization of the chi distribution.
 

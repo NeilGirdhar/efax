@@ -17,7 +17,7 @@ __all__ = ['RayleighNP', 'RayleighEP']
 
 
 @dataclass
-class RayleighNP(HasEntropyNP,
+class RayleighNP(HasEntropyNP['RayleighEP'],
                  TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP',
                                                    JaxRealArray]):
     """The natural parametrization of the Rayleigh distribution.

@@ -25,7 +25,7 @@ def _broadcasted_outer(x: JaxRealArray) -> JaxRealArray:
 
 
 @dataclass
-class MultivariateNormalNP(HasEntropyNP,
+class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
                            NaturalParametrization['MultivariateNormalEP', JaxRealArray],
                            Multidimensional):
     """The natural parametrization of the multivariate normal distribution.

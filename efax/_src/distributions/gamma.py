@@ -23,7 +23,7 @@ __all__ = ['GammaNP', 'GammaEP', 'GammaVP']
 
 
 @dataclass
-class GammaNP(HasEntropyNP,
+class GammaNP(HasEntropyNP['GammaEP'],
               Samplable,
               NaturalParametrization['GammaEP', JaxRealArray]):
     """The natural parametrization of the Gamma distribution.

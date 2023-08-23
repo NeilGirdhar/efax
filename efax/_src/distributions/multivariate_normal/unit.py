@@ -24,7 +24,7 @@ __all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
 
 
 @dataclass
-class MultivariateUnitNormalNP(HasEntropyNP,
+class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
                                NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray],
                                Multidimensional,
                                Samplable):

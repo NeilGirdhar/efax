@@ -19,7 +19,8 @@ __all__ = ['WeibullNP', 'WeibullEP']
 
 
 @dataclass
-class WeibullNP(HasEntropyNP, NaturalParametrization['WeibullEP', JaxRealArray]):
+class WeibullNP(HasEntropyNP['WeibullEP'],
+                NaturalParametrization['WeibullEP', JaxRealArray]):
     """The natural parametrization of the Weibull distribution.
 
     Args:

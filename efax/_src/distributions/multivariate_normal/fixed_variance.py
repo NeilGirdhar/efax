@@ -24,7 +24,7 @@ __all__ = ['MultivariateFixedVarianceNormalNP', 'MultivariateFixedVarianceNormal
 
 
 @dataclass
-class MultivariateFixedVarianceNormalNP(HasEntropyNP,
+class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceNormalEP'],
                                         NaturalParametrization['MultivariateFixedVarianceNormalEP',
                                                                JaxRealArray],
                                         Multidimensional,

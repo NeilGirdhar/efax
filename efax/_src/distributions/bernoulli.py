@@ -23,7 +23,7 @@ __all__ = ['BernoulliNP', 'BernoulliEP']
 
 
 @dataclass
-class BernoulliNP(HasEntropyNP,
+class BernoulliNP(HasEntropyNP['BernoulliEP'],
                   NaturalParametrization['BernoulliEP', JaxRealArray]):
     """The natural parametrization of the Bernoulli distribution.
 

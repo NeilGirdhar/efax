@@ -20,7 +20,7 @@ __all__ = ['NegativeBinomialNP', 'NegativeBinomialEP']
 
 
 @dataclass
-class NegativeBinomialNP(NBCommonNP,
+class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP'],
                          NaturalParametrization['NegativeBinomialEP', JaxRealArray]):
     """The natural parametrization of the negative binomial distribution.
 
@@ -51,7 +51,7 @@ class NegativeBinomialNP(NBCommonNP,
 
 @dataclass
 class NegativeBinomialEP(Samplable,
-                         NBCommonEP,
+                         NBCommonEP[NegativeBinomialNP],
                          ExpectationParametrization[NegativeBinomialNP]):
     """The expectation parametrization of the negative binomial distribution.
 

@@ -22,7 +22,7 @@ __all__ = ['UnitNormalNP', 'UnitNormalEP']
 
 
 @dataclass
-class UnitNormalNP(HasEntropyNP,
+class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
                    NaturalParametrization['UnitNormalEP', JaxRealArray],
                    Samplable):
     """The natural parametrization of the normal distribution with unit variance.

@@ -18,7 +18,7 @@ __all__ = ['BetaNP', 'BetaEP']
 
 
 @dataclass
-class BetaNP(DirichletCommonNP,
+class BetaNP(DirichletCommonNP['BetaEP'],
              NaturalParametrization['BetaEP', JaxRealArray]
              ):
     """The natural parametrization of the beta distribution.

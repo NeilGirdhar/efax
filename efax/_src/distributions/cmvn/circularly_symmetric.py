@@ -27,7 +27,7 @@ def _broadcasted_outer_c(x: JaxComplexArray) -> JaxComplexArray:
 
 @dataclass
 class ComplexCircularlySymmetricNormalNP(
-        HasEntropyNP,
+        HasEntropyNP['ComplexCircularlySymmetricNormalEP'],
         NaturalParametrization['ComplexCircularlySymmetricNormalEP', JaxComplexArray],
         Multidimensional,
         Samplable):

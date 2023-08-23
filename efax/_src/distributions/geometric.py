@@ -17,8 +17,8 @@ __all__ = ['GeometricNP', 'GeometricEP']
 
 
 @dataclass
-class GeometricNP(HasEntropyNP,
-                  NBCommonNP,
+class GeometricNP(HasEntropyNP['GeometricEP'],
+                  NBCommonNP['GeometricEP'],
                   NaturalParametrization['GeometricEP', JaxRealArray]):
     """The natural parameters of the geometric distribution.
 
@@ -47,7 +47,7 @@ class GeometricNP(HasEntropyNP,
 
 @dataclass
 class GeometricEP(HasEntropyEP[GeometricNP],
-                  NBCommonEP,
+                  NBCommonEP[GeometricNP],
                   ExpectationParametrization[GeometricNP]):
     """The expectation parameters of the geometric distribution.
 

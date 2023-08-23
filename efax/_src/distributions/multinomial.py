@@ -26,7 +26,7 @@ __all__ = ['MultinomialNP', 'MultinomialEP']
 
 
 @dataclass
-class MultinomialNP(HasEntropyNP,
+class MultinomialNP(HasEntropyNP['MultinomialEP'],
                     Samplable,
                     NaturalParametrization['MultinomialEP', JaxRealArray], Multidimensional):
     """The natural parametrization of the multinomial distribution.

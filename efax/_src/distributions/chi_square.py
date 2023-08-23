@@ -20,7 +20,7 @@ __all__ = ['ChiSquareNP', 'ChiSquareEP']
 
 
 @dataclass
-class ChiSquareNP(HasEntropyNP,
+class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
                   Samplable,
                   NaturalParametrization['ChiSquareEP', JaxRealArray]):
     """The natural parameters of the chi-square distribution with k degrees of freedom.

@@ -21,7 +21,7 @@ __all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
 
 
 @dataclass
-class VonMisesFisherNP(HasEntropyNP,
+class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
                        NaturalParametrization['VonMisesFisherEP', JaxRealArray],
                        Multidimensional):
     """The natural parametrization of the von Mises-Fisher distribution.

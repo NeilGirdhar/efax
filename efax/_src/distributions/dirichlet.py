@@ -16,7 +16,7 @@ __all__ = ['DirichletNP', 'DirichletEP']
 
 
 @dataclass
-class DirichletNP(DirichletCommonNP,
+class DirichletNP(DirichletCommonNP['DirichletEP'],
                   NaturalParametrization['DirichletEP', JaxRealArray]):
     """The natural parametrization of the Dirichlet distribution.
 

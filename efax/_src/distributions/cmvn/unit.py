@@ -21,7 +21,7 @@ __all__ = ['ComplexMultivariateUnitNormalNP', 'ComplexMultivariateUnitNormalEP']
 
 
 @dataclass
-class ComplexMultivariateUnitNormalNP(HasEntropyNP,
+class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNormalEP'],
                                       NaturalParametrization['ComplexMultivariateUnitNormalEP',
                                                              JaxComplexArray],
                                       Multidimensional,

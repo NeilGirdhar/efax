@@ -22,7 +22,7 @@ __all__ = ['MultivariateDiagonalNormalNP', 'MultivariateDiagonalNormalEP',
 
 
 @dataclass
-class MultivariateDiagonalNormalNP(HasEntropyNP,
+class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
                                    NaturalParametrization['MultivariateDiagonalNormalEP',
                                                           JaxRealArray],
                                    Multidimensional):

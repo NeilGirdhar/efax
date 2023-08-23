@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import Any, TypeVar
 
 import jax.numpy as jnp
 from jax.scipy.special import gammaln
@@ -15,8 +16,9 @@ from ..parameter import ScalarSupport, integral_ring
 __all__: list[str] = []
 
 
+EP = TypeVar('EP', bound='NBCommonEP[Any]')
 @dataclass
-class NBCommonNP(NaturalParametrization['NBCommonEP', JaxRealArray]):
+class NBCommonNP(NaturalParametrization[EP, JaxRealArray]):
     log_not_p: JaxRealArray
 
     @property
@@ -47,8 +49,9 @@ class NBCommonNP(NaturalParametrization['NBCommonEP', JaxRealArray]):
         raise NotImplementedError
 
 
+NP = TypeVar('NP', bound=NBCommonNP[Any])
 @dataclass
-class NBCommonEP(ExpectationParametrization[NBCommonNP]):
+class NBCommonEP(ExpectationParametrization[NP]):
     mean: JaxRealArray
 
     @property

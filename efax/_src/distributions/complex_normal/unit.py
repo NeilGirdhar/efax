@@ -19,7 +19,7 @@ __all__ = ['ComplexUnitNormalNP', 'ComplexUnitNormalEP']
 
 
 @dataclass
-class ComplexUnitNormalNP(HasEntropyNP,
+class ComplexUnitNormalNP(HasEntropyNP['ComplexUnitNormalEP'],
                           NaturalParametrization['ComplexUnitNormalEP', JaxComplexArray],
                           Samplable):
     """The natural parametrization of the complex unit normal distribution.
