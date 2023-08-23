@@ -17,6 +17,9 @@ from jax.lax import (add, bitwise_and, bitwise_not, bitwise_or, cond, digamma, d
                      full_like, gt, le, lgamma, log, lt, mul, ne, neg, reciprocal, scan, select,
                      standard_naryop, sub, while_loop)
 from tjax import JaxBooleanArray, JaxRealArray
+from tjax.dataclasses import dataclass
+from tjax.fixed_point import ZeroIteratedFunctionWithCombinator
+from typing_extensions import override
 
 __all__ = ['random_gamma']
 
@@ -30,16 +33,21 @@ class IgammaMode(Enum):
   SAMPLE_DERIVATIVE = 3
 
 
-def _igammac_continued_fraction(ax, x, a, enabled, dtype, mode, hessian):
-    eps = dtypes.finfo(dtype).eps
+@dataclass
+class IGammaCF(ZeroIteratedFunctionWithCombinator):
+    mode: Any
+    eps: Any
 
-    def cond_fn(vals):
-        enabled, _ans, _t, _y, _x, c, *_ = vals
-        return bitwise_and(c < _const(c, 2000), _any(enabled))
+    @override
+    def expected_state(self, theta: Parameters, state: State) -> State:
+        """The expected value of the next state given the old one.
 
-    def body_fn(vals):
+        This is used by the combinator.
+        """
+        eps = self.eps
+        vals = state
         (enabled, ans, t, y, z, c, pkm1, qkm1, pkm2, qkm2,
-            dpkm2_da, dqkm2_da, dpkm1_da, dqkm1_da, dans_da) = vals
+            dpkm2_da, dqkm2_da, dpkm1_da, dqkm1_da, dans_da, grad_conditional) = vals
 
         c = c + _const(c, 1)
         y = y + _const(y, 1)
@@ -81,7 +89,7 @@ def _igammac_continued_fraction(ax, x, a, enabled, dtype, mode, hessian):
         dpkm1_da = select(rescale, mul(dpkm1_da, _const(dpkm1_da, eps)), dpkm1_da)
         dqkm1_da = select(rescale, mul(dqkm1_da, _const(dqkm1_da, eps)), dqkm1_da)
 
-        if mode == IgammaMode.VALUE:
+        if self.mode == IgammaMode.VALUE:
             conditional = bitwise_and(enabled, t > eps)
         else:
             conditional = bitwise_and(enabled,
@@ -101,7 +109,63 @@ def _igammac_continued_fraction(ax, x, a, enabled, dtype, mode, hessian):
                 select(enabled, dqkm2_da, vals[11]),
                 select(enabled, dpkm1_da, vals[12]),
                 select(enabled, dqkm1_da, vals[13]),
-                select(enabled, dans_da_new, vals[14]))
+                select(enabled, dans_da_new, vals[14]),
+                select(enabled, grad_conditional, vals[15]))
+
+    @override
+    def extract_comparand(self, state: State) -> Comparand:
+        """Extracts the "comparand" from the state.
+
+        This is a subset of the values in the state that are compared by subclasses to detect
+        convergence:
+        * In ZeroIteratedFunction, the comparand is compared with zero.
+        * In ComparingIteratedFunction, the comparand is compared in successive states.
+        * In StochasticIteratedFunction, the mean and variance of the comparand are compared.
+        """
+        vals = state
+        (enabled, ans, t, y, z, c, pkm1, qkm1, pkm2, qkm2,
+            dpkm2_da, dqkm2_da, dpkm1_da, dqkm1_da, dans_da, grad_conditional) = vals
+        if self.mode == IgammaMode.VALUE:
+            return t
+        return grad_conditional
+
+    @override
+    def extract_differentiand(self, theta: Parameters, state: State) -> Differentiand:
+        """Extract the differentiable values in a state.
+
+        It is used by the combinator to find cotangents.
+
+        Returns: The differentiable values in the state.
+        """
+        vals = state
+        return vals[1], vals[14]
+
+    @override
+    def implant_differentiand(self,
+                              theta: Parameters,
+                              state: State,
+                              differentiand: Differentiand) -> State:
+        """Implant the differentiand into the state.
+
+        Args:
+            theta: The parameters for which gradients can be calculated.
+            state: A state that will provide nondifferentiable values.
+            differentiand: A differentiand that will provide differentiable values.
+        Returns: A state containing differentiable from the differentiand and nondifferentiable
+            values from the inputted state.
+        """
+        vals = state
+        (enabled, ans, t, y, z, c, pkm1, qkm1, pkm2, qkm2,
+            dpkm2_da, dqkm2_da, dpkm1_da, dqkm1_da, dans_da, grad_conditional) = vals
+        ans, dans_da = differentiand
+        return (enabled, ans, t, y, z, c, pkm1, qkm1, pkm2, qkm2,
+            dpkm2_da, dqkm2_da, dpkm1_da, dqkm1_da, dans_da, grad_conditional)
+
+
+def _igammac_continued_fraction(ax, x, a, enabled, dtype, mode, hessian):
+    eps = dtypes.finfo(dtype).eps
+
+    igcf = IGammaCF(maximum_iterations=2000, atol=eps, mode=mode, eps=eps)
 
     y = _const(a, 1) - a
     z = x + y + _const(x, 1)
@@ -117,9 +181,11 @@ def _igammac_continued_fraction(ax, x, a, enabled, dtype, mode, hessian):
     dpkm1_da = full_like(x, 0)
     dqkm1_da = -x
     dans_da = (dpkm1_da - ans * dqkm1_da) / qkm1
+    grad_contitional = full_like(x, 0)
     init_vals = (enabled,    ans,        t,        y,        z,
                  c,        pkm1,     qkm1,     pkm2,     qkm2,
-                 dpkm2_da, dqkm2_da, dpkm1_da, dqkm1_da, dans_da)
+                 dpkm2_da, dqkm2_da, dpkm1_da, dqkm1_da, dans_da,
+                 grad_contitional)
 
     vals = (_while_loop_scan(cond_fn, body_fn, init_vals, 256)
             if hessian
