@@ -1,8 +1,14 @@
 =================================
 EFAX: Exponential Families in JAX
 =================================
-.. image:: https://badge.fury.io/py/efax.svg
-    :target: https://badge.fury.io/py/efax
+
+|pypi| |py_versions|
+
+.. |pypi| image:: https://img.shields.io/pypi/v/efax
+   :   alt: PyPI - Version
+
+.. |py_versions| image:: https://img.shields.io/pypi/pyversions/efax
+   :   alt: PyPI - Python Version
 
 .. role:: bash(code)
     :language: bash
