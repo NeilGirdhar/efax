@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from tjax.dataclasses import DataclassInstance, dataclass
 from abc import abstractmethod
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
@@ -35,6 +36,7 @@ def log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
     return y, y_dot
 
 
+@dataclass
 class NaturalParametrization(Parametrization,
                              JaxAbstractClass,
                              Generic[EP, Domain]):
@@ -141,6 +143,7 @@ class NaturalParametrization(Parametrization,
             else:
                 raise RuntimeError
             kwargs[name] = new_value
+        assert isinstance(self, DataclassInstance)
         return replace(self, **kwargs)
 
     @final
