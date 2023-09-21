@@ -8,6 +8,7 @@ import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
 from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
+from tjax.dataclasses import DataclassInstance, dataclass
 from typing_extensions import Self
 
 from .parametrization import Parametrization
@@ -35,6 +36,7 @@ def log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
     return y, y_dot
 
 
+@dataclass
 class NaturalParametrization(Parametrization,
                              JaxAbstractClass,
                              Generic[EP, Domain]):
@@ -141,6 +143,7 @@ class NaturalParametrization(Parametrization,
             else:
                 raise RuntimeError
             kwargs[name] = new_value
+        assert isinstance(self, DataclassInstance)
         return replace(self, **kwargs)
 
     @final
