@@ -13,7 +13,7 @@ __all__: list[str] = []
 
 
 def np_abs_square(x: NumpyComplexArray) -> NumpyRealArray:
-    return np.square(x.real) + np.square(x.imag)  # pyright: ignore
+    return np.square(x.real) + np.square(x.imag)
 
 
 def parameters_dot_product(x: NaturalParametrization[Any, Any], y: Any) -> JaxRealArray:
