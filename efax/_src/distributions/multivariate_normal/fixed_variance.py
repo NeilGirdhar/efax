@@ -5,8 +5,7 @@ from typing import Any
 
 import jax
 import jax.numpy as jnp
-from jax.random import KeyArray
-from tjax import JaxRealArray, Shape
+from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 

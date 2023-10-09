@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
-from jax.random import KeyArray, split
-from tjax import JaxIntegralArray, JaxRealArray, Shape
+from jax.random import split
+from tjax import JaxIntegralArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 

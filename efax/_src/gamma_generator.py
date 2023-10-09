@@ -8,14 +8,14 @@ import numpy as np
 from jax import Array, core, grad, jit, lax, vmap
 from jax._src import dtypes, xla_bridge
 from jax._src.interpreters import batching
-from jax._src.lax.lax import _const, _float, _isnan
+from jax._src.lax.lax import standard_naryop, _const, _float, _isnan
 from jax._src.lax.special import _any, _up_and_broadcast
 from jax._src.random import _check_prng_key, _check_shape, _gamma_batching_rule, _gamma_impl
 from jax._src.typing import ArrayLike, DTypeLike
 from jax.interpreters import ad, mlir
 from jax.lax import (add, bitwise_and, bitwise_not, bitwise_or, cond, digamma, div, eq, exp,
                      full_like, gt, le, lgamma, log, lt, mul, ne, neg, reciprocal, scan, select,
-                     standard_naryop, sub, while_loop)
+                     sub, while_loop)
 from tjax import JaxBooleanArray, JaxRealArray
 
 __all__ = ['random_gamma']

@@ -6,10 +6,10 @@ from typing import Any
 
 import jax.numpy as jnp
 from jax import hessian, jacrev, vmap
-from jax.random import KeyArray, split
+from jax.random import split
 from jax.tree_util import tree_map
 from numpy.random import Generator
-from tjax import JaxArray, JaxRealArray, assert_tree_allclose
+from tjax import JaxArray, JaxRealArray, KeyArray, assert_tree_allclose
 
 from efax import Multidimensional, Samplable
 from efax._src.parametrization import Parametrization

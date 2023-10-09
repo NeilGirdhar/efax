@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from jax.random import KeyArray
-from tjax import JaxArray, Shape
+from tjax import JaxArray, KeyArray, Shape
 
 from ..parametrization import Parametrization
 

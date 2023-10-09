@@ -7,8 +7,9 @@ import numpy as np
 import pytest
 from jax import enable_custom_prng
 from jax.experimental import enable_x64
-from jax.random import KeyArray, PRNGKey
+from jax.random import PRNGKey
 from numpy.random import Generator as NumpyGenerator
+from tjax import KeyArray
 
 from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior,
                   IntegralRing, Samplable)

@@ -3,7 +3,8 @@ from math import isclose
 import jax.numpy as jnp
 import pytest
 from jax import grad, vmap
-from jax.random import KeyArray, split
+from jax.random import split
+from tjax import KeyArray
 
 from efax import random_gamma
 

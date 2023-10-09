@@ -4,9 +4,8 @@ from typing import Any
 
 import jax.numpy as jnp
 from jax.nn import softplus
-from jax.random import KeyArray
 from jax.scipy import special as jss
-from tjax import JaxRealArray, Shape, inverse_softplus
+from tjax import JaxRealArray, KeyArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 

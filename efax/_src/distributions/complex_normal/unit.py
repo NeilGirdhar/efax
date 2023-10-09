@@ -4,8 +4,7 @@ import math
 from typing import Any
 
 import jax
-from jax.random import KeyArray
-from tjax import JaxComplexArray, JaxRealArray, Shape, abs_square
+from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
