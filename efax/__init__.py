@@ -1,6 +1,7 @@
-from ._src import (BooleanRing, ComplexField, ExpectationParametrization, IntegralRing,
-                   NaturalParametrization, RealField, Ring, ScalarSupport, SquareMatrixSupport,
-                   Support, SymmetricMatrixSupport, VectorSupport, random_gamma)
+from ._src import (BooleanRing, ComplexField,  # type: ignore[attr-defined]
+                   ExpectationParametrization, IntegralRing, NaturalParametrization, RealField,
+                   Ring, ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
+                   VectorSupport, random_gamma)
 from ._src.distributions import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP,
                                  ChiSquareEP, ChiSquareNP, ComplexCircularlySymmetricNormalEP,
                                  ComplexCircularlySymmetricNormalNP,

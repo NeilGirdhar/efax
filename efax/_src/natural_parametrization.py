@@ -144,7 +144,7 @@ class NaturalParametrization(Parametrization,
                 raise RuntimeError
             kwargs[name] = new_value
         assert isinstance(self, DataclassInstance)
-        return replace(self, **kwargs)
+        return replace(self, **kwargs)  # type: ignore[misc, return-value]
 
     @final
     def jeffreys_prior(self) -> JaxRealArray:

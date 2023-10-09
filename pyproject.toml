@@ -138,6 +138,10 @@ warn_unused_ignores = true
 exclude = ["efax/_src/gamma_generator.py"]
 
 [[tool.mypy.overrides]]
+module = ['efax._src.gamma_generator']
+follow_imports = 'skip'
+
+[[tool.mypy.overrides]]
 module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
        'tensorflow_probability.substrates']
 ignore_missing_imports = true
