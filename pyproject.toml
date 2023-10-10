@@ -16,17 +16,16 @@ classifiers = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
     'Topic :: Scientific/Engineering :: Artificial Intelligence',
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Typing :: Typed',
     'License :: OSI Approved :: MIT License']
 
 [tool.poetry.dependencies]
-python = '>=3.9,<3.13'
+python = '>=3.10,<3.13'
 jax = '>=0.4.14'
 numpy = '>=1.22'
 scipy = '^1.4'
@@ -153,7 +152,7 @@ ignore = ["B011", "D100", "D101", "D102", "D107", "D103", "D105", "S101", "ANN10
        "Q000", "TCH001", "TCH002", "TCH003", "ERA001", "ARG001", "ARG002", "ARG003", "ARG004",
        "FIX002", "TD", "PD008"]
 line-length = 100
-target-version = "py39"
+target-version = "py310"
 extend-exclude = ["__init__.py", "examples"]
 exclude = ["efax/_src/gamma_generator.py"]
 

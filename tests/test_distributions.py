@@ -21,9 +21,9 @@ def test_conversion(generator: Generator,
                     ) -> None:
     """Test that the conversion between the different parametrizations are consistent."""
     atol = (5e-3
-            if isinstance(distribution_info, (GammaInfo, BetaInfo))
+            if isinstance(distribution_info, GammaInfo | BetaInfo)
             else 2e-2
-            if isinstance(distribution_info, (DirichletInfo, GeneralizedDirichletInfo))
+            if isinstance(distribution_info, DirichletInfo | GeneralizedDirichletInfo)
             else 1e-4)
 
     for _ in range(10):

@@ -41,12 +41,10 @@ def test_maximum_likelihood_estimation(generator: Generator,
             else 2e-1
             if isinstance(sampling_distribution_info, ComplexCircularlySymmetricNormalInfo)
             else 1e-1
-            if isinstance(sampling_distribution_info, (ComplexNormalInfo,
-                                                       ComplexMultivariateUnitNormalInfo,
-                                                       MultivariateDiagonalNormalInfo,
-                                                       MultivariateNormalInfo,
-                                                       MultivariateFixedVarianceNormalInfo,
-                                                       MultivariateUnitNormalInfo))
+            if isinstance(sampling_distribution_info,
+                          ComplexNormalInfo | ComplexMultivariateUnitNormalInfo |
+                          MultivariateDiagonalNormalInfo | MultivariateNormalInfo |
+                          MultivariateFixedVarianceNormalInfo | MultivariateUnitNormalInfo)
             else 1e-2
             if isinstance(sampling_distribution_info, PoissonInfo)
             else 1e-6)

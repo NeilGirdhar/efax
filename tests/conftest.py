@@ -87,7 +87,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              for natural in [False, True]
              for cls in [info.nat_class() if natural else info.exp_class()]
              if issubclass(cls, Samplable)
-             if not isinstance(cls.domain_support().ring, (BooleanRing, IntegralRing))
+             if not isinstance(cls.domain_support().ring, BooleanRing | IntegralRing)
              if not isinstance(info, ComplexCircularlySymmetricNormalInfo)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
