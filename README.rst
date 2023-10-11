@@ -5,10 +5,10 @@ EFAX: Exponential Families in JAX
 |pypi| |py_versions|
 
 .. |pypi| image:: https://img.shields.io/pypi/v/efax
-   :   alt: PyPI - Version
+   :alt: PyPI - Version
 
 .. |py_versions| image:: https://img.shields.io/pypi/pyversions/efax
-   :   alt: PyPI - Python Version
+   :alt: PyPI - Python Version
 
 .. role:: bash(code)
     :language: bash
