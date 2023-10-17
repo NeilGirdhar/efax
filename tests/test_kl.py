@@ -45,7 +45,7 @@ def test_kl(generator: Generator, distribution_info_kl: DistributionInfo[Any, An
         ysh = y.shape_minus_one + 1.0
         xsc = -1.0 / x.to_nat().negative_rate
         ysc = -1.0 / y.negative_rate
-        scipy_kl = (((xsc - ysc)/ysc) * xsh + gammaln(ysh) - gammaln(xsh)
+        scipy_kl = (((xsc - ysc) / ysc) * xsh + gammaln(ysh) - gammaln(xsh)
                     + ysh * np.log(ysc) - xsh * np.log(xsc)
                     + (xsh - ysh) * (np.log(xsc) + digamma(xsh)))
     else:

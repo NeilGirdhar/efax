@@ -226,7 +226,7 @@ class SymmetricMatrixSupport(Support):
         sqrt_discriminant = sqrt(1 + 8 * k)
         i_sqrt_discriminant = int(sqrt_discriminant)
         if i_sqrt_discriminant != sqrt_discriminant:
-            msg =f"{k} {sqrt_discriminant}"
+            msg = f"{k} {sqrt_discriminant}"
             raise ValueError(msg)
         if i_sqrt_discriminant % 2 != 1:
             raise ValueError

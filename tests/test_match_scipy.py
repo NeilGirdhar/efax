@@ -34,7 +34,7 @@ def test_entropy(generator: Generator, entropy_distribution_info: DistributionIn
     if isinstance(entropy_distribution_info, GeometricInfo):
         # Work around https://github.com/scipy/scipy/issues/18226
         p = 1.0 / (1.0 + nat_parameters.to_exp().mean)
-        scipy_entropy = -np.log(p) - np.log1p(-p) * (1.0-p) / p
+        scipy_entropy = -np.log(p) - np.log1p(-p) * (1.0 - p) / p
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
 
 

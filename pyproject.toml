@@ -146,11 +146,12 @@ module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
 ignore_missing_imports = true
 
 [tool.ruff]
+preview = true
 select = ["ALL"]
 ignore = ["B011", "D100", "D101", "D102", "D107", "D103", "D105", "S101", "ANN101",
        "ANN102", "ANN401", "TID252", "FBT003", "I001", "G004", "PT015", "PGH003", "COM812",
        "Q000", "TCH001", "TCH002", "TCH003", "ERA001", "ARG001", "ARG002", "ARG003", "ARG004",
-       "FIX002", "TD", "PD008"]
+       "FIX002", "TD", "PD008", "PT013", "CPY001", "PLR6301"]
 line-length = 100
 target-version = "py310"
 extend-exclude = ["__init__.py", "examples"]
