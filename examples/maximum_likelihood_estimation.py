@@ -1,7 +1,7 @@
 from functools import partial
 
 import jax.numpy as jnp
-from jax.random import PRNGKey
+from jax.random import key
 from jax.tree_util import tree_map
 
 from efax import DirichletNP
@@ -12,8 +12,8 @@ source_distribution = DirichletNP(alpha_minus_one=alpha - 1.0)
 
 # Let's sample from it.
 n_samples = 10000
-key = PRNGKey(123)
-samples = source_distribution.sample(key, (n_samples,))
+key_a = key(123)
+samples = source_distribution.sample(key_a, (n_samples,))
 
 # Now, let's find the maximum likelihood Dirichlet distribution that fits it.
 # First, convert the samples to their sufficient statistics.
