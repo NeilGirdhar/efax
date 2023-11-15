@@ -1,0 +1,49 @@
+# Install the pre-commit hooks below with
+# 'pre-commit install'
+
+# Auto-update the version of the hooks with
+# 'pre-commit autoupdate'
+
+# Run the hooks on all files with
+# 'pre-commit run --all'
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.5.0
+  hooks:
+  - id: check-toml
+  - id: check-yaml
+  - id: check-shebang-scripts-are-executable
+  - id: debug-statements
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.1.5
+  hooks:
+  - id: ruff
+
+- repo: https://github.com/PyCQA/isort
+  rev: 5.12.0
+  hooks:
+  - id: isort
+
+- repo: local
+  hooks:
+  - id: pyright
+    name: pyright
+    entry: pyright
+    language: node
+    pass_filenames: false
+    types: [python]
+    stages: [pre-commit, pre-merge-commit, pre-push, manual]
+    additional_dependencies: &pyright_dependencies
+    - pyright@1.1.335
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: 'v1.7.0'
+  hooks:
+  - id: mypy
+    additional_dependencies: [tjax]
+    args: [--config=pyproject.toml]
+    stages: [pre-push, manual]
