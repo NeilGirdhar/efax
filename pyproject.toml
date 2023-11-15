@@ -149,10 +149,43 @@ ignore_missing_imports = true
 [tool.ruff]
 preview = true
 select = ["ALL"]
-ignore = ["B011", "D100", "D101", "D102", "D107", "D103", "D105", "S101", "ANN101",
-       "ANN102", "ANN401", "TID252", "FBT003", "I001", "G004", "PT015", "PGH003", "COM812",
-       "Q000", "TCH001", "TCH002", "TCH003", "ERA001", "ARG001", "ARG002", "ARG003", "ARG004",
-       "FIX002", "TD", "PD008", "PT013", "CPY001", "PLR6301"]
+ignore = [
+    "ANN101",  # Missing type annotation for self.
+    "ANN102",  # Missing type annotation for cls.
+    "ANN401",  # Dynamically typed expressions (Any).
+    "ARG001",  # Unused function argument.
+    "ARG002",  # Unused method argument.
+    "ARG003",  # Unused class method argument.
+    "ARG004",  # Unused static method argument.
+    "B011",  # Do not assert false.
+    "C901",  # Complex structure.
+    "COM812",  # Trailing comma missing.
+    "CPY001",  # Missing copyright.
+    "D100",  # Missing docstring in public module.
+    "D101",  # Missing docstring in public class.
+    "D102",  # Missing docstring in public method.
+    "D103",  # Missing docstring in public function.
+    "D105",  # Missing docstring in magic method.
+    "D107",  # Missing docstring in __init__.
+    "ERA001",  # Commented-out code.
+    "FBT003",  # Boolean positional value in function call.
+    "FIX002",  # Line contains TODO, consider resolving the issue.
+    "G004",  # Logging statement uses f-string.
+    "I001",  # Import block is un-sorted or un-formatted.
+    "PD008",  # Use .loc instead of .at. If speed is important, use NumPy.
+    "PGH003",  # Use specific rule codes when ignoring type issues.
+    "PLR0913",  # Too many arguments in function definition.
+    "PLR6301",  # Method doesn't use self.
+    "PT013",  # Found incorrect import of pytest, use simple import pytest instead.
+    "Q000",  # Single quotes found but double quotes preferred.
+    "S101",  # Assert used.
+    "TCH001",  # Move application import into a type-checking block.
+    "TCH002",  # Move third-party import into a type-checking block.
+    "TCH003",  # Move standard library import into a type-checking block.
+    "TD002",  # Missing author in TODO; try: # TODO(<author_name>): ....
+    "TD003",  # Missing issue link on the line following this TODO.
+    "TID252",  # Relative imports from parent modules are banned.
+]
 line-length = 100
 target-version = "py310"
 extend-exclude = ["__init__.py", "examples"]

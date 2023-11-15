@@ -49,6 +49,6 @@ def test_kl(generator: Generator, distribution_info_kl: DistributionInfo[Any, An
                     + ysh * np.log(ysc) - xsh * np.log(xsc)
                     + (xsh - ysh) * (np.log(xsc) + digamma(xsh)))
     else:
-        assert False
+        pytest.fail("Unexpected type.")
     rtol = 1e-5
     assert_allclose(my_kl, scipy_kl, rtol=rtol)
