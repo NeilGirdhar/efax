@@ -15,7 +15,6 @@ __all__ = ['ScipyDirichlet', 'ScipyGeneralizedDirichlet']
 scipy_beta = scipy.special.beta
 
 
-# pylint: disable=protected-access
 mvd: type = ss._multivariate.dirichlet_frozen  # noqa: SLF001
 class ScipyDirichletFixRVsAndPDF(mvd):
     """This class repairs dirichlet.

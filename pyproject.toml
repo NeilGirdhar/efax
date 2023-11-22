@@ -63,6 +63,7 @@ disable = [
     'line-too-long',
     'missing-docstring',
     'no-member',
+    'protected-access',
     'too-few-public-methods',
     'too-many-ancestors',
     'too-many-arguments',

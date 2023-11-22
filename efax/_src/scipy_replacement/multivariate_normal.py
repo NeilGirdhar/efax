@@ -11,7 +11,6 @@ from .shaped_distribution import ShapedDistribution
 __all__ = ['ScipyMultivariateNormal']
 
 
-# pylint: disable=protected-access
 mvn: type = ss._multivariate.multivariate_normal_frozen  # noqa: SLF001
 class ScipyMultivariateNormalUnvectorized(mvn):
     """This class repairs multivariate_normal.

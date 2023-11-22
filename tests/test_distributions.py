@@ -50,7 +50,7 @@ def test_gradient_log_normalizer(
                                             Any]
         ) -> None:
     """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
-    # pylint: disable=too-many-locals, disable=protected-access
+    # pylint: disable=too-many-locals
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
     original_ln = cls._original_log_normalizer  # type: ignore # pyright: ignore
     original_gln = jit(grad(original_ln, allow_int=True))

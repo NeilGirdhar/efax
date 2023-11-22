@@ -17,7 +17,6 @@ def test_mvn_fisher_information(distribution_name: None | str) -> None:
     MultivariateNormalInfo.skip_if_deselected(distribution_name)
     m = MultivariateNormalNP(jnp.zeros(2), -0.5 * jnp.eye(2))
 
-    # pylint: disable=protected-access
     assert_tree_allclose(m._fisher_information_matrix(),  # noqa: SLF001
                          np.asarray([[1., 0., 0., 0., 0.],
                                      [0., 1., 0., 0., 0.],
@@ -38,7 +37,6 @@ def test_mvn_fisher_information_b(distribution_name: None | str) -> None:
     MultivariateNormalInfo.skip_if_deselected(distribution_name)
     m = MultivariateNormalNP(jnp.asarray([3.0, 5.0]), jnp.asarray([[-0.5, 0.0], [0.0, -0.8]]))
 
-    # pylint: disable=protected-access
     assert_tree_allclose(m._fisher_information_matrix(),  # noqa: SLF001
                          jnp.asarray([[1., -0., 6., 6.25, -0.],
                                       [-0., 0.625, -0., 3.75, 3.90625],
@@ -59,7 +57,6 @@ def test_fisher_information_is_convex(generator: Generator,
                                       distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     shape = (3, 2)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
-    # pylint: disable=protected-access
     fisher_information = nat_parameters._fisher_information_matrix()  # noqa: SLF001
     assert issubclass(fisher_information.dtype.type, jnp.floating)
     eigvals = jnp.linalg.eigvals(fisher_information)
