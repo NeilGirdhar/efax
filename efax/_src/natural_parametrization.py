@@ -145,7 +145,7 @@ class NaturalParametrization(Parametrization,
             kwargs[name] = new_value
         assert isinstance(self, DataclassInstance)
 
-        return replace(self, **kwargs)  # type: ignore[return-value] # pyright: ignore
+        return replace(self, **kwargs)  # type: ignore[return-value]
 
     @final
     def jeffreys_prior(self) -> JaxRealArray:

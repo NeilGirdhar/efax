@@ -19,7 +19,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.5
+  rev: v0.1.6
   hooks:
   - id: ruff
 
@@ -38,10 +38,10 @@ repos:
     types: [python]
     stages: [pre-commit, pre-merge-commit, pre-push, manual]
     additional_dependencies: &pyright_dependencies
-    - pyright@1.1.335
+    - pyright@1.1.338
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.7.0'
+  rev: 'v1.7.1'
   hooks:
   - id: mypy
     additional_dependencies: [tjax]
