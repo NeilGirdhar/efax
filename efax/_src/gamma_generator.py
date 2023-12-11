@@ -1,3 +1,4 @@
+# pylint: disable=bad-indentation
 from collections.abc import Sequence
 from enum import Enum
 from functools import partial

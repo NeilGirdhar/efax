@@ -64,6 +64,8 @@ disable = [
     'missing-docstring',
     'no-member',
     'protected-access',
+    'redefined-builtin',
+    'signature-differs',
     'too-few-public-methods',
     'too-many-ancestors',
     'too-many-arguments',
