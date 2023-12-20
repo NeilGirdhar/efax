@@ -102,7 +102,7 @@ class ScipyComplexMultivariateNormal(
         else:
             raise ValueError
         dtype = np.result_type(*[x.dtype
-                                 for x in [mean, variance, pseudo_variance]
+                                 for x in (mean, variance, pseudo_variance)
                                  if x is not None])
         rvs_shape = (dimensions,)
         if mean is None:

@@ -11,7 +11,7 @@ from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 # Tools --------------------------------------------------------------------------------------------
 def random_complex_array(generator: Generator, shape: Shape = ()) -> NumpyComplexArray:
-    return np.asarray(sum(x * generator.normal(size=shape) for x in [0.5, 0.5j]))
+    return np.asarray(sum(x * generator.normal(size=shape) for x in (0.5, 0.5j)))
 
 
 def build_uvcn(generator: Generator, shape: Shape) -> ScipyComplexNormal:

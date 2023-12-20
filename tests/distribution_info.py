@@ -85,8 +85,8 @@ class DistributionInfo(Generic[NP, EP, Domain]):
                 and cls.nat_parameter_generator is DistributionInfo.nat_parameter_generator):
             raise TypeError
 
-        for method in ['exp_parameter_generator', 'nat_parameter_generator',
-                       'scipy_to_exp_family_observation']:
+        for method in ('exp_parameter_generator', 'nat_parameter_generator',
+                       'scipy_to_exp_family_observation'):
             old_method = getattr(cls, method)
 
             def new_method(*args: Any,

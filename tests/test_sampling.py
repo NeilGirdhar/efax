@@ -141,11 +141,9 @@ def test_sampling_cotangents(generator: Generator,
     distribution_shape = (23,)
     keys = split(key, distribution_shape)
 
-    parameters: Parametrization
-    if natural:
-        parameters = info.nat_parameter_generator(generator, distribution_shape)
-    else:
-        parameters = info.exp_parameter_generator(generator, distribution_shape)
+    parameters: Parametrization = (info.nat_parameter_generator(generator, distribution_shape)
+                                   if natural
+                                   else info.exp_parameter_generator(generator, distribution_shape))
     jacobian = calculate_jacobian(parameters, keys)
     curvature = calculate_curvature(parameters, keys)
     assert jacobian.shape == curvature.shape

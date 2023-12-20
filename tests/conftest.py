@@ -75,7 +75,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if 'sampling_distribution_info' in metafunc.fixturenames and 'natural' in metafunc.fixturenames:
         p = [(info, natural)
              for info in _all_infos
-             for natural in [False, True]
+             for natural in (False, True)
              if issubclass(info.nat_class() if natural else info.exp_class(), Samplable)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_distribution_info", "natural"), p,
@@ -84,9 +84,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
             and 'natural' in metafunc.fixturenames):
         p = [(info, natural)
              for info in _all_infos
-             for natural in [False, True]
-             for cls in [info.nat_class() if natural else info.exp_class()]
-             if issubclass(cls, Samplable)
+             for natural in (False, True)
+             if issubclass(cls := (info.nat_class() if natural else info.exp_class()), Samplable)
              if not isinstance(cls.domain_support().ring, BooleanRing | IntegralRing)
              if not isinstance(info, ComplexCircularlySymmetricNormalInfo)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
