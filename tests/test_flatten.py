@@ -6,15 +6,12 @@ import numpy as np
 from numpy.random import Generator
 from tjax import assert_tree_allclose
 
-from efax import ExpectationParametrization, NaturalParametrization
-
 from .distribution_info import DistributionInfo
 
 
 def test_flatten(generator: Generator,
-                 distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
-                                                     ExpectationParametrization[Any],
-                                                     Any]) -> None:
+                 distribution_info: DistributionInfo[Any, Any, Any]
+                 ) -> None:
     """Test that the methods produce the correct shapes."""
     shape = (3, 4)
 

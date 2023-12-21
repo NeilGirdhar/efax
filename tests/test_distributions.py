@@ -1,23 +1,23 @@
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Callable
+from typing import Any, TypeAlias
 
 import jax.numpy as jnp
 from jax import grad, jvp, vjp
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_tree_allclose, jit, zero_tangent_like
+from tjax import JaxRealArray, assert_tree_allclose, jit, zero_tangent_like
 
-from efax import ExpectationParametrization, NaturalParametrization
+from efax import NaturalParametrization
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
 
+LogNormalizer: TypeAlias = Callable[[NaturalParametrization[Any, Any]], JaxRealArray]
 
 def test_conversion(generator: Generator,
-                    distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
-                                                        ExpectationParametrization[Any],
-                                                        Any]
+                    distribution_info: DistributionInfo[Any, Any, Any]
                     ) -> None:
     """Test that the conversion between the different parametrizations are consistent."""
     atol = (5e-3
@@ -43,25 +43,26 @@ def test_conversion(generator: Generator,
         assert_tree_allclose(original_fixed, final_fixed)
 
 
-def test_gradient_log_normalizer(
-        generator: Generator,
-        distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
-                                            ExpectationParametrization[Any],
-                                            Any]
-        ) -> None:
-    """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
-    # pylint: disable=too-many-locals
+def prelude(generator: Generator,
+            distribution_info: DistributionInfo[Any, Any, Any]
+            ) -> tuple[LogNormalizer, LogNormalizer]:
     cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
-    original_ln = cls._original_log_normalizer  # type: ignore # pyright: ignore
-    original_gln = jit(grad(original_ln, allow_int=True))
+    original_ln = cls._original_log_normalizer
     optimized_ln = cls.log_normalizer
-    optimized_gln = jit(grad(optimized_ln, allow_int=True))
+    return original_ln, optimized_ln
 
+
+def test_gradient_log_normalizer_primals(generator: Generator,
+                                         distribution_info: DistributionInfo[Any, Any, Any]
+                                         ) -> None:
+    """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
+    original_ln, optimized_ln = prelude(generator, distribution_info)
+    original_gln = jit(grad(original_ln, allow_int=True))
+    optimized_gln = jit(grad(optimized_ln, allow_int=True))
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         fixed_parameters = nat_parameters.fixed_parameters()
         exp_parameters = nat_parameters.to_exp()  # Regular transformation.
-        nat_cls = type(nat_parameters)
         ep_cls = type(exp_parameters)
 
         # Original GLN.
@@ -79,20 +80,41 @@ def test_gradient_log_normalizer(
         assert_tree_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)
         assert_tree_allclose(exp_parameters, optimized_exp_parameters, rtol=1e-5)
 
+
+def unit_tangent(nat_parameters: NaturalParametrization[Any, Any]
+                 ) -> NaturalParametrization[Any, Any]:
+    nat_cls = type(nat_parameters)
+    return nat_cls(**{name: zero_tangent_like(value)
+                      for name, value in nat_parameters.fixed_parameters().items()},
+                   **{name: jnp.ones_like(value)
+                      for name, value in nat_parameters.parameters_name_value()})
+
+
+def test_gradient_log_normalizer_jvp(generator: Generator,
+                                     distribution_info: DistributionInfo[Any, Any, Any]
+                                     ) -> None:
+    """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
+    original_ln, optimized_ln = prelude(generator, distribution_info)
+    for _ in range(20):
+        nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
+
         # Test JVP.
-        ones_like_nat_parameters = nat_cls(
-            **{name: zero_tangent_like(value)
-               for name, value in nat_parameters.fixed_parameters().items()},
-            **{name: jnp.ones_like(value)
-               for name, value in nat_parameters.parameters_name_value()})
-        original_ln_of_nat, original_jvp = jvp(original_ln, (nat_parameters,),
-                                               (ones_like_nat_parameters,))
-        optimized_ln_of_nat, optimized_jvp = jvp(optimized_ln, (nat_parameters,),
-                                                 (ones_like_nat_parameters,))
+        nat_tangent = unit_tangent(nat_parameters)
+        original_ln_of_nat, original_jvp = jvp(original_ln, (nat_parameters,), (nat_tangent,))
+        optimized_ln_of_nat, optimized_jvp = jvp(optimized_ln, (nat_parameters,), (nat_tangent,))
         assert_allclose(original_ln_of_nat, optimized_ln_of_nat, rtol=1.5e-5)
         assert_allclose(original_jvp, optimized_jvp, rtol=1.5e-5)
 
-        # Test VJP.
+
+def test_gradient_log_normalizer_vjp(generator: Generator,
+                                     distribution_info: DistributionInfo[Any, Any, Any]
+                                     ) -> None:
+    """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
+    original_ln, optimized_ln = prelude(generator, distribution_info)
+    for _ in range(20):
+        nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
+        nat_tangent = unit_tangent(nat_parameters)
+        original_ln_of_nat, _ = jvp(original_ln, (nat_parameters,), (nat_tangent,))
         original_ln_of_nat_b, original_vjp = vjp(original_ln, nat_parameters)
         original_gln_of_nat, = original_vjp(1.0)
         optimized_ln_of_nat_b, optimized_vjp = vjp(optimized_ln, nat_parameters)

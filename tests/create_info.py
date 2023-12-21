@@ -477,48 +477,36 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
 
 
 def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
-    # pylint: disable=too-many-locals
-    # Discrete
-    bernoulli = BernoulliInfo()
-    geometric = GeometricInfo()
-    poisson = PoissonInfo()
-    negative_binomial = NegativeBinomialInfo(3)
-    logarithmic = LogarithmicInfo()
-    discrete: list[DistributionInfo[Any, Any, Any]] = [bernoulli, geometric, poisson,
-                                                       negative_binomial, logarithmic]
+    return [
+            # Discrete
+            BernoulliInfo(),
+            GeometricInfo(),
+            PoissonInfo(),
+            NegativeBinomialInfo(3),
+            LogarithmicInfo(),
 
-    # Continuous
-    normal = NormalInfo()
-    unit_normal = UnitNormalInfo()
-    complex_unit_normal = ComplexUnitNormalInfo()
-    complex_normal = ComplexNormalInfo()
-    cmvn_unit = ComplexMultivariateUnitNormalInfo(dimensions=4)
-    cmvn_cs = ComplexCircularlySymmetricNormalInfo(dimensions=3)
-    exponential = ExponentialInfo()
-    rayleigh = RayleighInfo()
-    gamma = GammaInfo()
-    beta = BetaInfo()
-    dirichlet = DirichletInfo(5)
-    gen_dirichlet = GeneralizedDirichletInfo(5)
-    von_mises = VonMisesFisherInfo()
-    chi_square = ChiSquareInfo()
-    chi = ChiInfo()
-    weibull = WeibullInfo()
-    continuous: list[DistributionInfo[Any, Any, Any]] = [normal, unit_normal, complex_unit_normal,
-                                                         complex_normal, cmvn_unit, cmvn_cs,
-                                                         exponential, rayleigh, gamma, beta,
-                                                         dirichlet, gen_dirichlet, von_mises,
-                                                         chi_square, chi, weibull]
+            # Continuous
+            NormalInfo(),
+            UnitNormalInfo(),
+            ComplexUnitNormalInfo(),
+            ComplexNormalInfo(),
+            ComplexMultivariateUnitNormalInfo(dimensions=4),
+            ComplexCircularlySymmetricNormalInfo(dimensions=3),
+            ExponentialInfo(),
+            RayleighInfo(),
+            GammaInfo(),
+            BetaInfo(),
+            DirichletInfo(5),
+            GeneralizedDirichletInfo(5),
+            VonMisesFisherInfo(),
+            ChiSquareInfo(),
+            ChiInfo(),
+            WeibullInfo(),
 
-    # Multivariate normal
-    multivariate_fixed_variance_normal = MultivariateFixedVarianceNormalInfo(dimensions=5,
-                                                                             variance=3.0)
-    multivariate_unit_normal = MultivariateUnitNormalInfo(dimensions=5)
-    isotropic_normal = IsotropicNormalInfo(dimensions=4)
-    diagonal_normal = MultivariateDiagonalNormalInfo(dimensions=4)
-    multivariate_normal = MultivariateNormalInfo(dimensions=4)
-    mvn: list[DistributionInfo[Any, Any, Any]] = [multivariate_fixed_variance_normal,
-                                                  multivariate_unit_normal, isotropic_normal,
-                                                  diagonal_normal, multivariate_normal]
-
-    return discrete + continuous + mvn
+            # Multivariate normal
+            MultivariateFixedVarianceNormalInfo(dimensions=5, variance=3.0),
+            MultivariateUnitNormalInfo(dimensions=5),
+            IsotropicNormalInfo(dimensions=4),
+            MultivariateDiagonalNormalInfo(dimensions=4),
+            MultivariateNormalInfo(dimensions=4),
+            ]
