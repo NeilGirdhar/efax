@@ -19,12 +19,12 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.6
+  rev: v0.1.12
   hooks:
   - id: ruff
 
 - repo: https://github.com/PyCQA/isort
-  rev: 5.12.0
+  rev: 5.13.2
   hooks:
   - id: isort
 
@@ -41,7 +41,7 @@ repos:
     - pyright@1.1.338
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.7.1'
+  rev: 'v1.8.0'
   hooks:
   - id: mypy
     additional_dependencies: [tjax]

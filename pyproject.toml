@@ -190,6 +190,7 @@ ignore = [
     "PLR6301",  # Method doesn't use self.
     "PT013",  # Found incorrect import of pytest, use simple import pytest instead.
     "Q000",  # Single quotes found but double quotes preferred.
+    "RUF021",  # Parenthesize `a and b` expressions when chaining `and` and `or` together...
     "S101",  # Assert used.
     "TCH001",  # Move application import into a type-checking block.
     "TCH002",  # Move third-party import into a type-checking block.
