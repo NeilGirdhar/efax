@@ -1,4 +1,5 @@
-# pylint: disable=bad-indentation
+# pylint: disable=bad-indentation, import-private-name, consider-ternary-expression
+# pylint: disable=consider-alternative-union-syntax
 from collections.abc import Sequence
 from enum import Enum
 from functools import partial

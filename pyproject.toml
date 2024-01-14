@@ -50,6 +50,33 @@ skip_glob = ['.pytype/*.py']
 
 [tool.pylint.master]
 jobs = 0
+py-version = '3.10'
+load-plugins = [
+    'pylint.extensions.bad_builtin',
+    'pylint.extensions.broad_try_clause',
+    'pylint.extensions.check_elif',
+    'pylint.extensions.code_style',
+    'pylint.extensions.comparison_placement',
+    'pylint.extensions.confusing_elif',
+    'pylint.extensions.consider_refactoring_into_while_condition',
+    'pylint.extensions.consider_ternary_expression',
+    'pylint.extensions.dict_init_mutate',
+    'pylint.extensions.docparams',
+    'pylint.extensions.docstyle',
+    'pylint.extensions.dunder',
+    'pylint.extensions.empty_comment',
+    'pylint.extensions.eq_without_hash',
+    'pylint.extensions.for_any_all',
+    'pylint.extensions.magic_value',
+    'pylint.extensions.mccabe',
+    'pylint.extensions.no_self_use',
+    'pylint.extensions.overlapping_exceptions',
+    'pylint.extensions.private_import',
+    'pylint.extensions.redefined_loop_name',
+    'pylint.extensions.redefined_variable_type',
+    'pylint.extensions.set_membership',
+    'pylint.extensions.typing',
+    'pylint.extensions.while_used']
 extension-pkg-whitelist = [
     'mypy.plugins.dataclasses']
 
@@ -57,12 +84,20 @@ extension-pkg-whitelist = [
 disable = [
     'abstract-method',
     'arguments-differ',
+    'bad-dunder-name',
+    'confusing-consecutive-elif',
     'consider-using-assignment-expr',
+    'consider-using-tuple',
+    'cyclic-import',
     'duplicate-code',
     'empty-comment',
+    'fixme',
+    'import-outside-toplevel',
+    'invalid-field-call',
     'invalid-name',
     'invalid-unary-operand-type',
     'line-too-long',
+    'keyword-arg-before-vararg',
     'magic-value-comparison',
     'missing-docstring',
     'no-member',
@@ -82,8 +117,10 @@ disable = [
     'too-many-return-statements',
     'too-many-statements',
     'too-many-try-statements',
+    'unexpected-keyword-arg',
     'unused-argument',
     'unused-import',
+    'use-set-for-membership',
     'while-used']
 enable= [
     'useless-suppression',
