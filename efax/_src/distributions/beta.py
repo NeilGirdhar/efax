@@ -13,7 +13,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
-__all__ = ['BetaNP', 'BetaEP']
+__all__ = ['BetaEP', 'BetaNP']
 
 
 @dataclass

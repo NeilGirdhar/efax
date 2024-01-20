@@ -14,7 +14,7 @@ from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 
-__all__ = ['WeibullNP', 'WeibullEP']
+__all__ = ['WeibullEP', 'WeibullNP']
 
 
 @dataclass

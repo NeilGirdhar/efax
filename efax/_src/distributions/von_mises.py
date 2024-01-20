@@ -17,7 +17,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..tools import iv_ratio, log_ive
 
-__all__ = ['VonMisesFisherNP', 'VonMisesFisherEP']
+__all__ = ['VonMisesFisherEP', 'VonMisesFisherNP']
 
 
 @dataclass

@@ -24,7 +24,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 from ..tools import betaln
 
-__all__ = ['GeneralizedDirichletNP', 'GeneralizedDirichletEP']
+__all__ = ['GeneralizedDirichletEP', 'GeneralizedDirichletNP']
 
 
 @dataclass

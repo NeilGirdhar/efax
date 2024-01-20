@@ -19,7 +19,7 @@ from ...parameter import VectorSupport, distribution_parameter
 from .diagonal import MultivariateDiagonalNormalNP
 from .isotropic import IsotropicNormalNP
 
-__all__ = ['MultivariateUnitNormalNP', 'MultivariateUnitNormalEP']
+__all__ = ['MultivariateUnitNormalEP', 'MultivariateUnitNormalNP']
 
 
 @dataclass

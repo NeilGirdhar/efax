@@ -16,7 +16,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from .gamma import GammaNP
 
-__all__ = ['ExponentialNP', 'ExponentialEP']
+__all__ = ['ExponentialEP', 'ExponentialNP']
 
 
 @dataclass

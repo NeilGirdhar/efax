@@ -18,7 +18,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, boolean_ring, distribution_parameter
 from .beta import BetaNP
 
-__all__ = ['BernoulliNP', 'BernoulliEP']
+__all__ = ['BernoulliEP', 'BernoulliNP']
 
 
 @dataclass

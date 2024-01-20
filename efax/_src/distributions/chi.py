@@ -14,7 +14,7 @@ from ..mixins.transformed_parametrization import (TransformedExpectationParametr
 from ..parameter import ScalarSupport, distribution_parameter
 from .chi_square import ChiSquareEP, ChiSquareNP
 
-__all__ = ['ChiNP', 'ChiEP']
+__all__ = ['ChiEP', 'ChiNP']
 
 
 @dataclass

@@ -16,7 +16,7 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
 
-__all__ = ['MultivariateNormalNP', 'MultivariateNormalEP', 'MultivariateNormalVP']
+__all__ = ['MultivariateNormalEP', 'MultivariateNormalNP', 'MultivariateNormalVP']
 
 
 def _broadcasted_outer(x: JaxRealArray) -> JaxRealArray:

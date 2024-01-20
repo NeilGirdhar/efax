@@ -13,7 +13,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 
-__all__ = ['GeometricNP', 'GeometricEP']
+__all__ = ['GeometricEP', 'GeometricNP']
 
 
 @dataclass

@@ -17,7 +17,7 @@ from ...natural_parametrization import NaturalParametrization
 from ...parameter import (SymmetricMatrixSupport, VectorSupport, complex_field,
                           distribution_parameter)
 
-__all__ = ['ComplexCircularlySymmetricNormalNP', 'ComplexCircularlySymmetricNormalEP']
+__all__ = ['ComplexCircularlySymmetricNormalEP', 'ComplexCircularlySymmetricNormalNP']
 
 
 def _broadcasted_outer_c(x: JaxComplexArray) -> JaxComplexArray:

@@ -21,7 +21,7 @@ from ..parameter import VectorSupport, distribution_parameter
 from .dirichlet import DirichletNP
 from .gen_dirichlet import GeneralizedDirichletNP
 
-__all__ = ['MultinomialNP', 'MultinomialEP']
+__all__ = ['MultinomialEP', 'MultinomialNP']
 
 
 @dataclass

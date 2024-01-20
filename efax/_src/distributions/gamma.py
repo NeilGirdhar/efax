@@ -18,7 +18,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 from ..parametrization import Parametrization
 
-__all__ = ['GammaNP', 'GammaEP', 'GammaVP']
+__all__ = ['GammaEP', 'GammaNP', 'GammaVP']
 
 
 @dataclass
