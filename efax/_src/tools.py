@@ -5,15 +5,10 @@ from functools import reduce
 from typing import TYPE_CHECKING, Any
 
 import jax.numpy as jnp
-import numpy as np
 from tensorflow_probability.substrates import jax as tfp
-from tjax import JaxComplexArray, JaxRealArray, NumpyComplexArray, NumpyRealArray
+from tjax import JaxComplexArray, JaxRealArray
 
 __all__: list[str] = []
-
-
-def np_abs_square(x: NumpyComplexArray) -> NumpyRealArray:
-    return np.square(x.real) + np.square(x.imag)  # pyright: ignore
 
 
 def parameters_dot_product(x: NaturalParametrization[Any, Any], y: Any) -> JaxRealArray:
@@ -30,37 +25,6 @@ def parameters_dot_product(x: NaturalParametrization[Any, Any], y: Any) -> JaxRe
 iv_ratio = tfp.math.bessel_iv_ratio
 log_ive = tfp.math.log_bessel_ive
 betaln = tfp.math.lbeta
-
-
-def vectorized_tril(m: NumpyRealArray, k: int = 0) -> NumpyRealArray:
-    n, m_ = m.shape[-2:]
-    indices = (..., *np.tril_indices(n, k, m_))
-    values = m[indices]
-    retval = np.zeros_like(m)
-    retval[indices] = values
-    return retval
-
-
-def vectorized_triu(m: NumpyRealArray, k: int = 0) -> NumpyRealArray:
-    n, m_ = m.shape[-2:]
-    indices = (..., *np.triu_indices(n, k, m_))
-    values = m[indices]
-    retval = np.zeros_like(m)
-    retval[indices] = values
-    return retval
-
-
-def create_diagonal(m: NumpyRealArray) -> NumpyRealArray:
-    """A vectorized version of diagonal.
-
-    Args:
-        m: Has shape (*k, n)
-    Returns: Array with shape (*k, n, n) and the elements of m on the diagonals.
-    """
-    indices = (..., *np.diag_indices(m.shape[-1]))
-    retval = np.zeros((*m.shape, m.shape[-1]), dtype=m.dtype)
-    retval[indices] = m
-    return retval
 
 
 # Private functions --------------------------------------------------------------------------------

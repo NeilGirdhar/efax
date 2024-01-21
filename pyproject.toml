@@ -30,7 +30,7 @@ jax = '>=0.4.20'
 numpy = '>=1.22'
 scipy = '>=1.8'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.29.7'
+tjax = '>=0.31'
 typing_extensions = '>=4.8'
 
 [tool.poetry.group.dev.dependencies]

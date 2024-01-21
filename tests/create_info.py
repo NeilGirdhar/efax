@@ -7,7 +7,7 @@ import numpy as np
 import scipy.stats as ss
 from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
-from tjax import NumpyComplexArray, NumpyRealArray, Shape
+from tjax import NumpyComplexArray, NumpyRealArray, Shape, create_diagonal_array, np_abs_square
 from typing_extensions import override
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
@@ -25,7 +25,6 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises,
                   UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
                   WeibullNP)
-from efax._src.tools import create_diagonal, np_abs_square, vectorized_tril, vectorized_triu
 
 from .distribution_info import DistributionInfo
 
@@ -225,8 +224,9 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
 
     @override
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
-        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean),
-                                               cov=create_diagonal(np.asarray(p.variance())))
+        variance = np.asarray(p.variance())
+        covariance = create_diagonal_array(variance)
+        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
 
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateDiagonalNormalEP:
@@ -249,7 +249,7 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
         mean = np.asarray(p.mean, dtype=np.float64)
         v = np.asarray(p.variance(), dtype=np.float64)
         v_transpose = v.swapaxes(-1, -2)
-        covariance = vectorized_tril(v) + vectorized_triu(v_transpose, 1)
+        covariance = np.tril(v) + np.triu(v_transpose, 1)
         return ScipyMultivariateNormal.from_mc(mean=mean, cov=covariance)
 
     @override
