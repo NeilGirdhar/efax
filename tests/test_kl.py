@@ -6,7 +6,8 @@ import numpy as np
 from numpy.linalg import det, inv
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from scipy.special import digamma, gammaln  # pylint: disable=no-name-in-module
+from scipy.special import digamma, gammaln
+from tjax import JaxRealArray
 
 from efax import (ExpectationParametrization, GammaEP, GammaNP, MultivariateNormalEP,
                   MultivariateNormalNP, NaturalParametrization, NormalEP, NormalNP)
@@ -18,12 +19,13 @@ from .distribution_info import DistributionInfo
 def prelude(generator: Generator,
             distribution_info_kl: DistributionInfo[Any, Any, Any],
             distribution_name: None | str
-            ) -> tuple[ExpectationParametrization[Any], NaturalParametrization[Any, Any], float]:
+            ) -> tuple[ExpectationParametrization[Any], NaturalParametrization[Any, Any],
+                       JaxRealArray]:
     shape = (3, 2)
     distribution_info_kl.skip_if_deselected(distribution_name)
     x = distribution_info_kl.exp_parameter_generator(generator, shape=shape)
     y = distribution_info_kl.nat_parameter_generator(generator, shape=shape)
-    my_kl = float(x.kl_divergence(y).item())
+    my_kl = x.kl_divergence(y)
     return x, y, my_kl
 
 
