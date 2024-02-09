@@ -39,7 +39,7 @@ jupyter = '>=1'
 mypy = '>=1.7'
 pylint = '>=2.12'
 pyright = ">=0.0.13"
-pytest = '^7'
+pytest = '>=8'
 pytest-xdist = {version = '>=3', extras = ['psutil']}
 ruff = '>=0.2'
 

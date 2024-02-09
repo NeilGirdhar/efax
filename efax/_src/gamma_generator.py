@@ -348,7 +348,7 @@ def random_gamma(key: Array,
         loggamma : sample gamma values in log-space, which can provide improved
             accuracy for small values of ``a``.
     """
-    key, _ = _check_prng_key(key)
+    key, _ = _check_prng_key("gamma", key)
     if not dtypes.issubdtype(dtype, np.floating):
         msg = f'dtype argument to `gamma` must be a float dtype, got {dtype}'
         raise ValueError(msg)
