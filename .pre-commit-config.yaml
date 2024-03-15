@@ -19,7 +19,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.2.1
+  rev: v0.3.2
   hooks:
   - id: ruff
 
@@ -28,20 +28,13 @@ repos:
   hooks:
   - id: isort
 
-- repo: local
+- repo: https://github.com/RobertCraigie/pyright-python
+  rev: v1.1.354
   hooks:
   - id: pyright
-    name: pyright
-    entry: pyright
-    language: node
-    pass_filenames: false
-    types: [python]
-    stages: [pre-commit, pre-merge-commit, pre-push, manual]
-    additional_dependencies: &pyright_dependencies
-    - pyright@1.1.338
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.8.0'
+  rev: 'v1.9.0'
   hooks:
   - id: mypy
     additional_dependencies: [tjax]
