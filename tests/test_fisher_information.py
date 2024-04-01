@@ -60,7 +60,7 @@ def test_fisher_information_is_convex(generator: Generator,
     fisher_information = nat_parameters._fisher_information_matrix()  # noqa: SLF001
     assert issubclass(fisher_information.dtype.type, jnp.floating)
     eigvals = jnp.linalg.eigvals(fisher_information)
-    if not jnp.all(eigvals >= 0.0):  # noqa: PLR2004
+    if not jnp.all(eigvals >= 0.0):
         msg = (f"The Fisher information of {nat_parameters} is not convex.  Its eigenvalues are:"
                f"{eigvals}")
         raise AssertionError(msg)
@@ -68,7 +68,7 @@ def test_fisher_information_is_convex(generator: Generator,
     assert determinant.shape == shape
     assert issubclass(determinant.dtype.type, jnp.floating)
 
-    if not jnp.all(determinant >= 0.0):  # noqa: PLR2004
+    if not jnp.all(determinant >= 0.0):
         msg = (f"The determinant of the Fisher information of {nat_parameters} is not all "
                f"nonnegative: {determinant}")
         raise AssertionError(msg)

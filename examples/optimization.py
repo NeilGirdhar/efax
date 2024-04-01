@@ -28,7 +28,7 @@ def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
     q_bar = gce(some_p, q)
     total = tree_reduce(jnp.sum,
                         tree_map(lambda x: jnp.sum(jnp.square(x)), q_bar))
-    return total > 1e-6
+    return total > 1e-6  # noqa: PLR2004
 
 
 # some_p are expectation parameters of a Bernoulli distribution corresponding

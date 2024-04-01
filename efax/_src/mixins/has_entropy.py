@@ -13,6 +13,8 @@ __all__ = ['HasEntropyEP', 'HasEntropyNP']
 
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+
+
 class HasEntropyEP(ExpectationParametrization[NP],
                    JaxAbstractClass,
                    Generic[NP]):
@@ -49,6 +51,8 @@ class HasEntropyEP(ExpectationParametrization[NP],
 
 
 EP = TypeVar('EP', bound=HasEntropyEP[Any])
+
+
 class HasEntropyNP(NaturalParametrization[EP, Any],
                    Generic[EP]):
     @jit

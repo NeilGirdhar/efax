@@ -25,4 +25,4 @@ ss_mean = tree_map(partial(jnp.mean, axis=0), ss)  # ss_mean also has type Diric
 
 # Convert this back to the natural parametrization.
 estimated_distribution = ss_mean.to_nat()
-print(estimated_distribution.alpha_minus_one + 1.0)  # [1.9849904 3.0065458 3.963935 ]
+print(estimated_distribution.alpha_minus_one + 1.0)  # [1.9849904 3.0065458 3.963935 ]  # noqa: T201

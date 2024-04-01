@@ -17,6 +17,8 @@ __all__: list[str] = []
 
 
 EP = TypeVar('EP', bound='NBCommonEP[Any]')
+
+
 @dataclass
 class NBCommonNP(NaturalParametrization[EP, JaxRealArray]):
     log_not_p: JaxRealArray
@@ -50,6 +52,8 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray]):
 
 
 NP = TypeVar('NP', bound=NBCommonNP[Any])
+
+
 @dataclass
 class NBCommonEP(ExpectationParametrization[NP]):
     mean: JaxRealArray

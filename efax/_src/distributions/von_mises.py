@@ -55,7 +55,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
         q = self.mean_times_concentration
         kappa: JaxRealArray = jnp.linalg.norm(q, axis=-1, keepdims=True)
         return VonMisesFisherEP(
-            jnp.where(kappa == 0.0,  # noqa: PLR2004
+            jnp.where(kappa == 0.0,
                       q,
                       q * (_a_k(self.dimensions(), kappa) / kappa)))
 
@@ -80,7 +80,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
         if self.dimensions() != 2:  # noqa: PLR2004
             raise ValueError
         kappa = self.kappa()
-        angle = jnp.where(kappa == 0.0,  # noqa: PLR2004
+        angle = jnp.where(kappa == 0.0,
                           0.0,
                           jnp.arctan2(self.mean_times_concentration[..., 1],
                                       self.mean_times_concentration[..., 0]))
@@ -122,7 +122,7 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
     def initial_search_parameters(self) -> JaxRealArray:
         mu: JaxRealArray = jnp.linalg.norm(self.mean, 2, axis=-1)
         # 0 <= mu <= 1.0
-        initial_kappa = jnp.where(mu == 1.0,  # noqa: PLR2004
+        initial_kappa = jnp.where(mu == 1.0,
                                   jnp.inf,
                                   (mu * self.dimensions() - mu ** 3) / (1.0 - mu ** 2))
         return inverse_softplus(initial_kappa)

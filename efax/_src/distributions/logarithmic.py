@@ -106,8 +106,8 @@ class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray],
     @override
     def to_nat(self) -> LogarithmicNP:
         z: LogarithmicNP = super().to_nat()
-        return LogarithmicNP(jnp.where(self.chi < 1.0,  # noqa: PLR2004
+        return LogarithmicNP(jnp.where(self.chi < 1.0,
                                        jnp.nan,
-                                       jnp.where(self.chi == 1.0,  # noqa: PLR2004
+                                       jnp.where(self.chi == 1.0,
                                                  jnp.inf,
                                                  z.log_probability)))

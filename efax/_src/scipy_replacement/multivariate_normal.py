@@ -12,6 +12,8 @@ __all__ = ['ScipyMultivariateNormal']
 
 
 mvn: type = ss._multivariate.multivariate_normal_frozen  # noqa: SLF001
+
+
 class ScipyMultivariateNormalUnvectorized(mvn):
     """This class repairs multivariate_normal.
 

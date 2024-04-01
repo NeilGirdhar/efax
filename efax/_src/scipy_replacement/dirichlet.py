@@ -16,6 +16,8 @@ scipy_beta = scipy.special.beta
 
 
 mvd: type = ss._multivariate.dirichlet_frozen  # noqa: SLF001
+
+
 class ScipyDirichletFixRVsAndPDF(mvd):
     """This class repairs dirichlet.
 

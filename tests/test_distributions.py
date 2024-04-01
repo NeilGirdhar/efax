@@ -16,6 +16,7 @@ from .distribution_info import DistributionInfo
 
 LogNormalizer: TypeAlias = Callable[[NaturalParametrization[Any, Any]], JaxRealArray]
 
+
 def test_conversion(generator: Generator,
                     distribution_info: DistributionInfo[Any, Any, Any]
                     ) -> None:
