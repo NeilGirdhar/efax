@@ -4,25 +4,26 @@ build-backend = 'poetry.core.masonry.api'
 
 [tool.poetry]
 name = 'efax'
-version = "1.15.1"
-description = "Exponential families for JAX"
+version = '1.15.1'
+description = 'Exponential families for JAX'
 license = 'MIT'
 authors = ['Neil Girdhar <mistersheik@gmail.com>']
 readme = 'README.rst'
 repository = 'https://github.com/NeilGirdhar/efax'
 classifiers = [
-    'Development Status :: 5 - Production/Stable',
-    'Intended Audience :: Science/Research',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Topic :: Scientific/Engineering :: Artificial Intelligence',
-    'Topic :: Software Development :: Libraries :: Python Modules',
-    'Typing :: Typed',
-    'License :: OSI Approved :: MIT License']
+  'Development Status :: 5 - Production/Stable',
+  'Intended Audience :: Science/Research',
+  'Operating System :: OS Independent',
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Topic :: Scientific/Engineering :: Artificial Intelligence',
+  'Topic :: Software Development :: Libraries :: Python Modules',
+  'Typing :: Typed',
+  'License :: OSI Approved :: MIT License',
+]
 
 [tool.poetry.dependencies]
 python = '>=3.10,<3.13'
@@ -38,9 +39,9 @@ isort = '>=5.11'
 jupyter = '>=1'
 mypy = '>=1.7'
 pylint = '>=2.12'
-pyright = ">=0.0.13"
+pyright = '>=0.0.13'
 pytest = '>=8'
-pytest-xdist = {version = '>=3', extras = ['psutil']}
+pytest-xdist = { version = '>=3', extras = ['psutil'] }
 ruff = '>=0.2'
 
 [tool.isort]
@@ -52,79 +53,83 @@ skip_glob = ['.pytype/*.py']
 jobs = 0
 py-version = '3.10'
 load-plugins = [
-    'pylint.extensions.bad_builtin',
-    'pylint.extensions.broad_try_clause',
-    'pylint.extensions.check_elif',
-    'pylint.extensions.code_style',
-    'pylint.extensions.comparison_placement',
-    'pylint.extensions.confusing_elif',
-    'pylint.extensions.consider_refactoring_into_while_condition',
-    'pylint.extensions.consider_ternary_expression',
-    'pylint.extensions.dict_init_mutate',
-    'pylint.extensions.docparams',
-    'pylint.extensions.docstyle',
-    'pylint.extensions.dunder',
-    'pylint.extensions.empty_comment',
-    'pylint.extensions.eq_without_hash',
-    'pylint.extensions.for_any_all',
-    'pylint.extensions.magic_value',
-    'pylint.extensions.mccabe',
-    'pylint.extensions.no_self_use',
-    'pylint.extensions.overlapping_exceptions',
-    'pylint.extensions.private_import',
-    'pylint.extensions.redefined_loop_name',
-    'pylint.extensions.redefined_variable_type',
-    'pylint.extensions.set_membership',
-    'pylint.extensions.typing',
-    'pylint.extensions.while_used']
+  'pylint.extensions.bad_builtin',
+  'pylint.extensions.broad_try_clause',
+  'pylint.extensions.check_elif',
+  'pylint.extensions.code_style',
+  'pylint.extensions.comparison_placement',
+  'pylint.extensions.confusing_elif',
+  'pylint.extensions.consider_refactoring_into_while_condition',
+  'pylint.extensions.consider_ternary_expression',
+  'pylint.extensions.dict_init_mutate',
+  'pylint.extensions.docparams',
+  'pylint.extensions.docstyle',
+  'pylint.extensions.dunder',
+  'pylint.extensions.empty_comment',
+  'pylint.extensions.eq_without_hash',
+  'pylint.extensions.for_any_all',
+  'pylint.extensions.magic_value',
+  'pylint.extensions.mccabe',
+  'pylint.extensions.no_self_use',
+  'pylint.extensions.overlapping_exceptions',
+  'pylint.extensions.private_import',
+  'pylint.extensions.redefined_loop_name',
+  'pylint.extensions.redefined_variable_type',
+  'pylint.extensions.set_membership',
+  'pylint.extensions.typing',
+  'pylint.extensions.while_used',
+]
 extension-pkg-whitelist = [
-    'mypy.plugins.dataclasses']
+  'mypy.plugins.dataclasses',
+]
 
 [tool.pylint.messages_control]
 disable = [
-    'abstract-method',
-    'arguments-differ',
-    'bad-dunder-name',
-    'confusing-consecutive-elif',
-    'consider-using-assignment-expr',
-    'consider-using-tuple',
-    'cyclic-import',
-    'duplicate-code',
-    'empty-comment',
-    'fixme',
-    'import-outside-toplevel',
-    'invalid-field-call',
-    'invalid-name',
-    'invalid-unary-operand-type',
-    'line-too-long',
-    'keyword-arg-before-vararg',
-    'magic-value-comparison',
-    'missing-docstring',
-    'no-member',
-    'no-self-use',
-    'protected-access',
-    'redefined-builtin',
-    'redefined-outer-name',
-    'redefined-variable-type',
-    'signature-differs',
-    'too-complex',
-    'too-few-public-methods',
-    'too-many-ancestors',
-    'too-many-arguments',
-    'too-many-branches',
-    'too-many-instance-attributes',
-    'too-many-locals',
-    'too-many-return-statements',
-    'too-many-statements',
-    'too-many-try-statements',
-    'unexpected-keyword-arg',
-    'unused-argument',
-    'unused-import',
-    'use-set-for-membership',
-    'while-used']
-enable= [
-    'useless-suppression',
-    'use-symbolic-message-instead']
+  'abstract-method',
+  'arguments-differ',
+  'bad-dunder-name',
+  'confusing-consecutive-elif',
+  'consider-using-assignment-expr',
+  'consider-using-tuple',
+  'cyclic-import',
+  'duplicate-code',
+  'empty-comment',
+  'fixme',
+  'import-outside-toplevel',
+  'invalid-field-call',
+  'invalid-name',
+  'invalid-unary-operand-type',
+  'line-too-long',
+  'keyword-arg-before-vararg',
+  'magic-value-comparison',
+  'missing-docstring',
+  'no-member',
+  'no-self-use',
+  'protected-access',
+  'redefined-builtin',
+  'redefined-outer-name',
+  'redefined-variable-type',
+  'signature-differs',
+  'too-complex',
+  'too-few-public-methods',
+  'too-many-ancestors',
+  'too-many-arguments',
+  'too-many-branches',
+  'too-many-instance-attributes',
+  'too-many-locals',
+  'too-many-return-statements',
+  'too-many-statements',
+  'too-many-try-statements',
+  'unexpected-keyword-arg',
+  'unused-argument',
+  'unused-import',
+  'use-set-for-membership',
+  'while-used',
+]
+enable = [
+  'useless-suppression',
+  'use-symbolic-message-instead',
+]
 
 [tool.pylint.reports]
 output-format = 'colorized'
@@ -134,11 +139,11 @@ min-similarity-lines = 10
 ignore-imports = 'yes'
 
 [tool.pyright]
-include = ["efax", "tests", "examples"]
-exclude = ["efax/_src/gamma_generator.py"]
-stubPath = ""
-venvPath = "."
-venv = ".venv"
+include = ['efax', 'tests', 'examples']
+exclude = ['efax/_src/gamma_generator.py']
+stubPath = ''
+venvPath = '.'
+venv = '.venv'
 enableTypeIgnoreComments = false
 # reportImportCycles = true
 reportCallInDefaultInitializer = true
@@ -170,7 +175,7 @@ reportUntypedFunctionDecorator = true
 reportUntypedNamedTuple = true
 
 [tool.mypy]
-files = ["efax", "tests", "examples"]
+files = ['efax', 'tests', 'examples']
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -187,63 +192,68 @@ warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
-exclude = ["efax/_src/gamma_generator.py"]
+exclude = ['efax/_src/gamma_generator.py']
 
 [[tool.mypy.overrides]]
 module = ['efax._src.gamma_generator']
 follow_imports = 'skip'
 
 [[tool.mypy.overrides]]
-module = ['scipy', 'scipy.optimize', 'scipy.special', 'scipy.stats',
-       'tensorflow_probability.substrates']
+module = [
+  'scipy',
+  'scipy.optimize',
+  'scipy.special',
+  'scipy.stats',
+  'tensorflow_probability.substrates',
+]
 ignore_missing_imports = true
 
 [tool.ruff]
-target-version = "py310"
+target-version = 'py310'
 line-length = 100
 
 [tool.ruff.lint]
 preview = true
-select = ["ALL"]
+select = ['ALL']
 ignore = [
-    "ANN101",  # Missing type annotation for self.
-    "ANN102",  # Missing type annotation for cls.
-    "ANN401",  # Dynamically typed expressions (Any).
-    "ARG001",  # Unused function argument.
-    "ARG002",  # Unused method argument.
-    "ARG003",  # Unused class method argument.
-    "ARG004",  # Unused static method argument.
-    "B011",  # Do not assert false.
-    "C901",  # Complex structure.
-    "COM812",  # Trailing comma missing.
-    "CPY001",  # Missing copyright.
-    "D100",  # Missing docstring in public module.
-    "D101",  # Missing docstring in public class.
-    "D102",  # Missing docstring in public method.
-    "D103",  # Missing docstring in public function.
-    "D105",  # Missing docstring in magic method.
-    "D107",  # Missing docstring in __init__.
-    "ERA001",  # Commented-out code.
-    "FBT003",  # Boolean positional value in function call.
-    "FIX002",  # Line contains TODO, consider resolving the issue.
-    "G004",  # Logging statement uses f-string.
-    "I001",  # Import block is un-sorted or un-formatted.
-    "PD008",  # Use .loc instead of .at. If speed is important, use NumPy.
-    "PGH003",  # Use specific rule codes when ignoring type issues.
-    "PLR0913",  # Too many arguments in function definition.
-    "PLR6301",  # Method doesn't use self.
-    "PT013",  # Found incorrect import of pytest, use simple import pytest instead.
-    "Q000",  # Single quotes found but double quotes preferred.
-    "RUF021",  # Parenthesize `a and b` expressions when chaining `and` and `or` together...
-    "S101",  # Assert used.
-    "TCH001",  # Move application import into a type-checking block.
-    "TCH002",  # Move third-party import into a type-checking block.
-    "TCH003",  # Move standard library import into a type-checking block.
-    "TD002",  # Missing author in TODO; try: # TODO(<author_name>): ....
-    "TD003",  # Missing issue link on the line following this TODO.
-    "TID252",  # Relative imports from parent modules are banned.
+  'ANN101', # Missing type annotation for self.
+  'ANN102', # Missing type annotation for cls.
+  'ANN401', # Dynamically typed expressions (Any).
+  'ARG001', # Unused function argument.
+  'ARG002', # Unused method argument.
+  'ARG003', # Unused class method argument.
+  'ARG004', # Unused static method argument.
+  'B011', # Do not assert false.
+  'C901', # Complex structure.
+  'COM812', # Trailing comma missing.
+  'CPY001', # Missing copyright.
+  'D100', # Missing docstring in public module.
+  'D101', # Missing docstring in public class.
+  'D102', # Missing docstring in public method.
+  'D103', # Missing docstring in public function.
+  'D105', # Missing docstring in magic method.
+  'D107', # Missing docstring in __init__.
+  'ERA001', # Commented-out code.
+  'FBT003', # Boolean positional value in function call.
+  'FIX002', # Line contains TODO, consider resolving the issue.
+  'G004', # Logging statement uses f-string.
+  'I001', # Import block is un-sorted or un-formatted.
+  'PD008', # Use .loc instead of .at. If speed is important, use NumPy.
+  'PGH003', # Use specific rule codes when ignoring type issues.
+  'PLR0913', # Too many arguments in function definition.
+  'PLR6301', # Method doesn't use self.
+  'PT013', # Found incorrect import of pytest, use simple import pytest instead.
+  'Q000', # Single quotes found but double quotes preferred.
+  'RUF021', # Parenthesize `a and b` expressions when chaining `and` and `or` together...
+  'S101', # Assert used.
+  'TCH001', # Move application import into a type-checking block.
+  'TCH002', # Move third-party import into a type-checking block.
+  'TCH003', # Move standard library import into a type-checking block.
+  'TD002', # Missing author in TODO; try: # TODO(<author_name>): ....
+  'TD003', # Missing issue link on the line following this TODO.
+  'TID252', # Relative imports from parent modules are banned.
 ]
-exclude = ["efax/_src/gamma_generator.py"]
+exclude = ['efax/_src/gamma_generator.py']
 
 [tool.ruff.lint.flake8-annotations]
 mypy-init-return = true
@@ -255,7 +265,7 @@ max-string-length = 40
 combine-as-imports = true
 
 [tool.ruff.lint.pydocstyle]
-convention = "google"
+convention = 'google'
 
 [tool.ruff.lint.pylint]
 max-args = 8
