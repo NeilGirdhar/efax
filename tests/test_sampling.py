@@ -5,9 +5,8 @@ from functools import partial
 from typing import Any
 
 import jax.numpy as jnp
-from jax import hessian, jacrev, vmap
+from jax import hessian, jacrev, tree, vmap
 from jax.random import split
-from jax.tree_util import tree_map
 from numpy.random import Generator
 from tjax import JaxArray, JaxRealArray, KeyArray, assert_tree_allclose
 
@@ -82,7 +81,7 @@ def test_maximum_likelihood_estimation(generator: Generator,
     fixed_parameters = {name: jnp.broadcast_to(value, (*sample_shape, *distribution_shape))
                         for name, value in fixed_parameters.items()}
     sampled_exp_parameters = nat_cls.sufficient_statistics(samples, **fixed_parameters)
-    ml_exp_parameters = tree_map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
+    ml_exp_parameters = tree.map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
     assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)
 
 

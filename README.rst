@@ -240,7 +240,7 @@ Using the cross entropy to iteratively optimize a prediction is simple:
 
     import jax.numpy as jnp
     from jax import grad, jit, lax
-    from jax.tree_util import tree_map, tree_reduce
+    from jax import tree
     from tjax import BooleanNumeric, RealArray, RealNumeric, print_generic
 
     from efax import BernoulliEP, BernoulliNP
@@ -259,13 +259,13 @@ Using the cross entropy to iteratively optimize a prediction is simple:
 
     def body_fun(q: BernoulliNP) -> BernoulliNP:
         q_bar = gce(some_p, q)
-        return tree_map(apply, q, q_bar)
+        return tree.map(apply, q, q_bar)
 
 
     def cond_fun(q: BernoulliNP) -> BooleanNumeric:
         q_bar = gce(some_p, q)
-        total = tree_reduce(jnp.sum,
-                            tree_map(lambda x: jnp.sum(jnp.square(x)), q_bar))
+        total = tree.reduce(jnp.sum,
+                            tree.map(lambda x: jnp.sum(jnp.square(x)), q_bar))
         return total > 1e-6
 
 
@@ -309,7 +309,7 @@ of samples).
 
     import jax.numpy as jnp
     from jax.random import key
-    from jax.tree_util import tree_map
+    from jax import tree
 
     from efax import DirichletNP
 
@@ -328,7 +328,7 @@ of samples).
     # ss has type DirichletEP.  This is similar to the conjguate prior of the Dirichlet distribution.
 
     # Take the mean over the first axis.
-    ss_mean = tree_map(partial(jnp.mean, axis=0), ss)  # ss_mean also has type DirichletEP.
+    ss_mean = tree.map(partial(jnp.mean, axis=0), ss)  # ss_mean also has type DirichletEP.
 
     # Convert this back to the natural parametrization.
     estimated_distribution = ss_mean.to_nat()

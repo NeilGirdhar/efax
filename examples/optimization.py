@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from jax import grad, lax
-from jax.tree_util import tree_map, tree_reduce
+from jax import grad, lax, tree
 from tjax import JaxBooleanArray, JaxRealArray, jit, print_generic
 
 from efax import BernoulliEP, BernoulliNP
@@ -21,13 +20,13 @@ def apply(x: JaxRealArray, x_bar: JaxRealArray) -> JaxRealArray:
 
 def body_fun(q: BernoulliNP) -> BernoulliNP:
     q_bar = gce(some_p, q)
-    return tree_map(apply, q, q_bar)
+    return tree.map(apply, q, q_bar)
 
 
 def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
     q_bar = gce(some_p, q)
-    total = tree_reduce(jnp.sum,
-                        tree_map(lambda x: jnp.sum(jnp.square(x)), q_bar))
+    total = tree.reduce(jnp.sum,
+                        tree.map(lambda x: jnp.sum(jnp.square(x)), q_bar))
     return total > 1e-6  # noqa: PLR2004
 
 
