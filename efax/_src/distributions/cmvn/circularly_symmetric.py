@@ -4,7 +4,6 @@ import math
 from typing import Any
 
 import jax
-import jax.numpy as jnp
 from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape, outer_product
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -52,17 +51,20 @@ class ComplexCircularlySymmetricNormalNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        log_det_s = jnp.log(jnp.linalg.det(-self.negative_precision).real)
+        xp = self.get_namespace()
+        log_det_s = xp.log(xp.linalg.det(-self.negative_precision).real)
         return -log_det_s + self.dimensions() * math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexCircularlySymmetricNormalEP:
+        xp = self.get_namespace()
         return ComplexCircularlySymmetricNormalEP(
-            jnp.linalg.inv(-self.negative_precision).conjugate())
+            xp.linalg.inv(-self.negative_precision).conjugate())
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
-        return jnp.zeros(x.shape[:-1])
+        xp = self.get_namespace(x)
+        return xp.zeros(x.shape[:-1])
 
     @override
     @classmethod
@@ -112,12 +114,14 @@ class ComplexCircularlySymmetricNormalEP(
 
     @override
     def to_nat(self) -> ComplexCircularlySymmetricNormalNP:
+        xp = self.get_namespace()
         return ComplexCircularlySymmetricNormalNP(
-            -jnp.linalg.inv(self.variance).conjugate())
+            -xp.linalg.inv(self.variance).conjugate())
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
@@ -138,11 +142,15 @@ class ComplexCircularlySymmetricNormalEP(
 
     def _multivariate_normal_mean(self) -> JaxRealArray:
         """Return the mean of a corresponding real distribution with double the size."""
+        xp = self.get_namespace()
         n = self.dimensions()
-        return jnp.zeros((*self.shape, n * 2))
+        return xp.zeros((*self.shape, n * 2))
 
     def _multivariate_normal_cov(self) -> JaxRealArray:
         """Return the covariance of a corresponding real distribution with double the size."""
+        xp = self.get_namespace()
         gamma_r = 0.5 * self.variance.real
         gamma_i = 0.5 * self.variance.imag
-        return jnp.block([[gamma_r, -gamma_i], [gamma_i, gamma_r]])
+        return xp.concat([xp.concat([gamma_r, -gamma_i], axis=-1),
+                          xp.concat([gamma_i, gamma_r], axis=-1)],
+                         axis=-2)

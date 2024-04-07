@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, TypeVar
 
-import jax.numpy as jnp
 from jax.scipy.special import gammaln
 from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
@@ -34,7 +33,8 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return -self._failures() * jnp.log1p(-jnp.exp(self.log_not_p))
+        xp = self.get_namespace()
+        return -self._failures() * xp.log1p(-xp.exp(self.log_not_p))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -43,7 +43,8 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
         return gammaln(a + 1) - gammaln(x + 1) - gammaln(a - x + 1)
 
     def _mean(self) -> JaxRealArray:
-        return self._failures() / jnp.expm1(-self.log_not_p)
+        xp = self.get_namespace()
+        return self._failures() / xp.expm1(-self.log_not_p)
 
     @abstractmethod
     def _failures(self) -> int | JaxIntegralArray:
@@ -69,10 +70,11 @@ class NBCommonEP(ExpectationParametrization[NP],
         return ScalarSupport(ring=integral_ring)
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaPrimeNP:
-    #     return BetaPrimeNP(n * self._failures() * (self.mean, jnp.ones_like(self.mean)))
+    #     return BetaPrimeNP(n * self._failures() * (self.mean, xp.ones_like(self.mean)))
 
     def _log_not_p(self) -> JaxRealArray:
-        return -jnp.log1p(self._failures() / self.mean)
+        xp = self.get_namespace()
+        return -xp.log1p(self._failures() / self.mean)
 
     @abstractmethod
     def _failures(self) -> int | JaxIntegralArray:

@@ -4,7 +4,6 @@ import math
 from typing import Any
 
 import jax
-import jax.numpy as jnp
 from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -50,8 +49,9 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNorma
 
     @override
     def log_normalizer(self) -> JaxRealArray:
+        xp = self.get_namespace()
         mean_conjugate = self.two_mean_conjugate * 0.5
-        return jnp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
+        return xp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexMultivariateUnitNormalEP:
@@ -59,7 +59,8 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNorma
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
-        return -jnp.sum(abs_square(x), axis=-1)
+        xp = self.get_namespace(x)
+        return -xp.sum(abs_square(x), axis=-1)
 
     @override
     @classmethod
@@ -111,8 +112,9 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
+        xp = self.get_namespace()
         # The second moment of a normal distribution with the given mean.
-        return -(jnp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
+        return -(xp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
@@ -125,7 +127,7 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
         return a + 1j * b + self.mean
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-    #     negative_half_precision = -0.5 * n * jnp.ones(self.shape)
+    #     negative_half_precision = -0.5 * n * xp.ones(self.shape)
     #     return IsotropicNormalNP(n * self.mean, negative_half_precision)
     #
     # def conjugate_prior_observation(self) -> JaxComplexArray:

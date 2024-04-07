@@ -4,7 +4,6 @@ import math
 from typing import Any
 
 import jax
-import jax.numpy as jnp
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -46,7 +45,8 @@ class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return 0.5 * (jnp.sum(jnp.square(self.mean), axis=-1)
+        xp = self.get_namespace()
+        return 0.5 * (xp.sum(xp.square(self.mean), axis=-1)
                       + self.dimensions() * math.log(math.pi * 2.0))
 
     @override
@@ -56,7 +56,8 @@ class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         # The second moment of a delta distribution at x.
-        return -0.5 * jnp.sum(jnp.square(x), axis=-1)
+        xp = self.get_namespace(x)
+        return -0.5 * xp.sum(xp.square(x), axis=-1)
 
     @override
     @classmethod
@@ -115,7 +116,8 @@ class MultivariateUnitNormalEP(
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
-        return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) + self.dimensions())
+        xp = self.get_namespace()
+        return -0.5 * (xp.sum(xp.square(self.mean), axis=-1) + self.dimensions())
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -123,8 +125,9 @@ class MultivariateUnitNormalEP(
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-        negative_half_precision = -0.5 * n * jnp.ones(self.shape)
-        return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
+        xp = self.get_namespace()
+        negative_half_precision = -0.5 * n * xp.ones(self.shape)
+        return IsotropicNormalNP(n[..., xp.newaxis] * self.mean, negative_half_precision)
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray

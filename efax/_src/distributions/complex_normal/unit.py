@@ -116,7 +116,7 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
         return a + 1j * b + self.mean
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-    #     negative_half_precision = -0.5 * n * jnp.ones(self.shape)
+    #     negative_half_precision = -0.5 * n * xp.ones(self.shape)
     #     return IsotropicNormalNP(n * self.mean, negative_half_precision)
     #
     # def conjugate_prior_observation(self) -> JaxComplexArray:

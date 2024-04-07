@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar, final
 
-import jax.numpy as jnp
+import jax.experimental.array_api as jnp
 import pytest
 from numpy.random import Generator
 from tjax import JaxComplexArray, NumpyComplexArray, Shape
@@ -48,7 +48,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
     @final
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> NP:
         """Generate natural parameters."""
-        return self.nat_structure().generate_random(rng, shape)
+        return self.nat_structure().generate_random(jnp, rng, shape)
 
     def scipy_to_exp_family_observation(self, x: Domain) -> JaxComplexArray | dict[str, Any]:
         """The observation that's expected by the exponential family.

@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Generator
 from typing import Any
 
+import jax.experimental.array_api
+import jax.numpy as jnp
 import numpy as np
 import pytest
 from jax import enable_custom_prng
@@ -19,6 +21,9 @@ from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNor
                           DirichletInfo, GammaInfo, GeneralizedDirichletInfo, JointInfo,
                           create_infos)
 from .distribution_info import DistributionInfo
+
+jax.experimental.array_api.linalg.norm = jnp.linalg.norm  # type: ignore # pyright: ignore
+jax.experimental.array_api.diagonal = jnp.diagonal  # type: ignore # pyright: ignore
 
 
 @pytest.fixture(autouse=True)

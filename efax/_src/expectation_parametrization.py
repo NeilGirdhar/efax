@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Generic, TypeVar, final
 
-import jax.numpy as jnp
 from tjax import JaxRealArray, jit
 
 from .natural_parametrization import NaturalParametrization
@@ -46,7 +45,8 @@ class ExpectationParametrization(Distribution, Generic[NP]):
         """
         if self_nat is None:
             self_nat = self.to_nat()
-        difference = parameter_map(jnp.subtract, self_nat, q)
+        xp = self.get_namespace()
+        difference = parameter_map(xp.subtract, self_nat, q)
         return (parameter_dot_product(difference, self)
                 + q.log_normalizer()
                 - self_nat.log_normalizer())

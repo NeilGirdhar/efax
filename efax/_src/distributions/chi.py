@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import math
 from typing import Any
 
-import jax.numpy as jnp
+from array_api_compat import get_namespace
 from jax.scipy import special as jss
 from tjax import Array, JaxRealArray
 from tjax.dataclasses import dataclass
@@ -55,11 +56,13 @@ class ChiNP(HasEntropyNP['ChiEP'],
     @override
     @classmethod
     def sample_to_base_sample(cls, x: Array, **fixed_parameters: Any) -> JaxRealArray:
-        return jnp.square(x)
+        xp = get_namespace(x)
+        return xp.square(x)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.log(2.0 * x) - jnp.square(x) * 0.5
+        xp = self.get_namespace(x)
+        return xp.log(2.0 * x) - xp.square(x) * 0.5
 
 
 @dataclass
@@ -100,4 +103,4 @@ class ChiEP(HasEntropyEP[ChiNP],
     def expected_carrier_measure(self) -> JaxRealArray:
         q = self.to_nat()
         k_over_two = q.k_over_two_minus_one + 1.0
-        return -1.0 * k_over_two + 0.5 * jss.digamma(k_over_two) + 1.5 * jnp.log(2.0)
+        return -1.0 * k_over_two + 0.5 * jss.digamma(k_over_two) + 1.5 * math.log(2.0)
