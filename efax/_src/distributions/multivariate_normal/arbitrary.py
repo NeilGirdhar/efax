@@ -5,7 +5,7 @@ from typing import Any
 import jax
 import jax.numpy as jnp
 import numpy as np
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxRealArray, KeyArray, Shape, matrix_dot_product, matrix_vector_mul, outer_product
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -17,10 +17,6 @@ from ...natural_parametrization import NaturalParametrization
 from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
 
 __all__ = ['MultivariateNormalEP', 'MultivariateNormalNP', 'MultivariateNormalVP']
-
-
-def _broadcasted_outer(x: JaxRealArray) -> JaxRealArray:
-    return jnp.einsum("...i,...j->...ij", x, x)
 
 
 @dataclass
@@ -50,17 +46,16 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
     def log_normalizer(self) -> JaxRealArray:
         eta = self.mean_times_precision
         h_inv = jnp.linalg.inv(self.negative_half_precision)
-        a: JaxRealArray = jnp.einsum("...i,...ij,...j", eta, h_inv, eta)
+        a = matrix_dot_product(h_inv, outer_product(eta, eta))
         _, ld = jnp.linalg.slogdet(-self.negative_half_precision)
         return -0.25 * a - 0.5 * ld + 0.5 * self.dimensions() * jnp.log(np.pi)
 
     @override
     def to_exp(self) -> MultivariateNormalEP:
         h_inv = jnp.linalg.inv(self.negative_half_precision)
-        h_inv_times_eta: JaxRealArray = jnp.einsum(
-            "...ij,...j->...i", h_inv, self.mean_times_precision)
+        h_inv_times_eta: JaxRealArray = matrix_vector_mul(h_inv, self.mean_times_precision)
         mean = -0.5 * h_inv_times_eta
-        second_moment = 0.25 * _broadcasted_outer(h_inv_times_eta) - 0.5 * h_inv
+        second_moment = 0.25 * outer_product(h_inv_times_eta, h_inv_times_eta) - 0.5 * h_inv
         return MultivariateNormalEP(mean, second_moment)
 
     @override
@@ -71,7 +66,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> MultivariateNormalEP:
-        return MultivariateNormalEP(x, _broadcasted_outer(x))
+        return MultivariateNormalEP(x, outer_product(x, x))
 
     @override
     def dimensions(self) -> int:
@@ -103,7 +98,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
     @override
     def to_nat(self) -> MultivariateNormalNP:
         precision = jnp.linalg.inv(self.variance())
-        mean_times_precision = jnp.einsum("...ij,...j->...i", precision, self.mean)
+        mean_times_precision = matrix_vector_mul(precision, self.mean)
         return MultivariateNormalNP(mean_times_precision, -0.5 * precision)
 
     @override
@@ -119,7 +114,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
         return self.mean.shape[-1]
 
     def variance(self) -> JaxRealArray:
-        return self.second_moment - _broadcasted_outer(self.mean)
+        return self.second_moment - outer_product(self.mean, self.mean)
 
     def to_variance_parametrization(self) -> MultivariateNormalVP:
         return MultivariateNormalVP(self.mean, self.variance())
@@ -159,5 +154,5 @@ class MultivariateNormalVP(Samplable, Multidimensional):
         return self.mean.shape[-1]
 
     def to_exp(self) -> MultivariateNormalEP:
-        second_moment = self.variance + _broadcasted_outer(self.mean)
+        second_moment = self.variance + outer_product(self.mean, self.mean)
         return MultivariateNormalEP(self.mean, second_moment)

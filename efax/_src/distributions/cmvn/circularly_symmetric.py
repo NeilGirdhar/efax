@@ -5,7 +5,7 @@ from typing import Any
 
 import jax
 import jax.numpy as jnp
-from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape
+from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape, outer_product
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -18,10 +18,6 @@ from ...parameter import (SymmetricMatrixSupport, VectorSupport, complex_field,
                           distribution_parameter)
 
 __all__ = ['ComplexCircularlySymmetricNormalEP', 'ComplexCircularlySymmetricNormalNP']
-
-
-def _broadcasted_outer_c(x: JaxComplexArray) -> JaxComplexArray:
-    return jnp.einsum("...i,...j->...ij", x, x.conjugate())
 
 
 @dataclass
@@ -74,7 +70,7 @@ class ComplexCircularlySymmetricNormalNP(
     @classmethod
     def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: Any
                               ) -> ComplexCircularlySymmetricNormalEP:
-        return ComplexCircularlySymmetricNormalEP(_broadcasted_outer_c(x))
+        return ComplexCircularlySymmetricNormalEP(outer_product(x, x))
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
