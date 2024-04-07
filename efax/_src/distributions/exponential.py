@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, Self
 
 import jax
-import jax.numpy as jnp
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -40,7 +39,8 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return -jnp.log(-self.negative_rate)
+        xp = self.get_namespace()
+        return -xp.log(-self.negative_rate)
 
     @override
     def to_exp(self) -> ExponentialEP:
@@ -48,7 +48,8 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape)
+        xp = self.get_namespace(x)
+        return xp.zeros(x.shape)
 
     @override
     @classmethod
@@ -98,7 +99,8 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

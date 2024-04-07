@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, Self
 
 import jax
-import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -41,11 +40,13 @@ class PoissonNP(Samplable,
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return jnp.exp(self.log_mean)
+        xp = self.get_namespace()
+        return xp.exp(self.log_mean)
 
     @override
     def to_exp(self) -> PoissonEP:
-        return PoissonEP(jnp.exp(self.log_mean))
+        xp = self.get_namespace()
+        return PoissonEP(xp.exp(self.log_mean))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -91,7 +92,8 @@ class PoissonEP(HasConjugatePrior,
 
     @override
     def to_nat(self) -> PoissonNP:
-        return PoissonNP(jnp.log(self.mean))
+        xp = self.get_namespace()
+        return PoissonNP(xp.log(self.mean))
 
     # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of
     #   lambda ** k * log(k!) / k! = lambda ** k * log Gamma(k+1) / Gamma(k+1)

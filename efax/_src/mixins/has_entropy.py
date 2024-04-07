@@ -29,7 +29,7 @@ class HasEntropyEP(ExpectationParametrization[NP],
         """The expected carrier measure of the distribution.
 
         This is the missing term from the inner product between the observed distribution and the
-        predicted distribution.  Often, it is just jnp.zeros(self.shape).
+        predicted distribution.  Often, it is just xp.zeros(self.shape).
         """
         raise NotImplementedError
 

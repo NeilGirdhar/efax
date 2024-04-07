@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import math
 from typing import Any
 
-import jax.numpy as jnp
+import numpy as np
+from array_api_compat import get_namespace
 from jax.random import rayleigh
 from tjax import Array, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -56,17 +58,20 @@ class RayleighNP(Samplable,
     @classmethod
     def sample_to_base_sample(cls, x: Array, **fixed_parameters: Any
                               ) -> JaxRealArray:
-        return jnp.square(x)
+        xp = get_namespace(x)
+        return xp.square(x)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.log(x) + jnp.log(2)
+        xp = self.get_namespace(x)
+        return xp.log(x) + math.log(2.0)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.get_namespace()
         if shape is not None:
             shape += self.shape
-        sigma = jnp.sqrt(-0.5 / self.eta)
+        sigma = xp.sqrt(-0.5 / self.eta)
         return rayleigh(key, sigma, shape)
 
 
@@ -106,11 +111,13 @@ class RayleighEP(Samplable,
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return 0.5 * jnp.log(self.chi * 0.5) + (1.5 * jnp.log(2.0) - 0.5 * jnp.euler_gamma)
+        xp = self.get_namespace()
+        return 0.5 * xp.log(self.chi * 0.5) + (1.5 * math.log(2.0) - 0.5 * np.euler_gamma)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.get_namespace()
         if shape is not None:
             shape += self.shape
-        sigma = jnp.sqrt(0.5 * self.chi)
+        sigma = xp.sqrt(0.5 * self.chi)
         return rayleigh(key, sigma, shape)

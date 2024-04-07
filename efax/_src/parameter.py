@@ -5,14 +5,17 @@ from dataclasses import dataclass
 from math import comb, sqrt
 from typing import Any, cast
 
-import jax.numpy as jnp
 import numpy as np
+from array_api_compat import get_namespace
 from jax.dtypes import canonicalize_dtype
 from jax.scipy import special as jss
 from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import field
 from typing_extensions import override
+
+from .array_tools import array_at
+from .types import Namespace
 
 
 class Ring:
@@ -29,7 +32,7 @@ class Ring:
         raise NotImplementedError
 
     @abstractmethod
-    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
         raise NotImplementedError
 
     def clamp(self, x: JaxArray) -> JaxArray:
@@ -87,25 +90,26 @@ class RealField(Ring):
                 return y
 
     @override
-    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
         match self.minimum, self.maximum:
             case None, float(maximum):
-                return jnp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale)
+                return xp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale)
             case float(minimum), None:
-                return jnp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum)
+                return xp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum)
             case float(minimum), float(maximum):
-                return jnp.asarray(minimum + (maximum - minimum) * rng.uniform(size=shape))
+                return xp.asarray(minimum + (maximum - minimum) * rng.uniform(size=shape))
             case None, None:
-                return jnp.asarray(rng.normal(scale=1.0, size=shape) * self.generation_scale)
+                return xp.asarray(rng.normal(scale=1.0, size=shape) * self.generation_scale)
             case _:
                 raise TypeError
 
     @override
     def clamp(self, x: JaxRealArray) -> JaxRealArray:
-        eps = jnp.finfo(x.dtype).eps
+        xp = get_namespace(x)
+        eps = xp.finfo(x.dtype).eps
         minimum = None if self.minimum is None else self.minimum + eps
         maximum = None if self.maximum is None else self.maximum - eps
-        return jnp.clip(x, min=minimum, max=maximum)
+        return xp.clip(x, min=minimum, max=maximum)
 
 
 @dataclass
@@ -119,6 +123,7 @@ class ComplexField(Ring):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
+        xp = get_namespace(x)
         # if self.maximum_modulus is not None:
         #     assert False
         minimum = fix_bound(self.minimum_modulus, x)
@@ -126,17 +131,17 @@ class ComplexField(Ring):
         if map_to_plane:
             if maximum is None:
                 # x is outside the disk of the given minimum.  Map it to the plane.
-                magnitude = jnp.abs(x)
+                magnitude = xp.abs(x)
                 corrected_magnitude = magnitude - minimum
                 corrected_x = x * corrected_magnitude / magnitude
             else:
                 # x is in the disk of the given maximum.  Map it to the plane.
-                magnitude = jnp.abs(x)
+                magnitude = xp.abs(x)
                 corrected_magnitude = jss.logit(((magnitude - minimum) / maximum) * 0.5 + 0.5)
                 corrected_x = x * corrected_magnitude / magnitude
         else:
             corrected_x = x
-        return jnp.concat((corrected_x.real, corrected_x.imag), axis=-1)
+        return xp.concat([corrected_x.real, corrected_x.imag], axis=-1)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
@@ -148,22 +153,23 @@ class ComplexField(Ring):
         return self._unflattened(corrected_x)
 
     def _unflattened(self, corrected_x: JaxComplexArray) -> JaxComplexArray:
+        xp = get_namespace(corrected_x)
         minimum = fix_bound(self.minimum_modulus, corrected_x)
         maximum = fix_bound(self.maximum_modulus, corrected_x)
 
         if maximum is None:
             # x is outside the disk of the given minimum.  Map it to the plane.
-            corrected_magnitude = jnp.abs(corrected_x)
+            corrected_magnitude = xp.abs(corrected_x)
             magnitude = corrected_magnitude + minimum
             return corrected_x * magnitude / corrected_magnitude
         # x is in the disk of the given maximum.  Map it to the plane.
-        corrected_magnitude = jnp.abs(corrected_x)
+        corrected_magnitude = xp.abs(corrected_x)
         magnitude = maximum * (jss.expit(corrected_magnitude) - 0.5) * 2.0 + minimum
         return corrected_x * magnitude / corrected_magnitude
 
     @override
-    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
-        return self._unflattened(jnp.asarray(rng.normal(size=shape) + 1j * rng.normal(size=shape)))
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
+        return self._unflattened(xp.asarray(rng.normal(size=shape) + 1j * rng.normal(size=shape)))
 
 
 class BooleanRing(Ring):
@@ -173,15 +179,17 @@ class BooleanRing(Ring):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
-        return jnp.asarray(x, dtype=canonicalize_dtype(float))
+        xp = get_namespace(x)
+        return xp.asarray(x, dtype=canonicalize_dtype(float))
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
-        return jnp.asarray(y, dtype=jnp.bool_)
+        xp = get_namespace(y)
+        return xp.asarray(y, dtype=xp.bool_)
 
     @override
-    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
-        return jnp.asarray(rng.binomial(1, 0.5, shape).astype(np.bool_))
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
+        return xp.asarray(rng.binomial(1, 0.5, shape).astype(np.bool_))
 
 
 @dataclass
@@ -195,17 +203,19 @@ class IntegralRing(Ring):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
-        return jnp.asarray(x, dtype=canonicalize_dtype(float))
+        xp = get_namespace(x)
+        return xp.asarray(x, dtype=canonicalize_dtype(float))
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
-        return jnp.asarray(y, dtype=canonicalize_dtype(int))
+        xp = get_namespace(y)
+        return xp.asarray(y, dtype=canonicalize_dtype(int))
 
     @override
-    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
         field = RealField(minimum=None if self.minimum is None else float(self.minimum),
                       maximum=None if self.maximum is None else float(self.maximum))
-        real_values = field.generate(rng, shape) * 10
+        real_values = field.generate(xp, rng, shape) * 10
         return real_values.astype(canonicalize_dtype(int))
 
 
@@ -244,7 +254,8 @@ class Support:
         raise NotImplementedError
 
     @abstractmethod
-    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+                 ) -> JaxRealArray:
         raise NotImplementedError
 
     def clamp(self, x: JaxArray) -> JaxArray:
@@ -266,7 +277,8 @@ class ScalarSupport(Support):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
-        return self.ring.flattened(x[..., jnp.newaxis], map_to_plane=map_to_plane)
+        xp = get_namespace(x)
+        return self.ring.flattened(x[..., xp.newaxis], map_to_plane=map_to_plane)
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
@@ -275,8 +287,9 @@ class ScalarSupport(Support):
         return x[..., 0]
 
     @override
-    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
-        return self.ring.generate(rng, shape)
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+                 ) -> JaxRealArray:
+        return self.ring.generate(xp, rng, shape)
 
 
 class VectorSupport(Support):
@@ -303,8 +316,9 @@ class VectorSupport(Support):
         return x
 
     @override
-    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
-        return self.ring.generate(rng, (*shape, dimensions))
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+                 ) -> JaxRealArray:
+        return self.ring.generate(xp, rng, (*shape, dimensions))
 
 
 class SimplexSupport(Support):
@@ -332,13 +346,15 @@ class SimplexSupport(Support):
 
     @override
     def clamp(self, x: JaxArray) -> JaxArray:
-        eps = jnp.finfo(x.dtype).eps
-        s = jnp.sum(x, axis=-1, keepdims=True)
-        x *= jnp.minimum(1.0, (1.0 - eps) / s)
-        return jnp.clip(x, min=eps, max=1.0 - eps)
+        xp = get_namespace(x)
+        eps = xp.finfo(x.dtype).eps
+        s = xp.sum(x, axis=-1, keepdims=True)
+        x *= xp.minimum(1.0, (1.0 - eps) / s)
+        return xp.clip(x, min=eps, max=1.0 - eps)
 
     @override
-    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+                 ) -> JaxRealArray:
         raise NotImplementedError
 
 
@@ -371,13 +387,18 @@ class SymmetricMatrixSupport(Support):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
+        xp = get_namespace(x)
         dimensions = x.shape[-1]
         assert x.shape[-2] == dimensions
-        index = (..., *jnp.triu_indices(dimensions))
-        return self.ring.flattened(x[index], map_to_plane=map_to_plane)
+        index_a, index_b = np.triu_indices(dimensions)
+        x_triangular = xp.stack([x[..., i, j]
+                                 for i, j in zip(index_a, index_b, strict=True)],
+                                axis=-1)
+        return self.ring.flattened(x_triangular, map_to_plane=map_to_plane)
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
+        xp = get_namespace(y)
         x = self.ring.unflattened(y, map_from_plane=map_from_plane)
         k = x.shape[-1]
         sqrt_discriminant = sqrt(1 + 8 * k)
@@ -388,25 +409,29 @@ class SymmetricMatrixSupport(Support):
         if i_sqrt_discriminant % 2 != 1:
             raise ValueError
         dimensions = (i_sqrt_discriminant - 1) // 2
-        index = (..., *jnp.triu_indices(dimensions))
-        empty = jnp.empty(x.shape[:-1] + (dimensions, dimensions), dtype=x.dtype)
-        lower_diagonal = jnp.swapaxes(empty.at[index].set(x), -2, -1)
-        if self.hermitian:
-            lower_diagonal = lower_diagonal.conjugate()
-        return lower_diagonal.at[index].set(x)
+        index_a, index_b = np.triu_indices(dimensions)
+        result = xp.empty(x.shape[:-1] + (dimensions, dimensions), dtype=x.dtype)
+        for k, (i, j) in enumerate(zip(index_a, index_b, strict=True)):
+            xk = x[..., k]
+            result = array_at(result)[..., i, j].set(xk)
+            if i != j:
+                cxk = xp.conj(xk) if self.hermitian else xk
+                result = array_at(result)[..., j, i].set(cxk)
+        return result
 
     @override
-    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
-        m = self.ring.generate(rng, (*shape, dimensions, dimensions))
-        mt = jnp.matrix_transpose(m)
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+                 ) -> JaxRealArray:
+        m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions))
+        mt = xp.matrix_transpose(m)
         if self.hermitian:
             mt = mt.conj()
         if self.negative_semidefinite or self.positive_semidefinite:
             assert isinstance(self.ring, RealField | ComplexField)
             eig_field = (RealField(minimum=0.0)
                          if self.positive_semidefinite else RealField(maximum=0.0))
-            eig = eig_field.generate(rng, (*shape, dimensions))
-            return jnp.einsum('...ij,...j,...jk->...ik', m, eig, mt)
+            eig = eig_field.generate(xp, rng, (*shape, dimensions))
+            return xp.einsum('...ij,...j,...jk->...ik', m, eig, mt)
         return m + mt
 
 
@@ -425,13 +450,15 @@ class SquareMatrixSupport(Support):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxArray:
-        y = jnp.reshape(x, (*x.shape[:-2], -1))
+        xp = get_namespace(x)
+        y = xp.reshape(x, (*x.shape[:-2], -1))
         return self.ring.flattened(y, map_to_plane=map_to_plane)
 
     @override
     def unflattened(self, y: JaxArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
+        xp = get_namespace(y)
         x = self.ring.unflattened(y, map_from_plane=map_from_plane)
-        return jnp.reshape(x, x.shape[:-1] + self.shape(dimensions))
+        return xp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 
 
 class CircularBoundedSupport(VectorSupport):
@@ -444,7 +471,8 @@ class CircularBoundedSupport(VectorSupport):
         if not map_to_plane:
             return x
         # x is in the disk of the given radius.  Map it to the plane.
-        magnitude = jnp.linalg.norm(x, 2, axis=-1, keepdims=True)
+        xp = get_namespace(x)
+        magnitude = xp.linalg.norm(x, 2, axis=-1, keepdims=True)
         corrected_magnitude = jss.logit((magnitude / self.radius) * 0.5 + 0.5)
         return x * corrected_magnitude / magnitude
 
@@ -453,8 +481,9 @@ class CircularBoundedSupport(VectorSupport):
         if not map_from_plane:
             return y
         # y is in the plane.  Map it to the disk of the given radius.
+        xp = get_namespace(y)
         assert y.shape[-1] == dimensions
-        corrected_magnitude = cast('JaxRealArray', jnp.linalg.norm(y, 2, axis=-1, keepdims=True))
+        corrected_magnitude = cast('JaxRealArray', xp.linalg.norm(y, 2, axis=-1, keepdims=True))
         magnitude = self.radius * (jss.expit(corrected_magnitude) - 0.5) * 2.0
         return y * magnitude / corrected_magnitude
 
@@ -469,11 +498,13 @@ def distribution_parameter(support: Support,
 
 
 def fix_bound(x: JaxArray | float | None, y: JaxArray) -> JaxArray | None:
+    xp = get_namespace(y)
     if x is None:
         return x
     if isinstance(x, float):
-        x = jnp.asarray(x)
+        x = xp.asarray(x)
     assert isinstance(x, JaxArray)
+    xp = get_namespace(x, y)
     while x.ndim < y.ndim:
-        x = x[..., jnp.newaxis]
+        x = x[..., xp.newaxis]
     return x

@@ -3,7 +3,7 @@ from dataclasses import fields, replace
 from functools import partial, reduce
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast
 
-import jax.numpy as jnp
+from array_api_compat import get_namespace
 from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
@@ -11,7 +11,7 @@ from tjax.dataclasses import dataclass, field
 from .iteration import flatten_mapping, parameters, support
 from .parameter import Support
 from .parametrization import Distribution, SimpleDistribution
-from .types import Path
+from .types import Namespace, Path
 
 if TYPE_CHECKING:
     from .natural_parametrization import NaturalParametrization
@@ -100,14 +100,14 @@ class Structure(Generic[P]):
                 for info in self.infos
                 if issubclass(info.type_, SimpleDistribution)}
 
-    def generate_random(self, rng: Generator, shape: Shape) -> P:
+    def generate_random(self, xp: Namespace, rng: Generator, shape: Shape) -> P:
         """Generate a random distribution."""
         path_and_values = {}
         for info in self.infos:
             kwargs: dict[str, JaxComplexArray] = {}
             for name in support(info.type_):
                 s = info.type_.adjust_support(name, **kwargs)
-                value = s.generate(rng, shape, info.dimensions)
+                value = s.generate(xp, rng, shape, info.dimensions)
                 path_and_values[*info.path, name] = kwargs[name] = value
         return self.assemble(path_and_values)
 
@@ -233,7 +233,8 @@ class MaximumLikelihoodEstimator(Structure[P]):
             if n is None:
                 n = n_i
             else:
-                assert jnp.all(n == n_i)
+                xp = get_namespace(n)
+                assert xp.all(n == n_i)
             constructed[info.path] = p
         assert n is not None
         p = constructed[()]
@@ -305,10 +306,15 @@ class Flattener(MaximumLikelihoodEstimator[P]):
                 values (e.g., when taking a different of expectation parameters).  It should be true
                 when passing to a neural network.
         """
+        xp = p.get_namespace()
         arrays = [x
                   for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p)
                   for x in xs]
-        flattened_array = reduce(partial(jnp.append, axis=-1), arrays)
+
+        def concatenate(x: JaxRealArray, y: JaxRealArray, /) -> JaxRealArray:
+            return xp.concat([x, y], axis=-1)
+
+        flattened_array = reduce(concatenate, arrays)
         return (cls(cls._extract_distributions(p),
                     parameters(p, fixed=True),
                     map_to_plane),

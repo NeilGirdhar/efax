@@ -206,26 +206,28 @@ A basic use of the two parametrizations:
 
 .. code:: python
 
-    from jax import numpy as jnp
+    from __future__ import annotations
+
+    import jax.numpy as jnp
 
     from efax import BernoulliEP, BernoulliNP
 
     # p is the expectation parameters of three Bernoulli distributions having probabilities 0.4, 0.5,
     # and 0.6.
-    p = BernoulliEP(jnp.array([0.4, 0.5, 0.6]))
+    p = BernoulliEP(jnp.asarray([0.4, 0.5, 0.6]))
 
     # q is the natural parameters of three Bernoulli distributions having log-odds 0, which is
     # probability 0.5.
     q = BernoulliNP(jnp.zeros(3))
 
-    print(p.cross_entropy(q))
+    print(p.cross_entropy(q))  # noqa: T201
     # [0.6931472 0.6931472 0.6931472]
 
     # q2 is natural parameters of Bernoulli distributions having a probability of 0.3.
     p2 = BernoulliEP(0.3 * jnp.ones(3))
     q2 = p2.to_nat()
 
-    print(p.cross_entropy(q2))
+    print(p.cross_entropy(q2))  # noqa: T201
     # [0.6955941  0.78032386 0.86505365]
     # A Bernoulli distribution with probability 0.3 predicts a Bernoulli observation with probability
     # 0.4 better than the other observations.
@@ -303,8 +305,6 @@ of samples).
 
 .. code:: python
 
-    from functools import partial
-
     import jax.numpy as jnp
     from jax.random import key
 
@@ -329,8 +329,7 @@ of samples).
 
     # Convert this back to the natural parametrization.
     estimated_distribution = ss_mean.to_nat()
-    print(estimated_distribution.alpha_minus_one + 1.0)  # [1.9849904 3.0065458 3.963935 ]
-
+    print(estimated_distribution.alpha_minus_one + 1.0)  # [1.9849904 3.0065458 3.963935 ]  # noqa: T201
 
 Contribution guidelines
 =======================

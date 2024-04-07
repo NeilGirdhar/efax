@@ -4,7 +4,6 @@ import math
 from typing import Any, Self
 
 import jax
-import jax.numpy as jnp
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -43,7 +42,8 @@ class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return 0.5 * (jnp.square(self.mean) + math.log(math.pi * 2.0))
+        xp = self.get_namespace()
+        return 0.5 * (xp.square(self.mean) + math.log(math.pi * 2.0))
 
     @override
     def to_exp(self) -> UnitNormalEP:
@@ -52,7 +52,8 @@ class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         # The second moment of a delta distribution at x.
-        return -0.5 * jnp.square(x)
+        xp = self.get_namespace(x)
+        return -0.5 * xp.square(x)
 
     @override
     @classmethod
@@ -106,7 +107,8 @@ class UnitNormalEP(HasEntropyEP[UnitNormalNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
-        return -0.5 * (jnp.square(self.mean) + 1.0)
+        xp = self.get_namespace()
+        return -0.5 * (xp.square(self.mean) + 1.0)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 
-import jax.numpy as jnp
-from jax.nn import softplus
+from array_api_compat import get_namespace
 from jax.random import gamma as random_gamma
 from jax.scipy import special as jss
-from tjax import JaxRealArray, KeyArray, Shape, inverse_softplus
+from tjax import JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -47,24 +46,28 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
+        xp = self.get_namespace()
         shape = self.shape_minus_one + 1.0
-        return jss.gammaln(shape) - shape * jnp.log(-self.negative_rate)
+        return jss.gammaln(shape) - shape * xp.log(-self.negative_rate)
 
     @override
     def to_exp(self) -> GammaEP:
+        xp = self.get_namespace()
         shape = self.shape_minus_one + 1.0
         return GammaEP(-shape / self.negative_rate,
-                       jss.digamma(shape) - jnp.log(-self.negative_rate))
+                       jss.digamma(shape) - xp.log(-self.negative_rate))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape)
+        xp = self.get_namespace(x)
+        return xp.zeros(x.shape)
 
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> GammaEP:
-        return GammaEP(x, jnp.log(x))
+        xp = get_namespace(x)
+        return GammaEP(x, xp.log(x))
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -112,7 +115,8 @@ class GammaEP(HasEntropyEP[GammaNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -126,20 +130,22 @@ class GammaEP(HasEntropyEP[GammaNP],
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
+        xp = self.get_namespace()
         shape = softplus(search_parameters[..., 0])
-        log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
-        return (log_mean_minus_mean_log - jnp.log(shape) + jss.digamma(shape))[..., jnp.newaxis]
+        log_mean_minus_mean_log = xp.log(self.mean) - self.mean_log
+        return (log_mean_minus_mean_log - xp.log(shape) + jss.digamma(shape))[..., xp.newaxis]
         # gradient is 1.0 / shape - jss.polygamma(1, shape)
         # where polygamma(1) is trigamma
 
     @override
     def initial_search_parameters(self) -> JaxRealArray:
-        log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
-        initial_shape = (
+        xp = self.get_namespace()
+        log_mean_minus_mean_log = xp.log(self.mean) - self.mean_log
+        initial_shape: JaxRealArray = (
             (3.0 - log_mean_minus_mean_log
-             + jnp.sqrt((log_mean_minus_mean_log - 3.0) ** 2 + 24.0 * log_mean_minus_mean_log))
+             + xp.sqrt((log_mean_minus_mean_log - 3.0) ** 2 + 24.0 * log_mean_minus_mean_log))
             / (12.0 * log_mean_minus_mean_log))
-        return inverse_softplus(initial_shape)[..., jnp.newaxis]
+        return inverse_softplus(initial_shape)[..., xp.newaxis]
 
 
 @dataclass

@@ -26,9 +26,10 @@ classifiers = [
   'License :: OSI Approved :: MIT License',
 ]
 dependencies = [
+  'array_api_compat >= 1.6',
   'jax >= 0.4.34',
-  'optimistix>=0.0.9',
   'numpy >= 1.23',
+  'optimistix>=0.0.9',
   'scipy >= 1.10',
   'tensorflow_probability >= 0.15',
   'tjax >= 1.0.1',
@@ -217,6 +218,7 @@ module = [
   'scipy.special',
   'scipy.stats',
   'tensorflow_probability.substrates',
+  'array_api_compat',
 ]
 ignore_missing_imports = true
 
@@ -252,6 +254,7 @@ ignore = [
   'G004', # Logging statement uses f-string.
   'I001', # Import block is un-sorted or un-formatted.
   'PD008', # Use .loc instead of .at. If speed is important, use NumPy.
+  'PD013', # `.melt` is preferred to `.stack`; provides same functionality
   'PGH003', # Use specific rule codes when ignoring type issues.
   'PLR0913', # Too many arguments in function definition.
   'PLR6301', # Method doesn't use self.

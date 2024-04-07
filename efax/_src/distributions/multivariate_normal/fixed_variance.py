@@ -4,7 +4,6 @@ import math
 from typing import Any, Self
 
 import jax
-import jax.numpy as jnp
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -50,19 +49,22 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
 
     @override
     def log_normalizer(self) -> JaxRealArray:
+        xp = self.get_namespace()
         eta = self.mean_times_precision
-        return 0.5 * (jnp.sum(jnp.square(eta), axis=-1) * self.variance
-                      + self.dimensions() * jnp.log(math.pi * 2.0 * self.variance))
+        return 0.5 * (xp.sum(xp.square(eta), axis=-1) * self.variance
+                      + self.dimensions() * xp.log(math.pi * 2.0 * self.variance))
 
     @override
     def to_exp(self) -> MultivariateFixedVarianceNormalEP:
+        xp = self.get_namespace()
         return MultivariateFixedVarianceNormalEP(
-            self.mean_times_precision * self.variance[..., jnp.newaxis],
+            self.mean_times_precision * self.variance[..., xp.newaxis],
             variance=self.variance)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return -0.5 * jnp.sum(jnp.square(x), axis=-1) / self.variance
+        xp = self.get_namespace(x)
+        return -0.5 * xp.sum(xp.square(x), axis=-1) / self.variance
 
     @override
     @classmethod
@@ -115,28 +117,32 @@ class MultivariateFixedVarianceNormalEP(
 
     @override
     def to_nat(self) -> MultivariateFixedVarianceNormalNP:
-        return MultivariateFixedVarianceNormalNP(self.mean / self.variance[..., jnp.newaxis],
+        xp = self.get_namespace()
+        return MultivariateFixedVarianceNormalNP(self.mean / self.variance[..., xp.newaxis],
                                                  variance=self.variance)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return -0.5 * (jnp.sum(jnp.square(self.mean), axis=-1) / self.variance + self.dimensions())
+        xp = self.get_namespace()
+        return -0.5 * (xp.sum(xp.square(self.mean), axis=-1) / self.variance + self.dimensions())
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.get_namespace()
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        variance = self.variance[..., jnp.newaxis]
-        deviation = jnp.sqrt(variance)
+        variance = self.variance[..., xp.newaxis]
+        deviation = xp.sqrt(variance)
         return jax.random.normal(key, shape) * deviation + self.mean
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
+        xp = self.get_namespace()
         n_over_variance = n / self.variance
         negative_half_precision = -0.5 * n_over_variance
-        return IsotropicNormalNP(n_over_variance[..., jnp.newaxis] * self.mean,
+        return IsotropicNormalNP(n_over_variance[..., xp.newaxis] * self.mean,
                                  negative_half_precision)
 
     @classmethod
@@ -146,15 +152,17 @@ class MultivariateFixedVarianceNormalEP(
                                           ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, IsotropicNormalNP)
         assert variance is not None
+        xp = cp.get_namespace()
         n_over_variance = -2.0 * cp.negative_half_precision
         n = n_over_variance * variance
-        mean = cp.mean_times_precision / n_over_variance[..., jnp.newaxis]
+        mean = cp.mean_times_precision / n_over_variance[..., xp.newaxis]
         return cls(mean, variance), n
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray
                                                  ) -> MultivariateDiagonalNormalNP:
-        n_over_variance = n / self.variance[..., jnp.newaxis]
+        xp = self.get_namespace()
+        n_over_variance = n / self.variance[..., xp.newaxis]
         negative_half_precision = -0.5 * n_over_variance
         return MultivariateDiagonalNormalNP(n_over_variance * self.mean, negative_half_precision)
 

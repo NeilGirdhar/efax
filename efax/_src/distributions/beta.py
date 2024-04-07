@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import jax
-import jax.numpy as jnp
+from array_api_compat import get_namespace
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -40,11 +40,13 @@ class BetaNP(DirichletCommonNP['BetaEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> BetaEP:
-        return BetaEP(jnp.stack([jnp.log(x), jnp.log1p(-x)], axis=-1))
+        xp = get_namespace(x)
+        return BetaEP(xp.stack([xp.log(x), xp.log1p(-x)], axis=-1))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape)
+        xp = get_namespace(x)
+        return xp.zeros(x.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

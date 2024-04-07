@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 import jax
-import jax.numpy as jnp
 import numpy as np
 from jax.nn import one_hot
 from jax.scipy import special as jss
@@ -11,6 +10,7 @@ from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ..array_tools import array_at
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ..interfaces.multidimensional import Multidimensional
@@ -45,21 +45,24 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
+        xp = self.get_namespace()
+        max_q = xp.maximum(0.0, xp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return max_q + log_scaled_a
 
     @override
     def to_exp(self) -> MultinomialEP:
-        max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
+        xp = self.get_namespace()
+        max_q = xp.maximum(0.0, xp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
-        return MultinomialEP(jnp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
+        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        return MultinomialEP(xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape[:-1])
+        xp = self.get_namespace(x)
+        return xp.zeros(x.shape[:-1])
 
     @override
     @classmethod
@@ -79,16 +82,18 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         return self.log_odds.shape[-1]
 
     def nat_to_probability(self) -> JaxRealArray:
-        max_q = jnp.maximum(0.0, jnp.amax(self.log_odds, axis=-1))
+        xp = self.get_namespace()
+        max_q = xp.maximum(0.0, xp.amax(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
-        p = jnp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis])
-        final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
-        return jnp.concat((p, final_p), axis=-1)
+        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        p = xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis])
+        final_p = 1.0 - xp.sum(p, axis=-1, keepdims=True)
+        return xp.concat((p, final_p), axis=-1)
 
     def nat_to_surprisal(self) -> JaxRealArray:
+        xp = self.get_namespace()
         total_p = self.nat_to_probability()
-        return -jnp.log(total_p)
+        return -xp.log(total_p)
 
 
 @dataclass
@@ -122,27 +127,31 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
 
     @override
     def to_nat(self) -> MultinomialNP:
-        p_k = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
-        return MultinomialNP(jnp.log(self.probability / p_k))
+        xp = self.get_namespace()
+        p_k = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
+        return MultinomialNP(xp.log(self.probability / p_k))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> DirichletNP:
+        xp = self.get_namespace()
         reshaped_n = n[..., np.newaxis]
-        final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
-        return DirichletNP(reshaped_n * jnp.concat((self.probability, final_p), axis=-1))
+        final_p = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
+        return DirichletNP(reshaped_n * xp.concat((self.probability, final_p), axis=-1))
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray) -> GeneralizedDirichletNP:
-        final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
-        all_p = jnp.concat((self.probability, final_p), axis=-1)
+        xp = self.get_namespace()
+        final_p = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
+        all_p = xp.concat((self.probability, final_p), axis=-1)
         alpha = n * all_p
         beta = n * (1.0 - all_p)
-        alpha_roll = jnp.roll(alpha, -1, axis=-1).at[..., -1].set(0.0)
-        gamma = -jnp.diff(beta, append=1.0) - alpha_roll
+        alpha_roll = array_at(xp.roll(alpha, -1, axis=-1))[..., -1].set(0.0)
+        gamma = -xp.diff(beta, append=1.0) - alpha_roll
         return GeneralizedDirichletNP(alpha - 1.0, gamma)
 
     @override

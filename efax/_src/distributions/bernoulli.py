@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any, Self
 
 import jax
-import jax.numpy as jnp
 import numpy as np
+from array_api_compat import get_namespace
 from jax.scipy import special as jss
 from tjax import JaxBooleanArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -44,7 +44,8 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return jnp.logaddexp(self.log_odds, 0.0)
+        xp = self.get_namespace()
+        return xp.logaddexp(self.log_odds, xp.asarray(0.0))
 
     @override
     def to_exp(self) -> BernoulliEP:
@@ -52,7 +53,8 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape)
+        xp = self.get_namespace(x)
+        return xp.zeros(x.shape)
 
     @override
     @classmethod
@@ -61,13 +63,15 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
         return BernoulliEP(x)
 
     def nat_to_probability(self) -> JaxRealArray:
+        xp = self.get_namespace()
         p = jss.expit(self.log_odds)
         final_p = 1.0 - p
-        return jnp.stack([p, final_p], axis=-1)
+        return xp.stack([p, final_p], axis=-1)
 
     def nat_to_surprisal(self) -> JaxRealArray:
+        xp = self.get_namespace()
         total_p = self.nat_to_probability()
-        return -jnp.log(total_p)
+        return -xp.log(total_p)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -108,7 +112,8 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxBooleanArray:
@@ -118,8 +123,9 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaNP:
+        xp = self.get_namespace()
         reshaped_n = n[..., np.newaxis]
-        return BetaNP(reshaped_n * jnp.stack([self.probability, (1.0 - self.probability)], axis=-1))
+        return BetaNP(reshaped_n * xp.stack([self.probability, (1.0 - self.probability)], axis=-1))
 
     @classmethod
     @override
@@ -127,7 +133,8 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
                                           ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, BetaNP)
         a = cp.alpha_minus_one
-        n = jnp.sum(a, axis=-1)
+        xp = get_namespace(a)
+        n = xp.sum(a, axis=-1)
         probability = (a[..., 0] / n)
         return (cls(probability), n)
 

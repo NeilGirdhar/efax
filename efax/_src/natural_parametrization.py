@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, final, get_type_hints
 
-import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
 from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
@@ -63,7 +62,7 @@ class NaturalParametrization(Distribution,
 
         Args:
             x: The sample.
-        Returns: The corresponding carrier measure, which is typically jnp.zeros(x.shape[:-1]).
+        Returns: The corresponding carrier measure, which is typically xp.zeros(x.shape[:-1]).
         """
         raise NotImplementedError
 
@@ -93,7 +92,8 @@ class NaturalParametrization(Distribution,
         Args:
             x: The sample.
         """
-        return jnp.exp(self.log_pdf(x))
+        xp = self.get_namespace()
+        return xp.exp(self.log_pdf(x))
 
     @jit
     @final
@@ -116,9 +116,10 @@ class NaturalParametrization(Distribution,
 
         See also: apply_fisher_information.
         """
+        xp = self.get_namespace()
         flattener, _ = Flattener.flatten(self)
         fisher_matrix = self._fisher_information_matrix()
-        fisher_diagonal = jnp.diagonal(fisher_matrix)
+        fisher_diagonal = xp.diagonal(fisher_matrix)
         return flattener.unflatten(fisher_diagonal)
 
     @final
@@ -130,6 +131,7 @@ class NaturalParametrization(Distribution,
 
         See also: apply_fisher_information.
         """
+        xp = self.get_namespace()
         fisher_information_diagonal = self.fisher_information_diagonal()
         structure = Structure.create(self)
         final_parameters = parameters(self)
@@ -138,9 +140,9 @@ class NaturalParametrization(Distribution,
             if na == 0:
                 new_value = value
             elif na == 1:
-                new_value = jnp.sum(value, axis=-1)
+                new_value = xp.sum(value, axis=-1)
             elif na == 2:  # noqa: PLR2004
-                new_value = jnp.sum(jnp.triu(value), axis=(-2, -1))
+                new_value = xp.sum(xp.triu(value), axis=(-2, -1))
             else:
                 raise RuntimeError
             final_parameters[path] = new_value
@@ -148,8 +150,9 @@ class NaturalParametrization(Distribution,
 
     @final
     def jeffreys_prior(self) -> JaxRealArray:
+        xp = self.get_namespace()
         fisher_matrix = self._fisher_information_matrix()
-        return jnp.sqrt(jnp.linalg.det(fisher_matrix))
+        return xp.sqrt(xp.linalg.det(fisher_matrix))
 
     @jit
     @final
