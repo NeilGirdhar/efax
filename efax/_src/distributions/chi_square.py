@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import math
 from typing import Any
 
-import jax.numpy as jnp
+from array_api_compat import get_namespace
 from jax.random import chisquare
 from jax.scipy import special as jss
 from tjax import JaxRealArray, KeyArray, Shape
@@ -45,12 +46,12 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
     @override
     def log_normalizer(self) -> JaxRealArray:
         k_over_two = self.k_over_two_minus_one + 1.0
-        return jss.gammaln(k_over_two) - k_over_two * jnp.log(0.5)
+        return jss.gammaln(k_over_two) - k_over_two * math.log(0.5)
 
     @override
     def to_exp(self) -> ChiSquareEP:
         k_over_two = self.k_over_two_minus_one + 1.0
-        return ChiSquareEP(jss.digamma(k_over_two) - jnp.log(0.5))
+        return ChiSquareEP(jss.digamma(k_over_two) - math.log(0.5))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -60,7 +61,8 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> ChiSquareEP:
-        return ChiSquareEP(jnp.log(x))
+        xp = get_namespace(x)
+        return ChiSquareEP(xp.log(x))
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

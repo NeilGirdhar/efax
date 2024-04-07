@@ -4,6 +4,7 @@ from abc import abstractmethod
 from collections.abc import Mapping
 from typing import Any, Self, override
 
+from array_api_compat import get_namespace
 from tjax import JaxAbstractClass, JaxArray, Shape
 from tjax.dataclasses import dataclass
 
@@ -36,6 +37,11 @@ class Distribution(JaxAbstractClass):
     def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
         from .iteration import support  # noqa: PLC0415
         return support(cls)[name]
+
+    def get_namespace(self, *x: Any) -> Any:
+        from .iteration import parameters  # noqa: PLC0415
+        values = parameters(self, support=False).values()
+        return get_namespace(*values)
 
 
 @dataclass

@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 import jax
-import jax.numpy as jnp
 import numpy as np
+from array_api_compat import get_namespace
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -45,25 +45,29 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        components = (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
-                      + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
-        return jnp.sum(components, axis=-1)
+        xp = self.get_namespace()
+        components = (-xp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
+                      + 0.5 * xp.log(-np.pi / self.negative_half_precision))
+        return xp.sum(components, axis=-1)
 
     @override
     def to_exp(self) -> MultivariateDiagonalNormalEP:
+        xp = self.get_namespace()
         mean = -self.mean_times_precision / (2.0 * self.negative_half_precision)
-        second_moment = jnp.square(mean) - 0.5 / self.negative_half_precision
+        second_moment = xp.square(mean) - 0.5 / self.negative_half_precision
         return MultivariateDiagonalNormalEP(mean, second_moment)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape[:-1])
+        xp = self.get_namespace(x)
+        return xp.zeros(x.shape[:-1])
 
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> MultivariateDiagonalNormalEP:
-        return MultivariateDiagonalNormalEP(x, jnp.square(x))
+        xp = get_namespace(x)
+        return MultivariateDiagonalNormalEP(x, xp.square(x))
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -112,7 +116,8 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -123,7 +128,8 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
         return self.mean.shape[-1]
 
     def variance(self) -> JaxRealArray:
-        return self.second_moment - jnp.square(self.mean)
+        xp = self.get_namespace()
+        return self.second_moment - xp.square(self.mean)
 
     def to_variance_parametrization(self) -> MultivariateDiagonalNormalVP:
         return MultivariateDiagonalNormalVP(self.mean, self.variance())
@@ -156,7 +162,8 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        deviation = jnp.sqrt(self.variance)
+        xp = self.get_namespace()
+        deviation = xp.sqrt(self.variance)
         return jax.random.normal(key, shape) * deviation + self.mean
 
     @override
@@ -167,7 +174,8 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
         return self.to_nat().pdf(x)
 
     def to_exp(self) -> MultivariateDiagonalNormalEP:
-        second_moment = self.variance + jnp.square(self.mean)
+        xp = self.get_namespace()
+        second_moment = self.variance + xp.square(self.mean)
         return MultivariateDiagonalNormalEP(self.mean, second_moment)
 
     def to_nat(self) -> MultivariateDiagonalNormalNP:

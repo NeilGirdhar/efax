@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, Generic, TypeVar
 
 import jax
-import jax.numpy as jnp
 from jax.scipy import special as jss
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -35,9 +34,10 @@ class DirichletCommonNP(HasEntropyNP[EP],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
+        xp = self.get_namespace()
         q = self.alpha_minus_one
-        return (jnp.sum(jss.gammaln(q + 1.0), axis=-1)
-                - jss.gammaln(jnp.sum(q, axis=-1) + self.dimensions()))
+        return (xp.sum(jss.gammaln(q + 1.0), axis=-1)
+                - jss.gammaln(xp.sum(q, axis=-1) + self.dimensions()))
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -50,8 +50,9 @@ class DirichletCommonNP(HasEntropyNP[EP],
         return self.alpha_minus_one.shape[-1]
 
     def _exp_helper(self) -> JaxRealArray:
+        xp = self.get_namespace()
         q = self.alpha_minus_one
-        return jss.digamma(q + 1.0) - jss.digamma(jnp.sum(q, axis=-1, keepdims=True) + q.shape[-1])
+        return jss.digamma(q + 1.0) - jss.digamma(xp.sum(q, axis=-1, keepdims=True) + q.shape[-1])
 
 
 NP = TypeVar('NP', bound=DirichletCommonNP[Any])
@@ -72,7 +73,8 @@ class DirichletCommonEP(HasEntropyEP[NP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def dimensions(self) -> int:

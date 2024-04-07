@@ -48,7 +48,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
     @final
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> NP:
         """Generate natural parameters."""
-        return self.nat_structure().generate_random(rng, shape)
+        return self.nat_structure().generate_random(jnp, rng, shape)
 
     def scipy_to_exp_family_observation(self, x: Domain) -> JaxComplexArray | dict[str, Any]:
         """The observation that's expected by the exponential family.

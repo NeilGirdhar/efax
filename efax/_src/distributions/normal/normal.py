@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 import jax
-import jax.numpy as jnp
 import numpy as np
+from array_api_compat import get_namespace
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -44,24 +44,28 @@ class NormalNP(HasEntropyNP['NormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return (-jnp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
-                + 0.5 * jnp.log(-np.pi / self.negative_half_precision))
+        xp = self.get_namespace()
+        return (-xp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
+                + 0.5 * xp.log(-np.pi / self.negative_half_precision))
 
     @override
     def to_exp(self) -> NormalEP:
+        xp = self.get_namespace()
         mean = -self.mean_times_precision / (2.0 * self.negative_half_precision)
-        second_moment = jnp.square(mean) - 0.5 / self.negative_half_precision
+        second_moment = xp.square(mean) - 0.5 / self.negative_half_precision
         return NormalEP(mean, second_moment)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape)
+        xp = self.get_namespace(x)
+        return xp.zeros(x.shape)
 
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> NormalEP:
-        return NormalEP(x, jnp.square(x))
+        xp = get_namespace(x)
+        return NormalEP(x, xp.square(x))
 
     def to_var(self) -> NormalVP:
         return self.to_exp().to_var()
@@ -106,19 +110,22 @@ class NormalEP(HasEntropyEP[NormalNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.get_namespace()
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        deviation = jnp.sqrt(self.variance())
+        deviation = xp.sqrt(self.variance())
         return jax.random.normal(key, shape) * deviation + self.mean
 
     def variance(self) -> JaxRealArray:
-        return self.second_moment - jnp.square(self.mean)
+        xp = self.get_namespace()
+        return self.second_moment - xp.square(self.mean)
 
     def to_var(self) -> NormalVP:
         return NormalVP(self.mean, self.variance())
@@ -147,11 +154,12 @@ class NormalVP(Samplable, SimpleDistribution):
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.get_namespace()
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        deviation = jnp.sqrt(self.variance)
+        deviation = xp.sqrt(self.variance)
         return jax.random.normal(key, shape) * deviation + self.mean
 
     def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
@@ -161,7 +169,8 @@ class NormalVP(Samplable, SimpleDistribution):
         return self.to_nat().pdf(x)
 
     def to_exp(self) -> NormalEP:
-        second_moment = self.variance + jnp.square(self.mean)
+        xp = self.get_namespace()
+        second_moment = self.variance + xp.square(self.mean)
         return NormalEP(self.mean, second_moment)
 
     def to_nat(self) -> NormalNP:

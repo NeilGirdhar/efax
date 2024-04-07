@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import jax
-import jax.numpy as jnp
+from array_api_compat import get_namespace
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -44,27 +44,31 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
+        xp = self.get_namespace()
         eta = self.mean_times_precision
-        return 0.5 * (-0.5 * jnp.sum(jnp.square(eta), axis=-1) / self.negative_half_precision
-                      + self.dimensions() * jnp.log(jnp.pi / -self.negative_half_precision))
+        return 0.5 * (-0.5 * xp.sum(xp.square(eta), axis=-1) / self.negative_half_precision
+                      + self.dimensions() * xp.log(xp.pi / -self.negative_half_precision))
 
     @override
     def to_exp(self) -> IsotropicNormalEP:
+        xp = self.get_namespace()
         precision = -2.0 * self.negative_half_precision
-        mean = self.mean_times_precision / precision[..., jnp.newaxis]
+        mean = self.mean_times_precision / precision[..., xp.newaxis]
         total_variance = self.dimensions() / precision
-        total_second_moment = jnp.sum(jnp.square(mean), axis=-1) + total_variance
+        total_second_moment = xp.sum(xp.square(mean), axis=-1) + total_variance
         return IsotropicNormalEP(mean, total_second_moment)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return jnp.zeros(x.shape[:-1])
+        xp = get_namespace(x)
+        return xp.zeros(x.shape[:-1])
 
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> IsotropicNormalEP:
-        return IsotropicNormalEP(x, jnp.sum(jnp.square(x), axis=-1))
+        xp = get_namespace(x)
+        return IsotropicNormalEP(x, xp.sum(xp.square(x), axis=-1))
 
     @override
     def dimensions(self) -> int:
@@ -106,28 +110,32 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
 
     @override
     def to_nat(self) -> IsotropicNormalNP:
+        xp = self.get_namespace()
         variance = self.variance()
         negative_half_precision = -0.5 / variance
-        mean_times_precision = self.mean / variance[..., jnp.newaxis]
+        mean_times_precision = self.mean / variance[..., xp.newaxis]
         return IsotropicNormalNP(mean_times_precision, negative_half_precision)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.get_namespace()
         if shape is not None:
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        deviation = jnp.sqrt(self.variance())
-        return jax.random.normal(key, shape) * deviation[..., jnp.newaxis] + self.mean
+        deviation = xp.sqrt(self.variance())
+        return jax.random.normal(key, shape) * deviation[..., xp.newaxis] + self.mean
 
     @override
     def dimensions(self) -> int:
         return self.mean.shape[-1]
 
     def variance(self) -> JaxRealArray:
+        xp = self.get_namespace()
         dimensions = self.dimensions()
-        return (self.total_second_moment - jnp.sum(jnp.square(self.mean), axis=-1)) / dimensions
+        return (self.total_second_moment - xp.sum(xp.square(self.mean), axis=-1)) / dimensions

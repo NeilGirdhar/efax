@@ -2,7 +2,6 @@ from collections.abc import Callable, Mapping
 from functools import reduce
 from typing import Any, override
 
-import jax.numpy as jnp
 from jax.random import split
 from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -89,11 +88,13 @@ class JointDistributionE(JointDistribution,
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
+        xp = self.get_namespace()
+
         def f(x: ExpectationParametrization[Any]) -> JaxRealArray:
             assert isinstance(x, HasEntropyEP)
             return x.expected_carrier_measure()
 
-        return reduce(jnp.add, (f(value) for value in self._sub_distributions.values()))
+        return reduce(xp.add, (f(value) for value in self._sub_distributions.values()))
 
 
 @dataclass
@@ -108,7 +109,9 @@ class JointDistributionN(JointDistribution,
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return reduce(jnp.add,
+        xp = self.get_namespace()
+
+        return reduce(xp.add,
                       (x.log_normalizer() for x in self._sub_distributions.values()))
 
     @override
@@ -118,8 +121,10 @@ class JointDistributionN(JointDistribution,
 
     @override
     def carrier_measure(self, x: dict[str, Any]) -> JaxRealArray:
+        xp = self.get_namespace()
+
         joined = join_mappings(sub=self._sub_distributions, x=x)
-        return reduce(jnp.add,
+        return reduce(xp.add,
                       (value['sub'].carrier_measure(value['x'])
                        for value in joined.values()))
 

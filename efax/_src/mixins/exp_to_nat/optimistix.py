@@ -1,6 +1,5 @@
 from typing import Any
 
-import jax.numpy as jnp
 import optimistix as optx
 from jax import jit
 from tjax import JaxRealArray
@@ -24,10 +23,12 @@ class OptimistixRootFinder(ExpToNatMinimizer):
 
     @override
     def solve(self, exp_to_nat: ExpToNat[Any]) -> JaxRealArray:
+        xp = exp_to_nat.get_namespace()
+
         @jit
         def f(x: JaxRealArray, args: None, /) -> JaxRealArray:
             if self.send_lower_and_upper:
-                x = x[jnp.newaxis]
+                x = x[xp.newaxis]
             retval = exp_to_nat.search_gradient(x)
             if self.send_lower_and_upper:
                 retval = retval[0]
@@ -45,7 +46,7 @@ class OptimistixRootFinder(ExpToNatMinimizer):
         results: optx.Solution[JaxRealArray, None] = optx.root_find(
                 f, self.solver, initial, max_steps=self.max_steps, throw=False, options=options)
         if self.send_lower_and_upper:
-            return results.value[jnp.newaxis]
+            return results.value[xp.newaxis]
         return results.value
 
 

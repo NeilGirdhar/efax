@@ -6,7 +6,7 @@ from functools import reduce
 from itertools import starmap
 from typing import TYPE_CHECKING, Any, TypeVar
 
-import jax.numpy as jnp
+from array_api_compat import get_namespace
 from tensorflow_probability.substrates import jax as tfp
 from tjax import JaxComplexArray, JaxRealArray
 
@@ -26,7 +26,10 @@ def parameter_dot_product(x: NaturalParametrization[Any, Any], y: Any, /) -> Jax
             axes = x_support.axes()
             assert y_support.axes() == axes
             yield _parameter_dot_product(x_value, y_value, axes)
-    return reduce(jnp.add, dotted_fields())
+
+    dotted_fields_list = list(dotted_fields())
+    xp = get_namespace(*dotted_fields_list)
+    return reduce(xp.add, dotted_fields_list)
 
 
 T = TypeVar('T', bound=Distribution)
@@ -34,9 +37,10 @@ T = TypeVar('T', bound=Distribution)
 
 def parameter_mean(x: T, /, *, axis: Axis | None = None) -> T:
     """Return the mean of the parameters (fixed and variable)."""
+    xp = x.get_namespace()
     structure = Structure.create(x)
     p = parameters(x, support=False)
-    q = {path: jnp.mean(value, axis=axis) for path, value in p.items()}
+    q = {path: xp.mean(value, axis=axis) for path, value in p.items()}
     return structure.assemble(q)
 
 
@@ -82,8 +86,9 @@ log_ive = tfp.math.log_bessel_ive
 # Private functions --------------------------------------------------------------------------------
 def _parameter_dot_product(x: JaxComplexArray, y: JaxComplexArray, n_axes: int) -> JaxRealArray:
     """Returns the real component of the dot product of the final n_axes axes of two arrays."""
+    xp = get_namespace(x, y)
     axes = tuple(range(-n_axes, 0))
-    return jnp.sum(x * y, axis=axes).real
+    return xp.sum(x * y, axis=axes).real
 
 
 if TYPE_CHECKING:

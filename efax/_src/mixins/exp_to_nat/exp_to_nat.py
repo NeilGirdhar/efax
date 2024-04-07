@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import KW_ONLY, field
 from typing import Any, Generic, Self, TypeAlias, TypeVar
 
-import jax.numpy as jnp
 from jax import vmap
 from tjax import JaxRealArray, jit
 from tjax.dataclasses import dataclass
@@ -64,7 +63,8 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         Returns a real array of shape (self.shape, n) for some n.
         """
         _, flattened = Flattener.flatten(self)
-        return jnp.zeros_like(flattened)
+        xp = self.get_namespace()
+        return xp.zeros_like(flattened)
 
     def search_to_natural(self, search_parameters: SP) -> NP:
         """Convert the search parameters to the natural parametrization.

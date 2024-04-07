@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import jax.numpy as jnp
 from jax.random import geometric
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -79,7 +78,8 @@ class GeometricEP(HasEntropyEP[GeometricNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        return jnp.zeros(self.mean.shape)
+        xp = self.get_namespace()
+        return xp.zeros(self.mean.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

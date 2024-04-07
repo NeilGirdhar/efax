@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import jax.numpy as jnp
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -40,20 +39,25 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        return jnp.log(-jnp.log1p(-jnp.exp(self.log_probability)))
+        xp = self.get_namespace()
+        return xp.log(-xp.log1p(-xp.exp(self.log_probability)))
 
     @override
     def to_exp(self) -> LogarithmicEP:
-        probability = jnp.exp(self.log_probability)
-        chi = jnp.where(self.log_probability < log_probability_floor, 1.0,
-                        jnp.where(self.log_probability > log_probability_ceiling, jnp.inf,
-                                  probability / (jnp.expm1(self.log_probability)
-                                                 * jnp.log1p(-probability))))
+        xp = self.get_namespace()
+        probability = xp.exp(self.log_probability)
+        chi = xp.where(self.log_probability < log_probability_floor,
+                       xp.asarray(1.0),
+                       xp.where(self.log_probability > log_probability_ceiling,
+                                xp.asarray(xp.inf),
+                                probability / (xp.expm1(self.log_probability)
+                                               * xp.log1p(-probability))))
         return LogarithmicEP(chi)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        return -jnp.log(x)
+        xp = self.get_namespace(x)
+        return -xp.log(x)
 
     @override
     @classmethod
@@ -92,9 +96,10 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
 
     @override
     def to_nat(self) -> LogarithmicNP:
+        xp = self.get_namespace()
         z: LogarithmicNP = super().to_nat()
-        return LogarithmicNP(jnp.where(self.chi < 1.0,
-                                       jnp.nan,
-                                       jnp.where(self.chi == 1.0,
-                                                 jnp.inf,
-                                                 z.log_probability)))
+        return LogarithmicNP(xp.where(self.chi < 1.0,
+                                      xp.asarray(xp.nan),
+                                      xp.where(self.chi == 1.0,
+                                               xp.asarray(xp.inf),
+                                               z.log_probability)))
