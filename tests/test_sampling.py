@@ -1,17 +1,15 @@
 """These tests apply to only samplable distributions."""
 from __future__ import annotations
 
-from functools import partial
 from typing import Any
 
 import jax.numpy as jnp
-from jax import hessian, jacrev, tree, vmap
+from jax import hessian, jacrev, vmap
 from jax.random import split
 from numpy.random import Generator
 from tjax import JaxArray, JaxRealArray, KeyArray, assert_tree_allclose
 
-from efax import Multidimensional, Samplable
-from efax._src.parametrization import Parametrization
+from efax import Multidimensional, Parametrization, Samplable, parameter_mean
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
                           ComplexNormalInfo, GammaInfo, IsotropicNormalInfo,
@@ -81,7 +79,7 @@ def test_maximum_likelihood_estimation(generator: Generator,
     fixed_parameters = {name: jnp.broadcast_to(value, (*sample_shape, *distribution_shape))
                         for name, value in fixed_parameters.items()}
     sampled_exp_parameters = nat_cls.sufficient_statistics(samples, **fixed_parameters)
-    ml_exp_parameters = tree.map(partial(jnp.mean, axis=sample_axes), sampled_exp_parameters)
+    ml_exp_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
     assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)
 
 

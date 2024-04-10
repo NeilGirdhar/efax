@@ -1,10 +1,8 @@
-from functools import partial
 
 import jax.numpy as jnp
-from jax import tree
 from jax.random import key
 
-from efax import DirichletNP
+from efax import DirichletNP, parameter_mean
 
 # Consider a Dirichlet distribution with a given alpha.
 alpha = jnp.asarray([2.0, 3.0, 4.0])
@@ -21,7 +19,7 @@ ss = DirichletNP.sufficient_statistics(samples)
 # ss has type DirichletEP.  This is similar to the conjguate prior of the Dirichlet distribution.
 
 # Take the mean over the first axis.
-ss_mean = tree.map(partial(jnp.mean, axis=0), ss)  # ss_mean also has type DirichletEP.
+ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
 # Convert this back to the natural parametrization.
 estimated_distribution = ss_mean.to_nat()

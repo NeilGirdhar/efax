@@ -7,7 +7,7 @@ from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
-from ..tools import parameters_dot_product
+from ..tools import parameter_dot_product
 
 __all__ = ['HasEntropyEP', 'HasEntropyNP']
 
@@ -36,7 +36,7 @@ class HasEntropyEP(ExpectationParametrization[NP],
         Args:
             q: The natural parameters of the prediction.
         """
-        return (-parameters_dot_product(q, self)
+        return (-parameter_dot_product(q, self)
                 + q.log_normalizer()
                 - self.expected_carrier_measure())
 

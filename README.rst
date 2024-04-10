@@ -239,39 +239,37 @@ Using the cross entropy to iteratively optimize a prediction is simple:
     from __future__ import annotations
 
     import jax.numpy as jnp
-    from jax import grad, jit, lax
-    from jax import tree
-    from tjax import BooleanNumeric, RealArray, RealNumeric, print_generic
+    from jax import grad, lax
+    from tjax import JaxBooleanArray, JaxRealArray, jit, print_generic
 
-    from efax import BernoulliEP, BernoulliNP
+    from efax import BernoulliEP, BernoulliNP, parameter_dot_product, parameter_map
 
 
-    def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> RealNumeric:
+    def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> JaxRealArray:
         return jnp.sum(p.cross_entropy(q))
 
 
     gce = jit(grad(cross_entropy_loss, 1))
 
 
-    def apply(x: RealArray, x_bar: RealArray) -> RealArray:
+    def apply(x: JaxRealArray, x_bar: JaxRealArray) -> JaxRealArray:
         return x - 1e-4 * x_bar
 
 
     def body_fun(q: BernoulliNP) -> BernoulliNP:
         q_bar = gce(some_p, q)
-        return tree.map(apply, q, q_bar)
+        return parameter_map(apply, q, q_bar)
 
 
-    def cond_fun(q: BernoulliNP) -> BooleanNumeric:
+    def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
         q_bar = gce(some_p, q)
-        total = tree.reduce(jnp.sum,
-                            tree.map(lambda x: jnp.sum(jnp.square(x)), q_bar))
-        return total > 1e-6
+        total = jnp.sum(parameter_dot_product(q_bar, q_bar))
+        return total > 1e-6  # noqa: PLR2004
 
 
     # some_p are expectation parameters of a Bernoulli distribution corresponding
     # to probabilities 0.3, 0.4, and 0.7.
-    some_p = BernoulliEP(jnp.array([0.3, 0.4, 0.7]))
+    some_p = BernoulliEP(jnp.asarray([0.3, 0.4, 0.7]))
 
     # some_q are natural parameters of a Bernoulli distribution corresponding to
     # log-odds 0, which is probability 0.5.
@@ -309,9 +307,8 @@ of samples).
 
     import jax.numpy as jnp
     from jax.random import key
-    from jax import tree
 
-    from efax import DirichletNP
+    from efax import DirichletNP, parameter_mean
 
     # Consider a Dirichlet distribution with a given alpha.
     alpha = jnp.asarray([2.0, 3.0, 4.0])
@@ -328,7 +325,7 @@ of samples).
     # ss has type DirichletEP.  This is similar to the conjguate prior of the Dirichlet distribution.
 
     # Take the mean over the first axis.
-    ss_mean = tree.map(partial(jnp.mean, axis=0), ss)  # ss_mean also has type DirichletEP.
+    ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
     # Convert this back to the natural parametrization.
     estimated_distribution = ss_mean.to_nat()

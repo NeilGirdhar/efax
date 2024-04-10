@@ -44,11 +44,13 @@ from ._src.natural_parametrization import NaturalParametrization
 from ._src.parameter import (BooleanRing, ComplexField, IntegralRing, RealField, Ring,
                              ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
                              VectorSupport)
+from ._src.parametrization import Parametrization
 from ._src.scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from ._src.scipy_replacement.complex_normal import ScipyComplexNormal
 from ._src.scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises
+from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
 
 __all__ = [
     'BernoulliEP',
@@ -109,6 +111,7 @@ __all__ = [
     'NormalEP',
     'NormalNP',
     'NormalVP',
+    'Parametrization',
     'PoissonEP',
     'PoissonNP',
     'RayleighEP',
@@ -133,5 +136,8 @@ __all__ = [
     'VonMisesFisherNP',
     'WeibullEP',
     'WeibullNP',
+    'parameter_dot_product',
+    'parameter_map',
+    'parameter_mean',
     'random_gamma',
 ]

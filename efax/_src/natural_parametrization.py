@@ -12,7 +12,7 @@ from tjax.dataclasses import DataclassInstance, dataclass
 from typing_extensions import Self
 
 from .parametrization import Parametrization
-from .tools import parameters_dot_product
+from .tools import parameter_dot_product
 
 if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
@@ -32,7 +32,7 @@ def log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
     q_dot, = tangents
     y = q.log_normalizer()
     p = q.to_exp()
-    y_dot = parameters_dot_product(q_dot, p)
+    y_dot = parameter_dot_product(q_dot, p)
     return y, y_dot
 
 
@@ -106,7 +106,7 @@ class NaturalParametrization(Parametrization,
             x: The sample.
         """
         tx = self.sufficient_statistics(x, **self.fixed_parameters())
-        return parameters_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
+        return parameter_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 
     @final
     def fisher_information_diagonal(self) -> Self:

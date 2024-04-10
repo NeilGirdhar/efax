@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-import operator
 from abc import abstractmethod
 from typing import Any, Generic, TypeVar, final
 
-from jax import tree
+import jax.numpy as jnp
 from tjax import JaxRealArray, jit
 
 from .natural_parametrization import NaturalParametrization
 from .parametrization import Parametrization
-from .tools import parameters_dot_product
+from .tools import parameter_dot_product, parameter_map
 
 __all__ = ['ExpectationParametrization']
 
@@ -50,7 +49,7 @@ class ExpectationParametrization(Parametrization, Generic[NP]):
         """
         if self_nat is None:
             self_nat = self.to_nat()
-        difference = tree.map(operator.sub, self_nat, q)
-        return (parameters_dot_product(difference, self)
+        difference = parameter_map(jnp.subtract, self_nat, q)
+        return (parameter_dot_product(difference, self)
                 + q.log_normalizer()
                 - self_nat.log_normalizer())

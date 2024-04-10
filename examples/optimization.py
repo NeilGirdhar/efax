@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
-from jax import grad, lax, tree
+from jax import grad, lax
 from tjax import JaxBooleanArray, JaxRealArray, jit, print_generic
 
-from efax import BernoulliEP, BernoulliNP
+from efax import BernoulliEP, BernoulliNP, parameter_dot_product, parameter_map
 
 
 def cross_entropy_loss(p: BernoulliEP, q: BernoulliNP) -> JaxRealArray:
@@ -20,13 +20,12 @@ def apply(x: JaxRealArray, x_bar: JaxRealArray) -> JaxRealArray:
 
 def body_fun(q: BernoulliNP) -> BernoulliNP:
     q_bar = gce(some_p, q)
-    return tree.map(apply, q, q_bar)
+    return parameter_map(apply, q, q_bar)
 
 
 def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
     q_bar = gce(some_p, q)
-    total = tree.reduce(jnp.sum,
-                        tree.map(lambda x: jnp.sum(jnp.square(x)), q_bar))
+    total = jnp.sum(parameter_dot_product(q_bar, q_bar))
     return total > 1e-6  # noqa: PLR2004
 
 

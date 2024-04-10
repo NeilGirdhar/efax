@@ -4,7 +4,6 @@ from abc import abstractmethod
 from typing import Any, Generic, TypeAlias, TypeVar
 
 import jax.numpy as jnp
-from jax import tree
 from tjax import JaxComplexArray, jit
 from tjax.dataclasses import dataclass, field
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
@@ -13,6 +12,7 @@ from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
+from ..tools import parameter_map
 
 __all__: list[str] = []
 
@@ -74,7 +74,7 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
             and self.  This difference is returned as natural parameters.
         """
         expectation_parameters: ExpToNat[NP] = natural_parameters.to_exp()
-        exp_difference: ExpToNat[NP] = tree.map(jnp.subtract, expectation_parameters, self)
+        exp_difference: ExpToNat[NP] = parameter_map(jnp.subtract, expectation_parameters, self)
         return type(natural_parameters).unflattened(exp_difference.flattened(),
                                                     **self.fixed_parameters())
 

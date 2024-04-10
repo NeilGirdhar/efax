@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
-from jax import grad, tree, vmap
+from jax import grad, vmap
 from numpy.random import Generator
 from tjax import assert_tree_allclose
 
@@ -40,7 +40,7 @@ def test_conjugate_prior(generator: Generator,
 
     # Check the gradient of the density of the conjugate prior at p is zero.
     derivative = density_gradient(cp_q, cp_x)
-    zero_derivative = tree.map(jnp.zeros_like, derivative)
+    zero_derivative = jnp.zeros_like(derivative)
     assert_tree_allclose(derivative, zero_derivative, atol=1.5)
 
 
@@ -73,5 +73,5 @@ def test_generalized_conjugate_prior(generator: Generator,
 
     # Check the gradient of the density of the conjugate prior at p is zero.
     derivative = density_gradient(gcp_q, cp_x)
-    zero_derivative = tree.map(jnp.zeros_like, derivative)
+    zero_derivative = jnp.zeros_like(derivative)
     assert_tree_allclose(derivative, zero_derivative, atol=1.5)
