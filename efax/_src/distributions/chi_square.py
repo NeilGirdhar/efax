@@ -73,7 +73,7 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
 class ChiSquareEP(HasEntropyEP[ChiSquareNP],
-                  ExpToNat[ChiSquareNP, ChiSquareNP],
+                  ExpToNat[ChiSquareNP],
                   ExpectationParametrization[ChiSquareNP]):
     """The expectation parameters of the chi-square distribution with k degrees of freedom.
 
@@ -106,13 +106,13 @@ class ChiSquareEP(HasEntropyEP[ChiSquareNP],
         return -k_over_two
 
     @override
-    def initial_search_parameters(self) -> ChiSquareNP:
-        return ChiSquareNP(jnp.zeros(self.mean_log.shape))
+    def initial_search_parameters(self) -> JaxRealArray:
+        return jnp.zeros(self.mean_log.shape)
 
     @override
-    def search_to_natural(self, search_parameters: ChiSquareNP) -> ChiSquareNP:
-        return search_parameters
+    def search_to_natural(self, search_parameters: JaxRealArray) -> ChiSquareNP:
+        return ChiSquareNP(search_parameters)
 
     @override
-    def search_gradient(self, search_parameters: ChiSquareNP) -> ChiSquareNP:
-        return self._natural_gradient(search_parameters)
+    def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
+        return self._natural_gradient(ChiSquareNP(search_parameters)).k_over_two_minus_one

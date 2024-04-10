@@ -89,7 +89,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
 
 @dataclass
 class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
-                       ExpToNat[VonMisesFisherNP, JaxRealArray],
+                       ExpToNat[VonMisesFisherNP],
                        Multidimensional,
                        ExpectationParametrization[VonMisesFisherNP]):
     """The expectation parametrization of the von Mises-Fisher distribution.

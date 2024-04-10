@@ -95,7 +95,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 
 @dataclass
 class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
-                             ExpToNat[GeneralizedDirichletNP, JaxRealArray],
+                             ExpToNat[GeneralizedDirichletNP],
                              ExpectationParametrization[GeneralizedDirichletNP],
                              Multidimensional):
     # E({log(x_i)}_i)

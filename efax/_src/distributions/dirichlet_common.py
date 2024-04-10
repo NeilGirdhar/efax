@@ -62,7 +62,7 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 @dataclass
 class DirichletCommonEP(HasEntropyEP[NP],
-                        ExpToNat[NP, JaxRealArray],
+                        ExpToNat[NP],
                         Multidimensional, Generic[NP]):
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
 

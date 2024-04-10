@@ -64,7 +64,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
 
 
 @dataclass
-class LogarithmicEP(ExpToNat[LogarithmicNP, JaxRealArray],
+class LogarithmicEP(ExpToNat[LogarithmicNP],
                     ExpectationParametrization[LogarithmicNP]):
     """The expectation parametrization of the logarithmic distribution.
 

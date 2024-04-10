@@ -81,7 +81,7 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
 @dataclass
 class GammaEP(HasEntropyEP[GammaNP],
-              ExpToNat[GammaNP, JaxRealArray],
+              ExpToNat[GammaNP],
               ExpectationParametrization[GammaNP]):
     """The expectation parametrization of the Gamma distribution.
 
