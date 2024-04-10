@@ -14,8 +14,8 @@ from tjax import KeyArray
 from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior,
                   IntegralRing, Samplable)
 
-from .create_info import (ComplexCircularlySymmetricNormalInfo, GeneralizedDirichletInfo,
-                          create_infos)
+from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
+                          DirichletInfo, GeneralizedDirichletInfo, create_infos)
 from .distribution_info import DistributionInfo
 
 
@@ -87,7 +87,9 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              for natural in (False, True)
              if issubclass(cls := (info.nat_class() if natural else info.exp_class()), Samplable)
              if not isinstance(cls.domain_support().ring, BooleanRing | IntegralRing)
-             if not isinstance(info, ComplexCircularlySymmetricNormalInfo)]
+             if not isinstance(info,
+                               ComplexCircularlySymmetricNormalInfo | BetaInfo | DirichletInfo
+                               | ChiSquareInfo)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
                              ids=ids)
