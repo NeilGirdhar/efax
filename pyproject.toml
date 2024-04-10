@@ -141,6 +141,7 @@ ignore-imports = 'yes'
 
 [tool.pyright]
 include = ['efax', 'tests', 'examples']
+exclude = ['efax/_src/gamma_generator.py']
 stubPath = ''
 venvPath = '.'
 venv = '.venv'
@@ -193,9 +194,11 @@ warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
+exclude = ['efax/_src/gamma_generator.py']
 
 [[tool.mypy.overrides]]
 module = [
+  'efax._src.gamma_generator',
   'scipy',
   'scipy.special',
   'scipy.stats',
@@ -248,6 +251,7 @@ ignore = [
   'TD003', # Missing issue link on the line following this TODO.
   'TID252', # Relative imports from parent modules are banned.
 ]
+exclude = ['efax/_src/gamma_generator.py']
 
 [tool.ruff.lint.flake8-annotations]
 mypy-init-return = true

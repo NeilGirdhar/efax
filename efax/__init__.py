@@ -35,6 +35,7 @@ from ._src.distributions.rayleigh import RayleighEP, RayleighNP
 from ._src.distributions.von_mises import VonMisesFisherEP, VonMisesFisherNP
 from ._src.distributions.weibull import WeibullEP, WeibullNP
 from ._src.expectation_parametrization import ExpectationParametrization
+from ._src.gamma_generator import random_gamma
 from ._src.interfaces.conjugate_prior import HasConjugatePrior, HasGeneralizedConjugatePrior
 from ._src.interfaces.multidimensional import Multidimensional
 from ._src.interfaces.samplable import Samplable
@@ -159,6 +160,7 @@ __all__ = [
     'parameter_map',
     'parameter_mean',
     'parameters',
+    'random_gamma',
     'support',
     'unflatten_mapping',
 ]

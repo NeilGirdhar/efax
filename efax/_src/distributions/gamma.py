@@ -4,13 +4,13 @@ from typing import Any
 
 import jax.numpy as jnp
 from jax.nn import softplus
-from jax.random import gamma as random_gamma
 from jax.scipy import special as jss
 from tjax import JaxRealArray, KeyArray, Shape, inverse_softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..gamma_generator import random_gamma
 from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
