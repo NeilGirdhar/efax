@@ -99,5 +99,6 @@ def test_maximum_likelihood_estimation(generator: Generator,
     sufficient_stats = nat_cls.sufficient_statistics(efax_x, **fixed_parameters)
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
-    calculated_parameters = parameter_map(partial(np.mean, axis=0), sufficient_stats)
+    calculated_parameters = parameter_map(partial(np.mean, axis=0),  # type: ignore[arg-type]
+                                          sufficient_stats)
     assert_tree_allclose(exp_parameters, calculated_parameters, rtol=rtol, atol=atol)
