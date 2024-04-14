@@ -9,34 +9,17 @@
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v4.6.0
   hooks:
   - id: check-toml
   - id: check-yaml
-  - id: check-shebang-scripts-are-executable
-  - id: debug-statements
-  - id: end-of-file-fixer
-  - id: trailing-whitespace
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.3.5
+  rev: v0.3.7
   hooks:
   - id: ruff
 
-- repo: https://github.com/PyCQA/isort
-  rev: 5.13.2
-  hooks:
-  - id: isort
-
 - repo: https://github.com/RobertCraigie/pyright-python
-  rev: v1.1.357
+  rev: v1.1.358
   hooks:
   - id: pyright
-
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: 'v1.9.0'
-  hooks:
-  - id: mypy
-    additional_dependencies: [tjax]
-    args: [--config=pyproject.toml]
-    stages: [pre-push, manual]
