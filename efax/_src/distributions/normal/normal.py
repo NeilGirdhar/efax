@@ -130,7 +130,7 @@ class NormalVP(Samplable):
     @property
     @override
     def shape(self) -> Shape:
-        return self.mean.shape[:-1]
+        return self.mean.shape
 
     @override
     @classmethod
