@@ -42,7 +42,7 @@ class BetaNP(DirichletCommonNP['BetaEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> BetaEP:
-        return BetaEP(jnp.stack([jnp.log(x), jnp.log(1.0 - x)], axis=-1))
+        return BetaEP(jnp.stack([jnp.log(x), jnp.log1p(-x)], axis=-1))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:

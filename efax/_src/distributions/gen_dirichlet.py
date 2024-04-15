@@ -69,7 +69,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
                               ) -> GeneralizedDirichletEP:
         cs_x = jnp.cumsum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
-        return GeneralizedDirichletEP(jnp.log(x), jnp.log(1.0 - cs_x))
+        return GeneralizedDirichletEP(jnp.log(x), jnp.log1p(-cs_x))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
