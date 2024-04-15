@@ -28,21 +28,21 @@ classifiers = [
 [tool.poetry.dependencies]
 python = '>=3.10,<3.13'
 jax = '>=0.4.20'
-numpy = '>=1.22'
-scipy = '>=1.8'
+numpy = '>=1.23'
+scipy = '>=1.10'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.31'
+tjax = '>=0.31.11'
 typing_extensions = '>=4.8'
 
 [tool.poetry.group.dev.dependencies]
-isort = '>=5.11'
+isort = '>=5.13'
 jupyter = '>=1'
 mypy = '>=1.7'
 pylint = '>=2.12'
 pyright = '>=0.0.13'
 pytest = '>=8'
 pytest-xdist = { version = '>=3', extras = ['psutil'] }
-ruff = '>=0.2'
+ruff = '>=0.4'
 
 [tool.isort]
 line_length = 100

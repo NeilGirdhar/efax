@@ -52,8 +52,8 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
     @override
     def to_exp(self) -> MultivariateNormalEP:
-        h_inv = jnp.linalg.inv(self.negative_half_precision)
-        h_inv_times_eta: JaxRealArray = matrix_vector_mul(h_inv, self.mean_times_precision)
+        h_inv: JaxRealArray = jnp.linalg.inv(self.negative_half_precision)
+        h_inv_times_eta = matrix_vector_mul(h_inv, self.mean_times_precision)
         mean = -0.5 * h_inv_times_eta
         second_moment = 0.25 * outer_product(h_inv_times_eta, h_inv_times_eta) - 0.5 * h_inv
         return MultivariateNormalEP(mean, second_moment)
@@ -97,7 +97,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
 
     @override
     def to_nat(self) -> MultivariateNormalNP:
-        precision = jnp.linalg.inv(self.variance())
+        precision: JaxRealArray = jnp.linalg.inv(self.variance())
         mean_times_precision = matrix_vector_mul(precision, self.mean)
         return MultivariateNormalNP(mean_times_precision, -0.5 * precision)
 

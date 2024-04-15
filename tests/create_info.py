@@ -7,7 +7,7 @@ import numpy as np
 import scipy.stats as ss
 from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
-from tjax import NumpyComplexArray, NumpyRealArray, Shape, create_diagonal_array, np_abs_square
+from tjax import NumpyComplexArray, NumpyRealArray, Shape, abs_square, create_diagonal_array
 from typing_extensions import override
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
@@ -283,7 +283,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         second_moment = np.asarray(p.second_moment, dtype=np.float64)
         pseudo_second_moment = np.asarray(p.pseudo_second_moment, dtype=np.complex128)
         return ScipyComplexNormal(mean,
-                                  second_moment - np_abs_square(mean),
+                                  second_moment - abs_square(mean),
                                   pseudo_second_moment - np.square(mean))
 
     @override
@@ -291,7 +291,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         mean = rng.normal(size=shape) + 1j * rng.normal(size=shape)
         variance = rng.exponential(size=shape)
         mean_j = jnp.asarray(mean)
-        second_moment = jnp.asarray(np_abs_square(mean) + variance)
+        second_moment = jnp.asarray(abs_square(mean) + variance)
         pseudo_variance = (variance * rng.beta(2, 2, size=shape)
                            * np.exp(1j * rng.uniform(0, 2 * np.pi, size=shape)))
         pseudo_second_moment = jnp.asarray(np.square(mean) + pseudo_variance)
