@@ -56,7 +56,6 @@ def parameter_map(operation: Callable[..., JaxComplexArray],
 
 iv_ratio = tfp.math.bessel_iv_ratio
 log_ive = tfp.math.log_bessel_ive
-betaln = tfp.math.lbeta
 
 
 # Private functions --------------------------------------------------------------------------------

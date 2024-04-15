@@ -11,7 +11,7 @@ from typing import Any
 
 import jax.numpy as jnp
 from jax.nn import softplus
-from jax.scipy.special import digamma
+from jax.scipy.special import betaln, digamma
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -22,7 +22,6 @@ from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
-from ..tools import betaln
 
 __all__ = ['GeneralizedDirichletEP', 'GeneralizedDirichletNP']
 
