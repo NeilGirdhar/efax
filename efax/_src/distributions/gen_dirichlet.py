@@ -23,8 +23,6 @@ from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import VectorSupport, distribution_parameter
 
-__all__ = ['GeneralizedDirichletEP', 'GeneralizedDirichletNP']
-
 
 @dataclass
 class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],

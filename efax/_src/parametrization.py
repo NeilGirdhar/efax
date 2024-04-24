@@ -14,8 +14,6 @@ from typing_extensions import Self
 
 from .parameter import Support
 
-__all__ = ['Parametrization']
-
 
 @dataclass
 class Parametrization(JaxAbstractClass):

@@ -13,8 +13,6 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, complex_field, distribution_parameter
 
-__all__ = ['ComplexNormalEP', 'ComplexNormalNP']
-
 
 @dataclass
 class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],

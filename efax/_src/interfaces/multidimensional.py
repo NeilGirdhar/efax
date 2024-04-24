@@ -4,8 +4,6 @@ from abc import abstractmethod
 
 from ..parametrization import Parametrization
 
-__all__ = ['Multidimensional']
-
 
 class Multidimensional(Parametrization):
     @abstractmethod

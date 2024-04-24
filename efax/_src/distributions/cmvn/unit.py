@@ -16,8 +16,6 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import VectorSupport, complex_field, distribution_parameter
 
-__all__ = ['ComplexMultivariateUnitNormalEP', 'ComplexMultivariateUnitNormalNP']
-
 
 @dataclass
 class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNormalEP'],

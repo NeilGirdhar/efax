@@ -16,8 +16,6 @@ from .gamma import GammaNP
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 from .poisson import PoissonEP
 
-__all__ = ['NegativeBinomialEP', 'NegativeBinomialNP']
-
 
 @dataclass
 class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP'],

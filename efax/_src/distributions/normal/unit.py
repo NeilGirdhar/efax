@@ -17,8 +17,6 @@ from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, distribution_parameter
 from .normal import NormalNP
 
-__all__ = ['UnitNormalEP', 'UnitNormalNP']
-
 
 @dataclass
 class UnitNormalNP(HasEntropyNP['UnitNormalEP'],

@@ -20,9 +20,6 @@ from jax.lax import (add, bitwise_and, bitwise_not, bitwise_or, cond, digamma, d
                      sub, while_loop)
 from tjax import JaxBooleanArray, JaxRealArray
 
-__all__ = ['random_gamma']
-
-
 RealArray = ArrayLike
 Shape = Sequence[int]
 DTypeLikeFloat = DTypeLike

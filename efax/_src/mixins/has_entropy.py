@@ -9,9 +9,6 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
 from ..tools import parameter_dot_product
 
-__all__ = ['HasEntropyEP', 'HasEntropyNP']
-
-
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 
 

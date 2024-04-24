@@ -16,8 +16,6 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_parameter
 
-__all__ = ['MultivariateNormalEP', 'MultivariateNormalNP', 'MultivariateNormalVP']
-
 
 @dataclass
 class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],

@@ -9,9 +9,6 @@ from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 
-__all__ = ['ScipyDirichlet', 'ScipyGeneralizedDirichlet']
-
-
 scipy_beta = scipy.special.beta
 
 

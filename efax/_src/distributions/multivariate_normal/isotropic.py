@@ -15,8 +15,6 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, VectorSupport, distribution_parameter
 
-__all__ = ['IsotropicNormalEP', 'IsotropicNormalNP']
-
 
 @dataclass
 class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],

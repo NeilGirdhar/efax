@@ -17,8 +17,6 @@ from .tools import parameter_dot_product
 if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
 
-__all__ = ['NaturalParametrization']
-
 
 EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
 Domain = TypeVar('Domain', bound=JaxComplexArray)

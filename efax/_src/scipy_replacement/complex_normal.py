@@ -8,8 +8,6 @@ from typing_extensions import Self, override
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
 
-__all__ = ['ScipyComplexNormal']
-
 
 class ScipyComplexNormalUnvectorized:
     """Represents an array of univariate complex normal distributions."""

@@ -10,9 +10,6 @@ from .natural_parametrization import NaturalParametrization
 from .parametrization import Parametrization
 from .tools import parameter_dot_product, parameter_map
 
-__all__ = ['ExpectationParametrization']
-
-
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 
 

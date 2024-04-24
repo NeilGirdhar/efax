@@ -15,8 +15,6 @@ from ..mixins.transformed_parametrization import (TransformedExpectationParametr
 from ..parameter import ScalarSupport, distribution_parameter
 from .exponential import ExponentialEP, ExponentialNP
 
-__all__ = ['RayleighEP', 'RayleighNP']
-
 
 @dataclass
 class RayleighNP(Samplable,

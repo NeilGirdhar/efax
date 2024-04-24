@@ -12,8 +12,6 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import SimplexSupport
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
-__all__ = ['DirichletEP', 'DirichletNP']
-
 
 @dataclass
 class DirichletNP(DirichletCommonNP['DirichletEP'],

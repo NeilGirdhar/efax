@@ -6,8 +6,6 @@ from tjax import JaxArray, KeyArray, Shape
 
 from ..parametrization import Parametrization
 
-__all__ = ['Samplable']
-
 
 class Samplable(Parametrization):
     @abstractmethod

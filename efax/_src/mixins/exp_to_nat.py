@@ -14,9 +14,6 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
 from ..tools import parameter_map
 
-__all__: list[str] = []
-
-
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 SP: TypeAlias = JaxComplexArray
 

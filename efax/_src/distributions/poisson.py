@@ -16,8 +16,6 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter, integral_ring
 from .gamma import GammaNP
 
-__all__ = ['PoissonEP', 'PoissonNP']
-
 
 @dataclass
 class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray]):

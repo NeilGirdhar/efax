@@ -9,8 +9,6 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 
-__all__ = ['HasConjugatePrior', 'HasGeneralizedConjugatePrior']
-
 
 class HasConjugatePrior(ExpectationParametrization[Any]):
     @abstractmethod

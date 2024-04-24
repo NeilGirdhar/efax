@@ -14,8 +14,6 @@ from ..mixins.transformed_parametrization import (TransformedExpectationParametr
 from ..parameter import ScalarSupport, distribution_parameter
 from .chi_square import ChiSquareEP, ChiSquareNP
 
-__all__ = ['ChiEP', 'ChiNP']
-
 
 @dataclass
 class ChiNP(HasEntropyNP['ChiEP'],

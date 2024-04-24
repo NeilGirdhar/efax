@@ -8,9 +8,6 @@ from typing_extensions import Self, override
 
 from .shaped_distribution import ShapedDistribution
 
-__all__ = ['ScipyMultivariateNormal']
-
-
 mvn: type = ss._multivariate.multivariate_normal_frozen  # noqa: SLF001
 
 

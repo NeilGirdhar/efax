@@ -15,8 +15,6 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, distribution_parameter
 
-__all__ = ['NormalEP', 'NormalNP', 'NormalVP']
-
 
 @dataclass
 class NormalNP(HasEntropyNP['NormalEP'], NaturalParametrization['NormalEP', JaxRealArray]):

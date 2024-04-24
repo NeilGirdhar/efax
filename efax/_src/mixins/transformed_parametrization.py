@@ -9,9 +9,6 @@ from typing_extensions import override
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import EP, NaturalParametrization
 
-__all__: list[str] = []
-
-
 TEP = TypeVar('TEP', bound=ExpectationParametrization[Any])
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 Domain = TypeVar('Domain', bound=JaxComplexArray)

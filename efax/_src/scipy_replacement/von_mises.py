@@ -7,8 +7,6 @@ from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 
-__all__ = ['ScipyVonMises']
-
 
 class ScipyVonMises(ShapedDistribution[ss.vonmises]):  # pyright: ignore
     """This class allows distributions having a non-empty shape."""

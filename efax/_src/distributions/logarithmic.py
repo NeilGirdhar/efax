@@ -13,9 +13,6 @@ from ..mixins.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter
 
-__all__ = ['LogarithmicEP', 'LogarithmicNP']
-
-
 log_probability_floor = -50.0
 log_probability_ceiling = -1e-7
 
