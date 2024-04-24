@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
 import pytest
-from numpy.random import Generator, default_rng
+from numpy.random import Generator
 from tjax import NumpyComplexArray, Shape
 from typing_extensions import override
 
@@ -55,10 +55,10 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         return x
 
     def exp_class(self) -> type[EP]:
-        return type(self.exp_parameter_generator(default_rng(), ()))
+        raise NotImplementedError
 
     def nat_class(self) -> type[NP]:
-        return type(self.nat_parameter_generator(default_rng(), ()))
+        raise NotImplementedError
 
     @classmethod
     def name(cls) -> str:

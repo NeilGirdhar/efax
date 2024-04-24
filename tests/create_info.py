@@ -19,12 +19,12 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP, LogarithmicNP,
                   MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
                   MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
-                  MultivariateNormalEP, MultivariateUnitNormalEP, MultivariateUnitNormalNP,
-                  NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP,
-                  RayleighEP, RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal,
-                  ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises,
-                  UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
-                  WeibullNP)
+                  MultivariateNormalEP, MultivariateNormalNP, MultivariateUnitNormalEP,
+                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
+                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
+                  ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
+                  ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises, UnitNormalEP,
+                  UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -75,6 +75,14 @@ class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, NumpyRealArray]):
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> BernoulliEP:
         return BernoulliEP(jnp.asarray(rng.uniform(size=shape)))
 
+    @override
+    def exp_class(self) -> type[BernoulliEP]:
+        return BernoulliEP
+
+    @override
+    def nat_class(self) -> type[BernoulliNP]:
+        return BernoulliNP
+
 
 class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
     @override
@@ -91,6 +99,14 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyRealArray:
         return x - 1
 
+    @override
+    def exp_class(self) -> type[GeometricEP]:
+        return GeometricEP
+
+    @override
+    def nat_class(self) -> type[GeometricNP]:
+        return GeometricNP
+
 
 class PoissonInfo(DistributionInfo[PoissonNP, PoissonEP, NumpyRealArray]):
     @override
@@ -100,6 +116,14 @@ class PoissonInfo(DistributionInfo[PoissonNP, PoissonEP, NumpyRealArray]):
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> PoissonEP:
         return PoissonEP(jnp.asarray(rng.exponential(size=shape)))
+
+    @override
+    def exp_class(self) -> type[PoissonEP]:
+        return PoissonEP
+
+    @override
+    def nat_class(self) -> type[PoissonNP]:
+        return PoissonNP
 
 
 class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomialEP,
@@ -118,6 +142,14 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
         return NegativeBinomialEP(jnp.asarray(rng.exponential(size=shape)),
                                   self.r * jnp.ones(shape, dtype=canonicalize_dtype(int)))
 
+    @override
+    def exp_class(self) -> type[NegativeBinomialEP]:
+        return NegativeBinomialEP
+
+    @override
+    def nat_class(self) -> type[NegativeBinomialNP]:
+        return NegativeBinomialNP
+
 
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, NumpyRealArray]):
     @override
@@ -127,6 +159,14 @@ class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, NumpyRealAr
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> LogarithmicEP:
         return LogarithmicEP(jnp.asarray(rng.exponential(size=shape) + 1.0))
+
+    @override
+    def exp_class(self) -> type[LogarithmicEP]:
+        return LogarithmicEP
+
+    @override
+    def nat_class(self) -> type[LogarithmicNP]:
+        return LogarithmicNP
 
 
 class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
@@ -140,6 +180,14 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
         variance = rng.exponential(size=shape)
         return NormalEP(jnp.asarray(mean), jnp.asarray(mean ** 2 + variance))
 
+    @override
+    def exp_class(self) -> type[NormalEP]:
+        return NormalEP
+
+    @override
+    def nat_class(self) -> type[NormalNP]:
+        return NormalNP
+
 
 class UnitNormalInfo(DistributionInfo[UnitNormalNP, UnitNormalEP, NumpyRealArray]):
     @override
@@ -150,6 +198,14 @@ class UnitNormalInfo(DistributionInfo[UnitNormalNP, UnitNormalEP, NumpyRealArray
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> UnitNormalEP:
         mean = rng.normal(scale=4.0, size=shape)
         return UnitNormalEP(jnp.asarray(mean))
+
+    @override
+    def exp_class(self) -> type[UnitNormalEP]:
+        return UnitNormalEP
+
+    @override
+    def nat_class(self) -> type[UnitNormalNP]:
+        return UnitNormalNP
 
 
 class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVarianceNormalNP,
@@ -176,6 +232,14 @@ class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVari
             jnp.asarray(rng.normal(size=(*shape, self.dimensions))),
             variance=variance)
 
+    @override
+    def exp_class(self) -> type[MultivariateFixedVarianceNormalEP]:
+        return MultivariateFixedVarianceNormalEP
+
+    @override
+    def nat_class(self) -> type[MultivariateFixedVarianceNormalNP]:
+        return MultivariateFixedVarianceNormalNP
+
 
 class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
                                                   MultivariateUnitNormalEP,
@@ -192,6 +256,14 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> MultivariateUnitNormalEP:
         return MultivariateUnitNormalEP(jnp.asarray(rng.normal(size=(*shape, self.dimensions))))
+
+    @override
+    def exp_class(self) -> type[MultivariateUnitNormalEP]:
+        return MultivariateUnitNormalEP
+
+    @override
+    def nat_class(self) -> type[MultivariateUnitNormalNP]:
+        return MultivariateUnitNormalNP
 
 
 class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP, NumpyRealArray]):
@@ -212,6 +284,14 @@ class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP,
         mean = rng.normal(size=(*shape, self.dimensions))
         total_variance = self.dimensions * rng.exponential(size=shape)
         return IsotropicNormalEP(jnp.asarray(mean), jnp.sum(np.square(mean)) + total_variance)
+
+    @override
+    def exp_class(self) -> type[IsotropicNormalEP]:
+        return IsotropicNormalEP
+
+    @override
+    def nat_class(self) -> type[IsotropicNormalNP]:
+        return IsotropicNormalNP
 
 
 class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormalNP,
@@ -235,8 +315,16 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
         variance = rng.exponential(size=dist_shape)
         return MultivariateDiagonalNormalEP(jnp.asarray(mean), jnp.square(mean) + variance)
 
+    @override
+    def exp_class(self) -> type[MultivariateDiagonalNormalEP]:
+        return MultivariateDiagonalNormalEP
 
-class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, MultivariateNormalEP,
+    @override
+    def nat_class(self) -> type[MultivariateDiagonalNormalNP]:
+        return MultivariateDiagonalNormalNP
+
+
+class MultivariateNormalInfo(DistributionInfo[MultivariateNormalNP, MultivariateNormalEP,
                                               NumpyRealArray]):
     @override
     def __init__(self, dimensions: int):
@@ -259,6 +347,14 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateUnitNormalNP, Multivar
         second_moment = covariance + mean[..., :, np.newaxis] * mean[..., np.newaxis, :]
         return MultivariateNormalEP(jnp.asarray(mean), jnp.asarray(second_moment))
 
+    @override
+    def exp_class(self) -> type[MultivariateNormalEP]:
+        return MultivariateNormalEP
+
+    @override
+    def nat_class(self) -> type[MultivariateNormalNP]:
+        return MultivariateNormalNP
+
 
 class ComplexUnitNormalInfo(DistributionInfo[ComplexUnitNormalNP, ComplexUnitNormalEP,
                                              NumpyComplexArray]):
@@ -274,6 +370,14 @@ class ComplexUnitNormalInfo(DistributionInfo[ComplexUnitNormalNP, ComplexUnitNor
         mean = rng.normal(size=shape) + 1j * rng.normal(size=shape)
         mean_j = jnp.asarray(mean)
         return ComplexUnitNormalEP(mean_j)
+
+    @override
+    def exp_class(self) -> type[ComplexUnitNormalEP]:
+        return ComplexUnitNormalEP
+
+    @override
+    def nat_class(self) -> type[ComplexUnitNormalNP]:
+        return ComplexUnitNormalNP
 
 
 class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, NumpyComplexArray]):
@@ -297,6 +401,14 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         pseudo_second_moment = jnp.asarray(np.square(mean) + pseudo_variance)
         return ComplexNormalEP(mean_j, second_moment, pseudo_second_moment)
 
+    @override
+    def exp_class(self) -> type[ComplexNormalEP]:
+        return ComplexNormalEP
+
+    @override
+    def nat_class(self) -> type[ComplexNormalNP]:
+        return ComplexNormalNP
+
 
 class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnitNormalNP,
                                                          ComplexMultivariateUnitNormalEP,
@@ -318,6 +430,14 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
         b = rng.normal(size=(*shape, self.dimensions))
         return ComplexMultivariateUnitNormalEP(jnp.asarray(a + 1j * b))
 
+    @override
+    def exp_class(self) -> type[ComplexMultivariateUnitNormalEP]:
+        return ComplexMultivariateUnitNormalEP
+
+    @override
+    def nat_class(self) -> type[ComplexMultivariateUnitNormalNP]:
+        return ComplexMultivariateUnitNormalNP
+
 
 class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySymmetricNormalNP,
                                                             ComplexCircularlySymmetricNormalEP,
@@ -338,6 +458,14 @@ class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySym
         cc = vectorized_complex_covariance(rng, shape, self.dimensions)
         return ComplexCircularlySymmetricNormalEP(jnp.asarray(cc))
 
+    @override
+    def exp_class(self) -> type[ComplexCircularlySymmetricNormalEP]:
+        return ComplexCircularlySymmetricNormalEP
+
+    @override
+    def nat_class(self) -> type[ComplexCircularlySymmetricNormalNP]:
+        return ComplexCircularlySymmetricNormalNP
+
 
 class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, NumpyRealArray]):
     @override
@@ -347,6 +475,14 @@ class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, NumpyRealAr
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> ExponentialEP:
         return ExponentialEP(jnp.asarray(rng.exponential(size=shape)))
+
+    @override
+    def exp_class(self) -> type[ExponentialEP]:
+        return ExponentialEP
+
+    @override
+    def nat_class(self) -> type[ExponentialNP]:
+        return ExponentialNP
 
 
 class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP, NumpyRealArray]):
@@ -358,6 +494,14 @@ class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP, NumpyRealArray]):
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> RayleighEP:
         return RayleighEP(jnp.asarray(rng.exponential(size=shape)))
 
+    @override
+    def exp_class(self) -> type[RayleighEP]:
+        return RayleighEP
+
+    @override
+    def nat_class(self) -> type[RayleighNP]:
+        return RayleighNP
+
 
 class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
     @override
@@ -368,6 +512,14 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
     @override
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> BetaNP:
         return BetaNP(jnp.asarray(dirichlet_parameter_generator(2, rng, shape)))
+
+    @override
+    def exp_class(self) -> type[BetaEP]:
+        return BetaEP
+
+    @override
+    def nat_class(self) -> type[BetaNP]:
+        return BetaNP
 
 
 class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
@@ -382,6 +534,14 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
         gamma_shape = jnp.asarray(rng.exponential(size=shape))
         rate = jnp.asarray(rng.exponential(size=shape))
         return GammaNP(-rate, gamma_shape - 1.0)
+
+    @override
+    def exp_class(self) -> type[GammaEP]:
+        return GammaEP
+
+    @override
+    def nat_class(self) -> type[GammaNP]:
+        return GammaNP
 
 
 class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
@@ -402,6 +562,14 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyRealArray:
         return x[..., : -1]
 
+    @override
+    def exp_class(self) -> type[DirichletEP]:
+        return DirichletEP
+
+    @override
+    def nat_class(self) -> type[DirichletNP]:
+        return DirichletNP
+
 
 class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, GeneralizedDirichletEP,
                                                 NumpyRealArray]):
@@ -421,6 +589,14 @@ class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, Generali
         gamma = dirichlet_parameter_generator(self.dimensions, rng, shape) + 1.0
         return GeneralizedDirichletNP(jnp.asarray(alpha_minus_one), jnp.asarray(gamma))
 
+    @override
+    def exp_class(self) -> type[GeneralizedDirichletEP]:
+        return GeneralizedDirichletEP
+
+    @override
+    def nat_class(self) -> type[GeneralizedDirichletNP]:
+        return GeneralizedDirichletNP
+
 
 class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, NumpyRealArray]):
     @override
@@ -439,6 +615,14 @@ class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, Nu
         result[..., 1] = np.sin(x)
         return result
 
+    @override
+    def exp_class(self) -> type[VonMisesFisherEP]:
+        return VonMisesFisherEP
+
+    @override
+    def nat_class(self) -> type[VonMisesFisherNP]:
+        return VonMisesFisherNP
+
 
 class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, NumpyRealArray]):
     @override
@@ -449,6 +633,14 @@ class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, NumpyRealArray]):
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> ChiSquareNP:
         return ChiSquareNP(jnp.asarray(rng.exponential(size=shape)))
 
+    @override
+    def exp_class(self) -> type[ChiSquareEP]:
+        return ChiSquareEP
+
+    @override
+    def nat_class(self) -> type[ChiSquareNP]:
+        return ChiSquareNP
+
 
 class ChiInfo(DistributionInfo[ChiNP, ChiEP, NumpyRealArray]):
     @override
@@ -458,6 +650,14 @@ class ChiInfo(DistributionInfo[ChiNP, ChiEP, NumpyRealArray]):
     @override
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> ChiNP:
         return ChiNP(jnp.asarray(rng.exponential(size=shape)))
+
+    @override
+    def exp_class(self) -> type[ChiEP]:
+        return ChiEP
+
+    @override
+    def nat_class(self) -> type[ChiNP]:
+        return ChiNP
 
 
 class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
@@ -474,6 +674,14 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
                          else rng.exponential(size=shape)) + 1.0
         return WeibullNP(jnp.asarray(concentration),
                          jnp.asarray(-rng.exponential(size=shape) - 1.0))
+
+    @override
+    def exp_class(self) -> type[WeibullEP]:
+        return WeibullEP
+
+    @override
+    def nat_class(self) -> type[WeibullNP]:
+        return WeibullNP
 
 
 def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
