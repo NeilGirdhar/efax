@@ -28,11 +28,6 @@ class RayleighNP(Samplable,
     """
     eta: JaxRealArray = distribution_parameter(ScalarSupport())
 
-    @property
-    @override
-    def shape(self) -> Shape:
-        return self.eta.shape
-
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
@@ -80,11 +75,6 @@ class RayleighEP(Samplable,
         chi: 2 * sigma^2.
     """
     chi: JaxRealArray = distribution_parameter(ScalarSupport())
-
-    @property
-    @override
-    def shape(self) -> Shape:
-        return self.chi.shape
 
     @override
     @classmethod

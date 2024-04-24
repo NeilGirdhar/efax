@@ -4,7 +4,7 @@ from typing import Any
 
 import jax.numpy as jnp
 from jax.scipy import special as jss
-from tjax import Array, JaxRealArray, Shape
+from tjax import Array, JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -24,11 +24,6 @@ class ChiNP(HasEntropyNP['ChiEP'],
         k_over_two_minus_one: k/2 - 1 where k is the shape parameter.
     """
     k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
-
-    @property
-    @override
-    def shape(self) -> Shape:
-        return self.k_over_two_minus_one.shape
 
     @override
     @classmethod
@@ -68,11 +63,6 @@ class ChiEP(HasEntropyEP[ChiNP],
         mean_log: E(log(x)).
     """
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
-
-    @property
-    @override
-    def shape(self) -> Shape:
-        return self.mean_log.shape
 
     @override
     @classmethod
