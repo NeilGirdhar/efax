@@ -25,11 +25,7 @@ def test_nat_entropy(generator: Generator,
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
     assert isinstance(nat_parameters, HasEntropyNP)
     scipy_distribution = entropy_distribution_info.nat_to_scipy_distribution(nat_parameters)
-    rtol = (1e-3
-            if isinstance(entropy_distribution_info, ComplexCircularlySymmetricNormalInfo)
-            else 4e-4
-            if isinstance(entropy_distribution_info, ComplexNormalInfo)
-            else 2e-5)
+    rtol = 2e-5
     my_entropy = nat_parameters.entropy()
     scipy_entropy = scipy_distribution.entropy()
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
