@@ -10,25 +10,45 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose
 
-from efax import Multidimensional, parameter_map
+from efax import HasEntropyEP, HasEntropyNP, Multidimensional, parameter_map
 
-from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
-                          MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
+from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
+                          DirichletInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
 
 
-def test_entropy(generator: Generator, entropy_distribution_info: DistributionInfo[Any, Any, Any]
-                 ) -> None:
+def test_nat_entropy(generator: Generator,
+                     entropy_distribution_info: DistributionInfo[Any, Any, Any]
+                     ) -> None:
     """Test that the entropy calculation matches scipy's."""
     shape = (7, 13)
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
+    assert isinstance(nat_parameters, HasEntropyNP)
     scipy_distribution = entropy_distribution_info.nat_to_scipy_distribution(nat_parameters)
     rtol = (1e-3
             if isinstance(entropy_distribution_info, ComplexCircularlySymmetricNormalInfo)
             else 4e-4
             if isinstance(entropy_distribution_info, ComplexNormalInfo)
-            else 2.0e-5)
+            else 2e-5)
     my_entropy = nat_parameters.entropy()
+    scipy_entropy = scipy_distribution.entropy()
+    assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
+
+
+def test_exp_entropy(generator: Generator,
+                     entropy_distribution_info: DistributionInfo[Any, Any, Any]
+                     ) -> None:
+    """Test that the entropy calculation matches scipy's."""
+    shape = (7, 13)
+    exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
+    assert isinstance(exp_parameters, HasEntropyEP)
+    scipy_distribution = entropy_distribution_info.exp_to_scipy_distribution(exp_parameters)
+    rtol = (8e-2
+            if isinstance(entropy_distribution_info, BetaInfo)
+            else 4e-2
+            if isinstance(entropy_distribution_info, DirichletInfo)
+            else 2e-5)
+    my_entropy = exp_parameters.entropy()
     scipy_entropy = scipy_distribution.entropy()
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
 

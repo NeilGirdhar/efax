@@ -11,8 +11,8 @@ from jax.random import key as jax_key
 from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
 
-from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasGeneralizedConjugatePrior,
-                  IntegralRing, Samplable)
+from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
+                  HasGeneralizedConjugatePrior, IntegralRing, Samplable)
 
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
                           DirichletInfo, GeneralizedDirichletInfo, create_infos)
@@ -106,6 +106,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if 'entropy_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
-             if issubclass(info.exp_class(), HasEntropyEP)
-             if not isinstance(info, GeneralizedDirichletInfo)]
+             if ((issubclass(info.exp_class(), HasEntropyEP)
+                  or issubclass(info.nat_class(), HasEntropyNP))
+                 and not isinstance(info, GeneralizedDirichletInfo))]
         metafunc.parametrize("entropy_distribution_info", q, ids=[info.name() for info in q])
