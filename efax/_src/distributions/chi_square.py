@@ -105,12 +105,12 @@ class ChiSquareEP(HasEntropyEP[ChiSquareNP],
 
     @override
     def initial_search_parameters(self) -> JaxRealArray:
-        return jnp.zeros(self.mean_log.shape)
+        return jnp.zeros((*self.shape, 1))
 
     @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> ChiSquareNP:
-        return ChiSquareNP(search_parameters)
+        return ChiSquareNP(search_parameters[..., 0])
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(ChiSquareNP(search_parameters)).k_over_two_minus_one
+        return self._natural_gradient(search_parameters)

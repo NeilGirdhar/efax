@@ -74,11 +74,11 @@ class DirichletCommonEP(HasEntropyEP[NP],
 
     @override
     def initial_search_parameters(self) -> JaxRealArray:
-        return jnp.zeros(self.mean_log_probability.shape)
+        return jnp.zeros_like(self.mean_log_probability)
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(self.search_to_natural(search_parameters)).alpha_minus_one
+        return self._natural_gradient(search_parameters)
 
     @override
     def dimensions(self) -> int:

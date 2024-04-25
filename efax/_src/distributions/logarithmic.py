@@ -89,16 +89,16 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
 
     @override
     def initial_search_parameters(self) -> JaxRealArray:
-        return jnp.zeros(self.chi.shape)
+        return jnp.zeros((*self.chi.shape, 1))
 
     @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> LogarithmicNP:
         # Run Newton's method on the whole real line.
-        return LogarithmicNP(-softplus(-search_parameters))
+        return LogarithmicNP(-softplus(-search_parameters[..., 0]))
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(self.search_to_natural(search_parameters)).log_probability
+        return self._natural_gradient(search_parameters)
 
     @override
     def to_nat(self) -> LogarithmicNP:

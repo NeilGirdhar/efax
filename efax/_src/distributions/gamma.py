@@ -111,15 +111,15 @@ class GammaEP(HasEntropyEP[GammaNP],
 
     @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> GammaNP:
-        shape = softplus(search_parameters)
+        shape = softplus(search_parameters[..., 0])
         rate = shape / self.mean
         return GammaNP(-rate, shape - 1.0)
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        shape = softplus(search_parameters)
+        shape = softplus(search_parameters[..., 0])
         log_mean_minus_mean_log = jnp.log(self.mean) - self.mean_log
-        return log_mean_minus_mean_log - jnp.log(shape) + jss.digamma(shape)
+        return (log_mean_minus_mean_log - jnp.log(shape) + jss.digamma(shape))[..., jnp.newaxis]
         # gradient is 1.0 / shape - jss.polygamma(1, shape)
         # where polygamma(1) is trigamma
 
@@ -130,7 +130,7 @@ class GammaEP(HasEntropyEP[GammaNP],
             (3.0 - log_mean_minus_mean_log
              + jnp.sqrt((log_mean_minus_mean_log - 3.0) ** 2 + 24.0 * log_mean_minus_mean_log))
             / (12.0 * log_mean_minus_mean_log))
-        return inverse_softplus(initial_shape)
+        return inverse_softplus(initial_shape)[..., jnp.newaxis]
 
 
 @dataclass

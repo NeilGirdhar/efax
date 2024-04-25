@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import Any, Generic, TypeAlias, TypeVar
 
 import jax.numpy as jnp
-from tjax import JaxComplexArray, jit
+from tjax import JaxRealArray, jit
 from tjax.dataclasses import dataclass, field
 from tjax.fixed_point import ComparingIteratedFunctionWithCombinator, ComparingState
 from tjax.gradient import Adam, GradientTransformation
@@ -15,7 +15,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..tools import parameter_map
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
-SP: TypeAlias = JaxComplexArray
+SP: TypeAlias = JaxRealArray
 
 
 class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
@@ -39,15 +39,12 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
         final_state = iterated_function.find_fixed_point(self, initial_state).current_state
         return self.search_to_natural(final_state.search_parameters)
 
-    def _zero_natural_parameters(self) -> NP:
-        """A convenience method for implementing initial_search_parameters."""
-        fixed_parameters = self.fixed_parameters()
-        cls = type(self).natural_parametrization_cls()
-        return cls.unflattened(jnp.zeros_like(self.flattened()), **fixed_parameters)
-
     @abstractmethod
     def initial_search_parameters(self) -> SP:
-        """Returns: The initial value of the parameters that Newton's method runs on."""
+        """The initial value of the parameters used by the search algorithm.
+
+        Returns a real array of shape (self.shape, n) for some n.
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -55,31 +52,41 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
         """Convert the search parameters to the natural parametrization.
 
         Args:
-            search_parameters: The parameters that Newton's method runs on.
+            search_parameters: The parameters in search space.
         Returns: The corresponding natural parameters.
+
+        This function should be monotonic.
         """
         raise NotImplementedError
 
     @abstractmethod
     def search_gradient(self, search_parameters: SP) -> SP:
+        """Convert the search parameters to the natural parametrization.
+
+        Args:
+            search_parameters: The parameters in search space.
+        Returns: The gradient of the loss wrt to the search parameters.
+        """
         raise NotImplementedError
 
-    def _natural_gradient(self, natural_parameters: NP) -> NP:
+    def _natural_gradient(self, search_parameters: SP) -> SP:
         """The natural gradient.
 
-        Returns: The difference of the expectation parameters corresponding to natural_parameters
-            and self.  This difference is returned as natural parameters.
+        Returns: The gradient of the loss wrt to the search parameters.
+
+        This is a helper function to help with search_gradient.  It converts natural parameters to
+        expectations parameters, takes the difference with self, and flattens the result.
         """
+        natural_parameters = self.search_to_natural(search_parameters)
         expectation_parameters: ExpToNat[NP] = natural_parameters.to_exp()
         exp_difference: ExpToNat[NP] = parameter_map(jnp.subtract, expectation_parameters, self)
-        return type(natural_parameters).unflattened(exp_difference.flattened(),
-                                                    **self.fixed_parameters())
+        return exp_difference.flattened()
 
 
 @dataclass
 class ExpToNatIteratedFunctionState:
     gradient_transformation_state: Any
-    search_parameters: JaxComplexArray
+    search_parameters: JaxRealArray
 
 
 @dataclass

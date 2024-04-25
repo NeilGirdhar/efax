@@ -133,7 +133,7 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(self.search_to_natural(search_parameters)).flattened()
+        return self._natural_gradient(search_parameters)
 
     @override
     def dimensions(self) -> int:
