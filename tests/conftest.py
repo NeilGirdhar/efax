@@ -15,7 +15,7 @@ from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
                   HasGeneralizedConjugatePrior, IntegralRing, Samplable)
 
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
-                          DirichletInfo, GeneralizedDirichletInfo, create_infos)
+                          DirichletInfo, GammaInfo, GeneralizedDirichletInfo, create_infos)
 from .distribution_info import DistributionInfo
 
 
@@ -89,7 +89,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              if not isinstance(cls.domain_support().ring, BooleanRing | IntegralRing)
              if not isinstance(info,
                                ComplexCircularlySymmetricNormalInfo | BetaInfo | DirichletInfo
-                               | ChiSquareInfo)]
+                               | ChiSquareInfo | GammaInfo)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
                              ids=ids)
