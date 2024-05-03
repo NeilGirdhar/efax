@@ -362,7 +362,7 @@ The tests can be run using :bash:`pytest . -n auto`.  Specific distributions can
 
 There are a few tools to clean and check the source:
 
-- :bash:`ruff .`
+- :bash:`ruff check .`
 - :bash:`pyright`
 - :bash:`mypy`
 - :bash:`isort .`
