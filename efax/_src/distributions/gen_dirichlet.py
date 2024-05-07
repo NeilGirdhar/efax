@@ -56,8 +56,9 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
         digamma_sum = digamma(alpha + beta)
         alpha_bar_direct = digamma(alpha) - digamma_sum
         beta_bar = digamma(beta) - digamma_sum
-        gamma_bar = jnp.cumsum(beta_bar, axis=-1)
-        alpha_bar_indirect = jnp.roll(gamma_bar, 1, axis=-1).at[..., 0].set(0.0)
+        cs_beta_bar = jnp.cumulative_sum(beta_bar, axis=-1, include_initial=True)
+        gamma_bar = cs_beta_bar[..., 1:]
+        alpha_bar_indirect = cs_beta_bar[..., :-1]
         alpha_bar = alpha_bar_direct + alpha_bar_indirect
         return GeneralizedDirichletEP(alpha_bar, gamma_bar)
 
@@ -65,7 +66,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> GeneralizedDirichletEP:
-        cs_x = jnp.cumsum(x, axis=-1)
+        cs_x = jnp.cumulative_sum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
         return GeneralizedDirichletEP(jnp.log(x), jnp.log1p(-cs_x))
 
@@ -81,12 +82,9 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
         alpha = self.alpha_minus_one + 1.0
         # cs_alpha[i] = sum_{j>=i} alpha[j]
         # cs_gamma[i] = sum_{j>=i} gamma[j]
-        cs_alpha = jnp.cumsum(alpha[..., ::-1], axis=-1)[..., ::-1]
-        cs_gamma = jnp.cumsum(self.gamma[..., ::-1], axis=-1)[..., ::-1]
-        # roll_cs_alpha[i] = sum_{j>i} alpha[j]
-        roll_cs_alpha = jnp.roll(cs_alpha, -1, axis=-1)
-        roll_cs_alpha = roll_cs_alpha.at[..., -1].set(0.0)
-        beta = cs_gamma + roll_cs_alpha + 1.0
+        cs_alpha = jnp.cumulative_sum(alpha[..., ::-1], axis=-1, include_initial=True)[..., :-1]
+        cs_gamma = jnp.cumulative_sum(self.gamma[..., ::-1], axis=-1)
+        beta = (cs_gamma + cs_alpha + 1.0)[..., ::-1]
         return alpha, beta
 
 
