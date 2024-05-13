@@ -9,7 +9,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxRealArray, assert_tree_allclose, jit, zero_tangent_like
 
-from efax import NaturalParametrization
+from efax import Flattener, NaturalParametrization, Structure, parameters
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
@@ -37,9 +37,9 @@ def test_conversion(generator: Generator,
         assert_tree_allclose(final_ep, original_ep, atol=atol, rtol=1e-4)
 
         # Check fixed parameters.
-        original_fixed = original_ep.fixed_parameters()
-        intermediate_fixed = intermediate_np.fixed_parameters()
-        final_fixed = final_ep.fixed_parameters()
+        original_fixed = parameters(original_ep, fixed=True)
+        intermediate_fixed = parameters(intermediate_np, fixed=True)
+        final_fixed = parameters(final_ep, fixed=True)
         assert_tree_allclose(original_fixed, intermediate_fixed)
         assert_tree_allclose(original_fixed, final_fixed)
 
@@ -62,20 +62,19 @@ def test_gradient_log_normalizer_primals(generator: Generator,
     optimized_gln = jit(grad(optimized_ln, allow_int=True))
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
-        fixed_parameters = nat_parameters.fixed_parameters()
         exp_parameters = nat_parameters.to_exp()  # Regular transformation.
-        ep_cls = type(exp_parameters)
+        # Able to unflatten into expectation parameters.
+        flattener, _ = Flattener.flatten(exp_parameters)
 
         # Original GLN.
         original_nat_parameters = original_gln(nat_parameters)
-        f_original_nat_parameters = original_nat_parameters.flattened()
-        original_exp_parameters = ep_cls.unflattened(f_original_nat_parameters, **fixed_parameters)
+        _, f_original_nat_parameters = Flattener.flatten(original_nat_parameters)
+        original_exp_parameters = flattener.unflatten(f_original_nat_parameters)
 
         # Optimized GLN.
         optimized_nat_parameters = optimized_gln(nat_parameters)
-        f_optimized_nat_parameters = optimized_nat_parameters.flattened()
-        optimized_exp_parameters = ep_cls.unflattened(f_optimized_nat_parameters,
-                                                      **fixed_parameters)
+        _, f_optimized_nat_parameters = Flattener.flatten(optimized_nat_parameters)
+        optimized_exp_parameters = flattener.unflatten(f_optimized_nat_parameters)
 
         # Test primal evaluation.
         assert_tree_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)
@@ -84,11 +83,12 @@ def test_gradient_log_normalizer_primals(generator: Generator,
 
 def unit_tangent(nat_parameters: NaturalParametrization[Any, Any]
                  ) -> NaturalParametrization[Any, Any]:
-    nat_cls = type(nat_parameters)
-    return nat_cls(**{name: zero_tangent_like(value)
-                      for name, value in nat_parameters.fixed_parameters().items()},
-                   **{name: jnp.ones_like(value)
-                      for name, value in nat_parameters.parameters_name_value()})
+    new_variable_parameters = {path: jnp.ones_like(value)
+                               for path, value in parameters(nat_parameters, fixed=False).items()}
+    new_fixed_parameters = {path: zero_tangent_like(value)
+                            for path, value in parameters(nat_parameters, fixed=True).items()}
+    structure = Structure.create(nat_parameters)
+    return structure.assemble({**new_variable_parameters, **new_fixed_parameters})
 
 
 def test_gradient_log_normalizer_jvp(generator: Generator,
@@ -123,6 +123,6 @@ def test_gradient_log_normalizer_vjp(generator: Generator,
 
         assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)
         assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)
-        assert_tree_allclose([value for _, value in original_gln_of_nat.parameters_name_value()],
-                             [value for _, value in optimized_gln_of_nat.parameters_name_value()],
+        assert_tree_allclose(parameters(original_gln_of_nat, fixed=False),
+                             parameters(optimized_gln_of_nat, fixed=False),
                              rtol=1e-5)

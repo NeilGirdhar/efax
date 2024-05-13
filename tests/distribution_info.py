@@ -13,7 +13,7 @@ from efax import ExpectationParametrization, NaturalParametrization
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 EP = TypeVar('EP', bound=ExpectationParametrization[Any])
-Domain = TypeVar('Domain', bound=NumpyComplexArray)
+Domain = TypeVar('Domain', bound=NumpyComplexArray | dict[str, Any])
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):
@@ -47,7 +47,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return self.exp_parameter_generator(rng, shape).to_nat()
 
-    def scipy_to_exp_family_observation(self, x: Domain) -> JaxComplexArray:
+    def scipy_to_exp_family_observation(self, x: Domain) -> JaxComplexArray | dict[str, Any]:
         """The observation that's expected by the exponential family.
 
         Args:

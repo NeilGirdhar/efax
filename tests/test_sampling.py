@@ -1,7 +1,7 @@
 """These tests apply to only samplable distributions."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypeAlias
 
 import jax.numpy as jnp
 from jax import hessian, jacrev, vmap
@@ -9,13 +9,16 @@ from jax.random import split
 from numpy.random import Generator
 from tjax import JaxArray, JaxRealArray, KeyArray, assert_tree_allclose
 
-from efax import Multidimensional, Parametrization, Samplable, parameter_mean
+from efax import (Flattener, Multidimensional, Parametrization, Samplable, fixed_parameter_packet,
+                  parameter_mean)
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
                           ComplexNormalInfo, GammaInfo, IsotropicNormalInfo,
                           MultivariateDiagonalNormalInfo, MultivariateFixedVarianceNormalInfo,
                           MultivariateNormalInfo, MultivariateUnitNormalInfo, PoissonInfo)
 from .distribution_info import DistributionInfo
+
+Path: TypeAlias = tuple[str, ...]
 
 
 def test_maximum_likelihood_estimation(generator: Generator,
@@ -62,53 +65,52 @@ def test_maximum_likelihood_estimation(generator: Generator,
         assert isinstance(exp_parameters, Samplable)
         nat_cls = exp_parameters.natural_parametrization_cls()  # type: ignore[attr-defined]
         samples = exp_parameters.sample(key, sample_shape)
-
     dimensions = (exp_parameters.dimensions() if isinstance(exp_parameters, Multidimensional)
                   else 0)
-    fixed_parameters = exp_parameters[jnp.newaxis, jnp.newaxis, ...].fixed_parameters()
-    support = exp_parameters.domain_support()
 
     # Verify that the samples have the right shape.
+    support = exp_parameters.domain_support()
     ideal_shape = (*sample_shape, *distribution_shape, *support.shape(dimensions))
     assert samples.shape == ideal_shape
 
     # Verify the maximum likelihood estimate.
+    fixed_parameters = fixed_parameter_packet(exp_parameters[jnp.newaxis, jnp.newaxis, ...])
     sampled_exp_parameters = nat_cls.sufficient_statistics(samples, **fixed_parameters)
     ml_exp_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
     assert_tree_allclose(ml_exp_parameters, exp_parameters, rtol=rtol, atol=atol)
 
 
 def sample_using_flattened(flattened_parameters: JaxRealArray,
-                           parameters_type: type[Samplable],
+                           flattener: Flattener[Samplable],
                            key: KeyArray,
-                           fixed_parameters: dict[str, Any]) -> JaxArray:
-    parameters = parameters_type.unflattened(flattened_parameters, **fixed_parameters)
-    support = parameters.domain_support()
-    ordinary_sample = parameters.sample(key)
+                           ) -> JaxArray:
+    p = flattener.unflatten(flattened_parameters)
+    support = p.domain_support()
+    ordinary_sample = p.sample(key)
     return support.flattened(ordinary_sample)
 
 
-def calculate_jacobian(parameters: Parametrization,
+def calculate_jacobian(p: Parametrization,
                        keys: KeyArray,
                        ) -> JaxRealArray:
-    jacobian_sample = vmap(jacrev(sample_using_flattened, argnums=(0,)), in_axes=(0, None, 0, 0))
-    parameters_jacobian, = jacobian_sample(parameters.flattened(), type(parameters), keys,
-                                           parameters.fixed_parameters())
-    assert parameters_jacobian.shape[0: 1] == parameters.shape
+    flattener, flattened = Flattener.flatten(p)
+    jacobian_sample = vmap(jacrev(sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
+    parameters_jacobian, = jacobian_sample(flattened, flattener, keys)
+    assert parameters_jacobian.shape[0: 1] == p.shape
     parameters_jacobian = jnp.sum(parameters_jacobian, axis=0)
     return jnp.sum(parameters_jacobian, axis=0)
 
 
-def calculate_curvature(parameters: Parametrization,
+def calculate_curvature(p: Parametrization,
                         keys: KeyArray,
                         ) -> JaxRealArray:
     # Calculate curvature.
-    hessian_sample = vmap(hessian(sample_using_flattened, argnums=(0,)), in_axes=(0, None, 0, 0))
-    parameters_hessian_x, = hessian_sample(parameters.flattened(), type(parameters), keys,
-                                           parameters.fixed_parameters())
+    flattener, flattened = Flattener.flatten(p)
+    hessian_sample = vmap(hessian(sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
+    parameters_hessian_x, = hessian_sample(flattened, flattener, keys)
     parameters_hessian, = parameters_hessian_x
 
-    assert parameters_hessian.shape[0: 1] == parameters.shape
+    assert parameters_hessian.shape[0: 1] == p.shape
     parameters_hessian = jnp.sum(parameters_hessian, axis=0)
 
     assert parameters_hessian.shape[-2] == parameters_hessian.shape[-1]
@@ -133,10 +135,10 @@ def test_sampling_cotangents(generator: Generator,
     distribution_shape = (23,)
     keys = split(key, distribution_shape)
 
-    parameters: Parametrization = (info.nat_parameter_generator(generator, distribution_shape)
-                                   if natural
-                                   else info.exp_parameter_generator(generator, distribution_shape))
-    jacobian = calculate_jacobian(parameters, keys)
-    curvature = calculate_curvature(parameters, keys)
+    p: Parametrization = (info.nat_parameter_generator(generator, distribution_shape)
+                          if natural
+                          else info.exp_parameter_generator(generator, distribution_shape))
+    jacobian = calculate_jacobian(p, keys)
+    curvature = calculate_curvature(p, keys)
     assert jacobian.shape == curvature.shape
     assert jnp.all((jacobian != 0) | (curvature != 0))

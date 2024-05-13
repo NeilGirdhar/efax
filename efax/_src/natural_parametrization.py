@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from dataclasses import replace
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
 
 import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
 from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
-from tjax.dataclasses import DataclassInstance, dataclass
+from tjax.dataclasses import dataclass
 from typing_extensions import Self
 
+from .iteration import fixed_parameter_packet, parameters
 from .parametrization import Parametrization
+from .structure import Flattener, Structure
 from .tools import parameter_dot_product
 
 if TYPE_CHECKING:
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
 
 EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
-Domain = TypeVar('Domain', bound=JaxComplexArray)
+Domain = TypeVar('Domain', bound=JaxComplexArray | dict[str, Any])
 
 
 def log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
@@ -103,7 +104,7 @@ class NaturalParametrization(Parametrization,
         Args:
             x: The sample.
         """
-        tx = self.sufficient_statistics(x, **self.fixed_parameters())
+        tx = self.sufficient_statistics(x, **fixed_parameter_packet(self))
         return parameter_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 
     @final
@@ -115,9 +116,10 @@ class NaturalParametrization(Parametrization,
 
         See also: apply_fisher_information.
         """
+        flattener, _ = Flattener.flatten(self)
         fisher_matrix = self._fisher_information_matrix()
         fisher_diagonal = jnp.diagonal(fisher_matrix)
-        return type(self).unflattened(fisher_diagonal, **self.fixed_parameters())
+        return flattener.unflatten(fisher_diagonal)
 
     @final
     def fisher_information_trace(self) -> Self:
@@ -129,8 +131,9 @@ class NaturalParametrization(Parametrization,
         See also: apply_fisher_information.
         """
         fisher_information_diagonal = self.fisher_information_diagonal()
-        kwargs = {}
-        for name, value, support in fisher_information_diagonal.parameters_name_value_support():
+        structure = Structure.create(self)
+        final_parameters = parameters(self)
+        for path, (value, support) in parameters(fisher_information_diagonal, support=True).items():
             na = support.axes()
             if na == 0:
                 new_value = value
@@ -140,10 +143,8 @@ class NaturalParametrization(Parametrization,
                 new_value = jnp.sum(jnp.triu(value), axis=(-2, -1))
             else:
                 raise RuntimeError
-            kwargs[name] = new_value
-        assert isinstance(self, DataclassInstance)
-
-        return replace(self, **kwargs)  # type: ignore[return-value]
+            final_parameters[path] = new_value
+        return structure.assemble(final_parameters)
 
     @final
     def jeffreys_prior(self) -> JaxRealArray:
@@ -173,14 +174,15 @@ class NaturalParametrization(Parametrization,
     @classmethod
     def _flat_log_normalizer(cls,
                              flattened_parameters: JaxRealArray,
-                             **fixed_parameters: Any,
+                             flattener: Flattener[Self],
                              ) -> JaxRealArray:
-        distribution = cls.unflattened(flattened_parameters, **fixed_parameters)
+        distribution = flattener.unflatten(flattened_parameters)
         return distribution.log_normalizer()
 
     @jit
     def _fisher_information_matrix(self) -> JaxRealArray:
+        flattener, flattened = Flattener.flatten(self)
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
         for _ in range(len(self.shape)):
             fisher_info_f = vmap(fisher_info_f)
-        return fisher_info_f(self.flattened(), **self.fixed_parameters())
+        return fisher_info_f(flattened, flattener)

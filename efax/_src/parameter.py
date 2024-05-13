@@ -116,6 +116,28 @@ class Support:
         raise NotImplementedError
 
 
+class JointDistributionSupport(Support):
+    @override
+    def axes(self) -> int:
+        raise ValueError
+
+    @override
+    def shape(self, dimensions: int) -> Shape:
+        raise ValueError
+
+    @override
+    def num_elements(self, dimensions: int) -> int:
+        raise ValueError
+
+    @override
+    def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
+        raise ValueError
+
+    @override
+    def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
+        raise ValueError
+
+
 class ScalarSupport(Support):
     @override
     def axes(self) -> int:
