@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 from numpy.random import Generator
 
-from efax import HasEntropyEP, HasEntropyNP
+from efax import HasEntropyEP, HasEntropyNP, Parametrization, parameters
 
 from .distribution_info import DistributionInfo
 
@@ -20,8 +20,8 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo[Any, A
     scipy_x = scipy_dist.rvs()
     x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
-    def check(z: Any) -> None:
-        for _, xf, support in z.parameters_name_value_support():
+    def check(z: Parametrization) -> None:
+        for xf, support in parameters(z, support=True).values():
             assert xf.shape[:len(xf.shape) - support.axes()] == shape
 
     assert p.shape == shape

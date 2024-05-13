@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 import jax.numpy as jnp
@@ -17,16 +18,16 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ComplexNormalNP, ComplexUnitNormalEP, ComplexUnitNormalNP, DirichletEP,
                   DirichletNP, ExponentialEP, ExponentialNP, GammaEP, GammaNP,
                   GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
-                  IsotropicNormalEP, IsotropicNormalNP, LogarithmicEP, LogarithmicNP,
-                  MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
-                  MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
-                  MultivariateNormalEP, MultivariateNormalNP, MultivariateUnitNormalEP,
-                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
-                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
-                  ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
-                  ScipyGeneralizedDirichlet, ScipyGeometric, ScipyMultivariateNormal, ScipyVonMises,
-                  UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
-                  WeibullNP)
+                  IsotropicNormalEP, IsotropicNormalNP, JointDistributionE, JointDistributionN,
+                  LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
+                  MultivariateDiagonalNormalNP, MultivariateFixedVarianceNormalEP,
+                  MultivariateFixedVarianceNormalNP, MultivariateNormalEP, MultivariateNormalNP,
+                  MultivariateUnitNormalEP, MultivariateUnitNormalNP, NegativeBinomialEP,
+                  NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP,
+                  RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
+                  ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution,
+                  ScipyMultivariateNormal, ScipyVonMises, UnitNormalEP, UnitNormalNP,
+                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -686,6 +687,37 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
         return WeibullNP
 
 
+class NormalGammaInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[str, Any]]):
+    def __init__(self, infos: Mapping[str, DistributionInfo[Any, Any, Any]]):
+        super().__init__()
+        self.infos = dict(infos)
+
+    @override
+    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> JointDistributionN:
+        return JointDistributionN({name: info.nat_parameter_generator(rng, shape)
+                                   for name, info in self.infos.items()})
+
+    @override
+    def nat_to_scipy_distribution(self, q: JointDistributionN) -> Any:
+        return ScipyJointDistribution(
+                {name: info.nat_to_scipy_distribution(q.sub_distributions()[name])
+                 for name, info in self.infos.items()})
+
+    @override
+    def scipy_to_exp_family_observation(self, x: dict[str, Any]) -> dict[str, Any]:
+        assert isinstance(x, dict)
+        return {name: info.scipy_to_exp_family_observation(x[name])
+                for name, info in self.infos.items()}
+
+    @override
+    def exp_class(self) -> type[JointDistributionE]:
+        return JointDistributionE
+
+    @override
+    def nat_class(self) -> type[JointDistributionN]:
+        return JointDistributionN
+
+
 def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
     return [
             BernoulliInfo(),
@@ -708,6 +740,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             MultivariateNormalInfo(dimensions=4),
             MultivariateUnitNormalInfo(dimensions=5),
             NegativeBinomialInfo(3),
+            NormalGammaInfo({'gamma': GammaInfo(), 'normal': NormalInfo()}),
             NormalInfo(),
             PoissonInfo(),
             RayleighInfo(),

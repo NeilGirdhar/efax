@@ -12,6 +12,7 @@ from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
+from ..structure import Flattener
 from ..tools import parameter_map
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
@@ -80,7 +81,8 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
         natural_parameters = self.search_to_natural(search_parameters)
         expectation_parameters: ExpToNat[NP] = natural_parameters.to_exp()
         exp_difference: ExpToNat[NP] = parameter_map(jnp.subtract, expectation_parameters, self)
-        return exp_difference.flattened()
+        _, flattened = Flattener.flatten(exp_difference)
+        return flattened
 
 
 @dataclass

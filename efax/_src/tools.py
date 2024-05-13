@@ -3,13 +3,16 @@ from __future__ import annotations
 from collections.abc import Callable, Generator, Iterable
 from dataclasses import fields
 from functools import reduce
+from itertools import starmap
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import jax.numpy as jnp
 from tensorflow_probability.substrates import jax as tfp
 from tjax import JaxComplexArray, JaxRealArray
 
+from .iteration import parameters
 from .parametrization import Parametrization
+from .structure import Structure
 
 Axis = int | tuple[int, ...]
 
@@ -17,9 +20,10 @@ Axis = int | tuple[int, ...]
 def parameter_dot_product(x: NaturalParametrization[Any, Any], y: Any, /) -> JaxRealArray:
     """Return the vectorized dot product over all of the variable parameters."""
     def dotted_fields() -> Iterable[JaxRealArray]:
-        for (x_value, x_support), (y_value, y_support) in zip(x.parameters_value_support(),
-                                                              y.parameters_value_support(),
-                                                              strict=True):
+        xs = parameters(x, fixed=False, support=True).values()
+        ys = parameters(y, fixed=False, support=True).values()
+
+        for (x_value, x_support), (y_value, y_support) in zip(xs, ys, strict=True):
             axes = x_support.axes()
             assert y_support.axes() == axes
             yield _parameter_dot_product(x_value, y_value, axes)
@@ -45,13 +49,13 @@ def parameter_map(operation: Callable[..., JaxComplexArray],
                   *ys: Parametrization
                   ) -> T:
     """Return a new distribution created by operating on the variable fields of the inputs."""
-    def operated_fields() -> Generator[tuple[str, JaxRealArray], None, None]:
-        for name, x_value, _ in x.parameters_name_value_support():
-            y_values = [getattr(yi, name) for yi in ys]
-            yield name, operation(x_value, *y_values)
+    paths = parameters(x, fixed=False).keys()
+    iterators = [parameters(y, fixed=False).values() for y in (x, *ys)]
+    final_values = list(starmap(operation, zip(*iterators, strict=True)))
+    operated_fields = dict(zip(paths, final_values, strict=True))
 
-    fixed_parameters = x.fixed_parameters()
-    return type(x)(**dict(operated_fields()), **fixed_parameters)
+    fixed_parameters = parameters(x, fixed=True)
+    return Structure.create(x).assemble({**fixed_parameters, **operated_fields})
 
 
 iv_ratio = tfp.math.bessel_iv_ratio

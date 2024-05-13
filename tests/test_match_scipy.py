@@ -5,11 +5,13 @@ from functools import partial
 from typing import Any
 
 import numpy as np
+from jax import Array
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import assert_tree_allclose
+from tjax import JaxComplexArray, assert_tree_allclose
 
-from efax import HasEntropyEP, HasEntropyNP, Multidimensional, NaturalParametrization, parameter_map
+from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, Multidimensional,
+                  NaturalParametrization, fixed_parameter_packet, parameter_map)
 
 from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           DirichletInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
@@ -48,6 +50,22 @@ def test_exp_entropy(generator: Generator,
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
 
 
+def check_observation_shape(nat_parameters: NaturalParametrization[Any, Any],
+                            efax_x: JaxComplexArray | dict[str, Any]
+                            ) -> None:
+    """Verify that the sufficient statistics have the right shape."""
+    if isinstance(nat_parameters, JointDistributionN):
+        assert isinstance(efax_x, dict)
+        for name, value in nat_parameters.sub_distributions().items():
+            check_observation_shape(value, efax_x[name])
+        return
+    assert isinstance(efax_x, Array)
+    dimensions = (nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional)
+                  else 0)
+    ideal_shape = nat_parameters.domain_support().shape(dimensions)
+    assert efax_x.shape == ideal_shape
+
+
 def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """Test that the density/mass function calculation matches scipy's."""
     for _ in range(10):
@@ -56,11 +74,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         scipy_x = scipy_distribution.rvs(random_state=generator)
         efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
-        # Verify that the sufficient statistics have the right shape.
-        dimensions = (nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional)
-                      else 0)
-        ideal_shape = nat_parameters.domain_support().shape(dimensions)
-        assert efax_x.shape == ideal_shape
+        check_observation_shape(nat_parameters, efax_x)
 
         # Verify that the density matches scipy.
         efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
@@ -104,7 +118,7 @@ def test_maximum_likelihood_estimation(
     scipy_x = scipy_distribution.rvs(random_state=generator, size=n)
     # Convert the variates to sufficient statistics.
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
-    fixed_parameters = exp_parameters.fixed_parameters()
+    fixed_parameters = fixed_parameter_packet(exp_parameters)
     nat_cls = distribution_info.nat_class()
     sufficient_stats = nat_cls.sufficient_statistics(efax_x, **fixed_parameters)
 
