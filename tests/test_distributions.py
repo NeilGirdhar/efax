@@ -123,7 +123,6 @@ def test_gradient_log_normalizer_vjp(generator: Generator,
 
         assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)
         assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)
-
-        for name, original_value in original_gln_of_nat.parameters_name_value():
-            optimized_value = getattr(optimized_gln_of_nat, name)
-            assert_allclose(original_value, optimized_value, rtol=1e-5)
+        assert_tree_allclose([value for _, value in original_gln_of_nat.parameters_name_value()],
+                             [value for _, value in optimized_gln_of_nat.parameters_name_value()],
+                             rtol=1e-5)
