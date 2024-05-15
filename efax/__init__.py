@@ -47,6 +47,7 @@ from ._src.parametrization import Parametrization
 from ._src.scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from ._src.scipy_replacement.complex_normal import ScipyComplexNormal
 from ._src.scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
+from ._src.scipy_replacement.geometric import ScipyGeometric
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
@@ -123,6 +124,7 @@ __all__ = [
     'ScipyComplexNormal',
     'ScipyDirichlet',
     'ScipyGeneralizedDirichlet',
+    'ScipyGeometric',
     'ScipyMultivariateNormal',
     'ScipyVonMises',
     'SquareMatrixSupport',

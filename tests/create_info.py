@@ -24,8 +24,9 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
                   NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
                   ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
-                  ScipyGeneralizedDirichlet, ScipyMultivariateNormal, ScipyVonMises, UnitNormalEP,
-                  UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
+                  ScipyGeneralizedDirichlet, ScipyGeometric, ScipyMultivariateNormal, ScipyVonMises,
+                  UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
+                  WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -89,7 +90,7 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: GeometricEP) -> Any:
         # Scipy uses a different definition geometric distribution.  The parameter pis inverse odds.
-        return ss.geom(1.0 / (1.0 + p.mean))
+        return ScipyGeometric(np.asarray(1.0 / (1.0 + p.mean)))
 
     @override
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> GeometricEP:

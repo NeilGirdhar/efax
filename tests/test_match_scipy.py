@@ -54,7 +54,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
     for _ in range(10):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
-        scipy_x = np.asarray(scipy_distribution.rvs(random_state=generator))
+        scipy_x = scipy_distribution.rvs(random_state=generator)
         efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
         # Verify that the sufficient statistics have the right shape.
