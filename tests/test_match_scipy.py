@@ -4,7 +4,6 @@ from __future__ import annotations
 from functools import partial
 from typing import Any
 
-import jax.numpy as jnp
 import numpy as np
 from numpy.random import Generator
 from numpy.testing import assert_allclose
@@ -105,8 +104,6 @@ def test_maximum_likelihood_estimation(generator: Generator,
     # Convert the variates to sufficient statistics.
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
     fixed_parameters = exp_parameters.fixed_parameters()
-    fixed_parameters = {name: jnp.broadcast_to(value, efax_x.shape)
-                        for name, value in fixed_parameters.items()}
     nat_cls = distribution_info.nat_class()
     sufficient_stats = nat_cls.sufficient_statistics(efax_x, **fixed_parameters)
 
