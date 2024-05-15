@@ -9,7 +9,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose
 
-from efax import HasEntropyEP, HasEntropyNP, Multidimensional, parameter_map
+from efax import HasEntropyEP, HasEntropyNP, Multidimensional, NaturalParametrization, parameter_map
 
 from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           DirichletInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
@@ -78,8 +78,10 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         assert_allclose(efax_density, scipy_density, rtol=rtol, atol=atol)
 
 
-def test_maximum_likelihood_estimation(generator: Generator,
-                                       distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+def test_maximum_likelihood_estimation(
+        generator: Generator,
+        distribution_info: DistributionInfo[NaturalParametrization[Any, Any], Any, Any]
+        ) -> None:
     """Test maximum likelihood estimation using SciPy.
 
     Test that maximum likelihood estimation from scipy-generated variates produce the same
@@ -98,8 +100,7 @@ def test_maximum_likelihood_estimation(generator: Generator,
     # Generate a distribution with expectation parameters.
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
     # Generate variates from the corresponding scipy distribution.
-    scipy_distribution = distribution_info.exp_to_scipy_distribution(
-        exp_parameters)  # type: ignore[arg-type] # pyright: ignore
+    scipy_distribution = distribution_info.exp_to_scipy_distribution(exp_parameters)
     scipy_x = scipy_distribution.rvs(random_state=generator, size=n)
     # Convert the variates to sufficient statistics.
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
