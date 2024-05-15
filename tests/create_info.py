@@ -7,7 +7,8 @@ import numpy as np
 import scipy.stats as ss
 from jax.dtypes import canonicalize_dtype
 from numpy.random import Generator
-from tjax import NumpyComplexArray, NumpyRealArray, Shape, abs_square, create_diagonal_array
+from tjax import (JaxRealArray, NumpyComplexArray, NumpyRealArray, Shape, abs_square,
+                  create_diagonal_array)
 from typing_extensions import override
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
@@ -96,8 +97,8 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
         return GeometricEP(jnp.asarray(1.0 / p))
 
     @override
-    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyRealArray:
-        return x - 1
+    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
+        return jnp.asarray(x - 1)
 
     @override
     def exp_class(self) -> type[GeometricEP]:
@@ -559,8 +560,8 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
         return DirichletNP(jnp.asarray(dirichlet_parameter_generator(self.dimensions, rng, shape)))
 
     @override
-    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyRealArray:
-        return x[..., : -1]
+    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
+        return jnp.asarray(x[..., : -1])
 
     @override
     def exp_class(self) -> type[DirichletEP]:
@@ -609,11 +610,11 @@ class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, Nu
         return VonMisesFisherNP(jnp.asarray(rng.normal(size=(*shape, 2), scale=4.0)))
 
     @override
-    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyRealArray:
+    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
         result = np.empty((*x.shape, 2))
         result[..., 0] = np.cos(x)
         result[..., 1] = np.sin(x)
-        return result
+        return jnp.asarray(result)
 
     @override
     def exp_class(self) -> type[VonMisesFisherEP]:

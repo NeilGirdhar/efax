@@ -55,7 +55,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
         scipy_x = np.asarray(scipy_distribution.rvs(random_state=generator))
-        efax_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(scipy_x))
+        efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
 
         # Verify that the sufficient statistics have the right shape.
         dimensions = (nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional)
@@ -103,7 +103,7 @@ def test_maximum_likelihood_estimation(generator: Generator,
         exp_parameters)  # type: ignore[arg-type] # pyright: ignore
     scipy_x = scipy_distribution.rvs(random_state=generator, size=n)
     # Convert the variates to sufficient statistics.
-    efax_x = jnp.asarray(distribution_info.scipy_to_exp_family_observation(scipy_x))
+    efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
     fixed_parameters = exp_parameters.fixed_parameters()
     fixed_parameters = {name: jnp.broadcast_to(value, efax_x.shape)
                         for name, value in fixed_parameters.items()}

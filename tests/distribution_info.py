@@ -3,9 +3,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
+import jax.numpy as jnp
 import pytest
 from numpy.random import Generator
-from tjax import NumpyComplexArray, Shape
+from tjax import JaxComplexArray, NumpyComplexArray, Shape
 from typing_extensions import override
 
 from efax import ExpectationParametrization, NaturalParametrization
@@ -46,13 +47,13 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return self.exp_parameter_generator(rng, shape).to_nat()
 
-    def scipy_to_exp_family_observation(self, x: Domain) -> Domain:
+    def scipy_to_exp_family_observation(self, x: Domain) -> JaxComplexArray:
         """The observation that's expected by the exponential family.
 
         Args:
             x: The observation that's produced by the scipy distribution.
         """
-        return x
+        return jnp.asarray(x)
 
     def exp_class(self) -> type[EP]:
         raise NotImplementedError
