@@ -97,10 +97,13 @@ class Flattener(Structure[P]):
     def unflatten(self, flattened: JaxRealArray) -> P:
         consumed = 0
         constructed = {}
+        available = flattened.shape[-1]
         for info in self.distributions:
             kwargs = {}
             for name, this_support in support(info.type_, fixed=False).items():
                 k = this_support.num_elements(info.dimensions)
+                if consumed + k > available:
+                    raise ValueError('Incompatible array')  # noqa: TRY003
                 kwargs[name] = this_support.unflattened(flattened[..., consumed: consumed + k],
                                                         info.dimensions)
                 consumed += k
@@ -111,6 +114,8 @@ class Flattener(Structure[P]):
             if sub_distributions:
                 kwargs['sub_distributions_objects'] = sub_distributions
             constructed[info.path] = info.type_(**kwargs)
+        if consumed != available:
+            raise ValueError('Incompatible array')  # noqa: TRY003
         return constructed[()]
 
     @classmethod
