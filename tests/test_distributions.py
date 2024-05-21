@@ -9,7 +9,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxRealArray, assert_tree_allclose, jit, zero_tangent_like
 
-from efax import Flattener, NaturalParametrization, Structure, parameters
+from efax import NaturalParametrization, Structure, parameters
 
 from .create_info import BetaInfo, DirichletInfo, GammaInfo, GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
@@ -63,18 +63,16 @@ def test_gradient_log_normalizer_primals(generator: Generator,
     for _ in range(20):
         nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
         exp_parameters = nat_parameters.to_exp()  # Regular transformation.
+        exp_structure = Structure.create(exp_parameters)
         # Able to unflatten into expectation parameters.
-        flattener, _ = Flattener.flatten(exp_parameters)
 
         # Original GLN.
         original_nat_parameters = original_gln(nat_parameters)
-        _, f_original_nat_parameters = Flattener.flatten(original_nat_parameters)
-        original_exp_parameters = flattener.unflatten(f_original_nat_parameters)
+        original_exp_parameters = exp_structure.reinterpret(original_nat_parameters)
 
         # Optimized GLN.
         optimized_nat_parameters = optimized_gln(nat_parameters)
-        _, f_optimized_nat_parameters = Flattener.flatten(optimized_nat_parameters)
-        optimized_exp_parameters = flattener.unflatten(f_optimized_nat_parameters)
+        optimized_exp_parameters = exp_structure.reinterpret(optimized_nat_parameters)
 
         # Test primal evaluation.
         assert_tree_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)

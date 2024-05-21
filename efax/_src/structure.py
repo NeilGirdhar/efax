@@ -43,8 +43,9 @@ class Structure(Generic[P]):
     def create(cls, p: P) -> Self:
         return cls(cls._extract_distributions(p))
 
-    def assemble(self, parameters: Mapping[Path, JaxComplexArray]) -> P:
-        constructed: dict[Path, Parametrization | JaxComplexArray] = dict(parameters)
+    def assemble(self, p: Mapping[Path, JaxComplexArray]) -> P:
+        """Assemble a Parametrization from its parameters using the saved structure."""
+        constructed: dict[Path, Parametrization | JaxComplexArray] = dict(p)
         for info in self.distributions:
             kwargs: dict[str, Parametrization | JaxComplexArray | dict[str, Any]] = {
                     name: constructed[*info.path, name]
@@ -57,6 +58,15 @@ class Structure(Generic[P]):
         retval = constructed[()]
         assert isinstance(retval, Parametrization)
         return cast(P, retval)
+
+    def reinterpret(self, q: Parametrization) -> P:
+        """Reinterpret one parametrization using the saved structure."""
+        p_paths = [(*info.path, name)
+                   for info in self.distributions
+                   for name in support(info.type_)]
+        q_values = parameters(q, support=False).values()
+        q_params_as_p = dict(zip(p_paths, q_values, strict=True))
+        return self.assemble(q_params_as_p)
 
     @classmethod
     def _extract_distributions(cls, p: P) -> list[SubDistributionInfo]:
