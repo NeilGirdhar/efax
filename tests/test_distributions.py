@@ -61,22 +61,25 @@ def test_gradient_log_normalizer_primals(generator: Generator,
     original_gln = jit(grad(original_ln, allow_int=True))
     optimized_gln = jit(grad(optimized_ln, allow_int=True))
     for _ in range(20):
-        nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
-        exp_parameters = nat_parameters.to_exp()  # Regular transformation.
-        exp_structure = Structure.create(exp_parameters)
-        # Able to unflatten into expectation parameters.
+        generated_np = distribution_info.nat_parameter_generator(generator, shape=())
+        generated_ep = generated_np.to_exp()  # Regular transformation.
+        generated_parameters = parameters(generated_ep, fixed=False)
+        structure_ep = Structure.create(generated_ep)
 
         # Original GLN.
-        original_nat_parameters = original_gln(nat_parameters)
-        original_exp_parameters = exp_structure.reinterpret(original_nat_parameters)
+        origianl_gln_np = original_gln(generated_np)
+        original_gln_ep = structure_ep.reinterpret(origianl_gln_np)
+        original_gln_parameters = parameters(original_gln_ep, fixed=False)
 
         # Optimized GLN.
-        optimized_nat_parameters = optimized_gln(nat_parameters)
-        optimized_exp_parameters = exp_structure.reinterpret(optimized_nat_parameters)
+        optimized_gln_np = optimized_gln(generated_np)
+        optimized_gln_ep = structure_ep.reinterpret(optimized_gln_np)
+        optimized_gln_parameters = parameters(optimized_gln_ep, fixed=False)
 
         # Test primal evaluation.
-        assert_tree_allclose(exp_parameters, original_exp_parameters, rtol=1e-5)
-        assert_tree_allclose(exp_parameters, optimized_exp_parameters, rtol=1e-5)
+        # parameters(generated_ep, fixed=False)
+        assert_tree_allclose(generated_parameters, original_gln_parameters, rtol=1e-5)
+        assert_tree_allclose(generated_parameters, optimized_gln_parameters, rtol=1e-5)
 
 
 def unit_tangent(nat_parameters: NaturalParametrization[Any, Any]

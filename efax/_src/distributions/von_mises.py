@@ -14,7 +14,7 @@ from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import VectorSupport, distribution_parameter
+from ..parameter import CircularBoundedSupport, VectorSupport, distribution_parameter
 from ..tools import iv_ratio, log_ive
 
 
@@ -95,7 +95,7 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
     Args:
         mean: E(x).
     """
-    mean: JaxRealArray = distribution_parameter(VectorSupport())
+    mean: JaxRealArray = distribution_parameter(CircularBoundedSupport(1.0))
 
     @property
     @override

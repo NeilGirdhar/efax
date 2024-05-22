@@ -11,7 +11,8 @@ from typing_extensions import override
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter, integral_ring
+from ..parameter import (ScalarSupport, distribution_parameter, integral_ring, negative_support,
+                         positive_support)
 from .gamma import GammaNP
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 from .poisson import PoissonEP
@@ -28,7 +29,7 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP'],
         log_not_p: log(1-p).
         failures: r.
     """
-    log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
+    log_not_p: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
     failures: JaxIntegralArray = distribution_parameter(ScalarSupport(ring=integral_ring),
                                                         fixed=True)
 
@@ -59,7 +60,7 @@ class NegativeBinomialEP(Samplable,
         mean: E(x).
         failures: r.
     """
-    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
     failures: JaxIntegralArray = distribution_parameter(ScalarSupport(ring=integral_ring),
                                                         fixed=True)
 

@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterable, Mapping
+from dataclasses import replace
 from functools import partial, reduce
 from typing import Any, Generic, Self, TypeAlias, TypeVar, cast
 
@@ -103,8 +104,14 @@ class Flattener(Structure[P]):
     the inputs and outputs of neural networks.
     """
     fixed_parameters: dict[Path, JaxComplexArray]
+    mapped_to_plane: bool = field(static=True)
 
     def unflatten(self, flattened: JaxRealArray) -> P:
+        """Unflatten an array into a Parametrization.
+
+        Args:
+            flattened: The flattened array.
+        """
         consumed = 0
         constructed: dict[Path, Parametrization] = {}
         available = flattened.shape[-1]
@@ -115,7 +122,8 @@ class Flattener(Structure[P]):
                 if consumed + k > available:
                     raise ValueError('Incompatible array')  # noqa: TRY003
                 kwargs[name] = this_support.unflattened(flattened[..., consumed: consumed + k],
-                                                        info.dimensions)
+                                                        info.dimensions,
+                                                        map_from_plane=self.mapped_to_plane)
                 consumed += k
             for name in support(info.type_, fixed=True):
                 kwargs[name] = self.fixed_parameters[*info.path, name]
@@ -129,16 +137,54 @@ class Flattener(Structure[P]):
         return cast(P, constructed[()])
 
     @classmethod
-    def flatten(cls, p: P) -> tuple[Self, JaxRealArray]:
+    def flatten(cls,
+                p: P,
+                *,
+                map_to_plane: bool = True
+                ) -> tuple[Self, JaxRealArray]:
+        """Flatten a Parametrization.
+
+        Args:
+            p: The object to flatten.
+            map_to_plane: Whether to map the individual parameters to the plane.  It should be false
+                if flattening when the meaning of the flattened parameters should reflect parameter
+                values (e.g., when taking a different of expectation parameters).  It should be true
+                when passing to a neural network.
+        """
         arrays = [x
-                  for xs in cls._walk(cls._make_flat, p)
+                  for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p)
                   for x in xs]
         flattened_array = reduce(partial(jnp.append, axis=-1), arrays)
-        return (cls(cls._extract_distributions(p), parameters(p, fixed=True)),
+        return (cls(cls._extract_distributions(p),
+                    parameters(p, fixed=True),
+                    map_to_plane),
                 flattened_array)
 
     @classmethod
-    def _make_flat(cls, q: Parametrization, path: Path) -> list[JaxRealArray]:
-        return [support.flattened(value)
+    def create_flattener(cls,
+                         p: Parametrization,
+                         q_cls: type[P],
+                         *,
+                         mapped_to_plane: bool = True
+                         ) -> 'Flattener[P]':
+        """Create a Flattener.
+
+        Args:
+            p: The object from which to get dimensions and fixed parameters.
+            q_cls: The type of the returned Flattener.
+            mapped_to_plane: Whether the flattener should map from the plane.
+        """
+        if p.sub_distributions():
+            raise ValueError
+        info = cls._make_info(p, path=())
+        info = replace(info, type_=q_cls)
+        distributions = [info]
+        fixed_parameters = parameters(p, fixed=True, support=False)
+        return Flattener(distributions, fixed_parameters, mapped_to_plane)
+
+    @classmethod
+    def _make_flat(cls, q: Parametrization, path: Path, *, map_to_plane: bool
+                   ) -> list[JaxRealArray]:
+        return [support.flattened(value, map_to_plane=map_to_plane)
                 for value, support in parameters(q, fixed=False, support=True,
                                                  recurse=False).values()]

@@ -13,7 +13,7 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter, integral_ring
+from ..parameter import ScalarSupport, distribution_parameter, integral_ring, positive_support
 from .gamma import GammaNP
 
 
@@ -64,7 +64,7 @@ class PoissonEP(HasConjugatePrior,
     Args:
         mean: E(x).
     """
-    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
     @override

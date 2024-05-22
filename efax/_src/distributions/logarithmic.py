@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
-from jax.nn import softplus
 from tjax import JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -11,7 +10,7 @@ from typing_extensions import override
 from ..expectation_parametrization import ExpectationParametrization
 from ..mixins.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ..parameter import RealField, ScalarSupport, distribution_parameter, negative_support
 
 log_probability_floor = -50.0
 log_probability_ceiling = -1e-7
@@ -24,7 +23,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
     Args:
         log_probability: log(p).
     """
-    log_probability: JaxRealArray = distribution_parameter(ScalarSupport())
+    log_probability: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @property
     @override
@@ -68,7 +67,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
     Args:
         chi: -(p / (1-p)) * log(1-p).
     """
-    chi: JaxRealArray = distribution_parameter(ScalarSupport())
+    chi: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=1.0)))
 
     @property
     @override
@@ -86,19 +85,6 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
         return LogarithmicNP
 
     # The expected_carrier_measure is unknown.
-
-    @override
-    def initial_search_parameters(self) -> JaxRealArray:
-        return jnp.zeros((*self.chi.shape, 1))
-
-    @override
-    def search_to_natural(self, search_parameters: JaxRealArray) -> LogarithmicNP:
-        # Run Newton's method on the whole real line.
-        return LogarithmicNP(-softplus(-search_parameters[..., 0]))
-
-    @override
-    def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(search_parameters)
 
     @override
     def to_nat(self) -> LogarithmicNP:

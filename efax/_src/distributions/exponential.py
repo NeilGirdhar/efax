@@ -13,7 +13,7 @@ from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ..parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
 from .gamma import GammaNP
 
 
@@ -26,7 +26,7 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
     Args:
         negative_rate: -lambda where lambda is the rate.
     """
-    negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
+    negative_rate: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @property
     @override
@@ -75,7 +75,7 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
     Args:
         mean: E(x) = 1/lambda where lambda is the rate.
     """
-    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
     @override
