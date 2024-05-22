@@ -55,7 +55,7 @@ from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises
 from ._src.structure import Flattener, Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
-from ._src.transform.joint import JointDistributionE, JointDistributionN
+from ._src.transform.joint import JointDistribution, JointDistributionE, JointDistributionN
 
 __all__ = [
     'BernoulliEP',
@@ -96,6 +96,7 @@ __all__ = [
     'IntegralRing',
     'IsotropicNormalEP',
     'IsotropicNormalNP',
+    'JointDistribution',
     'JointDistributionE',
     'JointDistributionN',
     'LogarithmicEP',

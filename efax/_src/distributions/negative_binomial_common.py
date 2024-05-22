@@ -12,12 +12,14 @@ from typing_extensions import override
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, integral_ring
+from ..parametrization import Parametrization
 
 EP = TypeVar('EP', bound='NBCommonEP[Any]')
 
 
 @dataclass
-class NBCommonNP(NaturalParametrization[EP, JaxRealArray]):
+class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
+                 Parametrization):
     log_not_p: JaxRealArray
 
     @property
@@ -52,7 +54,8 @@ NP = TypeVar('NP', bound=NBCommonNP[Any])
 
 
 @dataclass
-class NBCommonEP(ExpectationParametrization[NP]):
+class NBCommonEP(ExpectationParametrization[NP],
+                 Parametrization):
     mean: JaxRealArray
 
     @property

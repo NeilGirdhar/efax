@@ -12,12 +12,14 @@ from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                   TransformedNaturalParametrization)
 from ..parameter import RealField, ScalarSupport, distribution_parameter
+from ..parametrization import Parametrization
 from .chi_square import ChiSquareEP, ChiSquareNP
 
 
 @dataclass
 class ChiNP(HasEntropyNP['ChiEP'],
-            TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray]):
+            TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray],
+            Parametrization):
     """The natural parametrization of the chi distribution.
 
     Args:
@@ -57,7 +59,8 @@ class ChiNP(HasEntropyNP['ChiEP'],
 
 @dataclass
 class ChiEP(HasEntropyEP[ChiNP],
-            TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP]):
+            TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP],
+            Parametrization):
     """The expectation parametrization of the chi distribution.
 
     Args:

@@ -12,10 +12,9 @@ from tensorflow_probability.substrates import jax as tfp
 from tjax import JaxComplexArray, JaxRealArray
 
 from .iteration import parameters
-from .parametrization import Parametrization
+from .parametrization import GeneralParametrization
 from .structure import Structure
-
-Axis = int | tuple[int, ...]
+from .types import Axis
 
 
 def parameter_dot_product(x: NaturalParametrization[Any, Any], y: Any, /) -> JaxRealArray:
@@ -31,7 +30,7 @@ def parameter_dot_product(x: NaturalParametrization[Any, Any], y: Any, /) -> Jax
     return reduce(jnp.add, dotted_fields())
 
 
-T = TypeVar('T', bound=Parametrization)
+T = TypeVar('T', bound=GeneralParametrization)
 
 
 def parameter_mean(x: T, /, *, axis: Axis | None = None) -> T:
@@ -47,7 +46,7 @@ def parameter_mean(x: T, /, *, axis: Axis | None = None) -> T:
 def parameter_map(operation: Callable[..., JaxComplexArray],
                   x: T,
                   /,
-                  *ys: Parametrization
+                  *ys: GeneralParametrization
                   ) -> T:
     """Return a new distribution created by operating on the variable fields of the inputs."""
     paths = parameters(x, fixed=False).keys()

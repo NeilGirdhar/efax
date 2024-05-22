@@ -14,10 +14,13 @@ from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
+from ...parametrization import Parametrization
 
 
 @dataclass
-class NormalNP(HasEntropyNP['NormalEP'], NaturalParametrization['NormalEP', JaxRealArray]):
+class NormalNP(HasEntropyNP['NormalEP'],
+               NaturalParametrization['NormalEP', JaxRealArray],
+               Parametrization):
     """The natural parametrization of the normal distribution.
 
     Args:
@@ -66,7 +69,8 @@ class NormalNP(HasEntropyNP['NormalEP'], NaturalParametrization['NormalEP', JaxR
 @dataclass
 class NormalEP(HasEntropyEP[NormalNP],
                ExpectationParametrization[NormalNP],
-               Samplable):
+               Samplable,
+               Parametrization):
     """The expectation parametrization of the normal distribution.
 
     Args:
@@ -116,7 +120,7 @@ class NormalEP(HasEntropyEP[NormalNP],
 
 
 @dataclass
-class NormalVP(Samplable):
+class NormalVP(Samplable, Parametrization):
     """The variance parametrization of the normal distribution.
 
     Args:

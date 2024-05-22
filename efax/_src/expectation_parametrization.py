@@ -7,13 +7,13 @@ import jax.numpy as jnp
 from tjax import JaxRealArray, jit
 
 from .natural_parametrization import NaturalParametrization
-from .parametrization import Parametrization
+from .parametrization import GeneralParametrization
 from .tools import parameter_dot_product, parameter_map
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 
 
-class ExpectationParametrization(Parametrization, Generic[NP]):
+class ExpectationParametrization(GeneralParametrization, Generic[NP]):
     """The expectation parametrization of an exponential family distribution.
 
     This class also doubles as the sufficient statistics of an exponential family distribution.

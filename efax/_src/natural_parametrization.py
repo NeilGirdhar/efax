@@ -11,7 +11,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import Self
 
 from .iteration import fixed_parameter_packet, parameters
-from .parametrization import Parametrization
+from .parametrization import GeneralParametrization
 from .structure import Flattener, Structure
 from .tools import parameter_dot_product
 
@@ -36,7 +36,7 @@ def log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
 
 
 @dataclass
-class NaturalParametrization(Parametrization,
+class NaturalParametrization(GeneralParametrization,
                              JaxAbstractClass,
                              Generic[EP, Domain]):
     """The natural parametrization of an exponential family distribution.

@@ -11,13 +11,15 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..mixins.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import RealField, ScalarSupport, distribution_parameter, negative_support
+from ..parametrization import Parametrization
 
 log_probability_floor = -50.0
 log_probability_ceiling = -1e-7
 
 
 @dataclass
-class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
+class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
+                    Parametrization):
     """The natural parametrization of the logarithmic distribution.
 
     Args:
@@ -61,7 +63,8 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray]):
 
 @dataclass
 class LogarithmicEP(ExpToNat[LogarithmicNP],
-                    ExpectationParametrization[LogarithmicNP]):
+                    ExpectationParametrization[LogarithmicNP],
+                    Parametrization):
     """The expectation parametrization of the logarithmic distribution.
 
     Args:

@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import replace
 from functools import partial, reduce
-from typing import Any, Generic, Self, TypeAlias, TypeVar, cast
+from typing import Any, Generic, Self, TypeVar, cast
 
 import jax.numpy as jnp
 from tjax import JaxComplexArray, JaxRealArray
@@ -9,31 +9,28 @@ from tjax.dataclasses import dataclass, field
 
 from .iteration import parameters, support
 from .parameter import Support
-from .parametrization import Parametrization
-
-Path: TypeAlias = tuple[str, ...]
-Parameters: TypeAlias = Mapping[str, 'JaxComplexArray | Parameters']
-Supports: TypeAlias = Mapping[str, 'Support | Supports']
-ParametersAndSupports: TypeAlias = Mapping[
-        str, 'tuple[JaxComplexArray, Support] | ParametersAndSupports']
+from .parametrization import GeneralParametrization, Parametrization
+from .types import Path
 
 
 @dataclass
 class SubDistributionInfo:
     """A hashable collection of the static information for recreating sub-distributions."""
     path: Path
-    type_: type[Parametrization]
+    type_: type[GeneralParametrization]
     dimensions: int
     sub_distribution_names: list[str]
 
 
 T = TypeVar('T')
-P = TypeVar('P', bound=Parametrization)
+P = TypeVar('P', bound=GeneralParametrization)
 
 
 @dataclass
 class Structure(Generic[P]):
-    """Divides a Parametrization into parameters and the information required to rebuid it.
+    """Structure is a generalization of type when it comes to Parametrization objects.
+
+    Divides a GeneralParametrization into parameters and the information required to rebuid it.
 
     This is useful for operating on all the parameters.
     """
@@ -45,10 +42,10 @@ class Structure(Generic[P]):
         return cls(cls._extract_distributions(p))
 
     def assemble(self, p: Mapping[Path, JaxComplexArray]) -> P:
-        """Assemble a Parametrization from its parameters using the saved structure."""
-        constructed: dict[Path, Parametrization | JaxComplexArray] = dict(p)
+        """Assemble a GeneralParametrization from its parameters using the saved structure."""
+        constructed: dict[Path, GeneralParametrization | JaxComplexArray] = dict(p)
         for info in self.distributions:
-            kwargs: dict[str, Parametrization | JaxComplexArray | dict[str, Any]] = {
+            kwargs: dict[str, GeneralParametrization | JaxComplexArray | dict[str, Any]] = {
                     name: constructed[*info.path, name]
                     for name in support(info.type_)}
             sub_distributions = {name: constructed[*info.path, name]
@@ -57,10 +54,10 @@ class Structure(Generic[P]):
                 kwargs['sub_distributions_objects'] = sub_distributions
             constructed[info.path] = info.type_(**kwargs)
         retval = constructed[()]
-        assert isinstance(retval, Parametrization)
+        assert isinstance(retval, GeneralParametrization)
         return cast(P, retval)
 
-    def reinterpret(self, q: Parametrization) -> P:
+    def reinterpret(self, q: GeneralParametrization) -> P:
         """Reinterpret one parametrization using the saved structure."""
         p_paths = [(*info.path, name)
                    for info in self.distributions
@@ -69,14 +66,19 @@ class Structure(Generic[P]):
         q_params_as_p = dict(zip(p_paths, q_values, strict=True))
         return self.assemble(q_params_as_p)
 
+    def domain_support(self) -> dict[Path, Support]:
+        return {info.path: info.type_.domain_support()
+                for info in self.distributions
+                if issubclass(info.type_, Parametrization)}
+
     @classmethod
     def _extract_distributions(cls, p: P) -> list[SubDistributionInfo]:
         return list(cls._walk(cls._make_info, p))
 
     @classmethod
     def _walk(cls,
-              f: Callable[[Parametrization, Path], T],
-              q: Parametrization,
+              f: Callable[[GeneralParametrization, Path], T],
+              q: GeneralParametrization,
               base_path: Path = (),
               ) -> Iterable[T]:
         """Post-order traversal of q."""
@@ -86,7 +88,7 @@ class Structure(Generic[P]):
         yield f(q, base_path)
 
     @classmethod
-    def _make_info(cls, q: Parametrization, path: Path) -> SubDistributionInfo:
+    def _make_info(cls, q: GeneralParametrization, path: Path) -> SubDistributionInfo:
         from .interfaces.multidimensional import Multidimensional  # noqa: PLC0415
         dimensions = q.dimensions() if isinstance(q, Multidimensional) else 1
         sub_distribution_names = list(q.sub_distributions())
@@ -95,7 +97,7 @@ class Structure(Generic[P]):
 
 @dataclass
 class Flattener(Structure[P]):
-    """Flattens a Parametrization into an array of variable parameters.
+    """Flattens a GeneralParametrization into an array of variable parameters.
 
     Like Structure, it divides the parametrization---in this case, into the flattened parameters and
     the information required to rebuid the parametrization.
@@ -107,16 +109,16 @@ class Flattener(Structure[P]):
     mapped_to_plane: bool = field(static=True)
 
     def unflatten(self, flattened: JaxRealArray) -> P:
-        """Unflatten an array into a Parametrization.
+        """Unflatten an array into a GeneralParametrization.
 
         Args:
             flattened: The flattened array.
         """
         consumed = 0
-        constructed: dict[Path, Parametrization] = {}
+        constructed: dict[Path, GeneralParametrization] = {}
         available = flattened.shape[-1]
         for info in self.distributions:
-            kwargs: dict[str, Parametrization | JaxComplexArray | dict[str, Any]] = {}
+            kwargs: dict[str, GeneralParametrization | JaxComplexArray | dict[str, Any]] = {}
             for name, this_support in support(info.type_, fixed=False).items():
                 k = this_support.num_elements(info.dimensions)
                 if consumed + k > available:
@@ -142,7 +144,7 @@ class Flattener(Structure[P]):
                 *,
                 map_to_plane: bool = True
                 ) -> tuple[Self, JaxRealArray]:
-        """Flatten a Parametrization.
+        """Flatten a GeneralParametrization.
 
         Args:
             p: The object to flatten.
@@ -162,7 +164,7 @@ class Flattener(Structure[P]):
 
     @classmethod
     def create_flattener(cls,
-                         p: Parametrization,
+                         p: GeneralParametrization,
                          q_cls: type[P],
                          *,
                          mapped_to_plane: bool = True
@@ -183,7 +185,7 @@ class Flattener(Structure[P]):
         return Flattener(distributions, fixed_parameters, mapped_to_plane)
 
     @classmethod
-    def _make_flat(cls, q: Parametrization, path: Path, *, map_to_plane: bool
+    def _make_flat(cls, q: GeneralParametrization, path: Path, *, map_to_plane: bool
                    ) -> list[JaxRealArray]:
         return [support.flattened(value, map_to_plane=map_to_plane)
                 for value, support in parameters(q, fixed=False, support=True,

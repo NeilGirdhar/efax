@@ -1,40 +1,65 @@
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from functools import reduce
-from typing import Any, override
+from typing import Any, TypeVar, override
 
 import jax.numpy as jnp
-from tjax import JaxRealArray, Shape
+from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass, field
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..interfaces.samplable import Samplable
+from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import JointDistributionSupport
-from ..parametrization import Parametrization
+from ..parametrization import GeneralParametrization, Parametrization
 from ..tools import join_mappings
+
+T = TypeVar('T', bound=GeneralParametrization)
 
 
 @dataclass
-class JointDistribution(Parametrization):
-    sub_distributions_objects: Mapping[str, Parametrization] = field(metadata={'parameter': False})
+class JointDistribution(GeneralParametrization):
+    # TODO: rename _sub_distributions
+    sub_distributions_objects: Mapping[str, GeneralParametrization] = field(
+            metadata={'parameter': False})
 
     @override
-    def sub_distributions(self) -> Mapping[str, Parametrization]:
+    def sub_distributions(self) -> Mapping[str, GeneralParametrization]:
         return self.sub_distributions_objects
+
+    def general_method(self,
+                       f: Callable[[T], Any],
+                       t: type[T] = GeneralParametrization
+                       ) -> Any:
+        return {name: (value.general_method(f, t)
+                       if isinstance(value, JointDistribution) else f(value))
+                for name, value in self.sub_distributions_objects.items()
+                if isinstance(value, JointDistribution | t)}
+
+    def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
+        def f(x: GeneralParametrization, /) -> JaxComplexArray:
+            assert isinstance(x, Samplable)
+            return x.sample(key, shape)
+
+        return self.general_method(f, Samplable)
+
+    def as_dict(self) -> dict[str, Any]:
+        def f(x: GeneralParametrization, /) -> Parametrization:
+            assert isinstance(x, Parametrization)
+            return x
+
+        return self.general_method(f)
 
     @property
     @override
     def shape(self) -> Shape:
-        first = next(iter(self.sub_distributions_objects.values()))
-        return first.shape
-
-    @override
-    @classmethod
-    def domain_support(cls) -> JointDistributionSupport:
-        return JointDistributionSupport()
+        for distribution in self.sub_distributions_objects.values():
+            return distribution.shape
+        raise ValueError
 
 
 @dataclass
 class JointDistributionE(JointDistribution,
+                         HasEntropyEP['JointDistributionN'],
                          ExpectationParametrization['JointDistributionN']):
     sub_distributions_objects: Mapping[str, ExpectationParametrization[Any]] = field(
             metadata={'parameter': False})
@@ -53,9 +78,18 @@ class JointDistributionE(JointDistribution,
         return JointDistributionN({name: value.to_nat()
                                    for name, value in self.sub_distributions_objects.items()})
 
+    @override
+    def expected_carrier_measure(self) -> JaxRealArray:
+        def f(x: ExpectationParametrization[Any]) -> JaxRealArray:
+            assert isinstance(x, HasEntropyEP)
+            return x.expected_carrier_measure()
+
+        return reduce(jnp.add, (f(value) for value in self.sub_distributions_objects.values()))
+
 
 @dataclass
 class JointDistributionN(JointDistribution,
+                         HasEntropyNP[JointDistributionE],
                          NaturalParametrization[JointDistributionE, dict[str, Any]]):
     sub_distributions_objects: Mapping[str, NaturalParametrization[Any, Any]] = field(
             metadata={'parameter': False})

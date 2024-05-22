@@ -28,4 +28,5 @@ class ScipyJointDistribution:
 
     def entropy(self) -> NumpyRealArray:
         return np.sum([distribution.entropy()
-                       for distribution in self.sub_distributions.values()])
+                       for distribution in self.sub_distributions.values()],
+                      axis=0)
