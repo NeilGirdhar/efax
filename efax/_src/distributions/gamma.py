@@ -23,7 +23,8 @@ from ..parametrization import Parametrization
 @dataclass
 class GammaNP(HasEntropyNP['GammaEP'],
               Samplable,
-              NaturalParametrization['GammaEP', JaxRealArray]):
+              NaturalParametrization['GammaEP', JaxRealArray],
+              Parametrization):
     """The natural parametrization of the Gamma distribution.
 
     Args:
@@ -81,8 +82,10 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
 @dataclass
 class GammaEP(HasEntropyEP[GammaNP],
+              Samplable,
               ExpToNat[GammaNP],
-              ExpectationParametrization[GammaNP]):
+              ExpectationParametrization[GammaNP],
+              Parametrization):
     """The expectation parametrization of the Gamma distribution.
 
     Args:
@@ -110,6 +113,10 @@ class GammaEP(HasEntropyEP[GammaNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_nat().sample(key, shape)
 
     @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> GammaNP:

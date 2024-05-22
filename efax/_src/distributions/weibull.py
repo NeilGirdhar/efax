@@ -13,11 +13,13 @@ from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
+from ..parametrization import Parametrization
 
 
 @dataclass
 class WeibullNP(HasEntropyNP['WeibullEP'],
-                NaturalParametrization['WeibullEP', JaxRealArray]):
+                NaturalParametrization['WeibullEP', JaxRealArray],
+                Parametrization):
     """The natural parametrization of the Weibull distribution.
 
     Args:
@@ -61,7 +63,10 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
 
 @dataclass
-class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], Samplable):
+class WeibullEP(HasEntropyEP[WeibullNP],
+                ExpectationParametrization[WeibullNP],
+                Samplable,
+                Parametrization):
     """The expectation parametrization of the Weibull distribution.
 
     Args:

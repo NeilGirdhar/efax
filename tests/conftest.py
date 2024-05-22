@@ -12,10 +12,12 @@ from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
 
 from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
-                  HasGeneralizedConjugatePrior, IntegralRing, Samplable, Structure)
+                  HasGeneralizedConjugatePrior, IntegralRing, JointDistribution, Samplable,
+                  Structure)
 
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
-                          DirichletInfo, GammaInfo, GeneralizedDirichletInfo, create_infos)
+                          DirichletInfo, GammaInfo, GeneralizedDirichletInfo, JointInfo,
+                          create_infos)
 from .distribution_info import DistributionInfo
 
 
@@ -72,12 +74,13 @@ def distribution_info(request: Any) -> DistributionInfo[Any, Any, Any]:
 
 
 def supports(s: Structure[Any], abc: type[Any]) -> bool:
-    return all(issubclass(info.type_, abc) for info in s.distributions)
-
-
-def any_integral_supports(s: Structure[Any]) -> bool:
-    return any(isinstance(info.type_.domain_support().ring, BooleanRing | IntegralRing)
+    return all(issubclass(info.type_, abc) or issubclass(info.type_, JointDistribution)
                for info in s.distributions)
+
+
+def any_integral_supports(structure: Structure[Any]) -> bool:
+    return any(isinstance(s.ring, BooleanRing | IntegralRing)
+               for s in structure.domain_support().values())
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
@@ -85,7 +88,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
         p = [(info, natural)
              for info in _all_infos
              for natural in (False, True)
-             if supports(info.nat_structure() if natural else info.exp_structure(), Samplable)]
+             if supports(info.nat_structure() if natural else info.exp_structure(),
+                         Samplable)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_distribution_info", "natural"), p,
                              ids=ids)
@@ -99,7 +103,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              if not any_integral_supports(structure)
              if not isinstance(info,
                                ComplexCircularlySymmetricNormalInfo | BetaInfo | DirichletInfo
-                               | ChiSquareInfo | GammaInfo)]
+                               | ChiSquareInfo | GammaInfo | JointInfo)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
                              ids=ids)

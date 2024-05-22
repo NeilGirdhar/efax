@@ -1,17 +1,12 @@
 from collections.abc import Iterable, Mapping
 from dataclasses import fields
-from typing import Any, Literal, TypeAlias, overload
+from typing import Any, Literal, overload
 
 from tjax import JaxComplexArray
 
 from .parameter import Support
-from .parametrization import Parametrization
-
-Path: TypeAlias = tuple[str, ...]
-# Parameters: TypeAlias = Mapping[str, 'JaxComplexArray | Parameters']
-# Supports: TypeAlias = Mapping[str, 'Support | Supports']
-# ParametersAndSupports: TypeAlias = Mapping[
-#         str, 'tuple[JaxComplexArray, Support] | ParametersAndSupports']
+from .parametrization import GeneralParametrization
+from .types import Path
 
 
 def flatten_mapping(m: Mapping[str, Any], /) -> dict[Path, Any]:
@@ -41,7 +36,7 @@ def unflatten_mapping(m: Mapping[Path, Any], /) -> dict[str, Any]:
     return result
 
 
-# def parameters(p: Parametrization,
+# def parameters(p: GeneralParametrization,
 #                     /,
 #                     *,
 #                     fixed: bool | None = None
@@ -63,7 +58,7 @@ def unflatten_mapping(m: Mapping[Path, Any], /) -> dict[str, Any]:
 
 
 @overload
-def parameters(p: Parametrization,
+def parameters(p: GeneralParametrization,
                /,
                *,
                fixed: bool | None = None,
@@ -74,7 +69,7 @@ def parameters(p: Parametrization,
 
 
 @overload
-def parameters(p: Parametrization,
+def parameters(p: GeneralParametrization,
                /,
                *,
                fixed: bool | None = None,
@@ -85,7 +80,7 @@ def parameters(p: Parametrization,
 
 
 @overload
-def parameters(p: Parametrization,
+def parameters(p: GeneralParametrization,
                /,
                *,
                fixed: bool | None = None,
@@ -96,7 +91,7 @@ def parameters(p: Parametrization,
 
 
 @overload
-def parameters(p: Parametrization,
+def parameters(p: GeneralParametrization,
                /,
                *,
                fixed: bool | None = None,
@@ -106,7 +101,7 @@ def parameters(p: Parametrization,
     ...
 
 
-def parameters(p: Parametrization,
+def parameters(p: GeneralParametrization,
                /,
                *,
                fixed: bool | None = None,
@@ -124,7 +119,7 @@ def parameters(p: Parametrization,
     Returns:
         The path, value, and support of each variable parameter.
     """
-    def _parameters(q: Parametrization,
+    def _parameters(q: GeneralParametrization,
                     base_path: Path
                     ) -> Iterable[tuple[Any, ...]]:
         for this_field in fields(q):
@@ -153,7 +148,7 @@ def parameters(p: Parametrization,
     return dict(_parameters(p, ()))
 
 
-def support(p: type[Parametrization] | Parametrization,
+def support(p: type[GeneralParametrization] | GeneralParametrization,
             /,
             *,
             fixed: bool | None = None,
@@ -167,7 +162,7 @@ def support(p: type[Parametrization] | Parametrization,
     Returns:
         The path, value, and support of each variable parameter.
     """
-    def _parameters(q: type[Parametrization],
+    def _parameters(q: type[GeneralParametrization],
                     base_path: Path
                     ) -> Iterable[tuple[str, Support]]:
         for this_field in fields(q):
@@ -184,11 +179,11 @@ def support(p: type[Parametrization] | Parametrization,
             if not isinstance(support, Support):
                 raise TypeError
             yield name, support
-    cls_p: type[Parametrization] = type(p) if isinstance(p, Parametrization) else p
+    cls_p: type[GeneralParametrization] = type(p) if isinstance(p, GeneralParametrization) else p
     return dict(_parameters(cls_p, ()))
 
 
-def fixed_parameter_packet(p: Parametrization) -> dict[str, Any]:
+def fixed_parameter_packet(p: GeneralParametrization) -> dict[str, Any]:
     """Return a dict that suitable to be passed to methods requesting fixed parameters.
 
     Args:
@@ -201,7 +196,7 @@ def fixed_parameter_packet(p: Parametrization) -> dict[str, Any]:
     from .natural_parametrization import NaturalParametrization  # noqa: PLC0415
     from .transform.joint import JointDistribution  # noqa: PLC0415
     if isinstance(p, JointDistribution):
-        def g(t: type[Parametrization]) -> type[NaturalParametrization[Any, Any]]:
+        def g(t: type[GeneralParametrization]) -> type[NaturalParametrization[Any, Any]]:
             if issubclass(t, NaturalParametrization):
                 return t
             assert issubclass(t, ExpectationParametrization)
