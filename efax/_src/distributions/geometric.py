@@ -12,7 +12,7 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ..parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 
 
@@ -28,7 +28,7 @@ class GeometricNP(HasEntropyNP['GeometricEP'],
     Args:
         log_not_p: log(1-p).
     """
-    log_not_p: JaxRealArray = distribution_parameter(ScalarSupport())
+    log_not_p: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @override
     def to_exp(self) -> GeometricEP:
@@ -58,7 +58,7 @@ class GeometricEP(HasEntropyEP[GeometricNP],
     Args:
         mean: E(x).
     """
-    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @classmethod
     @override

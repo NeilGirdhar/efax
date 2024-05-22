@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import Any, Generic, TypeAlias, TypeVar
 
 import jax.numpy as jnp
@@ -13,7 +12,6 @@ from typing_extensions import override
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
 from ..structure import Flattener
-from ..tools import parameter_map
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 SP: TypeAlias = JaxRealArray
@@ -40,15 +38,14 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
         final_state = iterated_function.find_fixed_point(self, initial_state).current_state
         return self.search_to_natural(final_state.search_parameters)
 
-    @abstractmethod
     def initial_search_parameters(self) -> SP:
         """The initial value of the parameters used by the search algorithm.
 
         Returns a real array of shape (self.shape, n) for some n.
         """
-        raise NotImplementedError
+        _, flattened = Flattener.flatten(self)
+        return jnp.zeros_like(flattened)
 
-    @abstractmethod
     def search_to_natural(self, search_parameters: SP) -> NP:
         """Convert the search parameters to the natural parametrization.
 
@@ -58,31 +55,25 @@ class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
 
         This function should be monotonic.
         """
-        raise NotImplementedError
+        np_cls = self.natural_parametrization_cls()
+        flattener = Flattener.create_flattener(self, np_cls, mapped_to_plane=True)
+        return flattener.unflatten(search_parameters)
 
-    @abstractmethod
     def search_gradient(self, search_parameters: SP) -> SP:
-        """Convert the search parameters to the natural parametrization.
+        """Convert the search parameters to the natural gradient.
+
+        This function converts natural parameters to expectations parameters, takes the difference
+        with self, and flattens the result.
 
         Args:
             search_parameters: The parameters in search space.
         Returns: The gradient of the loss wrt to the search parameters.
         """
-        raise NotImplementedError
-
-    def _natural_gradient(self, search_parameters: SP) -> SP:
-        """The natural gradient.
-
-        Returns: The gradient of the loss wrt to the search parameters.
-
-        This is a helper function to help with search_gradient.  It converts natural parameters to
-        expectations parameters, takes the difference with self, and flattens the result.
-        """
-        natural_parameters = self.search_to_natural(search_parameters)
-        expectation_parameters: ExpToNat[NP] = natural_parameters.to_exp()
-        exp_difference: ExpToNat[NP] = parameter_map(jnp.subtract, expectation_parameters, self)
-        _, flattened = Flattener.flatten(exp_difference)
-        return flattened
+        search_np = self.search_to_natural(search_parameters)
+        search_ep: ExpToNat[NP] = search_np.to_exp()
+        _, self_flat = Flattener.flatten(self, map_to_plane=False)
+        _, search_flat = Flattener.flatten(search_ep, map_to_plane=False)
+        return search_flat - self_flat
 
 
 @dataclass

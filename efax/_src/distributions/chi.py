@@ -11,7 +11,7 @@ from typing_extensions import override
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                   TransformedNaturalParametrization)
-from ..parameter import ScalarSupport, distribution_parameter
+from ..parameter import RealField, ScalarSupport, distribution_parameter
 from .chi_square import ChiSquareEP, ChiSquareNP
 
 
@@ -23,7 +23,8 @@ class ChiNP(HasEntropyNP['ChiEP'],
     Args:
         k_over_two_minus_one: k/2 - 1 where k is the shape parameter.
     """
-    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
+    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport(
+        ring=RealField(minimum=-1.0)))
 
     @override
     @classmethod

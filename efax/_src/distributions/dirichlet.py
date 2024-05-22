@@ -59,7 +59,3 @@ class DirichletEP(DirichletCommonEP[DirichletNP],
     @override
     def natural_parametrization_cls(cls) -> type[DirichletNP]:
         return DirichletNP
-
-    @override
-    def search_to_natural(self, search_parameters: JaxRealArray) -> DirichletNP:
-        return DirichletNP(self._transform_nat_helper(search_parameters))

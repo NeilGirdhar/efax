@@ -13,7 +13,8 @@ from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import ScalarSupport, VectorSupport, distribution_parameter
+from ...parameter import (ScalarSupport, VectorSupport, distribution_parameter, negative_support,
+                          positive_support)
 
 
 @dataclass
@@ -27,7 +28,8 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
         negative_half_precision: -0.5 / Var(x).
     """
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
+    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport(
+        ring=negative_support))
 
     @property
     @override
@@ -80,7 +82,7 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
         variance: Var(x).
     """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
-    total_second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
+    total_second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
     @override

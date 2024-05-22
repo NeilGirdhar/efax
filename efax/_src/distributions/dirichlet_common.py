@@ -4,7 +4,6 @@ from typing import Any, Generic, TypeVar
 
 import jax
 import jax.numpy as jnp
-from jax.nn import softplus
 from jax.scipy import special as jss
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -15,7 +14,7 @@ from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import VectorSupport, distribution_parameter
+from ..parameter import RealField, VectorSupport, distribution_parameter, negative_support
 
 EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
 
@@ -26,7 +25,8 @@ class DirichletCommonNP(HasEntropyNP[EP],
                         Multidimensional,
                         NaturalParametrization[EP, JaxRealArray],
                         Generic[EP]):
-    alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
+    alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport(
+        ring=RealField(minimum=-1.0)))
 
     @property
     @override
@@ -61,7 +61,8 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 class DirichletCommonEP(HasEntropyEP[NP],
                         ExpToNat[NP],
                         Multidimensional, Generic[NP]):
-    mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
+    mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport(
+        ring=negative_support))
 
     @property
     @override
@@ -73,18 +74,5 @@ class DirichletCommonEP(HasEntropyEP[NP],
         return jnp.zeros(self.shape)
 
     @override
-    def initial_search_parameters(self) -> JaxRealArray:
-        return jnp.zeros_like(self.mean_log_probability)
-
-    @override
-    def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(search_parameters)
-
-    @override
     def dimensions(self) -> int:
         return self.mean_log_probability.shape[-1]
-
-    @classmethod
-    def _transform_nat_helper(cls, search_parameters: JaxRealArray) -> JaxRealArray:
-        # Run Newton's method on the whole real hyperspace.
-        return softplus(search_parameters) - 1.0
