@@ -14,7 +14,7 @@ from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import VectorSupport, distribution_parameter
+from ...parameter import VectorSupport, distribution_parameter, negative_support, positive_support
 
 
 @dataclass
@@ -29,7 +29,8 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
         negative_half_precision: The diagonal elements of -0.5 / Var(x).
     """
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(VectorSupport())
+    negative_half_precision: JaxRealArray = distribution_parameter(VectorSupport(
+        ring=negative_support))
 
     @property
     @override
@@ -80,7 +81,7 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
         second moment: The diagonal elements of E(x^2).
     """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
-    second_moment: JaxRealArray = distribution_parameter(VectorSupport())
+    second_moment: JaxRealArray = distribution_parameter(VectorSupport(ring=positive_support))
 
     @property
     @override

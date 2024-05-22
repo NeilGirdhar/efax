@@ -14,7 +14,7 @@ from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ..parameter import RealField, ScalarSupport, distribution_parameter
 
 
 @dataclass
@@ -28,7 +28,8 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
     Args:
         k_over_two_minus_one: k/2 - 1.
     """
-    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
+    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport(
+        ring=RealField(minimum=-1.0)))
 
     @property
     @override
@@ -102,15 +103,3 @@ class ChiSquareEP(HasEntropyEP[ChiSquareNP],
         q = self.to_nat()
         k_over_two = q.k_over_two_minus_one + 1.0
         return -k_over_two
-
-    @override
-    def initial_search_parameters(self) -> JaxRealArray:
-        return jnp.zeros((*self.shape, 1))
-
-    @override
-    def search_to_natural(self, search_parameters: JaxRealArray) -> ChiSquareNP:
-        return ChiSquareNP(search_parameters[..., 0])
-
-    @override
-    def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(search_parameters)

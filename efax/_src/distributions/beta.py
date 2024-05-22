@@ -75,7 +75,3 @@ class BetaEP(DirichletCommonEP[BetaNP],
     @override
     def natural_parametrization_cls(cls) -> type[BetaNP]:
         return BetaNP
-
-    @override
-    def search_to_natural(self, search_parameters: JaxRealArray) -> BetaNP:
-        return BetaNP(self._transform_nat_helper(search_parameters))

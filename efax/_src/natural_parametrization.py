@@ -181,7 +181,7 @@ class NaturalParametrization(Parametrization,
 
     @jit
     def _fisher_information_matrix(self) -> JaxRealArray:
-        flattener, flattened = Flattener.flatten(self)
+        flattener, flattened = Flattener.flatten(self, map_to_plane=False)
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
         for _ in range(len(self.shape)):
             fisher_info_f = vmap(fisher_info_f)

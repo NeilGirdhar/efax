@@ -21,15 +21,17 @@ from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import VectorSupport, distribution_parameter
+from ..parameter import (RealField, VectorSupport, distribution_parameter, negative_support,
+                         positive_support)
 
 
 @dataclass
 class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
                              NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
                              Multidimensional):
-    alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport())
-    gamma: JaxRealArray = distribution_parameter(VectorSupport())
+    alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport(
+        ring=RealField(minimum=-1.0)))
+    gamma: JaxRealArray = distribution_parameter(VectorSupport(ring=positive_support))
 
     @property
     @override
@@ -94,9 +96,11 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
                              ExpectationParametrization[GeneralizedDirichletNP],
                              Multidimensional):
     # E({log(x_i)}_i)
-    mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport())
+    mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport(
+        ring=negative_support))
     # E({log(1-∑_{j≤i} x_j)}_i)
-    mean_log_cumulative_probability: JaxRealArray = distribution_parameter(VectorSupport())
+    mean_log_cumulative_probability: JaxRealArray = distribution_parameter(VectorSupport(
+        ring=negative_support))
 
     @property
     @override
@@ -124,14 +128,6 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
-
-    @override
-    def initial_search_parameters(self) -> JaxRealArray:
-        return jnp.zeros((*self.shape, self.dimensions() * 2))
-
-    @override
-    def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        return self._natural_gradient(search_parameters)
 
     @override
     def dimensions(self) -> int:

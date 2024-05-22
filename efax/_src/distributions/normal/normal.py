@@ -13,7 +13,7 @@ from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import ScalarSupport, distribution_parameter
+from ...parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
 
 
 @dataclass
@@ -25,7 +25,8 @@ class NormalNP(HasEntropyNP['NormalEP'], NaturalParametrization['NormalEP', JaxR
         negative_half_precision: -0.5 times the precision.
     """
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport())
+    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport(
+        ring=negative_support))
 
     @property
     @override
@@ -73,7 +74,7 @@ class NormalEP(HasEntropyEP[NormalNP],
         second_moment: The second moment.
     """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
-    second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
+    second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
     @override
@@ -123,7 +124,7 @@ class NormalVP(Samplable):
         variance: The variance.
     """
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
-    variance: JaxRealArray = distribution_parameter(ScalarSupport())
+    variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
     @override

@@ -12,7 +12,7 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ..parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
 
 
 @dataclass
@@ -24,8 +24,9 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
         concentration: The fixed shape parameter k.
         eta: -scale ^ -concentration.
     """
-    concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
-    eta: JaxRealArray = distribution_parameter(ScalarSupport())
+    concentration: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support),
+                                                         fixed=True)
+    eta: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @property
     @override
@@ -67,8 +68,9 @@ class WeibullEP(HasEntropyEP[WeibullNP], ExpectationParametrization[WeibullNP], 
         concentration: The fixed shape parameter k.
         chi: scale ^ concentration.
     """
-    concentration: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
-    chi: JaxRealArray = distribution_parameter(ScalarSupport())
+    concentration: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support),
+                                                         fixed=True)
+    chi: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
     @override

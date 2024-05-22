@@ -15,7 +15,7 @@ from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, boolean_ring, distribution_parameter
+from ..parameter import RealField, ScalarSupport, boolean_ring, distribution_parameter
 from .beta import BetaNP
 
 
@@ -77,7 +77,8 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
     Args:
         probability: p.
     """
-    probability: JaxRealArray = distribution_parameter(ScalarSupport())
+    probability: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(
+        minimum=0.0, maximum=1.0)))
 
     @property
     @override

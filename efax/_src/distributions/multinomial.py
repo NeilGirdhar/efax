@@ -17,7 +17,7 @@ from ..interfaces.multidimensional import Multidimensional
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import VectorSupport, distribution_parameter
+from ..parameter import RealField, VectorSupport, distribution_parameter
 from .dirichlet import DirichletNP
 from .gen_dirichlet import GeneralizedDirichletNP
 
@@ -101,7 +101,8 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
     Args:
         log_odds: The probability vector with the final element omitted, i.e., [p_i]_{i in 1...n-1}.
     """
-    probability: JaxRealArray = distribution_parameter(VectorSupport())
+    probability: JaxRealArray = distribution_parameter(VectorSupport(ring=RealField(
+        minimum=0.0, maximum=1.0)))
 
     @property
     @override

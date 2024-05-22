@@ -87,7 +87,7 @@ def sample_using_flattened(flattened_parameters: JaxRealArray,
     p = flattener.unflatten(flattened_parameters)
     support = p.domain_support()
     ordinary_sample = p.sample(key)
-    return support.flattened(ordinary_sample)
+    return support.flattened(ordinary_sample, map_to_plane=False)
 
 
 def calculate_jacobian(p: Parametrization,

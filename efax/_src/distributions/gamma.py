@@ -15,7 +15,8 @@ from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter
+from ..parameter import (RealField, ScalarSupport, distribution_parameter, negative_support,
+                         positive_support)
 from ..parametrization import Parametrization
 
 
@@ -29,8 +30,9 @@ class GammaNP(HasEntropyNP['GammaEP'],
         negative_rate: The negative rate.
         shape_minus_one: The shape minus one.
     """
-    negative_rate: JaxRealArray = distribution_parameter(ScalarSupport())
-    shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport())
+    negative_rate: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
+    shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport(
+        ring=RealField(minimum=-1.0)))
 
     @property
     @override
@@ -87,7 +89,7 @@ class GammaEP(HasEntropyEP[GammaNP],
         mean: The mean: E(x).
         mean_log: The mean of the log: E(log(x)).
     """
-    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -141,8 +143,8 @@ class GammaVP(Parametrization):
         mean: The mean.
         variance: The variance.
     """
-    mean: JaxRealArray = distribution_parameter(ScalarSupport())
-    variance: JaxRealArray = distribution_parameter(ScalarSupport())
+    mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
+    variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
     @override
