@@ -9,7 +9,7 @@ from numpy.random import Generator
 from tjax import JaxComplexArray, NumpyComplexArray, Shape
 from typing_extensions import override
 
-from efax import ExpectationParametrization, NaturalParametrization
+from efax import ExpectationParametrization, NaturalParametrization, Structure, SubDistributionInfo
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 EP = TypeVar('EP', bound=ExpectationParametrization[Any])
@@ -17,6 +17,10 @@ Domain = TypeVar('Domain', bound=NumpyComplexArray | dict[str, Any])
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):
+    def __init__(self, dimensions: int = 1):
+        super().__init__()
+        self.dimensions = dimensions
+
     def exp_to_scipy_distribution(self, p: EP) -> Any:
         """Produce a corresponding scipy distribution from expectation parameters.
 
@@ -54,6 +58,12 @@ class DistributionInfo(Generic[NP, EP, Domain]):
             x: The observation that's produced by the scipy distribution.
         """
         return jnp.asarray(x)
+
+    def exp_structure(self) -> Structure[EP]:
+        return Structure([SubDistributionInfo((), self.exp_class(), self.dimensions, [])])
+
+    def nat_structure(self) -> Structure[NP]:
+        return Structure([SubDistributionInfo((), self.nat_class(), self.dimensions, [])])
 
     def exp_class(self) -> type[EP]:
         raise NotImplementedError
