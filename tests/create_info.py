@@ -26,8 +26,9 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP,
                   RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
                   ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution,
-                  ScipyMultivariateNormal, ScipyVonMises, UnitNormalEP, UnitNormalNP,
-                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
+                  ScipyMultivariateNormal, ScipyVonMises, Structure, SubDistributionInfo,
+                  UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
+                  WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -216,8 +217,7 @@ class MultivariateFixedVarianceNormalInfo(DistributionInfo[MultivariateFixedVari
                                                            NumpyRealArray]):
     @override
     def __init__(self, dimensions: int, variance: float):
-        super().__init__()
-        self.dimensions = dimensions
+        super().__init__(dimensions=dimensions)
         self.variance = variance
 
     @override
@@ -248,11 +248,6 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
                                                   MultivariateUnitNormalEP,
                                                   NumpyRealArray]):
     @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
-    @override
     def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
         return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean))
 
@@ -270,11 +265,6 @@ class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
 
 
 class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP, NumpyRealArray]):
-    @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
     @override
     def exp_to_scipy_distribution(self, p: IsotropicNormalEP) -> Any:
         v = p.variance()
@@ -301,11 +291,6 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
                                                       MultivariateDiagonalNormalEP,
                                                       NumpyRealArray]):
     @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
-    @override
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
         variance = np.asarray(p.variance())
         covariance = create_diagonal_array(variance)
@@ -329,11 +314,6 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
 
 class MultivariateNormalInfo(DistributionInfo[MultivariateNormalNP, MultivariateNormalEP,
                                               NumpyRealArray]):
-    @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
     @override
     def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
         # Correct numerical errors introduced by various conversions.
@@ -417,11 +397,6 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
                                                          ComplexMultivariateUnitNormalEP,
                                                          NumpyComplexArray]):
     @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
-    @override
     def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitNormalEP) -> Any:
         return ScipyComplexMultivariateNormal(mean=np.asarray(p.mean))
 
@@ -445,11 +420,6 @@ class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnit
 class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySymmetricNormalNP,
                                                             ComplexCircularlySymmetricNormalEP,
                                                             NumpyComplexArray]):
-    @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
     @override
     def exp_to_scipy_distribution(self, p: ComplexCircularlySymmetricNormalEP) -> Any:
         return ScipyComplexMultivariateNormal(variance=np.asarray(p.variance))
@@ -549,11 +519,6 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
 
 class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
     @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
-    @override
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:
         return ScipyDirichlet(np.asarray(q.alpha_minus_one, dtype=np.float64) + 1.0)
 
@@ -576,11 +541,6 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
 
 class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, GeneralizedDirichletEP,
                                                 NumpyRealArray]):
-    @override
-    def __init__(self, dimensions: int):
-        super().__init__()
-        self.dimensions = dimensions
-
     @override
     def nat_to_scipy_distribution(self, q: GeneralizedDirichletNP) -> Any:
         alpha, beta = q.alpha_beta()
@@ -687,7 +647,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
         return WeibullNP
 
 
-class NormalGammaInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[str, Any]]):
+class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[str, Any]]):
     def __init__(self, infos: Mapping[str, DistributionInfo[Any, Any, Any]]):
         super().__init__()
         self.infos = dict(infos)
@@ -710,6 +670,32 @@ class NormalGammaInfo(DistributionInfo[JointDistributionN, JointDistributionE, d
                 for name, info in self.infos.items()}
 
     @override
+    def exp_structure(self) -> Structure[JointDistributionE]:
+        infos = []
+        for name, info in self.infos.items():
+            infos.extend([SubDistributionInfo((*sub_info.path, name),
+                                              sub_info.type_,
+                                              sub_info.dimensions,
+                                              sub_info.sub_distribution_names)
+                          for sub_info in info.exp_structure().distributions])
+        infos.append(SubDistributionInfo((), self.exp_class(), self.dimensions,
+                                         list(self.infos.keys())))
+        return Structure(infos)
+
+    @override
+    def nat_structure(self) -> Structure[JointDistributionN]:
+        infos = []
+        for name, info in self.infos.items():
+            infos.extend([SubDistributionInfo((*sub_info.path, name),
+                                              sub_info.type_,
+                                              sub_info.dimensions,
+                                              sub_info.sub_distribution_names)
+                          for sub_info in info.nat_structure().distributions])
+        infos.append(SubDistributionInfo((), self.nat_class(), self.dimensions,
+                                         list(self.infos.keys())))
+        return Structure(infos)
+
+    @override
     def exp_class(self) -> type[JointDistributionE]:
         return JointDistributionE
 
@@ -728,10 +714,10 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             ComplexMultivariateUnitNormalInfo(dimensions=4),
             ComplexNormalInfo(),
             ComplexUnitNormalInfo(),
-            DirichletInfo(5),
+            DirichletInfo(dimensions=5),
             ExponentialInfo(),
             GammaInfo(),
-            GeneralizedDirichletInfo(5),
+            GeneralizedDirichletInfo(dimensions=5),
             GeometricInfo(),
             IsotropicNormalInfo(dimensions=4),
             LogarithmicInfo(),
@@ -739,8 +725,8 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             MultivariateFixedVarianceNormalInfo(dimensions=5, variance=3.0),
             MultivariateNormalInfo(dimensions=4),
             MultivariateUnitNormalInfo(dimensions=5),
-            NegativeBinomialInfo(3),
-            NormalGammaInfo({'gamma': GammaInfo(), 'normal': NormalInfo()}),
+            NegativeBinomialInfo(r=3),
+            JointInfo(infos={'gamma': GammaInfo(), 'normal': NormalInfo()}),
             NormalInfo(),
             PoissonInfo(),
             RayleighInfo(),

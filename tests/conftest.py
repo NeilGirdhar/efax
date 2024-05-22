@@ -12,7 +12,7 @@ from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
 
 from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
-                  HasGeneralizedConjugatePrior, IntegralRing, Samplable)
+                  HasGeneralizedConjugatePrior, IntegralRing, Samplable, Structure)
 
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
                           DirichletInfo, GammaInfo, GeneralizedDirichletInfo, create_infos)
@@ -71,12 +71,21 @@ def distribution_info(request: Any) -> DistributionInfo[Any, Any, Any]:
     return request.param
 
 
+def supports(s: Structure[Any], abc: type[Any]) -> bool:
+    return all(issubclass(info.type_, abc) for info in s.distributions)
+
+
+def any_integral_supports(s: Structure[Any]) -> bool:
+    return any(isinstance(info.type_.domain_support().ring, BooleanRing | IntegralRing)
+               for info in s.distributions)
+
+
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if 'sampling_distribution_info' in metafunc.fixturenames and 'natural' in metafunc.fixturenames:
         p = [(info, natural)
              for info in _all_infos
              for natural in (False, True)
-             if issubclass(info.nat_class() if natural else info.exp_class(), Samplable)]
+             if supports(info.nat_structure() if natural else info.exp_structure(), Samplable)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_distribution_info", "natural"), p,
                              ids=ids)
@@ -85,8 +94,9 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
         p = [(info, natural)
              for info in _all_infos
              for natural in (False, True)
-             if issubclass(cls := (info.nat_class() if natural else info.exp_class()), Samplable)
-             if not isinstance(cls.domain_support().ring, BooleanRing | IntegralRing)
+             if supports(structure := (info.nat_structure() if natural else info.exp_structure()),
+                         Samplable)
+             if not any_integral_supports(structure)
              if not isinstance(info,
                                ComplexCircularlySymmetricNormalInfo | BetaInfo | DirichletInfo
                                | ChiSquareInfo | GammaInfo)]
@@ -96,17 +106,17 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if 'cp_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
-             if issubclass(info.exp_class(), HasConjugatePrior)]
+             if supports(info.exp_structure(), HasConjugatePrior)]
         metafunc.parametrize("cp_distribution_info", q, ids=[info.name() for info in q])
     if 'gcp_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
-             if issubclass(info.exp_class(), HasGeneralizedConjugatePrior)]
+             if supports(info.exp_structure(), HasGeneralizedConjugatePrior)]
         metafunc.parametrize("gcp_distribution_info", q, ids=[info.name() for info in q])
     if 'entropy_distribution_info' in metafunc.fixturenames:
         q = [info
              for info in _all_infos
-             if ((issubclass(info.exp_class(), HasEntropyEP)
-                  or issubclass(info.nat_class(), HasEntropyNP))
+             if ((supports(info.exp_structure(), HasEntropyEP)
+                  or supports(info.nat_structure(), HasEntropyNP))
                  and not isinstance(info, GeneralizedDirichletInfo))]
         metafunc.parametrize("entropy_distribution_info", q, ids=[info.name() for info in q])
