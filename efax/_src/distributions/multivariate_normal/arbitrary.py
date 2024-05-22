@@ -28,7 +28,8 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
         negative_half_precision: -0.5 / Var(x).
     """
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
+    negative_half_precision: JaxRealArray = distribution_parameter(SymmetricMatrixSupport(
+        negative_semidefinite=True))
 
     @property
     @override
@@ -76,7 +77,8 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
                            ExpectationParametrization[MultivariateNormalNP], Multidimensional,
                            Samplable):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
-    second_moment: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
+    second_moment: JaxRealArray = distribution_parameter(SymmetricMatrixSupport(
+        positive_semidefinite=True))
 
     @property
     @override

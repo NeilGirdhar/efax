@@ -21,8 +21,7 @@ from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import (RealField, VectorSupport, distribution_parameter, negative_support,
-                         positive_support)
+from ..parameter import RealField, VectorSupport, distribution_parameter, negative_support
 
 
 @dataclass
@@ -30,8 +29,9 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
                              NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
                              Multidimensional):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=RealField(minimum=-1.0)))
-    gamma: JaxRealArray = distribution_parameter(VectorSupport(ring=positive_support))
+        ring=RealField(minimum=-1.0, generation_scale=3.0)))
+    gamma: JaxRealArray = distribution_parameter(VectorSupport(
+        ring=RealField(minimum=0.0, generation_scale=3.0)))
 
     @property
     @override

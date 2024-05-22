@@ -15,7 +15,7 @@ from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import ScalarSupport, VectorSupport, distribution_parameter
+from ...parameter import RealField, ScalarSupport, VectorSupport, distribution_parameter
 from .diagonal import MultivariateDiagonalNormalNP
 from .isotropic import IsotropicNormalNP
 
@@ -35,7 +35,8 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
         variance: The fixed variance, Var(x).
     """
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    variance: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
+    variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=0.0)),
+                                                    fixed=True)
 
     @property
     @override
@@ -94,7 +95,8 @@ class MultivariateFixedVarianceNormalEP(
         variance: The fixed variance, Var(x).
     """
     mean: JaxRealArray = distribution_parameter(VectorSupport())
-    variance: JaxRealArray = distribution_parameter(ScalarSupport(), fixed=True)
+    variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=0.0)),
+                                                    fixed=True)
 
     @property
     @override
@@ -132,14 +134,17 @@ class MultivariateFixedVarianceNormalEP(
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-        negative_half_precision = -0.5 * n / self.variance
-        return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
+        n_over_variance = n / self.variance
+        negative_half_precision = -0.5 * n_over_variance
+        return IsotropicNormalNP(n_over_variance[..., jnp.newaxis] * self.mean,
+                                 negative_half_precision)
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray
                                                  ) -> MultivariateDiagonalNormalNP:
-        negative_half_precision = -0.5 * n / self.variance[..., jnp.newaxis]
-        return MultivariateDiagonalNormalNP(n * self.mean, negative_half_precision)
+        n_over_variance = n / self.variance[..., jnp.newaxis]
+        negative_half_precision = -0.5 * n_over_variance
+        return MultivariateDiagonalNormalNP(n_over_variance * self.mean, negative_half_precision)
 
     @override
     def conjugate_prior_observation(self) -> JaxRealArray:

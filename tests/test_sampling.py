@@ -7,9 +7,9 @@ import jax.numpy as jnp
 from numpy.random import Generator
 from tjax import JaxComplexArray, KeyArray, Shape, assert_tree_allclose
 
-from efax import (ExpectationParametrization, JointDistribution, MaximumLikelihoodEstimator,
-                  NaturalParametrization, Samplable, SimpleDistribution, Structure, flatten_mapping,
-                  parameter_mean)
+from efax import (Distribution, ExpectationParametrization, JointDistribution,
+                  MaximumLikelihoodEstimator, NaturalParametrization, Samplable, SimpleDistribution,
+                  Structure, flat_dict_of_observations, flatten_mapping, parameter_mean)
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
                           ComplexNormalInfo, GammaInfo, IsotropicNormalInfo, JointInfo,
@@ -40,9 +40,16 @@ def produce_samples(generator: Generator,
 
     if isinstance(sampling_object, Samplable):
         samples = sampling_object.sample(key, sample_shape)
+        samples = sampling_object.domain_support().clamp(samples)
     else:
         assert isinstance(sampling_object, JointDistribution)
-        samples = sampling_object.general_sample(key, sample_shape)
+
+        def f(x: Distribution, /) -> JaxComplexArray:
+            assert isinstance(x, Samplable)
+            sample = x.sample(key, sample_shape)
+            return x.domain_support().clamp(sample)
+
+        samples = sampling_object.general_method(f)
     return exp_parameters, samples
 
 
@@ -109,6 +116,7 @@ def test_sampling_and_estimation(generator: Generator,
     sample_shape = (1024, 64)  # The number of samples that are taken to do the estimation.
     exp_parameters, samples = produce_samples(generator, key, sampling_distribution_info,
                                               distribution_shape, sample_shape, natural=natural)
+    flat_map_of_samples = flat_dict_of_observations(samples)
     structure = Structure.create(exp_parameters)
     flat_map_of_samples = flatten_mapping(samples) if isinstance(samples, dict) else {(): samples}
     verify_sample_shape(distribution_shape, sample_shape, structure, flat_map_of_samples)

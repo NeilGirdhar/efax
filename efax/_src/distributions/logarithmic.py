@@ -10,7 +10,8 @@ from typing_extensions import override
 from ..expectation_parametrization import ExpectationParametrization
 from ..mixins.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import RealField, ScalarSupport, distribution_parameter, negative_support
+from ..parameter import (IntegralRing, RealField, ScalarSupport, distribution_parameter,
+                         negative_support)
 from ..parametrization import SimpleDistribution
 
 log_probability_floor = -50.0
@@ -35,7 +36,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=IntegralRing(minimum=1))
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -80,7 +81,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=IntegralRing(minimum=1))
 
     @classmethod
     @override

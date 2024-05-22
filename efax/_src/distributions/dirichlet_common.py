@@ -26,7 +26,7 @@ class DirichletCommonNP(HasEntropyNP[EP],
                         NaturalParametrization[EP, JaxRealArray],
                         Generic[EP]):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=RealField(minimum=-1.0)))
+        ring=RealField(minimum=-1.0, generation_scale=3.0)))
 
     @property
     @override

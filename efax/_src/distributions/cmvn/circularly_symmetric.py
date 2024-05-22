@@ -32,7 +32,7 @@ class ComplexCircularlySymmetricNormalNP(
         negative_precision: -1/Var(x).
     """
     negative_precision: JaxComplexArray = distribution_parameter(
-        SymmetricMatrixSupport(hermitian=True))
+        SymmetricMatrixSupport(hermitian=True, negative_semidefinite=True))
     # S = -1/negative_precision, U = 0
     # P = S.conjugate, R = 0
     # H = -1/S, J = 0
@@ -92,7 +92,8 @@ class ComplexCircularlySymmetricNormalEP(
     Args:
         variance: Var(x).
     """
-    variance: JaxComplexArray = distribution_parameter(SymmetricMatrixSupport(hermitian=True))
+    variance: JaxComplexArray = distribution_parameter(
+            SymmetricMatrixSupport(hermitian=True, positive_semidefinite=True))
 
     @property
     @override

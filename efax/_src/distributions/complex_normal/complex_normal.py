@@ -11,7 +11,7 @@ from typing_extensions import override
 from ...expectation_parametrization import ExpectationParametrization
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import ScalarSupport, complex_field, distribution_parameter
+from ...parameter import RealField, ScalarSupport, complex_field, distribution_parameter
 from ...parametrization import SimpleDistribution
 
 
@@ -28,7 +28,8 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
     """
     mean_times_precision: JaxComplexArray = distribution_parameter(
         ScalarSupport(ring=complex_field))
-    precision: JaxRealArray = distribution_parameter(ScalarSupport())
+    negative_precision: JaxRealArray = distribution_parameter(
+            ScalarSupport(ring=RealField(maximum=0.0)))
     pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
 
     @property
@@ -45,8 +46,8 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
     def log_normalizer(self) -> JaxRealArray:
         _, s, mu = self._r_s_mu()
         det_s = s
-        det_h = -self.precision
-        return (-abs_square(mu) * self.precision
+        det_h = -self.negative_precision
+        return (-abs_square(mu) * self.negative_precision
                 - (jnp.square(mu) * self.pseudo_precision).real
                 + 0.5 * jnp.log(det_s)
                 - 0.5 * jnp.log(det_h)
@@ -69,11 +70,12 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
         return ComplexNormalEP(x, abs_square(x), jnp.square(x))
 
     def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
-        r = -self.pseudo_precision / self.precision
-        s = 1.0 / ((abs_square(r) - 1.0) * self.precision)
-        k = self.pseudo_precision / self.precision
-        l_eta = 0.5 * self.mean_times_precision / ((abs_square(k) - 1.0) * self.precision)
-        mu = l_eta.conjugate() - (self.pseudo_precision / self.precision).conjugate() * l_eta
+        r = -self.pseudo_precision / self.negative_precision
+        s = 1.0 / ((abs_square(r) - 1.0) * self.negative_precision)
+        k = self.pseudo_precision / self.negative_precision
+        l_eta = 0.5 * self.mean_times_precision / ((abs_square(k) - 1.0) * self.negative_precision)
+        mu = (l_eta.conjugate()
+              - (self.pseudo_precision / self.negative_precision).conjugate() * l_eta)
         return r, s, mu
 
 
@@ -89,7 +91,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         pseudo_second_moment: E(x^2).
     """
     mean: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
-    second_moment: JaxRealArray = distribution_parameter(ScalarSupport())
+    second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=0.0)))
     pseudo_second_moment: JaxComplexArray = distribution_parameter(
         ScalarSupport(ring=complex_field))
 

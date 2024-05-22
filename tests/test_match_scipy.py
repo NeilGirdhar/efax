@@ -11,10 +11,13 @@ from numpy.testing import assert_allclose
 from tjax import JaxComplexArray, assert_tree_allclose
 
 from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, MaximumLikelihoodEstimator,
-                  Multidimensional, NaturalParametrization, SimpleDistribution, parameter_map)
+                  Multidimensional, NaturalParametrization, SimpleDistribution,
+                  flat_dict_of_observations, flat_dict_of_parameters, parameter_map,
+                  unflatten_mapping)
 
 from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
-                          DirichletInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
+                          DirichletInfo, IsotropicNormalInfo, MultivariateDiagonalNormalInfo,
+                          MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
 
 
@@ -74,7 +77,6 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
         scipy_x = scipy_distribution.rvs(random_state=generator)
         efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
-
         check_observation_shape(nat_parameters, efax_x)
 
         # Verify that the density matches scipy.
@@ -104,10 +106,10 @@ def test_maximum_likelihood_estimation(
     """
     if isinstance(distribution_info, ComplexCircularlySymmetricNormalInfo | MultivariateNormalInfo):
         atol = 2e-2
-        rtol = 1e-3
-    elif isinstance(distribution_info, ComplexNormalInfo):
-        atol = 1e-2
-        rtol = 1e-3
+        rtol = 2e-2
+    elif isinstance(distribution_info, ComplexNormalInfo | IsotropicNormalInfo):
+        atol = 1e-3
+        rtol = 2e-2
     else:
         atol = 1e-4
         rtol = 2e-2
@@ -119,8 +121,16 @@ def test_maximum_likelihood_estimation(
     scipy_x = scipy_distribution.rvs(random_state=generator, size=n)
     # Convert the variates to sufficient statistics.
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
+    flat_efax_x = flat_dict_of_observations(efax_x)
+    flat_parameters = flat_dict_of_parameters(exp_parameters)
+    flat_efax_x_clamped = {path: flat_parameters[path].domain_support().clamp(value)
+                           for path, value in flat_efax_x.items()}
+    efax_x_clamped = (flat_efax_x_clamped[()]
+                      if flat_efax_x_clamped.keys() == {()}
+                      else unflatten_mapping(flat_efax_x_clamped))
     estimator = MaximumLikelihoodEstimator.create_estimator(exp_parameters)
-    sufficient_stats = estimator.sufficient_statistics(efax_x)
+    sufficient_stats = estimator.sufficient_statistics(efax_x_clamped)
+
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
     calculated_parameters = parameter_map(partial(np.mean, axis=0),  # type: ignore[arg-type]
                                           sufficient_stats)

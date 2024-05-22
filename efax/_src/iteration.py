@@ -5,7 +5,7 @@ from typing import Any, Literal, overload
 from tjax import JaxComplexArray
 
 from .parameter import Support
-from .parametrization import Distribution
+from .parametrization import Distribution, SimpleDistribution
 from .types import Path
 
 
@@ -181,3 +181,13 @@ def support(p: type[Distribution] | Distribution,
             yield name, support
     cls_p: type[Distribution] = type(p) if isinstance(p, Distribution) else p
     return dict(_parameters(cls_p, ()))
+
+
+def flat_dict_of_parameters(d: Distribution) -> dict[Path, SimpleDistribution]:
+    from .transform.joint import JointDistribution  # noqa: PLC0415
+    return flatten_mapping(d.as_dict()) if isinstance(d, JointDistribution) else {(): d}
+
+
+def flat_dict_of_observations(x: Mapping[str, Any] | JaxComplexArray
+                              ) -> dict[Path, JaxComplexArray]:
+    return flatten_mapping(x) if isinstance(x, Mapping) else {(): x}

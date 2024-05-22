@@ -4,7 +4,8 @@ from functools import partial, reduce
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast
 
 import jax.numpy as jnp
-from tjax import JaxComplexArray, JaxRealArray
+from numpy.random import Generator
+from tjax import JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
 
 from .iteration import flatten_mapping, parameters, support
@@ -98,6 +99,13 @@ class Structure(Generic[P]):
         return {info.path: info.type_.domain_support()
                 for info in self.infos
                 if issubclass(info.type_, SimpleDistribution)}
+
+    def generate_random(self, rng: Generator, shape: Shape) -> P:
+        """Generate a random distribution."""
+        path_and_values = {(*info.path, name): s.generate(rng, shape, info.dimensions)
+                           for info in self.infos
+                           for name, s in support(info.type_).items()}
+        return self.assemble(path_and_values)
 
     @classmethod
     def _extract_distributions(cls, p: P) -> list[SubDistributionInfo]:

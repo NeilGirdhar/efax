@@ -10,7 +10,7 @@ from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport
+from ..parameter import RealField, ScalarSupport
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 
@@ -30,7 +30,7 @@ class BetaNP(DirichletCommonNP['BetaEP'],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=RealField(minimum=0.0, maximum=1.0))
 
     @override
     def to_exp(self) -> BetaEP:
@@ -69,7 +69,7 @@ class BetaEP(DirichletCommonEP[BetaNP],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=RealField(minimum=0.0, maximum=1.0))
 
     @classmethod
     @override

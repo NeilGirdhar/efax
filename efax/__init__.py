@@ -38,7 +38,8 @@ from ._src.expectation_parametrization import ExpectationParametrization
 from ._src.interfaces.conjugate_prior import HasConjugatePrior, HasGeneralizedConjugatePrior
 from ._src.interfaces.multidimensional import Multidimensional
 from ._src.interfaces.samplable import Samplable
-from ._src.iteration import flatten_mapping, parameters, support, unflatten_mapping
+from ._src.iteration import (flat_dict_of_observations, flat_dict_of_parameters, flatten_mapping,
+                             parameters, support, unflatten_mapping)
 from ._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ._src.natural_parametrization import NaturalParametrization
 from ._src.parameter import (BooleanRing, ComplexField, IntegralRing, RealField, Ring,
@@ -150,6 +151,8 @@ __all__ = [
     'VonMisesFisherNP',
     'WeibullEP',
     'WeibullNP',
+    'flat_dict_of_observations',
+    'flat_dict_of_parameters',
     'flatten_mapping',
     'parameter_dot_product',
     'parameter_map',

@@ -6,8 +6,11 @@ from math import comb, sqrt
 from typing import Any, cast
 
 import jax.numpy as jnp
+import numpy as np
 from jax.dtypes import canonicalize_dtype
+from jax.experimental.array_api import matrix_transpose
 from jax.scipy import special as jss
+from numpy.random import Generator
 from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import field
 from typing_extensions import override
@@ -26,11 +29,19 @@ class Ring:
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
         raise NotImplementedError
 
+    @abstractmethod
+    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+        raise NotImplementedError
+
+    def clamp(self, x: JaxArray) -> JaxArray:
+        return x
+
 
 @dataclass
 class RealField(Ring):
     minimum: float | None = None
     maximum: float | None = None
+    generation_scale: float = 1.0
 
     @override
     def num_elements(self, support_num_element: int) -> int:
@@ -64,6 +75,27 @@ class RealField(Ring):
             case _:
                 return y
 
+    @override
+    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+        match self.minimum, self.maximum:
+            case None, float(maximum):
+                return jnp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale)
+            case float(minimum), None:
+                return jnp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum)
+            case float(minimum), float(maximum):
+                return jnp.asarray(minimum + (maximum - minimum) * rng.uniform(size=shape))
+            case None, None:
+                return jnp.asarray(rng.normal(scale=1.0, size=shape) * self.generation_scale)
+            case _:
+                raise TypeError
+
+    @override
+    def clamp(self, x: JaxRealArray) -> JaxRealArray:
+        eps = jnp.finfo(x.dtype).eps
+        minimum = None if self.minimum is None else self.minimum + eps
+        maximum = None if self.maximum is None else self.maximum - eps
+        return jnp.clip(x, min=minimum, max=maximum)
+
 
 class ComplexField(Ring):
     @override
@@ -80,6 +112,10 @@ class ComplexField(Ring):
         n = y.shape[-1] // 2
         return y[..., :n] + 1j * y[..., n:]
 
+    @override
+    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+        return jnp.asarray(rng.normal(size=shape) + 1j * rng.normal(size=shape))
+
 
 class BooleanRing(Ring):
     @override
@@ -94,8 +130,16 @@ class BooleanRing(Ring):
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
         return jnp.asarray(y, dtype=jnp.bool_)
 
+    @override
+    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+        return jnp.asarray(rng.binomial(1, 0.5, shape).astype(np.bool_))
 
+
+@dataclass
 class IntegralRing(Ring):
+    minimum: int | None = None
+    maximum: int | None = None
+
     @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element
@@ -107,6 +151,13 @@ class IntegralRing(Ring):
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
         return jnp.asarray(y, dtype=canonicalize_dtype(int))
+
+    @override
+    def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
+        field = RealField(minimum=None if self.minimum is None else float(self.minimum),
+                      maximum=None if self.maximum is None else float(self.maximum))
+        real_values = field.generate(rng, shape) * 10
+        return real_values.astype(canonicalize_dtype(int))
 
 
 real_field = RealField()
@@ -143,6 +194,13 @@ class Support:
     def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
         raise NotImplementedError
 
+    @abstractmethod
+    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
+        raise NotImplementedError
+
+    def clamp(self, x: JaxArray) -> JaxArray:
+        return self.ring.clamp(x)
+
 
 class ScalarSupport(Support):
     @override
@@ -166,6 +224,10 @@ class ScalarSupport(Support):
         x = self.ring.unflattened(y, map_from_plane=map_from_plane)
         assert x.shape[-1] == 1
         return jnp.reshape(x, x.shape[:-1])
+
+    @override
+    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
+        return self.ring.generate(rng, shape)
 
 
 class VectorSupport(Support):
@@ -191,6 +253,10 @@ class VectorSupport(Support):
         assert x.shape[-1] == dimensions
         return x
 
+    @override
+    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
+        return self.ring.generate(rng, (*shape, dimensions))
+
 
 class SimplexSupport(Support):
     @override
@@ -215,14 +281,28 @@ class SimplexSupport(Support):
         assert x.shape[-1] == dimensions
         return x
 
+    @override
+    def clamp(self, x: JaxArray) -> JaxArray:
+        eps = jnp.finfo(x.dtype).eps
+        s = jnp.sum(x, axis=-1, keepdims=True)
+        x *= jnp.minimum(1.0, (1.0 - eps) / s)
+        return jnp.clip(x, min=eps, max=1.0 - eps)
+
 
 class SymmetricMatrixSupport(Support):
     @override
-    def __init__(self, *, hermitian: bool = False, **kwargs: Any):
+    def __init__(self,
+                 *,
+                 positive_semidefinite: bool = False,
+                 negative_semidefinite: bool = False,
+                 hermitian: bool = False,
+                 **kwargs: Any):
         if hermitian:
             kwargs.setdefault('ring', complex_field)
         super().__init__(**kwargs)
         self.hermitian = hermitian
+        self.positive_semidefinite = positive_semidefinite
+        self.negative_semidefinite = negative_semidefinite
 
     @override
     def axes(self) -> int:
@@ -261,6 +341,20 @@ class SymmetricMatrixSupport(Support):
         if self.hermitian:
             lower_diagonal = lower_diagonal.conjugate()
         return lower_diagonal.at[index].set(x)
+
+    @override
+    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
+        m = self.ring.generate(rng, (*shape, dimensions, dimensions))
+        mt = matrix_transpose(m)
+        if self.hermitian:
+            mt = mt.conj()
+        if self.negative_semidefinite or self.positive_semidefinite:
+            assert isinstance(self.ring, RealField | ComplexField)
+            eig_field = (RealField(minimum=0.0)
+                         if self.positive_semidefinite else RealField(maximum=0.0))
+            eig = eig_field.generate(rng, (*shape, dimensions))
+            return jnp.einsum('...ij,...j,...jk->...ik', m, eig, mt)
+        return m + mt
 
 
 class SquareMatrixSupport(Support):
