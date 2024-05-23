@@ -10,6 +10,7 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import JointDistributionSupport
 from ..parametrization import Parametrization
+from ..tools import join_mappings
 
 
 @dataclass
@@ -75,15 +76,17 @@ class JointDistributionN(JointDistribution,
 
     @override
     def carrier_measure(self, x: dict[str, Any]) -> JaxRealArray:
+        joined = join_mappings(sub=self.sub_distributions_objects, x=x)
         return reduce(jnp.add,
-                      (value.carrier_measure(x[name])
-                       for name, value in self.sub_distributions_objects.items()))
+                      (value['sub'].carrier_measure(value['x'])
+                       for value in joined.values()))
 
     @classmethod
     @override
     def sufficient_statistics(cls, x: dict[str, Any], **fixed_parameters: Any
                               ) -> JointDistributionE:
         sub_distributions_classes = fixed_parameters.pop('sub_distributions_classes')
+        joined = join_mappings(sub=sub_distributions_classes, fixed=fixed_parameters, x=x)
         return JointDistributionE(
-            {name: value.sufficient_statistics(x[name], **fixed_parameters.get(name, {}))
-             for name, value in sub_distributions_classes.items()})
+                {name: value['sub'].sufficient_statistics(value['x'], **value.get('fixed', {}))
+                 for name, value in joined.items()})

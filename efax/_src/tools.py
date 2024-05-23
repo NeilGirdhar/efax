@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Generator, Iterable
+from collections import defaultdict
+from collections.abc import Callable, Generator, Iterable, Mapping
 from dataclasses import fields
 from functools import reduce
 from itertools import starmap
@@ -57,6 +58,25 @@ def parameter_map(operation: Callable[..., JaxComplexArray],
 
     fixed_parameters = parameters(x, fixed=True)
     return Structure.create(x).assemble({**fixed_parameters, **operated_fields})
+
+
+_T = TypeVar('_T')
+_V = TypeVar('_V')
+
+
+def join_mappings(**field_to_map: Mapping[_T, _V]) -> dict[_T, dict[str, _V]]:
+    """Joins multiple mappings together using their common keys.
+
+    >>> user_scores = {'elliot': 50, 'claris': 60}
+    >>> user_times = {'elliot': 30, 'claris': 40}
+    >>> join_mappings(score=user_scores, time=user_times)
+    {'elliot': {'score': 50, 'time': 30}, 'claris': {'score': 60, 'time': 40}}
+    """
+    retval = defaultdict(dict)
+    for field_name, mapping in field_to_map.items():
+        for key, value in mapping.items():
+            retval[key][field_name] = value
+    return dict(retval)
 
 
 iv_ratio = tfp.math.bessel_iv_ratio

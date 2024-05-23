@@ -8,14 +8,16 @@ import numpy as np
 from numpy.random import Generator
 from tjax import NumpyRealArray, NumpyRealNumeric, ShapeLike
 
+from ..tools import join_mappings
+
 
 @dataclass
 class ScipyJointDistribution:
     sub_distributions: dict[str, Any]
 
     def pdf(self, z: dict[str, Any], out: None = None) -> NumpyRealNumeric:
-        return prod((distribution.pdf(z[name])
-                     for name, distribution in self.sub_distributions.items()))
+        joined = join_mappings(sub=self.sub_distributions, z=z)
+        return prod(value['sub'].pdf(value['z']) for value in joined.values())
 
     def rvs(self,
             size: ShapeLike | None = None,
