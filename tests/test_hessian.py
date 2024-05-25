@@ -50,8 +50,7 @@ def _calculate_curvature(p: SimpleDistribution,
                          ) -> JaxRealArray:
     # Calculate curvature.
     flattener, flattened = Flattener.flatten(p)
-    hessian_sample = vmap(hessian(_sample_using_flattened, argnums=(0,), reverse_only=True),
-                          in_axes=(0, 0, 0))
+    hessian_sample = vmap(hessian(_sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
     parameters_hessian_x, = hessian_sample(flattened, flattener, keys)
     parameters_hessian, = parameters_hessian_x
 
