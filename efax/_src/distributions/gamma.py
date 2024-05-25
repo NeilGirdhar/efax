@@ -17,14 +17,14 @@ from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import (RealField, ScalarSupport, distribution_parameter, negative_support,
                          positive_support)
-from ..parametrization import Parametrization
+from ..parametrization import SimpleDistribution
 
 
 @dataclass
 class GammaNP(HasEntropyNP['GammaEP'],
               Samplable,
               NaturalParametrization['GammaEP', JaxRealArray],
-              Parametrization):
+              SimpleDistribution):
     """The natural parametrization of the Gamma distribution.
 
     Args:
@@ -85,7 +85,7 @@ class GammaEP(HasEntropyEP[GammaNP],
               Samplable,
               ExpToNat[GammaNP],
               ExpectationParametrization[GammaNP],
-              Parametrization):
+              SimpleDistribution):
     """The expectation parametrization of the Gamma distribution.
 
     Args:
@@ -143,7 +143,7 @@ class GammaEP(HasEntropyEP[GammaNP],
 
 
 @dataclass
-class GammaVP(Parametrization):
+class GammaVP(SimpleDistribution):
     """The variance parametrization of the Gamma distribution.
 
     Args:

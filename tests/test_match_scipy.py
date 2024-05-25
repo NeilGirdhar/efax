@@ -11,7 +11,7 @@ from numpy.testing import assert_allclose
 from tjax import JaxComplexArray, assert_tree_allclose
 
 from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, Multidimensional,
-                  NaturalParametrization, Parametrization, fixed_parameter_packet, parameter_map)
+                  NaturalParametrization, SimpleDistribution, fixed_parameter_packet, parameter_map)
 
 from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           DirichletInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
@@ -59,7 +59,7 @@ def check_observation_shape(nat_parameters: NaturalParametrization[Any, Any],
         for name, value in nat_parameters.sub_distributions().items():
             check_observation_shape(value, efax_x[name])
         return
-    assert isinstance(nat_parameters, Parametrization)
+    assert isinstance(nat_parameters, SimpleDistribution)
     assert isinstance(efax_x, Array)
     dimensions = (nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional)
                   else 0)

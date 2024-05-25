@@ -14,13 +14,13 @@ from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter, integral_ring, positive_support
-from ..parametrization import Parametrization
+from ..parametrization import SimpleDistribution
 from .gamma import GammaNP
 
 
 @dataclass
 class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray],
-                Parametrization):
+                SimpleDistribution):
     """The natural parametrization of the Poisson distribution.
 
     Args:
@@ -61,7 +61,7 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray],
 class PoissonEP(HasConjugatePrior,
                 Samplable,
                 ExpectationParametrization[PoissonNP],
-                Parametrization):
+                SimpleDistribution):
     """The expectation parametrization of the Poisson distribution.
 
     Args:

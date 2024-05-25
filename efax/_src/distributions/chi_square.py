@@ -15,7 +15,7 @@ from ..mixins.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import RealField, ScalarSupport, distribution_parameter
-from ..parametrization import Parametrization
+from ..parametrization import SimpleDistribution
 
 
 @dataclass
@@ -75,7 +75,7 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
 class ChiSquareEP(HasEntropyEP[ChiSquareNP],
                   ExpToNat[ChiSquareNP],
                   ExpectationParametrization[ChiSquareNP],
-                  Parametrization):
+                  SimpleDistribution):
     """The expectation parameters of the chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.

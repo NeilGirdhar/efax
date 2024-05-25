@@ -13,7 +13,7 @@ from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
-from ..parametrization import Parametrization
+from ..parametrization import SimpleDistribution
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 
 
@@ -21,7 +21,7 @@ from .negative_binomial_common import NBCommonEP, NBCommonNP
 class GeometricNP(HasEntropyNP['GeometricEP'],
                   NBCommonNP['GeometricEP'],
                   NaturalParametrization['GeometricEP', JaxRealArray],
-                  Parametrization):
+                  SimpleDistribution):
     """The natural parameters of the geometric distribution.
 
     Models the number of Bernoulli trials having probability p until one failure.  Thus, it has
@@ -52,7 +52,7 @@ class GeometricEP(HasEntropyEP[GeometricNP],
                   Samplable,
                   NBCommonEP[GeometricNP],
                   ExpectationParametrization[GeometricNP],
-                  Parametrization):
+                  SimpleDistribution):
     """The expectation parameters of the geometric distribution.
 
     Models the number of Bernoulli trials having probability p until one failure.  Thus, it has

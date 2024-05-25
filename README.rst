@@ -41,7 +41,7 @@ Framework
 =========
 Representation
 --------------
-EFAX has a single base class for its objects: :python:`Parametrization` whose type encodes the
+EFAX has a single base class for its objects: :python:`Distribution` whose type encodes the
 distribution family.
 
 Each parametrization object has a shape, and so it can store any number of distributions.
@@ -93,7 +93,7 @@ Important methods
 -----------------
 EFAX aims to provide the main methods used in machine learning.
 
-Every :python:`Parametrization` has methods:
+Every :python:`Distribution` has methods:
 
 - :python:`flattened` and :python:`unflattened` to flatten and unflatten the parameters into a
   single array.  Typically, array-valued signals in a machine learning model would be unflattened

@@ -12,14 +12,14 @@ from typing_extensions import override
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, integral_ring
-from ..parametrization import Parametrization
+from ..parametrization import SimpleDistribution
 
 EP = TypeVar('EP', bound='NBCommonEP[Any]')
 
 
 @dataclass
 class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
-                 Parametrization):
+                 SimpleDistribution):
     log_not_p: JaxRealArray
 
     @property
@@ -55,7 +55,7 @@ NP = TypeVar('NP', bound=NBCommonNP[Any])
 
 @dataclass
 class NBCommonEP(ExpectationParametrization[NP],
-                 Parametrization):
+                 SimpleDistribution):
     mean: JaxRealArray
 
     @property

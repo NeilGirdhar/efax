@@ -45,7 +45,7 @@ from ._src.natural_parametrization import NaturalParametrization
 from ._src.parameter import (BooleanRing, ComplexField, IntegralRing, RealField, Ring,
                              ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
                              VectorSupport)
-from ._src.parametrization import Parametrization
+from ._src.parametrization import SimpleDistribution
 from ._src.scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from ._src.scipy_replacement.complex_normal import ScipyComplexNormal
 from ._src.scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
@@ -120,7 +120,6 @@ __all__ = [
     'NormalEP',
     'NormalNP',
     'NormalVP',
-    'Parametrization',
     'PoissonEP',
     'PoissonNP',
     'RayleighEP',
@@ -137,6 +136,7 @@ __all__ = [
     'ScipyJointDistribution',
     'ScipyMultivariateNormal',
     'ScipyVonMises',
+    'SimpleDistribution',
     'SquareMatrixSupport',
     'Structure',
     'SubDistributionInfo',
