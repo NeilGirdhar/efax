@@ -4,10 +4,10 @@ from abc import abstractmethod
 
 from tjax import JaxArray, KeyArray, Shape
 
-from ..parametrization import Parametrization
+from ..parametrization import SimpleDistribution
 
 
-class Samplable(Parametrization):
+class Samplable(SimpleDistribution):
     @abstractmethod
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxArray:
         raise NotImplementedError

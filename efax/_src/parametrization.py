@@ -12,9 +12,8 @@ from .parameter import Support
 
 
 @dataclass
-class GeneralParametrization(JaxAbstractClass):
+class Distribution(JaxAbstractClass):
     """The Distribution is the base class of all distributions."""
-    # TODO: Rename to Distribution
     def __getitem__(self, key: Any) -> Self:
         from .iteration import parameters  # noqa: PLC0415
         from .structure import Structure  # noqa: PLC0415
@@ -22,7 +21,7 @@ class GeneralParametrization(JaxAbstractClass):
         return Structure.create(self).assemble(parameters_)
 
     @abstractmethod
-    def sub_distributions(self) -> Mapping[str, GeneralParametrization]:
+    def sub_distributions(self) -> Mapping[str, Distribution]:
         raise NotImplementedError
 
     @property
@@ -32,14 +31,13 @@ class GeneralParametrization(JaxAbstractClass):
 
 
 @dataclass
-class Parametrization(GeneralParametrization):
+class SimpleDistribution(Distribution):
     """A SimpleDistribution has no sub-distributions.
 
     As a consequence, its domain is a simple support (rather than a dict).
     """
-    # TODO: Rename to SimpleDistribution
     @override
-    def sub_distributions(self) -> Mapping[str, GeneralParametrization]:
+    def sub_distributions(self) -> Mapping[str, Distribution]:
         return {}
 
     @classmethod

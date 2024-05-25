@@ -9,7 +9,7 @@ from tjax.dataclasses import dataclass, field
 
 from .iteration import parameters, support
 from .parameter import Support
-from .parametrization import GeneralParametrization, Parametrization
+from .parametrization import Distribution, SimpleDistribution
 from .types import Path
 
 
@@ -17,20 +17,20 @@ from .types import Path
 class SubDistributionInfo:
     """A hashable collection of the static information for recreating sub-distributions."""
     path: Path
-    type_: type[GeneralParametrization]
+    type_: type[Distribution]
     dimensions: int
     sub_distribution_names: list[str]
 
 
 T = TypeVar('T')
-P = TypeVar('P', bound=GeneralParametrization)
+P = TypeVar('P', bound=Distribution)
 
 
 @dataclass
 class Structure(Generic[P]):
-    """Structure is a generalization of type when it comes to Parametrization objects.
+    """Structure is a generalization of type when it comes to SimpleDistribution objects.
 
-    Divides a GeneralParametrization into parameters and the information required to rebuid it.
+    Divides a Distribution into parameters and the information required to rebuid it.
 
     This is useful for operating on all the parameters.
     """
@@ -42,22 +42,22 @@ class Structure(Generic[P]):
         return cls(cls._extract_distributions(p))
 
     def assemble(self, p: Mapping[Path, JaxComplexArray]) -> P:
-        """Assemble a GeneralParametrization from its parameters using the saved structure."""
-        constructed: dict[Path, GeneralParametrization | JaxComplexArray] = dict(p)
+        """Assemble a Distribution from its parameters using the saved structure."""
+        constructed: dict[Path, Distribution | JaxComplexArray] = dict(p)
         for info in self.distributions:
-            kwargs: dict[str, GeneralParametrization | JaxComplexArray | dict[str, Any]] = {
+            kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = {
                     name: constructed[*info.path, name]
                     for name in support(info.type_)}
             sub_distributions = {name: constructed[*info.path, name]
                                  for name in info.sub_distribution_names}
             if sub_distributions:
-                kwargs['sub_distributions_objects'] = sub_distributions
+                kwargs['_sub_distributions'] = sub_distributions
             constructed[info.path] = info.type_(**kwargs)
         retval = constructed[()]
-        assert isinstance(retval, GeneralParametrization)
+        assert isinstance(retval, Distribution)
         return cast(P, retval)
 
-    def reinterpret(self, q: GeneralParametrization) -> P:
+    def reinterpret(self, q: Distribution) -> P:
         """Reinterpret one parametrization using the saved structure."""
         p_paths = [(*info.path, name)
                    for info in self.distributions
@@ -69,7 +69,7 @@ class Structure(Generic[P]):
     def domain_support(self) -> dict[Path, Support]:
         return {info.path: info.type_.domain_support()
                 for info in self.distributions
-                if issubclass(info.type_, Parametrization)}
+                if issubclass(info.type_, SimpleDistribution)}
 
     @classmethod
     def _extract_distributions(cls, p: P) -> list[SubDistributionInfo]:
@@ -77,8 +77,8 @@ class Structure(Generic[P]):
 
     @classmethod
     def _walk(cls,
-              f: Callable[[GeneralParametrization, Path], T],
-              q: GeneralParametrization,
+              f: Callable[[Distribution, Path], T],
+              q: Distribution,
               base_path: Path = (),
               ) -> Iterable[T]:
         """Post-order traversal of q."""
@@ -88,7 +88,7 @@ class Structure(Generic[P]):
         yield f(q, base_path)
 
     @classmethod
-    def _make_info(cls, q: GeneralParametrization, path: Path) -> SubDistributionInfo:
+    def _make_info(cls, q: Distribution, path: Path) -> SubDistributionInfo:
         from .interfaces.multidimensional import Multidimensional  # noqa: PLC0415
         dimensions = q.dimensions() if isinstance(q, Multidimensional) else 1
         sub_distribution_names = list(q.sub_distributions())
@@ -97,7 +97,7 @@ class Structure(Generic[P]):
 
 @dataclass
 class Flattener(Structure[P]):
-    """Flattens a GeneralParametrization into an array of variable parameters.
+    """Flattens a Distribution into an array of variable parameters.
 
     Like Structure, it divides the parametrization---in this case, into the flattened parameters and
     the information required to rebuid the parametrization.
@@ -109,16 +109,16 @@ class Flattener(Structure[P]):
     mapped_to_plane: bool = field(static=True)
 
     def unflatten(self, flattened: JaxRealArray) -> P:
-        """Unflatten an array into a GeneralParametrization.
+        """Unflatten an array into a Distribution.
 
         Args:
             flattened: The flattened array.
         """
         consumed = 0
-        constructed: dict[Path, GeneralParametrization] = {}
+        constructed: dict[Path, Distribution] = {}
         available = flattened.shape[-1]
         for info in self.distributions:
-            kwargs: dict[str, GeneralParametrization | JaxComplexArray | dict[str, Any]] = {}
+            kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = {}
             for name, this_support in support(info.type_, fixed=False).items():
                 k = this_support.num_elements(info.dimensions)
                 if consumed + k > available:
@@ -132,7 +132,7 @@ class Flattener(Structure[P]):
             sub_distributions = {name: constructed[*info.path, name]
                                  for name in info.sub_distribution_names}
             if sub_distributions:
-                kwargs['sub_distributions_objects'] = sub_distributions
+                kwargs['_sub_distributions'] = sub_distributions
             constructed[info.path] = info.type_(**kwargs)
         if consumed != available:
             raise ValueError('Incompatible array')  # noqa: TRY003
@@ -144,7 +144,7 @@ class Flattener(Structure[P]):
                 *,
                 map_to_plane: bool = True
                 ) -> tuple[Self, JaxRealArray]:
-        """Flatten a GeneralParametrization.
+        """Flatten a Distribution.
 
         Args:
             p: The object to flatten.
@@ -164,7 +164,7 @@ class Flattener(Structure[P]):
 
     @classmethod
     def create_flattener(cls,
-                         p: GeneralParametrization,
+                         p: Distribution,
                          q_cls: type[P],
                          *,
                          mapped_to_plane: bool = True
@@ -185,7 +185,7 @@ class Flattener(Structure[P]):
         return Flattener(distributions, fixed_parameters, mapped_to_plane)
 
     @classmethod
-    def _make_flat(cls, q: GeneralParametrization, path: Path, *, map_to_plane: bool
+    def _make_flat(cls, q: Distribution, path: Path, *, map_to_plane: bool
                    ) -> list[JaxRealArray]:
         return [support.flattened(value, map_to_plane=map_to_plane)
                 for value, support in parameters(q, fixed=False, support=True,

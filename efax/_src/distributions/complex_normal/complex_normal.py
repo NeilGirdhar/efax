@@ -12,13 +12,13 @@ from ...expectation_parametrization import ExpectationParametrization
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, complex_field, distribution_parameter
-from ...parametrization import Parametrization
+from ...parametrization import SimpleDistribution
 
 
 @dataclass
 class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
                       NaturalParametrization['ComplexNormalEP', JaxComplexArray],
-                      Parametrization):
+                      SimpleDistribution):
     """The natural parametrization of the complex normal distribution.
 
     Args:
@@ -80,7 +80,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 @dataclass
 class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
                       ExpectationParametrization[ComplexNormalNP],
-                      Parametrization):
+                      SimpleDistribution):
     """The expectation parametrization of the complex normal distribution.
 
     Args:

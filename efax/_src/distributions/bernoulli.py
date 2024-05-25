@@ -16,14 +16,14 @@ from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import RealField, ScalarSupport, boolean_ring, distribution_parameter
-from ..parametrization import Parametrization
+from ..parametrization import SimpleDistribution
 from .beta import BetaNP
 
 
 @dataclass
 class BernoulliNP(HasEntropyNP['BernoulliEP'],
                   NaturalParametrization['BernoulliEP', JaxRealArray],
-                  Parametrization):
+                  SimpleDistribution):
     """The natural parametrization of the Bernoulli distribution.
 
     Args:

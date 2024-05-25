@@ -10,41 +10,40 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parametrization import GeneralParametrization, Parametrization
+from ..parametrization import Distribution, SimpleDistribution
 from ..tools import join_mappings
 
-T = TypeVar('T', bound=GeneralParametrization)
+T = TypeVar('T', bound=Distribution)
 
 
 @dataclass
-class JointDistribution(GeneralParametrization):
-    # TODO: rename _sub_distributions
-    sub_distributions_objects: Mapping[str, GeneralParametrization] = field(
+class JointDistribution(Distribution):
+    _sub_distributions: Mapping[str, Distribution] = field(
             metadata={'parameter': False})
 
     @override
-    def sub_distributions(self) -> Mapping[str, GeneralParametrization]:
-        return self.sub_distributions_objects
+    def sub_distributions(self) -> Mapping[str, Distribution]:
+        return self._sub_distributions
 
     def general_method(self,
                        f: Callable[[T], Any],
-                       t: type[T] = GeneralParametrization
+                       t: type[T] = Distribution
                        ) -> Any:
         return {name: (value.general_method(f, t)
                        if isinstance(value, JointDistribution) else f(value))
-                for name, value in self.sub_distributions_objects.items()
+                for name, value in self._sub_distributions.items()
                 if isinstance(value, JointDistribution | t)}
 
     def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
-        def f(x: GeneralParametrization, /) -> JaxComplexArray:
+        def f(x: Distribution, /) -> JaxComplexArray:
             assert isinstance(x, Samplable)
             return x.sample(key, shape)
 
         return self.general_method(f, Samplable)
 
     def as_dict(self) -> dict[str, Any]:
-        def f(x: GeneralParametrization, /) -> Parametrization:
-            assert isinstance(x, Parametrization)
+        def f(x: Distribution, /) -> SimpleDistribution:
+            assert isinstance(x, SimpleDistribution)
             return x
 
         return self.general_method(f)
@@ -52,7 +51,7 @@ class JointDistribution(GeneralParametrization):
     @property
     @override
     def shape(self) -> Shape:
-        for distribution in self.sub_distributions_objects.values():
+        for distribution in self._sub_distributions.values():
             return distribution.shape
         raise ValueError
 
@@ -61,12 +60,12 @@ class JointDistribution(GeneralParametrization):
 class JointDistributionE(JointDistribution,
                          HasEntropyEP['JointDistributionN'],
                          ExpectationParametrization['JointDistributionN']):
-    sub_distributions_objects: Mapping[str, ExpectationParametrization[Any]] = field(
+    _sub_distributions: Mapping[str, ExpectationParametrization[Any]] = field(
             metadata={'parameter': False})
 
     @override
     def sub_distributions(self) -> Mapping[str, ExpectationParametrization[Any]]:
-        return self.sub_distributions_objects
+        return self._sub_distributions
 
     @classmethod
     @override
@@ -76,7 +75,7 @@ class JointDistributionE(JointDistribution,
     @override
     def to_nat(self) -> 'JointDistributionN':
         return JointDistributionN({name: value.to_nat()
-                                   for name, value in self.sub_distributions_objects.items()})
+                                   for name, value in self._sub_distributions.items()})
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
@@ -84,33 +83,33 @@ class JointDistributionE(JointDistribution,
             assert isinstance(x, HasEntropyEP)
             return x.expected_carrier_measure()
 
-        return reduce(jnp.add, (f(value) for value in self.sub_distributions_objects.values()))
+        return reduce(jnp.add, (f(value) for value in self._sub_distributions.values()))
 
 
 @dataclass
 class JointDistributionN(JointDistribution,
                          HasEntropyNP[JointDistributionE],
                          NaturalParametrization[JointDistributionE, dict[str, Any]]):
-    sub_distributions_objects: Mapping[str, NaturalParametrization[Any, Any]] = field(
+    _sub_distributions: Mapping[str, NaturalParametrization[Any, Any]] = field(
             metadata={'parameter': False})
 
     @override
     def sub_distributions(self) -> Mapping[str, NaturalParametrization[Any, Any]]:
-        return self.sub_distributions_objects
+        return self._sub_distributions
 
     @override
     def log_normalizer(self) -> JaxRealArray:
         return reduce(jnp.add,
-                      (x.log_normalizer() for x in self.sub_distributions_objects.values()))
+                      (x.log_normalizer() for x in self._sub_distributions.values()))
 
     @override
     def to_exp(self) -> JointDistributionE:
         return JointDistributionE({name: value.to_exp()
-                                   for name, value in self.sub_distributions_objects.items()})
+                                   for name, value in self._sub_distributions.items()})
 
     @override
     def carrier_measure(self, x: dict[str, Any]) -> JaxRealArray:
-        joined = join_mappings(sub=self.sub_distributions_objects, x=x)
+        joined = join_mappings(sub=self._sub_distributions, x=x)
         return reduce(jnp.add,
                       (value['sub'].carrier_measure(value['x'])
                        for value in joined.values()))
