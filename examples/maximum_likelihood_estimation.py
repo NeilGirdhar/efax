@@ -2,7 +2,7 @@
 import jax.numpy as jnp
 from jax.random import key
 
-from efax import DirichletNP, parameter_mean
+from efax import DirichletEP, DirichletNP, MaximumLikelihoodEstimator, parameter_mean
 
 # Consider a Dirichlet distribution with a given alpha.
 alpha = jnp.asarray([2.0, 3.0, 4.0])
@@ -15,7 +15,8 @@ samples = source_distribution.sample(key_a, (n_samples,))
 
 # Now, let's find the maximum likelihood Dirichlet distribution that fits it.
 # First, convert the samples to their sufficient statistics.
-ss = DirichletNP.sufficient_statistics(samples)
+estimator = MaximumLikelihoodEstimator.create_simple_estimator(DirichletEP)
+ss = estimator.sufficient_statistics(samples)
 # ss has type DirichletEP.  This is similar to the conjguate prior of the Dirichlet distribution.
 
 # Take the mean over the first axis.

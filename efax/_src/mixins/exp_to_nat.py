@@ -11,13 +11,14 @@ from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
+from ..parametrization import SimpleDistribution
 from ..structure import Flattener
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 SP: TypeAlias = JaxRealArray
 
 
-class ExpToNat(ExpectationParametrization[NP], Generic[NP]):
+class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
     """This mixin implements the conversion from expectation to natural parameters.
 
     It uses Newton's method with a Jacobian to invert the gradient log-normalizer.

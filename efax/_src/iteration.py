@@ -181,29 +181,3 @@ def support(p: type[Distribution] | Distribution,
             yield name, support
     cls_p: type[Distribution] = type(p) if isinstance(p, Distribution) else p
     return dict(_parameters(cls_p, ()))
-
-
-def fixed_parameter_packet(p: Distribution) -> dict[str, Any]:
-    """Return a dict that suitable to be passed to methods requesting fixed parameters.
-
-    Args:
-        p: The parametrization to walk.
-
-    Returns:
-        The path, value, and support of each variable parameter.
-    """
-    from .expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
-    from .natural_parametrization import NaturalParametrization  # noqa: PLC0415
-    from .transform.joint import JointDistribution  # noqa: PLC0415
-    if isinstance(p, JointDistribution):
-        def g(t: type[Distribution]) -> type[NaturalParametrization[Any, Any]]:
-            if issubclass(t, NaturalParametrization):
-                return t
-            assert issubclass(t, ExpectationParametrization)
-            return t.natural_parametrization_cls()
-        sub_distributions_classes = {name: g(type(value))
-                                     for name, value in p.sub_distributions().items()}
-        sub_distributions = {'sub_distributions_classes': sub_distributions_classes}
-    else:
-        sub_distributions = {}
-    return unflatten_mapping(parameters(p, fixed=True)) | sub_distributions

@@ -113,13 +113,3 @@ class JointDistributionN(JointDistribution,
         return reduce(jnp.add,
                       (value['sub'].carrier_measure(value['x'])
                        for value in joined.values()))
-
-    @classmethod
-    @override
-    def sufficient_statistics(cls, x: dict[str, Any], **fixed_parameters: Any
-                              ) -> JointDistributionE:
-        sub_distributions_classes = fixed_parameters.pop('sub_distributions_classes')
-        joined = join_mappings(sub=sub_distributions_classes, fixed=fixed_parameters, x=x)
-        return JointDistributionE(
-                {name: value['sub'].sufficient_statistics(value['x'], **value.get('fixed', {}))
-                 for name, value in joined.items()})

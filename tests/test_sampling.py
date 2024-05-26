@@ -7,8 +7,8 @@ import jax.numpy as jnp
 from numpy.random import Generator
 from tjax import JaxComplexArray, KeyArray, Shape, assert_tree_allclose
 
-from efax import (ExpectationParametrization, JointDistribution, NaturalParametrization, Samplable,
-                  SimpleDistribution, Structure, fixed_parameter_packet, flatten_mapping,
+from efax import (ExpectationParametrization, JointDistribution, MaximumLikelihoodEstimator,
+                  NaturalParametrization, Samplable, SimpleDistribution, Structure, flatten_mapping,
                   parameter_mean)
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
@@ -53,7 +53,7 @@ def verify_sample_shape(distribution_shape: Shape,
                         ) -> None:
     ideal_samples_shape = {info.path: (*sample_shape, *distribution_shape,
                                        *info.type_.domain_support().shape(info.dimensions))
-                           for info in structure.distributions
+                           for info in structure.infos
                            if issubclass(info.type_, SimpleDistribution)}
     samples_shape = {path: s.shape for path, s in flat_map_of_samples.items()}
     assert samples_shape == ideal_samples_shape
@@ -66,7 +66,7 @@ def verify_maximum_likelihood_estimate(
         sample_shape: Shape,
         structure: Structure[ExpectationParametrization[Any]],
         exp_parameters: ExpectationParametrization[Any],
-        flat_map_of_samples: dict[Path, Any]
+        samples: dict[str, Any] | JaxComplexArray
         ) -> None:
     atol = (3.0
             if isinstance(sampling_distribution_info, IsotropicNormalInfo)
@@ -85,22 +85,11 @@ def verify_maximum_likelihood_estimate(
             else 4e-2)
     sample_axes = tuple(range(len(sample_shape)))
     newaxes = (jnp.newaxis,) * len(sample_shape)
-    fixed_parameters = fixed_parameter_packet(exp_parameters[*newaxes, ...])
-    flat_map_of_parameters: dict[Path, ExpectationParametrization[Any]] = (
-            flatten_mapping(exp_parameters.as_dict())
-            if isinstance(exp_parameters, JointDistribution)
-            else {(): exp_parameters})
-    for info in structure.distributions:
-        if not issubclass(info.type_, SimpleDistribution):
-            continue
-        assert issubclass(info.type_, ExpectationParametrization)
-        nat_cls = info.type_.natural_parametrization_cls()
-        samples = flat_map_of_samples[info.path]
-        sampled_exp_parameters = nat_cls.sufficient_statistics(samples, **fixed_parameters)
-        maximum_likelihood_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
-        observed_parameters = flat_map_of_parameters[info.path]
-        assert_tree_allclose(maximum_likelihood_parameters, observed_parameters, rtol=rtol,
-                             atol=atol)
+    estimator = MaximumLikelihoodEstimator.create_estimator(exp_parameters[*newaxes, ...])
+    sampled_exp_parameters = estimator.sufficient_statistics(samples)
+    maximum_likelihood_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
+    assert_tree_allclose(maximum_likelihood_parameters, exp_parameters, rtol=rtol,
+                         atol=atol)
 
 
 def test_maximum_likelihood_estimation(generator: Generator,
@@ -119,8 +108,8 @@ def test_maximum_likelihood_estimation(generator: Generator,
     sample_shape = (1024, 32)
     exp_parameters, samples = produce_samples(generator, key, sampling_distribution_info,
                                               distribution_shape, sample_shape, natural=natural)
-    flat_map_of_samples = flatten_mapping(samples) if isinstance(samples, dict) else {(): samples}
     structure = Structure.create(exp_parameters)
+    flat_map_of_samples = flatten_mapping(samples) if isinstance(samples, dict) else {(): samples}
     verify_sample_shape(distribution_shape, sample_shape, structure, flat_map_of_samples)
     verify_maximum_likelihood_estimate(sampling_distribution_info, sample_shape, structure,
-                                       exp_parameters, flat_map_of_samples)
+                                       exp_parameters, samples)

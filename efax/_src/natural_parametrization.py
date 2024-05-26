@@ -10,9 +10,9 @@ from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_cust
 from tjax.dataclasses import dataclass
 from typing_extensions import Self
 
-from .iteration import fixed_parameter_packet, parameters
+from .iteration import parameters
 from .parametrization import Distribution
-from .structure import Flattener, Structure
+from .structure import Flattener, MaximumLikelihoodEstimator, Structure
 from .tools import parameter_dot_product
 
 if TYPE_CHECKING:
@@ -104,7 +104,8 @@ class NaturalParametrization(Distribution,
         Args:
             x: The sample.
         """
-        tx = self.sufficient_statistics(x, **fixed_parameter_packet(self))
+        estimator = MaximumLikelihoodEstimator.create_estimator_from_natural(self)
+        tx = estimator.sufficient_statistics(x)
         return parameter_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 
     @final

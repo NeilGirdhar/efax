@@ -38,8 +38,7 @@ from ._src.expectation_parametrization import ExpectationParametrization
 from ._src.interfaces.conjugate_prior import HasConjugatePrior, HasGeneralizedConjugatePrior
 from ._src.interfaces.multidimensional import Multidimensional
 from ._src.interfaces.samplable import Samplable
-from ._src.iteration import (fixed_parameter_packet, flatten_mapping, parameters, support,
-                             unflatten_mapping)
+from ._src.iteration import flatten_mapping, parameters, support, unflatten_mapping
 from ._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ._src.natural_parametrization import NaturalParametrization
 from ._src.parameter import (BooleanRing, ComplexField, IntegralRing, RealField, Ring,
@@ -53,7 +52,7 @@ from ._src.scipy_replacement.geometric import ScipyGeometric
 from ._src.scipy_replacement.joint import ScipyJointDistribution
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises
-from ._src.structure import Flattener, Structure, SubDistributionInfo
+from ._src.structure import Flattener, MaximumLikelihoodEstimator, Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
 from ._src.transform.joint import JointDistribution, JointDistributionE, JointDistributionN
 
@@ -102,6 +101,7 @@ __all__ = [
     'JointDistributionN',
     'LogarithmicEP',
     'LogarithmicNP',
+    'MaximumLikelihoodEstimator',
     'Multidimensional',
     'MultinomialEP',
     'MultinomialNP',
@@ -150,7 +150,6 @@ __all__ = [
     'VonMisesFisherNP',
     'WeibullEP',
     'WeibullNP',
-    'fixed_parameter_packet',
     'flatten_mapping',
     'parameter_dot_product',
     'parameter_map',

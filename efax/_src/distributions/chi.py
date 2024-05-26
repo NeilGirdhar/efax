@@ -35,6 +35,11 @@ class ChiNP(HasEntropyNP['ChiEP'],
 
     @override
     @classmethod
+    def expectation_parametrization_cls(cls) -> type[ChiEP]:
+        return ChiEP
+
+    @override
+    @classmethod
     def base_distribution_cls(cls) -> type[ChiSquareNP]:
         return ChiSquareNP
 

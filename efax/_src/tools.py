@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Callable, Generator, Iterable, Mapping
-from dataclasses import fields
+from collections.abc import Callable, Iterable, Mapping
 from functools import reduce
 from itertools import starmap
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -35,12 +34,10 @@ T = TypeVar('T', bound=Distribution)
 
 def parameter_mean(x: T, /, *, axis: Axis | None = None) -> T:
     """Return the mean of the parameters (fixed and variable)."""
-    def mean_fields() -> Generator[tuple[str, JaxRealArray], None, None]:
-        for field in fields(x):
-            value = getattr(x, field.name)
-            yield field.name, jnp.mean(value, axis=axis)
-
-    return type(x)(**dict(mean_fields()))
+    structure = Structure.create(x)
+    p = parameters(x, support=False)
+    q = {path: jnp.mean(value, axis=axis) for path, value in p.items()}
+    return structure.assemble(q)
 
 
 def parameter_map(operation: Callable[..., JaxComplexArray],

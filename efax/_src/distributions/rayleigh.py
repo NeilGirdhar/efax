@@ -35,6 +35,11 @@ class RayleighNP(Samplable,
 
     @override
     @classmethod
+    def expectation_parametrization_cls(cls) -> type[RayleighEP]:
+        return RayleighEP
+
+    @override
+    @classmethod
     def base_distribution_cls(cls) -> type[ExponentialNP]:
         return ExponentialNP
 

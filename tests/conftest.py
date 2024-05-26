@@ -75,7 +75,7 @@ def distribution_info(request: Any) -> DistributionInfo[Any, Any, Any]:
 
 def supports(s: Structure[Any], abc: type[Any]) -> bool:
     return all(issubclass(info.type_, abc) or issubclass(info.type_, JointDistribution)
-               for info in s.distributions)
+               for info in s.infos)
 
 
 def any_integral_supports(structure: Structure[Any]) -> bool:

@@ -10,8 +10,8 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxComplexArray, assert_tree_allclose
 
-from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, Multidimensional,
-                  NaturalParametrization, SimpleDistribution, fixed_parameter_packet, parameter_map)
+from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, MaximumLikelihoodEstimator,
+                  Multidimensional, NaturalParametrization, SimpleDistribution, parameter_map)
 
 from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           DirichletInfo, MultivariateDiagonalNormalInfo, MultivariateNormalInfo)
@@ -119,10 +119,8 @@ def test_maximum_likelihood_estimation(
     scipy_x = scipy_distribution.rvs(random_state=generator, size=n)
     # Convert the variates to sufficient statistics.
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
-    fixed_parameters = fixed_parameter_packet(exp_parameters)
-    nat_cls = distribution_info.nat_class()
-    sufficient_stats = nat_cls.sufficient_statistics(efax_x, **fixed_parameters)
-
+    estimator = MaximumLikelihoodEstimator.create_estimator(exp_parameters)
+    sufficient_stats = estimator.sufficient_statistics(efax_x)
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
     calculated_parameters = parameter_map(partial(np.mean, axis=0),  # type: ignore[arg-type]
                                           sufficient_stats)

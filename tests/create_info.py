@@ -677,7 +677,7 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
                                               sub_info.type_,
                                               sub_info.dimensions,
                                               sub_info.sub_distribution_names)
-                          for sub_info in info.exp_structure().distributions])
+                          for sub_info in info.exp_structure().infos])
         infos.append(SubDistributionInfo((), self.exp_class(), self.dimensions,
                                          list(self.infos.keys())))
         return Structure(infos)
@@ -690,7 +690,7 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
                                               sub_info.type_,
                                               sub_info.dimensions,
                                               sub_info.sub_distribution_names)
-                          for sub_info in info.nat_structure().distributions])
+                          for sub_info in info.nat_structure().infos])
         infos.append(SubDistributionInfo((), self.nat_class(), self.dimensions,
                                          list(self.infos.keys())))
         return Structure(infos)
