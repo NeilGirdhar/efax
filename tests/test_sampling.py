@@ -12,7 +12,7 @@ from efax import (ExpectationParametrization, JointDistribution, MaximumLikeliho
                   parameter_mean)
 
 from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
-                          ComplexNormalInfo, GammaInfo, IsotropicNormalInfo,
+                          ComplexNormalInfo, GammaInfo, IsotropicNormalInfo, JointInfo,
                           MultivariateDiagonalNormalInfo, MultivariateFixedVarianceNormalInfo,
                           MultivariateNormalInfo, MultivariateUnitNormalInfo, PoissonInfo)
 from .distribution_info import DistributionInfo
@@ -68,17 +68,18 @@ def verify_maximum_likelihood_estimate(
         exp_parameters: ExpectationParametrization[Any],
         samples: dict[str, Any] | JaxComplexArray
         ) -> None:
-    atol = (3.0
-            if isinstance(sampling_distribution_info, IsotropicNormalInfo)
-            else 2e-1
-            if isinstance(sampling_distribution_info, ComplexCircularlySymmetricNormalInfo)
-            else 1e-1
+    atol = (1e-1
             if isinstance(sampling_distribution_info,
-                          ComplexNormalInfo | ComplexMultivariateUnitNormalInfo |
-                          MultivariateDiagonalNormalInfo | MultivariateNormalInfo |
-                          MultivariateFixedVarianceNormalInfo | MultivariateUnitNormalInfo)
+                          ComplexCircularlySymmetricNormalInfo
+                          | MultivariateFixedVarianceNormalInfo)
             else 1e-2
-            if isinstance(sampling_distribution_info, PoissonInfo)
+            if isinstance(sampling_distribution_info,
+                          ComplexNormalInfo | ComplexMultivariateUnitNormalInfo
+                          | MultivariateDiagonalNormalInfo | MultivariateNormalInfo
+                          | MultivariateUnitNormalInfo | IsotropicNormalInfo | PoissonInfo
+                          | JointInfo)
+            else 1e-3
+            if isinstance(sampling_distribution_info, JointInfo)
             else 1e-6)
     rtol = (5e-2
             if isinstance(sampling_distribution_info, GammaInfo)
@@ -92,20 +93,20 @@ def verify_maximum_likelihood_estimate(
                          atol=atol)
 
 
-def test_maximum_likelihood_estimation(generator: Generator,
-                                       key: KeyArray,
-                                       sampling_distribution_info: DistributionInfo[Any, Any, Any],
-                                       *,
-                                       distribution_name: None | str,
-                                       natural: bool) -> None:
+def test_sampling_and_estimation(generator: Generator,
+                                 key: KeyArray,
+                                 sampling_distribution_info: DistributionInfo[Any, Any, Any],
+                                 *,
+                                 distribution_name: None | str,
+                                 natural: bool) -> None:
     """Test that sampling is consistent with maximum likelihood estimation.
 
     This tests samples variates from either natural or expectation parametrizations.  Calculates the
     mean of the sufficient statistics, and verifies that it equals the expectation parameters.
     """
     sampling_distribution_info.skip_if_deselected(distribution_name)
-    distribution_shape = (4,)
-    sample_shape = (1024, 32)
+    distribution_shape = (4,)  # The number of distributions that are being estimated.
+    sample_shape = (1024, 64)  # The number of samples that are taken to do the estimation.
     exp_parameters, samples = produce_samples(generator, key, sampling_distribution_info,
                                               distribution_shape, sample_shape, natural=natural)
     structure = Structure.create(exp_parameters)
