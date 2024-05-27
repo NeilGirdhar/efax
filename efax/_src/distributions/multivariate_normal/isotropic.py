@@ -117,7 +117,7 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
         else:
             shape = self.mean.shape
         deviation = jnp.sqrt(self.variance())
-        return jax.random.normal(key, shape) * deviation + self.mean
+        return jax.random.normal(key, shape) * deviation[..., jnp.newaxis] + self.mean
 
     @override
     def dimensions(self) -> int:
