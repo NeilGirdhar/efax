@@ -98,19 +98,59 @@ class RealField(Ring):
 
 
 class ComplexField(Ring):
+    minimum_modulus: float = 0.0
+    maximum_modulus: None | float = None
+
     @override
     def num_elements(self, support_num_element: int) -> int:
         return support_num_element * 2
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
-        return jnp.concatenate([x.real, x.imag], axis=-1)
+        if map_to_plane:
+            match self.minimum_modulus, self.maximum_modulus:
+                case 0.0, None:
+                    corrected_x = x
+                case float(minimum), None:
+                    # x is outside the disk of the given minimum.  Map it to the plane.
+                    magnitude = jnp.abs(x)
+                    corrected_magnitude = magnitude - minimum
+                    corrected_x = x * corrected_magnitude / magnitude
+                case float(minimum), float(maximum):
+                    # x is in the disk of the given maximum.  Map it to the plane.
+                    magnitude = jnp.abs(x)
+                    corrected_magnitude = jss.logit(((magnitude - minimum) / maximum) * 0.5 + 0.5)
+                    corrected_x = x * corrected_magnitude / magnitude
+                case _:
+                    raise ValueError
+        else:
+            corrected_x = x
+        return jnp.concatenate([corrected_x.real, corrected_x.imag], axis=-1)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
         assert y.shape[-1] % 2 == 0
         n = y.shape[-1] // 2
-        return y[..., :n] + 1j * y[..., n:]
+        corrected_x = y[..., :n] + 1j * y[..., n:]
+
+        if map_from_plane:
+            match self.minimum_modulus, self.maximum_modulus:
+                case 0.0, None:
+                    return corrected_x
+                case float(minimum), None:
+                    # x is outside the disk of the given minimum.  Map it to the plane.
+                    corrected_magnitude = jnp.abs(corrected_x)
+                    magnitude = corrected_magnitude + minimum
+                    return corrected_x * magnitude / corrected_magnitude
+                case float(minimum), float(maximum):
+                    # x is in the disk of the given maximum.  Map it to the plane.
+                    corrected_magnitude = jnp.abs(corrected_x)
+                    magnitude = maximum * (jss.expit(corrected_magnitude) - 0.5) * 2.0 + minimum
+                    return corrected_x * magnitude / corrected_magnitude
+                case _:
+                    raise ValueError
+        else:
+            return corrected_x
 
     @override
     def generate(self, rng: Generator, shape: Shape) -> JaxRealArray:
