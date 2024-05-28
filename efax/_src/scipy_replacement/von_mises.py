@@ -23,3 +23,19 @@ class ScipyVonMises(ShapedDistribution[ss.vonmises]):  # pyright: ignore
         for i in np.ndindex(*shape):
             objects[i] = ss.vonmises(kappa[i], loc[i])
         super().__init__(shape, rvs_shape, dtype, objects)
+
+
+class ScipyVonMisesFisher(ShapedDistribution[ss.vonmises_fisher]):  # pyright: ignore
+    """This class allows distributions having a non-empty shape."""
+    @override
+    def __init__(self, mu: NumpyRealArray, kappa: NumpyRealArray):
+        assert mu.shape[:-1] == kappa.shape
+        shape = kappa.shape
+        rvs_shape = (mu.shape[-1],)
+        dtype = np.result_type(kappa.dtype, mu.dtype)
+        kappa = kappa.astype(dtype)
+        mu = mu.astype(dtype)
+        objects = np.empty(shape, dtype=np.object_)
+        for i in np.ndindex(*shape):
+            objects[i] = ss.vonmises_fisher(mu[i], kappa[i])
+        super().__init__(shape, rvs_shape, dtype, objects)

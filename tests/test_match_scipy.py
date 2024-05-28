@@ -17,7 +17,7 @@ from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, MaximumLikelih
 
 from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           DirichletInfo, IsotropicNormalInfo, MultivariateDiagonalNormalInfo,
-                          MultivariateNormalInfo)
+                          MultivariateNormalInfo, VonMisesFisherInfo)
 from .distribution_info import DistributionInfo
 
 
@@ -104,7 +104,9 @@ def test_maximum_likelihood_estimation(
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
-    if isinstance(distribution_info, ComplexCircularlySymmetricNormalInfo | MultivariateNormalInfo):
+    if isinstance(distribution_info,
+                  ComplexCircularlySymmetricNormalInfo | MultivariateNormalInfo
+                  | VonMisesFisherInfo):
         atol = 2e-2
         rtol = 2e-2
     elif isinstance(distribution_info, ComplexNormalInfo | IsotropicNormalInfo):

@@ -52,7 +52,7 @@ from ._src.scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDi
 from ._src.scipy_replacement.geometric import ScipyGeometric
 from ._src.scipy_replacement.joint import ScipyJointDistribution
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
-from ._src.scipy_replacement.von_mises import ScipyVonMises
+from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
 from ._src.structure import Flattener, MaximumLikelihoodEstimator, Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
 from ._src.transform.joint import JointDistribution, JointDistributionE, JointDistributionN
@@ -138,6 +138,7 @@ __all__ = [
     'ScipyJointDistribution',
     'ScipyMultivariateNormal',
     'ScipyVonMises',
+    'ScipyVonMisesFisher',
     'SimpleDistribution',
     'SquareMatrixSupport',
     'Structure',

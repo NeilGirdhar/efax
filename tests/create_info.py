@@ -25,9 +25,9 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP,
                   RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
                   ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution,
-                  ScipyMultivariateNormal, ScipyVonMises, Structure, SubDistributionInfo,
-                  UnitNormalEP, UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
-                  WeibullNP)
+                  ScipyMultivariateNormal, ScipyVonMises, ScipyVonMisesFisher, Structure,
+                  SubDistributionInfo, UnitNormalEP, UnitNormalNP, VonMisesFisherEP,
+                  VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -407,7 +407,7 @@ class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, Generali
         return GeneralizedDirichletNP
 
 
-class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, NumpyRealArray]):
+class VonMisesInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, NumpyRealArray]):
     def __init__(self) -> None:
         super().__init__(dimensions=2)
 
@@ -422,6 +422,22 @@ class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, Nu
         result[..., 0] = np.cos(x)
         result[..., 1] = np.sin(x)
         return jnp.asarray(result)
+
+    @override
+    def exp_class(self) -> type[VonMisesFisherEP]:
+        return VonMisesFisherEP
+
+    @override
+    def nat_class(self) -> type[VonMisesFisherNP]:
+        return VonMisesFisherNP
+
+
+class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, NumpyRealArray]):
+    @override
+    def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
+        kappa = np.asarray(q.kappa())
+        mu = np.asarray(q.mean_times_concentration) / kappa[..., np.newaxis]
+        return ScipyVonMisesFisher(mu, kappa)
 
     @override
     def exp_class(self) -> type[VonMisesFisherEP]:
@@ -554,6 +570,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             PoissonInfo(),
             RayleighInfo(),
             UnitNormalInfo(),
-            VonMisesFisherInfo(),
+            VonMisesInfo(),
+            VonMisesFisherInfo(dimensions=5),
             WeibullInfo(),
             ]
