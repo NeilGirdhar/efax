@@ -68,7 +68,7 @@ def join_mappings(**field_to_map: Mapping[_T, _V]) -> dict[_T, dict[str, _V]]:
     >>> join_mappings(score=user_scores, time=user_times)
     {'elliot': {'score': 50, 'time': 30}, 'claris': {'score': 60, 'time': 40}}
     """
-    retval = defaultdict(dict)
+    retval = defaultdict[_T, dict[str, _V]](dict)
     for field_name, mapping in field_to_map.items():
         for key, value in mapping.items():
             retval[key][field_name] = value

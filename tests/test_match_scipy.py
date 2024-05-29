@@ -65,7 +65,8 @@ def check_observation_shape(nat_parameters: NaturalParametrization[Any, Any],
         return
     assert isinstance(nat_parameters, SimpleDistribution)
     assert isinstance(efax_x, Array)
-    dimensions = (nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional)
+    dimensions = (nat_parameters.dimensions()  # type: ignore[attr-defined]
+                  if isinstance(nat_parameters, Multidimensional)  # type: ignore[unreachable]
                   else 0)
     ideal_shape = nat_parameters.domain_support().shape(dimensions)
     assert efax_x.shape == ideal_shape
@@ -128,9 +129,9 @@ def test_maximum_likelihood_estimation(
     flat_parameters = flat_dict_of_parameters(exp_parameters)
     flat_efax_x_clamped = {path: flat_parameters[path].domain_support().clamp(value)
                            for path, value in flat_efax_x.items()}
-    efax_x_clamped = (flat_efax_x_clamped[()]
-                      if flat_efax_x_clamped.keys() == {()}
-                      else unflatten_mapping(flat_efax_x_clamped))
+    efax_x_clamped: Array | dict[str, Any] = (flat_efax_x_clamped[()]
+                                              if flat_efax_x_clamped.keys() == {()}
+                                              else unflatten_mapping(flat_efax_x_clamped))
     estimator = MaximumLikelihoodEstimator.create_estimator(exp_parameters)
     sufficient_stats = estimator.sufficient_statistics(efax_x_clamped)
 

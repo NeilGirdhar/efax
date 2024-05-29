@@ -326,6 +326,10 @@ class SimplexSupport(Support):
         x *= jnp.minimum(1.0, (1.0 - eps) / s)
         return jnp.clip(x, min=eps, max=1.0 - eps)
 
+    @override
+    def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
+        raise NotImplementedError
+
 
 class SymmetricMatrixSupport(Support):
     @override

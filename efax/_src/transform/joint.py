@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping
 from functools import reduce
-from typing import Any, TypeVar, override
+from typing import Any, override
 
 import jax.numpy as jnp
 from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape
@@ -13,8 +13,6 @@ from ..natural_parametrization import NaturalParametrization
 from ..parametrization import Distribution, SimpleDistribution
 from ..tools import join_mappings
 
-T = TypeVar('T', bound=Distribution)
-
 
 @dataclass
 class JointDistribution(Distribution):
@@ -26,8 +24,8 @@ class JointDistribution(Distribution):
         return self._sub_distributions
 
     def general_method(self,
-                       f: Callable[[T], Any],
-                       t: type[T] = Distribution
+                       f: Callable[[Distribution], Any],
+                       t: type[Distribution] = Distribution
                        ) -> Any:
         return {name: (value.general_method(f, t)
                        if isinstance(value, JointDistribution) else f(value))
@@ -67,8 +65,8 @@ class JointDistributionE(JointDistribution,
     def sub_distributions(self) -> Mapping[str, ExpectationParametrization[Any]]:
         return self._sub_distributions
 
-    @classmethod
     @override
+    @classmethod
     def natural_parametrization_cls(cls) -> type['JointDistributionN']:
         return JointDistributionN
 
@@ -113,3 +111,9 @@ class JointDistributionN(JointDistribution,
         return reduce(jnp.add,
                       (value['sub'].carrier_measure(value['x'])
                        for value in joined.values()))
+
+    @override
+    @classmethod
+    def sufficient_statistics(cls, x: dict[str, Any], **fixed_parameters: Any
+                              ) -> JointDistributionE:
+        raise NotImplementedError

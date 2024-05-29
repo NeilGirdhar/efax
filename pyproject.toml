@@ -176,6 +176,7 @@ reportUntypedNamedTuple = true
 
 [tool.mypy]
 files = ['efax', 'tests', 'examples']
+disable_error_code = ['type-abstract']
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true

@@ -30,6 +30,7 @@ def produce_samples(generator: Generator,
                     *,
                     natural: bool) -> tuple[ExpectationParametrization[Any],
                                             dict[str, Any] | JaxComplexArray]:
+    sampling_object: Distribution
     if natural:
         sampling_object = nat_parameters = sampling_distribution_info.nat_parameter_generator(
                 generator, distribution_shape)

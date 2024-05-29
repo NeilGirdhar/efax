@@ -185,7 +185,10 @@ def support(p: type[Distribution] | Distribution,
 
 def flat_dict_of_parameters(d: Distribution) -> dict[Path, SimpleDistribution]:
     from .transform.joint import JointDistribution  # noqa: PLC0415
-    return flatten_mapping(d.as_dict()) if isinstance(d, JointDistribution) else {(): d}
+    if isinstance(d, JointDistribution):
+        return flatten_mapping(d.as_dict())
+    assert isinstance(d, SimpleDistribution)
+    return {(): d}
 
 
 def flat_dict_of_observations(x: Mapping[str, Any] | JaxComplexArray

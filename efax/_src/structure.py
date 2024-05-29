@@ -104,7 +104,7 @@ class Structure(Generic[P]):
         """Generate a random distribution."""
         path_and_values = {}
         for info in self.infos:
-            kwargs = {}
+            kwargs: dict[str, JaxComplexArray] = {}
             for name in support(info.type_):
                 s = info.type_.adjust_support(name, **kwargs)
                 value = s.generate(rng, shape, info.dimensions)
@@ -154,8 +154,6 @@ class MaximumLikelihoodEstimator(Structure[P]):
 
     @classmethod
     def create_estimator(cls, p: P) -> Self:
-        from .expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
-        assert isinstance(p, ExpectationParametrization)
         infos = cls.create(p).infos
         fixed_parameters = parameters(p, fixed=True)
         return cls(infos, fixed_parameters)
@@ -163,7 +161,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
     @classmethod
     def create_estimator_from_natural(cls, p: 'NaturalParametrization[Any, Any]'
                                       ) -> 'MaximumLikelihoodEstimator[Any]':
-        infos = cls.create(p).to_exp().infos
+        infos = MaximumLikelihoodEstimator.create(p).to_exp().infos
         fixed_parameters = parameters(p, fixed=True)
         return cls(infos, fixed_parameters)
 
