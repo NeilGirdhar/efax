@@ -257,13 +257,13 @@ class ScalarSupport(Support):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
-        return self.ring.flattened(jnp.reshape(x, (*x.shape, 1)), map_to_plane=map_to_plane)
+        return self.ring.flattened(x[..., jnp.newaxis], map_to_plane=map_to_plane)
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
         x = self.ring.unflattened(y, map_from_plane=map_from_plane)
         assert x.shape[-1] == 1
-        return jnp.reshape(x, x.shape[:-1])
+        return x[..., 0]
 
     @override
     def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
