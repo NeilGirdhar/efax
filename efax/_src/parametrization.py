@@ -4,7 +4,7 @@ from abc import abstractmethod
 from collections.abc import Mapping
 from typing import Any, override
 
-from tjax import JaxAbstractClass, Shape
+from tjax import JaxAbstractClass, JaxArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import Self
 
@@ -28,6 +28,11 @@ class Distribution(JaxAbstractClass):
     @abstractmethod
     def shape(self) -> Shape:
         raise NotImplementedError
+
+    @classmethod
+    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
+        from .iteration import support  # noqa: PLC0415
+        return support(cls)[name]
 
 
 @dataclass

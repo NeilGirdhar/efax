@@ -4,14 +4,15 @@ import math
 from typing import Any
 
 import jax.numpy as jnp
-from tjax import JaxComplexArray, JaxRealArray, Shape, abs_square
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import RealField, ScalarSupport, complex_field, distribution_parameter
+from ...parameter import (ComplexField, RealField, ScalarSupport, Support, complex_field,
+                          distribution_parameter)
 from ...parametrization import SimpleDistribution
 
 
@@ -23,8 +24,13 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
     Args:
         mean_times_precision: E(x) / Var(x).
-        precision: 1 / Var(x).
-        pseudo_precision: 1 / E(x^2 - E(x)^2).
+        negative_precision: -1 / Var(x).
+        pseudo_precision: 1 / PVar(x).
+
+    Where the pseudo-variance is
+        PVar(x) = E(x^2 - E(x)^2)
+
+    We know that |PVar(x)| < Var(x) where |x| is the modulus.
     """
     mean_times_precision: JaxComplexArray = distribution_parameter(
         ScalarSupport(ring=complex_field))
@@ -78,6 +84,14 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
               - (self.pseudo_precision / self.negative_precision).conjugate() * l_eta)
         return r, s, mu
 
+    @override
+    @classmethod
+    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
+        if name != 'pseudo_precision':
+            return super().adjust_support(name, **kwargs)
+        precision = -kwargs['negative_precision']
+        return ScalarSupport(ring=ComplexField(maximum_modulus=jnp.abs(precision)))
+
 
 @dataclass
 class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
@@ -127,3 +141,11 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         return jnp.zeros(self.shape)
+
+    @override
+    @classmethod
+    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
+        if name != 'pseudo_precision':
+            return super().adjust_support(name, **kwargs)
+        precision = -kwargs['negative_precision']
+        return ScalarSupport(ring=ComplexField(maximum_modulus=jnp.abs(precision)))

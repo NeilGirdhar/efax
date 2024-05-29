@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, final
 
 import jax.numpy as jnp
 import pytest
@@ -37,6 +37,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return self.exp_to_scipy_distribution(q.to_exp())
 
+    @final
     def exp_parameter_generator(self, rng: Generator, shape: Shape) -> EP:
         """Generate expectation parameters.
 
@@ -44,6 +45,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return self.nat_parameter_generator(rng, shape).to_exp()
 
+    @final
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> NP:
         """Generate natural parameters."""
         return self.nat_structure().generate_random(rng, shape)

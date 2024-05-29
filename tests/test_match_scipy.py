@@ -17,7 +17,8 @@ from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, MaximumLikelih
 
 from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
                           DirichletInfo, IsotropicNormalInfo, MultivariateDiagonalNormalInfo,
-                          MultivariateNormalInfo, VonMisesFisherInfo)
+                          MultivariateFixedVarianceNormalInfo, MultivariateNormalInfo,
+                          VonMisesFisherInfo)
 from .distribution_info import DistributionInfo
 
 
@@ -106,7 +107,7 @@ def test_maximum_likelihood_estimation(
     """
     if isinstance(distribution_info,
                   ComplexCircularlySymmetricNormalInfo | MultivariateNormalInfo
-                  | VonMisesFisherInfo):
+                  | VonMisesFisherInfo | MultivariateFixedVarianceNormalInfo):
         atol = 2e-2
         rtol = 2e-2
     elif isinstance(distribution_info, ComplexNormalInfo | IsotropicNormalInfo):

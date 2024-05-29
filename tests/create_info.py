@@ -6,9 +6,7 @@ from typing import Any
 import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
-from numpy.random import Generator
-from tjax import (JaxRealArray, NumpyComplexArray, NumpyRealArray, Shape, abs_square,
-                  create_diagonal_array)
+from tjax import JaxRealArray, NumpyComplexArray, NumpyRealArray, abs_square, create_diagonal_array
 from typing_extensions import override
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
@@ -254,21 +252,6 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         return ScipyComplexNormal(mean,
                                   second_moment - abs_square(mean),
                                   pseudo_second_moment - np.square(mean))
-
-    @override
-    def nat_parameter_generator(self, rng: Generator, shape: Shape) -> ComplexNormalNP:
-        return self.exp_parameter_generator(rng, shape).to_nat()
-
-    @override
-    def exp_parameter_generator(self, rng: Generator, shape: Shape) -> ComplexNormalEP:
-        mean = rng.normal(size=shape) + 1j * rng.normal(size=shape)
-        variance = rng.exponential(size=shape)
-        mean_j = jnp.asarray(mean)
-        second_moment = jnp.asarray(abs_square(mean) + variance)
-        pseudo_variance = (variance * rng.beta(2, 2, size=shape)
-                           * np.exp(1j * rng.uniform(0, 2 * np.pi, size=shape)))
-        pseudo_second_moment = jnp.asarray(np.square(mean) + pseudo_variance)
-        return ComplexNormalEP(mean_j, second_moment, pseudo_second_moment)
 
     @override
     def exp_class(self) -> type[ComplexNormalEP]:

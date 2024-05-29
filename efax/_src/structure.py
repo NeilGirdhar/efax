@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast
 
 import jax.numpy as jnp
 from numpy.random import Generator
-from tjax import JaxComplexArray, JaxRealArray, Shape
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
 
 from .iteration import flatten_mapping, parameters, support
@@ -102,9 +102,13 @@ class Structure(Generic[P]):
 
     def generate_random(self, rng: Generator, shape: Shape) -> P:
         """Generate a random distribution."""
-        path_and_values = {(*info.path, name): s.generate(rng, shape, info.dimensions)
-                           for info in self.infos
-                           for name, s in support(info.type_).items()}
+        path_and_values = {}
+        for info in self.infos:
+            kwargs = {}
+            for name in support(info.type_):
+                s = info.type_.adjust_support(name, **kwargs)
+                value = s.generate(rng, shape, info.dimensions)
+                path_and_values[(*info.path, name)] = kwargs[name] = value
         return self.assemble(path_and_values)
 
     @classmethod
@@ -229,15 +233,19 @@ class Flattener(MaximumLikelihoodEstimator[P]):
         constructed: dict[Path, Distribution] = {}
         available = flattened.shape[-1]
         for info in self.infos:
-            kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = {}
-            for name, this_support in support(info.type_, fixed=False).items():
+            regular_kwargs: dict[str, JaxArray] = {}
+            for name in support(info.type_, fixed=False):
+                this_support = info.type_.adjust_support(name, **regular_kwargs)
                 k = this_support.num_elements(info.dimensions)
                 if consumed + k > available:
                     raise ValueError('Incompatible array')  # noqa: TRY003
-                kwargs[name] = this_support.unflattened(flattened[..., consumed: consumed + k],
-                                                        info.dimensions,
-                                                        map_from_plane=self.mapped_to_plane)
+                regular_kwargs[name] = this_support.unflattened(
+                        flattened[..., consumed: consumed + k],
+                        info.dimensions,
+                        map_from_plane=self.mapped_to_plane)
                 consumed += k
+            kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = dict(
+                    regular_kwargs)
             for name in support(info.type_, fixed=True):
                 kwargs[name] = self.fixed_parameters[*info.path, name]
             sub_distributions = {name: constructed[*info.path, name]
@@ -296,8 +304,12 @@ class Flattener(MaximumLikelihoodEstimator[P]):
         return Flattener(infos, fixed_parameters, mapped_to_plane)
 
     @classmethod
-    def _make_flat(cls, q: Distribution, path: Path, *, map_to_plane: bool
+    def _make_flat(cls, q: Distribution, path: Path, /, *, map_to_plane: bool
                    ) -> list[JaxRealArray]:
-        return [support.flattened(value, map_to_plane=map_to_plane)
-                for value, support in parameters(q, fixed=False, support=True,
-                                                 recurse=False).values()]
+        kwargs: dict[str, JaxComplexArray] = {}
+        retval: list[JaxRealArray] = []
+        for name, value in parameters(q, fixed=False, support=False, recurse=False).items():
+            support_ = q.adjust_support(name, **kwargs)
+            kwargs[name] = value
+            retval.append(support_.flattened(value, map_to_plane=map_to_plane))
+        return retval
