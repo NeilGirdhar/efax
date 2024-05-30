@@ -57,15 +57,12 @@ class ScipyComplexNormalUnvectorized:
         return np.stack([self.mean.real, self.mean.imag], axis=-1)
 
     def _multivariate_normal_cov(self) -> NumpyRealArray:
-        cov_sum = self.variance + self.pseudo_variance
-        cov_diff = self.variance - self.pseudo_variance
-        xx = 0.5 * cov_sum.real
-        xy = 0.5 * -cov_diff.imag
-        yx = 0.5 * cov_sum.imag
-        yy = 0.5 * cov_diff.real
+        xx = self.variance + self.pseudo_variance.real
+        xy = self.pseudo_variance.imag
+        yy = self.variance - self.pseudo_variance.real
         xx_xy = np.stack([xx, xy], axis=-1)
-        yx_yy = np.stack([yx, yy], axis=-1)
-        return np.stack([xx_xy, yx_yy], axis=-2)
+        yx_yy = np.stack([xy, yy], axis=-1)
+        return 0.5 * np.stack([xx_xy, yx_yy], axis=-2)
 
 
 class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):

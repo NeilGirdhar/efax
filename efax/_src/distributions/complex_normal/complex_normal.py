@@ -3,12 +3,14 @@ from __future__ import annotations
 import math
 from typing import Any
 
+import jax
 import jax.numpy as jnp
-from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, abs_square
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ...expectation_parametrization import ExpectationParametrization
+from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import (ComplexField, RealField, ScalarSupport, Support, complex_field,
@@ -18,6 +20,7 @@ from ...parametrization import SimpleDistribution
 
 @dataclass
 class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
+                      Samplable,
                       NaturalParametrization['ComplexNormalEP', JaxComplexArray],
                       SimpleDistribution):
     """The natural parametrization of the complex normal distribution.
@@ -92,9 +95,14 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
         precision = -kwargs['negative_precision']
         return ScalarSupport(ring=ComplexField(maximum_modulus=jnp.abs(precision)))
 
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
+
 
 @dataclass
 class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
+                      Samplable,
                       ExpectationParametrization[ComplexNormalNP],
                       SimpleDistribution):
     """The expectation parametrization of the complex normal distribution.
@@ -149,3 +157,24 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
             return super().adjust_support(name, **kwargs)
         precision = -kwargs['negative_precision']
         return ScalarSupport(ring=ComplexField(maximum_modulus=jnp.abs(precision)))
+
+    def _multivariate_normal_cov(self) -> JaxRealArray:
+        variance = self.second_moment - abs_square(self.mean)
+        pseudo_variance = self.pseudo_second_moment - jnp.square(self.mean)
+        xx = variance + pseudo_variance.real
+        xy = pseudo_variance.imag
+        yy = variance - pseudo_variance.real
+        xx_xy = jnp.stack([xx, xy], axis=-1)
+        yx_yy = jnp.stack([xy, yy], axis=-1)
+        return 0.5 * jnp.stack([xx_xy, yx_yy], axis=-2)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        if shape is not None:
+            shape += self.shape
+        else:
+            shape = self.shape
+        mn_mean = jnp.stack([self.mean.real, self.mean.imag], axis=-1)
+        mn_cov = self._multivariate_normal_cov()
+        mn_sample = jax.random.multivariate_normal(key, mn_mean, mn_cov, shape)
+        return mn_sample[..., 0] + 1j * mn_sample[..., 1]
