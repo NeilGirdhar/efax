@@ -93,6 +93,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
 @dataclass
 class MultinomialEP(HasEntropyEP[MultinomialNP],
+                    Samplable,
                     HasGeneralizedConjugatePrior,
                     ExpectationParametrization[MultinomialNP],
                     Multidimensional):
@@ -151,3 +152,7 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
     @override
     def dimensions(self) -> int:
         return self.probability.shape[-1]
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_nat().sample(key, shape)

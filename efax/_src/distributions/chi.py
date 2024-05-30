@@ -31,7 +31,7 @@ class ChiNP(HasEntropyNP['ChiEP'],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=RealField(minimum=0.0))
 
     @override
     @classmethod
@@ -76,7 +76,7 @@ class ChiEP(HasEntropyEP[ChiNP],
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=RealField(minimum=0.0))
 
     @classmethod
     @override

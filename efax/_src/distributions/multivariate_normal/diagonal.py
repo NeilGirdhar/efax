@@ -21,7 +21,8 @@ from ...parameter import VectorSupport, distribution_parameter, negative_support
 class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
                                    NaturalParametrization['MultivariateDiagonalNormalEP',
                                                           JaxRealArray],
-                                   Multidimensional):
+                                   Multidimensional,
+                                   Samplable):
     """The natural parametrization of the normal distribution with diagonal variance.
 
     Args:
@@ -63,6 +64,10 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> MultivariateDiagonalNormalEP:
         return MultivariateDiagonalNormalEP(x, jnp.square(x))
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
 
     @override
     def dimensions(self) -> int:

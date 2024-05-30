@@ -11,10 +11,11 @@ from efax import (Distribution, ExpectationParametrization, JointDistribution,
                   MaximumLikelihoodEstimator, NaturalParametrization, Samplable, SimpleDistribution,
                   Structure, flat_dict_of_observations, flatten_mapping, parameter_mean)
 
-from .create_info import (ComplexCircularlySymmetricNormalInfo, ComplexMultivariateUnitNormalInfo,
-                          ComplexNormalInfo, GammaInfo, IsotropicNormalInfo, JointInfo,
-                          MultivariateDiagonalNormalInfo, MultivariateFixedVarianceNormalInfo,
-                          MultivariateNormalInfo, MultivariateUnitNormalInfo, PoissonInfo)
+from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo,
+                          ComplexMultivariateUnitNormalInfo, ComplexNormalInfo, DirichletInfo,
+                          GammaInfo, IsotropicNormalInfo, JointInfo, MultivariateDiagonalNormalInfo,
+                          MultivariateFixedVarianceNormalInfo, MultivariateNormalInfo,
+                          MultivariateUnitNormalInfo, PoissonInfo)
 from .distribution_info import DistributionInfo
 
 Path: TypeAlias = tuple[str, ...]
@@ -90,7 +91,7 @@ def verify_maximum_likelihood_estimate(
             if isinstance(sampling_distribution_info, JointInfo)
             else 1e-6)
     rtol = (5e-2
-            if isinstance(sampling_distribution_info, GammaInfo)
+            if isinstance(sampling_distribution_info, GammaInfo | DirichletInfo | BetaInfo)
             else 4e-2)
     sample_axes = tuple(range(len(sample_shape)))
     newaxes = (jnp.newaxis,) * len(sample_shape)

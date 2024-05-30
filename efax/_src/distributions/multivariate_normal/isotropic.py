@@ -19,6 +19,7 @@ from ...parameter import (ScalarSupport, VectorSupport, distribution_parameter, 
 
 @dataclass
 class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
+                        Samplable,
                         NaturalParametrization['IsotropicNormalEP', JaxRealArray],
                         Multidimensional):
     """The natural parametrization of the multivariate normal distribution with Var(x) = kI.
@@ -68,6 +69,10 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
     @override
     def dimensions(self) -> int:
         return self.mean_times_precision.shape[-1]
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass

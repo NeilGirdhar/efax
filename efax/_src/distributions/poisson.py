@@ -19,7 +19,8 @@ from .gamma import GammaNP
 
 
 @dataclass
-class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray],
+class PoissonNP(Samplable,
+                NaturalParametrization['PoissonEP', JaxRealArray],
                 SimpleDistribution):
     """The natural parametrization of the Poisson distribution.
 
@@ -55,6 +56,10 @@ class PoissonNP(NaturalParametrization['PoissonEP', JaxRealArray],
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> PoissonEP:
         return PoissonEP(x)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass

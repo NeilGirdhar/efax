@@ -143,7 +143,7 @@ class GammaEP(HasEntropyEP[GammaNP],
 
 
 @dataclass
-class GammaVP(SimpleDistribution):
+class GammaVP(Samplable, SimpleDistribution):
     """The variance parametrization of the Gamma distribution.
 
     Args:
@@ -172,3 +172,7 @@ class GammaVP(SimpleDistribution):
 
     def to_exp(self) -> GammaEP:
         return self.to_nat().to_exp()
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_nat().sample(key, shape)
