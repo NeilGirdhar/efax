@@ -19,6 +19,7 @@ from .negative_binomial_common import NBCommonEP, NBCommonNP
 
 @dataclass
 class GeometricNP(HasEntropyNP['GeometricEP'],
+                  Samplable,
                   NBCommonNP['GeometricEP'],
                   NaturalParametrization['GeometricEP', JaxRealArray],
                   SimpleDistribution):
@@ -45,6 +46,10 @@ class GeometricNP(HasEntropyNP['GeometricEP'],
     @override
     def _failures(self) -> int:
         return 1
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass

@@ -18,6 +18,7 @@ from ..parametrization import SimpleDistribution
 
 @dataclass
 class WeibullNP(HasEntropyNP['WeibullEP'],
+                Samplable,
                 NaturalParametrization['WeibullEP', JaxRealArray],
                 SimpleDistribution):
     """The natural parametrization of the Weibull distribution.
@@ -60,6 +61,10 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
                               ) -> WeibullEP:
         concentration = fixed_parameters['concentration']
         return WeibullEP(jnp.broadcast_to(concentration, x.shape), x ** concentration)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass

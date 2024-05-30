@@ -19,7 +19,8 @@ from .poisson import PoissonEP
 
 
 @dataclass
-class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP'],
+class NegativeBinomialNP(Samplable,
+                         NBCommonNP['NegativeBinomialEP'],
                          NaturalParametrization['NegativeBinomialEP', JaxRealArray]):
     """The natural parametrization of the negative binomial distribution.
 
@@ -42,6 +43,10 @@ class NegativeBinomialNP(NBCommonNP['NegativeBinomialEP'],
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> NegativeBinomialEP:
         return NegativeBinomialEP(x, jnp.broadcast_to(fixed_parameters['failures'], x.shape))
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
 
     @override
     def _failures(self) -> JaxIntegralArray:

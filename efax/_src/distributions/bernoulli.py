@@ -23,6 +23,7 @@ from .beta import BetaNP
 @dataclass
 class BernoulliNP(HasEntropyNP['BernoulliEP'],
                   NaturalParametrization['BernoulliEP', JaxRealArray],
+                  Samplable,
                   SimpleDistribution):
     """The natural parametrization of the Bernoulli distribution.
 
@@ -67,6 +68,10 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
     def nat_to_surprisal(self) -> JaxRealArray:
         total_p = self.nat_to_probability()
         return -jnp.log(total_p)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass

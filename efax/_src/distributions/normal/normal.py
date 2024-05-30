@@ -19,6 +19,7 @@ from ...parametrization import SimpleDistribution
 
 @dataclass
 class NormalNP(HasEntropyNP['NormalEP'],
+               Samplable,
                NaturalParametrization['NormalEP', JaxRealArray],
                SimpleDistribution):
     """The natural parametrization of the normal distribution.
@@ -64,6 +65,10 @@ class NormalNP(HasEntropyNP['NormalEP'],
 
     def to_var(self) -> NormalVP:
         return self.to_exp().to_var()
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_var().sample(key, shape)
 
 
 @dataclass

@@ -73,6 +73,7 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
 class ChiSquareEP(HasEntropyEP[ChiSquareNP],
+                  Samplable,
                   ExpToNat[ChiSquareNP],
                   ExpectationParametrization[ChiSquareNP],
                   SimpleDistribution):
@@ -105,3 +106,7 @@ class ChiSquareEP(HasEntropyEP[ChiSquareNP],
         q = self.to_nat()
         k_over_two = q.k_over_two_minus_one + 1.0
         return -k_over_two
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_nat().sample(key, shape)

@@ -59,6 +59,7 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 @dataclass
 class DirichletCommonEP(HasEntropyEP[NP],
+                        Samplable,
                         ExpToNat[NP],
                         Multidimensional, Generic[NP]):
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport(
@@ -76,3 +77,7 @@ class DirichletCommonEP(HasEntropyEP[NP],
     @override
     def dimensions(self) -> int:
         return self.mean_log_probability.shape[-1]
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_nat().sample(key, shape)
