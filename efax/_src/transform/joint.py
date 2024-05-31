@@ -3,6 +3,7 @@ from functools import reduce
 from typing import Any, override
 
 import jax.numpy as jnp
+from jax.random import split
 from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass, field
 
@@ -33,9 +34,23 @@ class JointDistribution(Distribution):
                 if isinstance(value, JointDistribution | t)}
 
     def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
+        count = 0
+
+        def g(x: Distribution, /) -> None:
+            nonlocal count
+            count += 1
+
+        self.general_method(g, Samplable)
+        keys = split(key, count)
+        count = 0
+
         def f(x: Distribution, /) -> JaxComplexArray:
             assert isinstance(x, Samplable)
-            return x.sample(key, shape)
+            nonlocal keys
+            nonlocal count
+            retval = x.sample(keys[count], shape)
+            count += 1
+            return retval
 
         return self.general_method(f, Samplable)
 
