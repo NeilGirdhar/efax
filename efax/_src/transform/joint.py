@@ -46,8 +46,7 @@ class JointDistribution(Distribution):
 
         def f(x: Distribution, /) -> JaxComplexArray:
             assert isinstance(x, Samplable)
-            nonlocal keys
-            nonlocal count
+            nonlocal keys, count
             retval = x.sample(keys[count], shape)
             count += 1
             return retval
