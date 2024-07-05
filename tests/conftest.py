@@ -31,12 +31,12 @@ def pytest_addoption(parser: Any) -> None:
     parser.addoption('--distribution', action='store', default=None)
 
 
-@pytest.fixture()
+@pytest.fixture
 def generator() -> NumpyGenerator:
     return np.random.default_rng(123)
 
 
-@pytest.fixture()
+@pytest.fixture
 def key() -> KeyArray:
     with enable_custom_prng():
         return jax_key(123)
@@ -59,7 +59,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
 _all_infos = create_infos()
 
 
-@pytest.fixture()
+@pytest.fixture
 def distribution_name(request: Any) -> None | str:
     return request.config.getoption("--distribution")
 
