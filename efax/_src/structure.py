@@ -148,12 +148,21 @@ class MaximumLikelihoodEstimator(Structure[P]):
                                 type_p: type[SimpleDistribution],
                                 **fixed_parameters: Any
                                 ) -> 'MaximumLikelihoodEstimator[Any]':
+        """Create an estimator for a simple expectation parametrization class.
+
+        This doesn't work with things like JointDistributionE.
+        """
+        from .expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        assert issubclass(type_p, ExpectationParametrization)
         return MaximumLikelihoodEstimator(
                 [SubDistributionInfo((), type_p, 0, [])],
                 {(name,): value for name, value in fixed_parameters.items()})
 
     @classmethod
     def create_estimator(cls, p: P) -> Self:
+        """Create an estimator for an expectation parametrization."""
+        from .expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        assert isinstance(p, ExpectationParametrization)
         infos = cls.create(p).infos
         fixed_parameters = parameters(p, fixed=True)
         return cls(infos, fixed_parameters)
@@ -161,6 +170,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
     @classmethod
     def create_estimator_from_natural(cls, p: 'NaturalParametrization[Any, Any]'
                                       ) -> 'MaximumLikelihoodEstimator[Any]':
+        """Create an estimator for a natural parametrization."""
         infos = MaximumLikelihoodEstimator.create(p).to_exp().infos
         fixed_parameters = parameters(p, fixed=True)
         return cls(infos, fixed_parameters)
