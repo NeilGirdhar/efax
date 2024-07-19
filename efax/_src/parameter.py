@@ -41,7 +41,19 @@ class Ring:
 class RealField(Ring):
     minimum: float | None = None
     maximum: float | None = None
-    generation_scale: float = 1.0
+    generation_scale: float = 1.0  # Scale the generated random numbers to improve random testing.
+    min_open: bool = True  # Open interval
+    max_open: bool = True  # Open interval
+
+    def __post_init__(self) -> None:
+        dtype = canonicalize_dtype(float)
+        eps = float(np.finfo(dtype).eps)
+        if self.min_open and self.minimum is not None:
+            self.minimum = float(max(self.minimum + eps,
+                                     self.minimum * (1.0 + np.copysign(eps, self.minimum))))
+        if self.max_open and self.maximum is not None:
+            self.maximum = float(min(self.maximum - eps,
+                                     self.maximum * (1.0 + np.copysign(eps, -self.maximum))))
 
     @override
     def num_elements(self, support_num_element: int) -> int:
