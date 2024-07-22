@@ -162,8 +162,8 @@ class MaximumLikelihoodEstimator(Structure[P]):
     def create_estimator(cls, p: P) -> Self:
         """Create an estimator for an expectation parametrization."""
         from .expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
-        assert isinstance(p, ExpectationParametrization)
         infos = cls.create(p).infos
+        assert isinstance(p, ExpectationParametrization)
         fixed_parameters = parameters(p, fixed=True)
         return cls(infos, fixed_parameters)
 
