@@ -108,7 +108,7 @@ class Structure(Generic[P]):
             for name in support(info.type_):
                 s = info.type_.adjust_support(name, **kwargs)
                 value = s.generate(rng, shape, info.dimensions)
-                path_and_values[(*info.path, name)] = kwargs[name] = value
+                path_and_values[*info.path, name] = kwargs[name] = value
         return self.assemble(path_and_values)
 
     @classmethod
@@ -189,7 +189,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
             nat_cls = exp_cls.natural_parametrization_cls()
             assert issubclass(nat_cls, NaturalParametrization)
 
-            fixed_parameters: dict[str, Any] = {name: self.fixed_parameters[(*info.path, name)]
+            fixed_parameters: dict[str, Any] = {name: self.fixed_parameters[*info.path, name]
                                                 for name in support(nat_cls, fixed=True)}
             p = nat_cls.sufficient_statistics(x, **fixed_parameters)
             assert isinstance(p, ExpectationParametrization)
