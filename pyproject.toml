@@ -228,6 +228,7 @@ ignore = [
   'D103', # Missing docstring in public function.
   'D105', # Missing docstring in magic method.
   'D107', # Missing docstring in __init__.
+  'DOC501', # Raised exception `ValueError` missing from docstring.
   'ERA001', # Commented-out code.
   'FBT003', # Boolean positional value in function call.
   'FIX002', # Line contains TODO, consider resolving the issue.
