@@ -28,10 +28,11 @@ classifiers = [
 [tool.poetry.dependencies]
 python = '>=3.10,<3.13'
 jax = '>=0.4.20'
+optimistix = {git = 'https://github.com/NeilGirdhar/optimistix.git', branch = 'expanding_bisection'}  # Pin until next optimistix > 0.0.7.
 numpy = '>=1.23'
 scipy = '>=1.10'
 tensorflow_probability = '>=0.15'
-tjax = '>=0.32.2'
+tjax = '>=1.0.1'
 typing_extensions = '>=4.8'
 
 [tool.poetry.group.dev.dependencies]

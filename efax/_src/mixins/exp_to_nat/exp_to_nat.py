@@ -1,10 +1,10 @@
 from __future__ import annotations
-from jax import vmap
 
 from dataclasses import KW_ONLY, field
-from typing import Any, Generic, TypeAlias, TypeVar, Self
+from typing import Any, Generic, Self, TypeAlias, TypeVar
 
 import jax.numpy as jnp
+from jax import vmap
 from tjax import JaxRealArray, jit
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -36,8 +36,13 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         if hasattr(super(), '__post_init__'):
             super().__post_init__()  # pyright: ignore
         if self.minimizer is None:
-            from .iterated_function import default_minimizer  # noqa: PLC0415
-            object.__setattr__(self, 'minimizer', default_minimizer)
+            from .optimistix import default_bisection_minimizer, default_minimizer  # noqa: PLC0415
+            initial_search_parameters = self.initial_search_parameters()
+            object.__setattr__(self,
+                               'minimizer',
+                               default_minimizer
+                               if initial_search_parameters.shape[-1] > 1
+                               else default_bisection_minimizer)
 
     @jit
     @override
