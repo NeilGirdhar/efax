@@ -26,13 +26,13 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
     @jit
     @override
     def to_nat(self) -> NP:
-        iterated_function = ExpToNatIteratedFunction[NP](minimum_iterations=1000,
-                                                         maximum_iterations=1000,
-                                                         rtol=1e-4,
+        iterated_function = ExpToNatIteratedFunction[NP](minimum_iterations=100,
+                                                         maximum_iterations=2000,
+                                                         rtol=0.0,
                                                          atol=1e-6,
                                                          z_minimum_iterations=100,
-                                                         z_maximum_iterations=1000,
-                                                         transform=Adam(1e-1))
+                                                         z_maximum_iterations=2000,
+                                                         transform=Adam(5e-2))
         initial_search_parameters = self.initial_search_parameters()
         initial_gt_state = iterated_function.transform.init(initial_search_parameters)
         initial_state = ExpToNatIteratedFunctionState(initial_gt_state, initial_search_parameters)
