@@ -5,7 +5,7 @@ from typing import Any, override
 import jax.numpy as jnp
 from jax.random import split
 from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape
-from tjax.dataclasses import dataclass, field
+from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
@@ -17,8 +17,7 @@ from ..tools import join_mappings
 
 @dataclass
 class JointDistribution(Distribution):
-    _sub_distributions: Mapping[str, Distribution] = field(
-            metadata={'parameter': False})
+    _sub_distributions: Mapping[str, Distribution]
 
     @override
     def sub_distributions(self) -> Mapping[str, Distribution]:
@@ -72,8 +71,7 @@ class JointDistribution(Distribution):
 class JointDistributionE(JointDistribution,
                          HasEntropyEP['JointDistributionN'],
                          ExpectationParametrization['JointDistributionN']):
-    _sub_distributions: Mapping[str, ExpectationParametrization[Any]] = field(
-            metadata={'parameter': False})
+    _sub_distributions: Mapping[str, ExpectationParametrization[Any]]
 
     @override
     def sub_distributions(self) -> Mapping[str, ExpectationParametrization[Any]]:
@@ -102,8 +100,7 @@ class JointDistributionE(JointDistribution,
 class JointDistributionN(JointDistribution,
                          HasEntropyNP[JointDistributionE],
                          NaturalParametrization[JointDistributionE, dict[str, Any]]):
-    _sub_distributions: Mapping[str, NaturalParametrization[Any, Any]] = field(
-            metadata={'parameter': False})
+    _sub_distributions: Mapping[str, NaturalParametrization[Any, Any]]
 
     @override
     def sub_distributions(self) -> Mapping[str, NaturalParametrization[Any, Any]]:

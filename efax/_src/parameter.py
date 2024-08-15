@@ -466,7 +466,7 @@ def distribution_parameter(support: Support,
                            static: bool = False) -> Any:
     if static and not fixed:
         raise ValueError
-    return field(static=static, metadata={'support': support, 'fixed': fixed})
+    return field(static=static, metadata={'support': support, 'fixed': fixed, 'parameter': True})
 
 
 def fix_bound(x: JaxArray | float | None, y: JaxArray) -> None | JaxArray:

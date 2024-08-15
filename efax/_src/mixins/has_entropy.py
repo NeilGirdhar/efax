@@ -1,18 +1,25 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, TypeVar, final
+from typing import Any, Generic, TypeVar, final, override
 
 from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
+from ..parametrization import Distribution
 from ..tools import parameter_dot_product
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 
 
+class HasEntropy(Distribution):
+    def entropy(self) -> JaxRealArray:
+        raise NotImplementedError
+
+
 class HasEntropyEP(ExpectationParametrization[NP],
+                   HasEntropy,
                    JaxAbstractClass,
                    Generic[NP]):
     @abstract_jit
@@ -39,6 +46,7 @@ class HasEntropyEP(ExpectationParametrization[NP],
 
     @jit
     @final
+    @override
     def entropy(self) -> JaxRealArray:
         """The Shannon entropy.
 
@@ -51,9 +59,11 @@ EP = TypeVar('EP', bound=HasEntropyEP[Any])
 
 
 class HasEntropyNP(NaturalParametrization[EP, Any],
+                   HasEntropy,
                    Generic[EP]):
     @jit
     @final
+    @override
     def entropy(self) -> JaxRealArray:
         """The Shannon entropy."""
         return self.to_exp().cross_entropy(self)

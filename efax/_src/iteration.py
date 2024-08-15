@@ -126,7 +126,7 @@ def parameters(p: Distribution,
             name = this_field.name
             value = getattr(q, name)
             metadata = this_field.metadata
-            if not metadata.get('parameter', True):
+            if not metadata.get('parameter', False):
                 continue
             is_fixed = metadata['fixed']
             if not isinstance(is_fixed, bool):
@@ -168,7 +168,7 @@ def support(p: type[Distribution] | Distribution,
         for this_field in fields(q):
             name = this_field.name
             metadata = this_field.metadata
-            if not metadata.get('parameter', True):
+            if not metadata.get('parameter', False):
                 continue
             support = metadata['support']
             is_fixed = metadata['fixed']

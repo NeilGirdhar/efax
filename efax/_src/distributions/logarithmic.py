@@ -8,7 +8,7 @@ from tjax.dataclasses import dataclass
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
-from ..mixins.exp_to_nat import ExpToNat
+from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import (IntegralRing, RealField, ScalarSupport, distribution_parameter,
                          negative_support)

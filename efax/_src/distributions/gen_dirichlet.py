@@ -18,7 +18,7 @@ from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.multidimensional import Multidimensional
-from ..mixins.exp_to_nat import ExpToNat
+from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import RealField, VectorSupport, distribution_parameter, negative_support

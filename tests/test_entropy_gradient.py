@@ -10,7 +10,7 @@ from jax import grad, tree, value_and_grad
 from numpy.random import Generator
 from tjax import JaxRealArray, assert_tree_allclose
 
-from efax import GammaEP, GammaVP, HasEntropyEP, HasEntropyNP
+from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
 from .create_info import BetaInfo, DirichletInfo
 from .distribution_info import DistributionInfo
@@ -20,7 +20,8 @@ def total_infinite(some_tree: Any, /) -> bool:
     return tree.reduce(add, tree.map(lambda x: x.size - jnp.sum(jnp.isfinite(x)), some_tree), 0)
 
 
-def sum_entropy(x: HasEntropyEP[Any] | HasEntropyNP[Any], /) -> JaxRealArray:
+def sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any], /) -> JaxRealArray:
+    x = flattener.unflatten(flattened)
     return jnp.sum(x.entropy())
 
 
@@ -28,8 +29,9 @@ def all_finite(some_tree: Any, /) -> bool:
     return tree.all(tree.map(lambda x: jnp.all(jnp.isfinite(x)), some_tree))
 
 
-def check_entropy_gradient(distribution: HasEntropyEP[Any] | HasEntropyNP[Any], /) -> None:
-    calculated_gradient = grad(sum_entropy)(distribution)
+def check_entropy_gradient(distribution: HasEntropy, /) -> None:
+    flattener, flattened = Flattener.flatten(distribution, map_to_plane=False)
+    calculated_gradient = grad(sum_entropy)(flattened, flattener)
     if not all_finite(calculated_gradient):
         print(type(distribution), total_infinite(calculated_gradient))  # noqa: T201
     assert all_finite(calculated_gradient)
@@ -56,17 +58,20 @@ def test_exp_entropy_gradient(generator: Generator,
 
 
 def test_gamma_vp_entropy_gradient() -> None:
-    def f(x_e: GammaEP) -> JaxRealArray:
+    def f(flattened: JaxRealArray, flattener: Flattener[GammaEP]) -> JaxRealArray:
+        x_e = flattener.unflatten(flattened)
         return x_e.entropy()
 
-    def g(x_e: GammaEP) -> JaxRealArray:
+    def g(flattened: JaxRealArray, flattener: Flattener[GammaEP]) -> JaxRealArray:
+        x_e = flattener.unflatten(flattened)
         x_n = x_e.to_nat()
         return x_n.entropy()
 
     o = jnp.ones(())
     x = GammaVP(o, o * 0.25)
     x_e = x.to_exp()
-    f_value, f_gradient = value_and_grad(f)(x_e)
-    g_value, g_gradient = value_and_grad(g)(x_e)
+    flattener, flattened = Flattener.flatten(x_e, map_to_plane=False)
+    f_value, f_gradient = value_and_grad(f)(flattened, flattener)
+    g_value, g_gradient = value_and_grad(g)(flattened, flattener)
     assert_tree_allclose(f_value, g_value)
     assert_tree_allclose(f_gradient, g_gradient)
