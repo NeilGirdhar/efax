@@ -18,7 +18,6 @@ from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
                           DirichletInfo, GammaInfo, GeneralizedDirichletInfo, JointInfo,
                           create_infos)
-from .distribution_info import DistributionInfo
 
 
 @pytest.fixture(autouse=True)
@@ -64,15 +63,6 @@ def distribution_name(request: Any) -> None | str:
     return request.config.getoption("--distribution")
 
 
-@pytest.fixture(scope='session', params=_all_infos)
-def distribution_info(request: Any) -> DistributionInfo[Any, Any, Any]:
-    distribution_name_option: str | None = request.config.getoption('--distribution')
-    info = request.param
-    assert isinstance(info, DistributionInfo)
-    info.skip_if_deselected(distribution_name_option)
-    return request.param
-
-
 def supports(s: Structure[Any], abc: type[Any]) -> bool:
     return all(issubclass(info.type_, abc) or issubclass(info.type_, JointDistribution)
                for info in s.infos)
@@ -84,6 +74,14 @@ def any_integral_supports(structure: Structure[Any]) -> bool:
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
+    if 'distribution_info' in metafunc.fixturenames:
+        distribution_name_option = metafunc.config.getoption('--distribution')
+        assert isinstance(distribution_name_option, str | type(None))
+        p = [info
+             for info in _all_infos
+             if info.tests_selected(distribution_name_option)]
+        ids = [info.name() for info in p]
+        metafunc.parametrize("distribution_info", p, ids=ids)
     if 'sampling_distribution_info' in metafunc.fixturenames and 'natural' in metafunc.fixturenames:
         p = [(info, natural)
              for info in _all_infos
