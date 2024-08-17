@@ -123,13 +123,13 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
         initial_kappa = jnp.where(mu == 1.0,
                                   jnp.inf,
                                   (mu * self.dimensions() - mu ** 3) / (1.0 - mu ** 2))
-        return inverse_softplus(initial_kappa)
+        return inverse_softplus(initial_kappa)[..., jnp.newaxis]
 
     @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> VonMisesFisherNP:
         kappa = softplus(search_parameters)
-        mu = jnp.linalg.norm(self.mean, 2, axis=-1)
-        q = self.mean * (kappa / mu)[..., jnp.newaxis]
+        mu = jnp.linalg.norm(self.mean, 2, axis=-1, keepdims=True)
+        q = self.mean * (kappa / mu)
         return VonMisesFisherNP(q)
 
     @override
