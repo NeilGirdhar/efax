@@ -1,7 +1,8 @@
 from __future__ import annotations
+from jax import vmap
 
-from dataclasses import KW_ONLY
-from typing import Any, Generic, TypeAlias, TypeVar
+from dataclasses import KW_ONLY, field
+from typing import Any, Generic, TypeAlias, TypeVar, Self
 
 import jax.numpy as jnp
 from tjax import JaxRealArray, jit
@@ -29,7 +30,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
     It uses Newton's method with a Jacobian to invert the gradient log-normalizer.
     """
     _: KW_ONLY
-    minimizer: ExpToNatMinimizer | None = None
+    minimizer: ExpToNatMinimizer | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
         if hasattr(super(), '__post_init__'):
@@ -41,8 +42,16 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
     @jit
     @override
     def to_nat(self) -> NP:
-        assert self.minimizer is not None
-        return self.search_to_natural(self.minimizer.solve(self))
+        flattener, flattened = Flattener[Self].flatten(self)
+
+        def solve(flattener: Flattener[Self], flattened: JaxRealArray) -> JaxRealArray:
+            x = flattener.unflatten(flattened)
+            assert self.minimizer is not None
+            return self.minimizer.solve(x)
+
+        for _ in range(self.ndim):
+            solve = vmap(solve, in_axes=(None, 0))
+        return self.search_to_natural(solve(flattener, flattened))
 
     def initial_search_parameters(self) -> SP:
         """The initial value of the parameters used by the search algorithm.

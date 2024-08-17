@@ -83,10 +83,10 @@ class IteratedMinimizer(ExpToNatMinimizer):
 
 
 default_minimizer = IteratedMinimizer(
-        ExpToNatIteratedFunction(minimum_iterations=100,
+        ExpToNatIteratedFunction(minimum_iterations=400,
                                  maximum_iterations=2000,
                                  rtol=0.0,
-                                 atol=1e-6,
-                                 z_minimum_iterations=100,
+                                 atol=1e-7,
+                                 z_minimum_iterations=400,
                                  z_maximum_iterations=2000,
                                  transform=Adam(5e-2)))

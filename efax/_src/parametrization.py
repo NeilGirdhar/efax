@@ -29,6 +29,10 @@ class Distribution(JaxAbstractClass):
     def shape(self) -> Shape:
         raise NotImplementedError
 
+    @property
+    def ndim(self) -> int:
+        return len(self.shape)
+
     @classmethod
     def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
         from .iteration import support  # noqa: PLC0415
