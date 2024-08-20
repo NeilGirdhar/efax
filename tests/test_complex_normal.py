@@ -98,4 +98,4 @@ def test_univariate_multivariate_consistency(generator: Generator) -> None:
     pseudo_variance: NumpyComplexArray = np.asarray(component.pseudo_variance[0, 0])
     uv = ScipyComplexNormal(mean, variance, pseudo_variance)
     x = random_complex_array(generator)
-    assert_allclose(mv.pdf(np.asarray([x])), uv.pdf(x))
+    assert_allclose(mv.pdf(x[np.newaxis]), uv.pdf(x))
