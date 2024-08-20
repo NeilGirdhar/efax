@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Generic, TypeVar, final, override
 
+from jax.lax import stop_gradient
 from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -52,7 +53,7 @@ class HasEntropyEP(ExpectationParametrization[NP],
 
         This can be quite slow since it depends on a conversion to natural parameters.
         """
-        return self.cross_entropy(self.to_nat())
+        return self.cross_entropy(stop_gradient(self.to_nat()))
 
 
 EP = TypeVar('EP', bound=HasEntropyEP[Any])

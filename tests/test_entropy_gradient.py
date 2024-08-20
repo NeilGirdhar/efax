@@ -7,8 +7,10 @@ from typing import Any
 import jax.numpy as jnp
 import pytest
 from jax import grad, tree, value_and_grad
+from jax.test_util import check_grads
 from numpy.random import Generator
-from tjax import JaxRealArray, assert_tree_allclose
+from rich.console import Console
+from tjax import JaxRealArray, assert_tree_allclose, print_generic
 
 from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
@@ -33,8 +35,14 @@ def check_entropy_gradient(distribution: HasEntropy, /) -> None:
     flattener, flattened = Flattener.flatten(distribution, map_to_plane=False)
     calculated_gradient = grad(sum_entropy)(flattened, flattener)
     if not all_finite(calculated_gradient):
-        print(type(distribution), total_infinite(calculated_gradient))  # noqa: T201
-    assert all_finite(calculated_gradient)
+        indices = jnp.argwhere(jnp.isnan(calculated_gradient))
+        bad_distributions = [distribution[tuple(index)[:-1]] for index in indices]
+        console = Console()
+        with console.capture() as capture:
+            print_generic(bad_distributions, console=console)
+        msg = f"Non-finite gradient found for distributions: {capture.get()}"
+        raise AssertionError(msg)
+    check_grads(sum_entropy, (flattened, flattener), order=1, atol=1e-4, rtol=1e-2)
 
 
 def test_nat_entropy_gradient(generator: Generator,
