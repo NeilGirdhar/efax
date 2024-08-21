@@ -1,15 +1,16 @@
 [build-system]
-requires = ['setuptools', 'poetry_core>=1.0']
-build-backend = 'poetry.core.masonry.api'
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[project]
 name = 'efax'
 version = "1.16.3"
 description = 'Exponential families for JAX'
-license = 'MIT'
-authors = ['Neil Girdhar <mistersheik@gmail.com>']
 readme = 'README.rst'
-repository = 'https://github.com/NeilGirdhar/efax'
+requires-python = '>=3.10,<3.13'
+license = {file = 'LICENSE'}
+authors = [{email = 'mistersheik@gmail.com'}, {name = 'Neil Girdhar'}]
+maintainers = [{email = 'mistersheik@gmail.com'}, {name = 'Neil Girdhar'}]
 classifiers = [
   'Development Status :: 5 - Production/Stable',
   'Intended Audience :: Science/Research',
@@ -24,26 +25,33 @@ classifiers = [
   'Typing :: Typed',
   'License :: OSI Approved :: MIT License',
 ]
+dependencies = [
+  'jax >= 0.4.20',
+  'optimistix',
+  'numpy >= 1.23',
+  'scipy >= 1.10',
+  'tensorflow_probability >= 0.15',
+  'tjax >= 1.0.1',
+  'typing_extensions >= 4.8',
+]
 
-[tool.poetry.dependencies]
-python = '>=3.10,<3.13'
-jax = '>=0.4.20'
-optimistix = {git = 'https://github.com/NeilGirdhar/optimistix.git', branch = 'expanding_bisection'}  # Pin until next optimistix > 0.0.7.
-numpy = '>=1.23'
-scipy = '>=1.10'
-tensorflow_probability = '>=0.15'
-tjax = '>=1.0.1'
-typing_extensions = '>=4.8'
+[project.urls]
+repository = 'https://github.com/NeilGirdhar/efax'
 
-[tool.poetry.group.dev.dependencies]
-isort = '>=5.13'
-jupyter = '>=1'
-mypy = '>=1.7'
-pylint = '>=2.12'
-pyright = '>=0.0.13'
-pytest = '>=8'
-pytest-xdist = { version = '>=3', extras = ['psutil'] }
-ruff = '>=0.4'
+[tool.uv]
+dev-dependencies = [
+  'isort >= 5.13',
+  'jupyter >= 1',
+  'mypy >= 1.7',
+  'pylint >= 2.12',
+  'pyright >= 0.0.13',
+  'pytest >= 8',
+  'pytest-xdist[psutil] >= 3',
+  'ruff >= 0.4',
+]
+
+[tool.uv.sources]
+optimistix = { git = "https://github.com/NeilGirdhar/optimistix.git", branch = 'expanding_bisection' }
 
 [tool.isort]
 line_length = 100
