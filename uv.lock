@@ -1,6 +1,6 @@
 version = 1
 requires-python = ">=3.10, <3.13"
-environment-markers = [
+resolution-markers = [
     "python_full_version < '3.11'",
     "python_full_version == '3.11.*'",
     "python_full_version >= '3.12'",
@@ -442,7 +442,6 @@ dev = [
     { name = "pylint" },
     { name = "pyright" },
     { name = "pytest" },
-    { name = "pytest-xdist" },
     { name = "pytest-xdist", extra = ["psutil"] },
     { name = "ruff" },
 ]
@@ -451,7 +450,7 @@ dev = [
 requires-dist = [
     { name = "jax", specifier = ">=0.4.20" },
     { name = "numpy", specifier = ">=1.23" },
-    { name = "optimistix", git = "https://github.com/NeilGirdhar/optimistix.git?branch=expanding_bisection" },
+    { name = "optimistix", git = "https://github.com/patrick-kidger/optimistix.git?branch=main" },
     { name = "scipy", specifier = ">=1.10" },
     { name = "tensorflow-probability", specifier = ">=0.15" },
     { name = "tjax", specifier = ">=1.0.1" },
@@ -1385,7 +1384,7 @@ wheels = [
 [[package]]
 name = "optimistix"
 version = "0.0.7"
-source = { git = "https://github.com/NeilGirdhar/optimistix.git?branch=expanding_bisection#86c82d650b5413d6458836a6cba06ef626c4c631" }
+source = { git = "https://github.com/patrick-kidger/optimistix.git?branch=main#58348db56dd92e099eeb070f76c597424ebee34f" }
 dependencies = [
     { name = "equinox" },
     { name = "jax" },

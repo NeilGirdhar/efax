@@ -51,7 +51,7 @@ dev-dependencies = [
 ]
 
 [tool.uv.sources]
-optimistix = { git = "https://github.com/NeilGirdhar/optimistix.git", branch = 'expanding_bisection' }
+optimistix = { git = "https://github.com/patrick-kidger/optimistix.git", branch = 'main' }
 
 [tool.isort]
 line_length = 100
