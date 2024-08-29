@@ -39,7 +39,7 @@ class ScipyDirichletFixRVsAndPDF(mvd):
 class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
     """This class allows distributions having a non-empty shape."""
     @override
-    def __init__(self, alpha: NumpyRealArray):
+    def __init__(self, alpha: NumpyRealArray) -> None:
         shape = alpha[..., -1].shape
         rvs_shape = (alpha.shape[-1],)
         dtype = alpha.dtype
@@ -59,7 +59,7 @@ class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
 
 class ScipyGeneralizedDirichlet:
     @override
-    def __init__(self, alpha: NumpyRealArray, beta: NumpyRealArray):
+    def __init__(self, alpha: NumpyRealArray, beta: NumpyRealArray) -> None:
         super().__init__()
         self.alpha = alpha
         self.beta = beta

@@ -18,7 +18,8 @@ class ShapedDistribution(Generic[T]):
                  shape: Shape,
                  rvs_shape: Shape,
                  rvs_dtype: np.dtype[Any],
-                 objects: npt.NDArray[np.object_]):
+                 objects: npt.NDArray[np.object_]
+                 ) -> None:
         super().__init__()
         self.shape = shape
         self.rvs_shape = rvs_shape

@@ -213,7 +213,6 @@ module = [
 ignore_missing_imports = true
 
 [tool.ruff]
-target-version = 'py310'
 line-length = 100
 
 [tool.ruff.lint]
@@ -261,9 +260,6 @@ ignore = [
   'TD003', # Missing issue link on the line following this TODO.
   'TID252', # Relative imports from parent modules are banned.
 ]
-
-[tool.ruff.lint.flake8-annotations]
-mypy-init-return = true
 
 [tool.ruff.lint.flake8-errmsg]
 max-string-length = 40

@@ -17,7 +17,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
     def __init__(self,
                  mean: NumpyComplexArray,
                  variance: NumpyComplexArray,
-                 pseudo_variance: NumpyComplexArray):
+                 pseudo_variance: NumpyComplexArray) -> None:
         super().__init__()
         self.size = mean.shape[0]
         self.mean = mean
@@ -87,7 +87,7 @@ class ScipyComplexMultivariateNormal(
     def __init__(self,
                  mean: NumpyComplexArray | None = None,
                  variance: NumpyComplexArray | None = None,
-                 pseudo_variance: NumpyComplexArray | None = None):
+                 pseudo_variance: NumpyComplexArray | None = None) -> None:
         if mean is not None:
             shape = mean.shape[:-1]
             dimensions = mean.shape[-1]

@@ -11,7 +11,7 @@ from .shaped_distribution import ShapedDistribution
 class ScipyVonMises(ShapedDistribution[ss.vonmises]):
     """This class allows distributions having a non-empty shape."""
     @override
-    def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None):
+    def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None) -> None:
         if loc is None:
             loc = np.zeros_like(kappa)
         shape = np.broadcast(kappa, loc).shape
@@ -28,7 +28,7 @@ class ScipyVonMises(ShapedDistribution[ss.vonmises]):
 class ScipyVonMisesFisher(ShapedDistribution[ss.vonmises_fisher]):
     """This class allows distributions having a non-empty shape."""
     @override
-    def __init__(self, mu: NumpyRealArray, kappa: NumpyRealArray):
+    def __init__(self, mu: NumpyRealArray, kappa: NumpyRealArray) -> None:
         assert mu.shape[:-1] == kappa.shape
         shape = kappa.shape
         rvs_shape = (mu.shape[-1],)

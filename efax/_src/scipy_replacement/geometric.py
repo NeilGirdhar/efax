@@ -11,7 +11,7 @@ scipy_beta = scipy.special.beta
 
 class ScipyGeometric:
     """This class repairs Geometric."""
-    def __init__(self, p: NumpyRealArray):
+    def __init__(self, p: NumpyRealArray) -> None:
         super().__init__()
         self.geom = ss.geom(p)
 

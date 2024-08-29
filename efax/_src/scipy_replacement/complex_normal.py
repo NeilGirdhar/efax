@@ -15,7 +15,7 @@ class ScipyComplexNormalUnvectorized:
     def __init__(self,
                  mean: NumpyComplexNumeric,
                  variance: NumpyRealNumeric,
-                 pseudo_variance: NumpyComplexNumeric):
+                 pseudo_variance: NumpyComplexNumeric) -> None:
         super().__init__()
         self.mean: NumpyComplexArray = np.asarray(mean)
         self.variance: NumpyRealArray = np.asarray(variance)
@@ -71,7 +71,7 @@ class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
     def __init__(self,
                  mean: NumpyComplexArray | None = None,
                  variance: NumpyRealArray | None = None,
-                 pseudo_variance: NumpyComplexArray | None = None):
+                 pseudo_variance: NumpyComplexArray | None = None) -> None:
         if mean is not None:
             shape = mean.shape
         elif variance is not None:

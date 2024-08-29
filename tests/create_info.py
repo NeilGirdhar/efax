@@ -475,7 +475,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
 
 
 class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[str, Any]]):
-    def __init__(self, infos: Mapping[str, DistributionInfo[Any, Any, Any]]):
+    def __init__(self, infos: Mapping[str, DistributionInfo[Any, Any, Any]]) -> None:
         super().__init__()
         self.infos = dict(infos)
 

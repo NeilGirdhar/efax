@@ -220,7 +220,7 @@ boolean_ring = BooleanRing()
 
 class Support:
     @override
-    def __init__(self, *, ring: Ring = real_field):
+    def __init__(self, *, ring: Ring = real_field) -> None:
         super().__init__()
         self.ring = ring
 
@@ -350,7 +350,7 @@ class SymmetricMatrixSupport(Support):
                  positive_semidefinite: bool = False,
                  negative_semidefinite: bool = False,
                  hermitian: bool = False,
-                 **kwargs: Any):
+                 **kwargs: Any) -> None:
         if hermitian:
             kwargs.setdefault('ring', complex_field)
         super().__init__(**kwargs)
@@ -436,7 +436,7 @@ class SquareMatrixSupport(Support):
 
 
 class CircularBoundedSupport(VectorSupport):
-    def __init__(self, radius: float):
+    def __init__(self, radius: float) -> None:
         super().__init__()
         self.radius = radius
 

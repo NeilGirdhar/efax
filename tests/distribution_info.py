@@ -17,7 +17,7 @@ Domain = TypeVar('Domain', bound=NumpyComplexArray | dict[str, Any])
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):
-    def __init__(self, dimensions: int = 1):
+    def __init__(self, dimensions: int = 1) -> None:
         super().__init__()
         self.dimensions = dimensions
 
