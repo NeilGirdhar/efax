@@ -1,7 +1,6 @@
 """These tests are related to entropy."""
 from __future__ import annotations
 
-from operator import add
 from typing import Any
 
 import jax.numpy as jnp
@@ -16,10 +15,6 @@ from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
 from .create_info import BetaInfo, DirichletInfo
 from .distribution_info import DistributionInfo
-
-
-def total_infinite(some_tree: Any, /) -> bool:
-    return tree.reduce(add, tree.map(lambda x: x.size - jnp.sum(jnp.isfinite(x)), some_tree), 0)
 
 
 def sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any], /) -> JaxRealArray:

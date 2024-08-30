@@ -77,11 +77,11 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if 'distribution_info' in metafunc.fixturenames:
         distribution_name_option = metafunc.config.getoption('--distribution')
         assert isinstance(distribution_name_option, str | type(None))
-        p = [info
+        q = [info
              for info in _all_infos
              if info.tests_selected(distribution_name_option)]
-        ids = [info.name() for info in p]
-        metafunc.parametrize("distribution_info", p, ids=ids)
+        ids = [info.name() for info in q]
+        metafunc.parametrize("distribution_info", q, ids=ids)
     if 'sampling_distribution_info' in metafunc.fixturenames and 'natural' in metafunc.fixturenames:
         p = [(info, natural)
              for info in _all_infos

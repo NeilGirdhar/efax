@@ -34,7 +34,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
 
     def __post_init__(self) -> None:
         if hasattr(super(), '__post_init__'):
-            super().__post_init__()  # pyright: ignore
+            super().__post_init__()  # type: ignore # pyright: ignore
         if self.minimizer is None:
             from .optimistix import default_bisection_minimizer, default_minimizer  # noqa: PLC0415
             initial_search_parameters = self.initial_search_parameters()
@@ -47,7 +47,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
     @jit
     @override
     def to_nat(self) -> NP:
-        flattener, flattened = Flattener[Self].flatten(self)
+        flattener, flattened = Flattener[Self].flatten(self)  # type: ignore[arg-type]
 
         def solve(flattener: Flattener[Self], flattened: JaxRealArray) -> JaxRealArray:
             x = flattener.unflatten(flattened)
