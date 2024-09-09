@@ -20,10 +20,10 @@ if TYPE_CHECKING:
 @dataclass
 class SubDistributionInfo:
     """A hashable collection of the static information for recreating sub-distributions."""
-    path: Path
-    type_: type[Distribution]
-    dimensions: int
-    sub_distribution_names: list[str]
+    path: Path = field(static=True)
+    type_: type[Distribution] = field(static=True)
+    dimensions: int = field(static=True)
+    sub_distribution_names: list[str] = field(static=True)
 
 
 T = TypeVar('T')
