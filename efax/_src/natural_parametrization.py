@@ -8,7 +8,7 @@ from jax import grad, jacfwd, vjp, vmap
 from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
 from tjax.dataclasses import dataclass
-from typing_extensions import Self
+from typing import Self
 
 from .iteration import parameters
 from .parametrization import Distribution
