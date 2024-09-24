@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from typing import Self
+
 import numpy as np
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyComplexNumeric, NumpyRealArray, NumpyRealNumeric, ShapeLike
-from typing_extensions import Self, override
+from typing_extensions import override
 
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution

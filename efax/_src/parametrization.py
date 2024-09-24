@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Mapping
-from typing import Any, override
+from typing import Any, Self, override
 
 from tjax import JaxAbstractClass, JaxArray, Shape
 from tjax.dataclasses import dataclass
-from typing_extensions import Self
 
 from .parameter import Support
 

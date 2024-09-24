@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, TypeVar, final, get_type_hints
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, final, get_type_hints
 
 import jax.numpy as jnp
 from jax import grad, jacfwd, vjp, vmap
 from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
 from tjax.dataclasses import dataclass
-from typing_extensions import Self
 
 from .iteration import parameters
 from .parametrization import Distribution
