@@ -26,8 +26,8 @@ classifiers = [
   'License :: OSI Approved :: MIT License',
 ]
 dependencies = [
-  'jax >= 0.4.20',
-  'optimistix',
+  'jax >= 0.4.34',
+  'optimistix>=0.0.9',
   'numpy >= 1.23',
   'scipy >= 1.10',
   'tensorflow_probability >= 0.15',
@@ -42,16 +42,13 @@ repository = 'https://github.com/NeilGirdhar/efax'
 dev-dependencies = [
   'isort >= 5.13',
   'jupyter >= 1',
-  'mypy >= 1.7',
-  'pylint >= 2.12',
+  'mypy >= 1.12',
+  'pylint >= 3.3.1',
   'pyright >= 0.0.13',
   'pytest >= 8',
   'pytest-xdist[psutil] >= 3',
-  'ruff >= 0.4',
+  'ruff >= 0.7',
 ]
-
-[tool.uv.sources]
-optimistix = { git = "https://github.com/patrick-kidger/optimistix.git", branch = 'main' }
 
 [tool.isort]
 line_length = 100
@@ -212,7 +209,6 @@ warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
-enable_incomplete_feature = 'NewGenericSyntax'
 
 [[tool.mypy.overrides]]
 module = [

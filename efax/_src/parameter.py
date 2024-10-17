@@ -8,7 +8,6 @@ from typing import Any, cast
 import jax.numpy as jnp
 import numpy as np
 from jax.dtypes import canonicalize_dtype
-from jax.experimental.array_api import matrix_transpose
 from jax.scipy import special as jss
 from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplus, softplus
@@ -399,7 +398,7 @@ class SymmetricMatrixSupport(Support):
     @override
     def generate(self, rng: Generator, shape: Shape, dimensions: int) -> JaxRealArray:
         m = self.ring.generate(rng, (*shape, dimensions, dimensions))
-        mt = matrix_transpose(m)
+        mt = jnp.matrix_transpose(m)
         if self.hermitian:
             mt = mt.conj()
         if self.negative_semidefinite or self.positive_semidefinite:
