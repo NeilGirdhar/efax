@@ -7,7 +7,7 @@ name = 'efax'
 version = "1.16.3"
 description = 'Exponential families for JAX'
 readme = 'README.rst'
-requires-python = '>=3.11,<3.13'
+requires-python = '>=3.11,<3.14'
 license = {file = 'LICENSE'}
 authors = [{email = 'mistersheik@gmail.com'}, {name = 'Neil Girdhar'}]
 maintainers = [{email = 'mistersheik@gmail.com'}, {name = 'Neil Girdhar'}]
@@ -19,6 +19,7 @@ classifiers = [
   'Programming Language :: Python :: 3',
   'Programming Language :: Python :: 3.11',
   'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
   'Topic :: Scientific/Engineering :: Artificial Intelligence',
   'Topic :: Software Development :: Libraries :: Python Modules',
   'Typing :: Typed',
