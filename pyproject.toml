@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = 'efax'
-version = "1.16.3"
+version = "1.17.0"
 description = 'Exponential families for JAX'
 readme = 'README.rst'
 requires-python = '>=3.11,<3.14'
