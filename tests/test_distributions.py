@@ -5,9 +5,10 @@ from typing import Any, TypeAlias
 
 import jax.numpy as jnp
 from jax import grad, jvp, vjp
+from jax.custom_derivatives import zero_from_primal
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import JaxRealArray, assert_tree_allclose, jit, zero_tangent_like
+from tjax import JaxRealArray, assert_tree_allclose, jit
 
 from efax import NaturalParametrization, Structure, parameters
 
@@ -86,7 +87,7 @@ def unit_tangent(nat_parameters: NaturalParametrization[Any, Any]
                  ) -> NaturalParametrization[Any, Any]:
     new_variable_parameters = {path: jnp.ones_like(value)
                                for path, value in parameters(nat_parameters, fixed=False).items()}
-    new_fixed_parameters = {path: zero_tangent_like(value)
+    new_fixed_parameters = {path: zero_from_primal(value, symbolic_zeros=False)
                             for path, value in parameters(nat_parameters, fixed=True).items()}
     structure = Structure.create(nat_parameters)
     return structure.assemble({**new_variable_parameters, **new_fixed_parameters})
