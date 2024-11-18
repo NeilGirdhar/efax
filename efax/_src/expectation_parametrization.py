@@ -34,7 +34,7 @@ class ExpectationParametrization(Distribution, Generic[NP]):
 
     @jit
     @final
-    def kl_divergence(self, q: NP, *, self_nat: None | NP = None) -> JaxRealArray:
+    def kl_divergence(self, q: NP, *, self_nat: NP | None = None) -> JaxRealArray:
         """The Kullback-Leibler divergence.
 
         This can be quite slow since it depends on a conversion to natural parameters.

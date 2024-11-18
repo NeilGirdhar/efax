@@ -13,7 +13,7 @@ from .create_info import MultivariateNormalInfo
 from .distribution_info import DistributionInfo
 
 
-def test_mvn_fisher_information(distribution_name: None | str) -> None:
+def test_mvn_fisher_information(distribution_name: str | None) -> None:
     MultivariateNormalInfo.skip_if_deselected(distribution_name)
     m = MultivariateNormalNP(jnp.zeros(2), -0.5 * jnp.eye(2))
 
@@ -33,7 +33,7 @@ def test_mvn_fisher_information(distribution_name: None | str) -> None:
                          MultivariateNormalNP(jnp.asarray(2.0), jnp.asarray(8.0)))
 
 
-def test_mvn_fisher_information_b(distribution_name: None | str) -> None:
+def test_mvn_fisher_information_b(distribution_name: str | None) -> None:
     MultivariateNormalInfo.skip_if_deselected(distribution_name)
     m = MultivariateNormalNP(jnp.asarray([3.0, 5.0]), jnp.asarray([[-0.5, 0.0], [0.0, -0.8]]))
 

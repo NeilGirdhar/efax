@@ -67,7 +67,7 @@ def test_sampling_cotangents(generator: Generator,
                              key: KeyArray,
                              sampling_wc_distribution_info: DistributionInfo[Any, Any, Any],
                              *,
-                             distribution_name: None | str,
+                             distribution_name: str | None,
                              natural: bool) -> None:
     """Test that the curvature is nonzero."""
     info = sampling_wc_distribution_info

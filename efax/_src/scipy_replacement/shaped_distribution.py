@@ -28,7 +28,7 @@ class ShapedDistribution(Generic[T]):
         self.objects = objects
 
     def rvs(self,
-            size: None | int | Shape = None,
+            size: int | Shape | None = None,
             random_state: Generator | None = None) -> NumpyRealArray:
         if size is None:
             size = ()

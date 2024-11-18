@@ -111,7 +111,7 @@ class RealField(Ring):
 @dataclass
 class ComplexField(Ring):
     minimum_modulus: float | JaxRealArray = 0.0
-    maximum_modulus: None | float | JaxRealArray = None
+    maximum_modulus: float | JaxRealArray | None = None
 
     @override
     def num_elements(self, support_num_element: int) -> int:
@@ -468,7 +468,7 @@ def distribution_parameter(support: Support,
     return field(static=static, metadata={'support': support, 'fixed': fixed, 'parameter': True})
 
 
-def fix_bound(x: JaxArray | float | None, y: JaxArray) -> None | JaxArray:
+def fix_bound(x: JaxArray | float | None, y: JaxArray) -> JaxArray | None:
     if x is None:
         return x
     if isinstance(x, float):

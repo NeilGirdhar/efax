@@ -106,7 +106,7 @@ def test_sampling_and_estimation(generator: Generator,
                                  key: KeyArray,
                                  sampling_distribution_info: DistributionInfo[Any, Any, Any],
                                  *,
-                                 distribution_name: None | str,
+                                 distribution_name: str | None,
                                  natural: bool) -> None:
     """Test that sampling is consistent with maximum likelihood estimation.
 

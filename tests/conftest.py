@@ -59,7 +59,7 @@ _all_infos = create_infos()
 
 
 @pytest.fixture
-def distribution_name(request: Any) -> None | str:
+def distribution_name(request: Any) -> str | None:
     return request.config.getoption("--distribution")
 
 

@@ -75,11 +75,11 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         return cls.__name__.removesuffix('Info')
 
     @classmethod
-    def tests_selected(cls, distribution_name: None | str) -> bool:
+    def tests_selected(cls, distribution_name: str | None) -> bool:
         return distribution_name is None or cls.name() == distribution_name
 
     @classmethod
-    def skip_if_deselected(cls, distribution_name: None | str) -> None:
+    def skip_if_deselected(cls, distribution_name: str | None) -> None:
         if not cls.tests_selected(distribution_name):
             pytest.skip(f"Deselected {cls.name()}")
 
