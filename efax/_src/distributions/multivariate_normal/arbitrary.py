@@ -21,7 +21,7 @@ from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_par
 class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
                            NaturalParametrization['MultivariateNormalEP', JaxRealArray],
                            Multidimensional,
-                            Samplable):
+                           Samplable):
     """The natural parametrization of the multivariate normal distribution.
 
     Args:
