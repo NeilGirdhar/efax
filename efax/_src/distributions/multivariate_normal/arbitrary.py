@@ -52,10 +52,20 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_variance_parametrization().sample(key, shape)
+
+    def variance(self) -> JaxRealArray:
         h_inv: JaxRealArray = jnp.linalg.inv(self.negative_half_precision)
-        variance = -0.5 * h_inv
+        return -0.5 * h_inv
+
+    def mean(self) -> JaxRealArray:
+        variance = self.variance()
+        return matrix_vector_mul(variance, self.mean_times_precision)
+
+    def to_variance_parametrization(self) -> MultivariateNormalVP:
+        variance = self.variance()
         mean = matrix_vector_mul(variance, self.mean_times_precision)
-        return MultivariateNormalVP(mean, variance).sample(key, shape)
+        return MultivariateNormalVP(mean, variance)
 
     @override
     def to_exp(self) -> MultivariateNormalEP:
