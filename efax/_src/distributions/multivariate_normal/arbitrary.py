@@ -20,7 +20,8 @@ from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_par
 @dataclass
 class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
                            NaturalParametrization['MultivariateNormalEP', JaxRealArray],
-                           Multidimensional):
+                           Multidimensional,
+                            Samplable):
     """The natural parametrization of the multivariate normal distribution.
 
     Args:
@@ -48,6 +49,13 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
         a = matrix_dot_product(h_inv, outer_product(eta, eta))
         _, ld = jnp.linalg.slogdet(-self.negative_half_precision)
         return -0.25 * a - 0.5 * ld + 0.5 * self.dimensions() * jnp.log(np.pi)
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        h_inv: JaxRealArray = jnp.linalg.inv(self.negative_half_precision)
+        variance = -0.5 * h_inv
+        mean = matrix_vector_mul(variance, self.mean_times_precision)
+        return MultivariateNormalVP(mean, variance).sample(key, shape)
 
     @override
     def to_exp(self) -> MultivariateNormalEP:
