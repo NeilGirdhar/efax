@@ -73,6 +73,9 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
     def dimensions(self) -> int:
         return self.mean_times_precision.shape[-1]
 
+    def to_variance_parametrization(self) -> MultivariateDiagonalNormalVP:
+        return self.to_exp().to_variance_parametrization()
+
 
 @dataclass
 class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
