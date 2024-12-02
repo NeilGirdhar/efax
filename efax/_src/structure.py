@@ -83,7 +83,7 @@ class Structure(Generic[P]):
             constructed[info.path] = info.type_(**kwargs)
         retval = constructed[()]
         assert isinstance(retval, Distribution)
-        return cast(P, retval)
+        return cast('P', retval)
 
     def reinterpret(self, q: Distribution) -> P:
         """Reinterpret a distribution in one parametrization using the saved structure."""
@@ -212,7 +212,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
         else:
             info, = self.infos
             g(info, x)
-        return cast(P, constructed[()])
+        return cast('P', constructed[()])
 
 
 @dataclass
@@ -263,7 +263,7 @@ class Flattener(MaximumLikelihoodEstimator[P]):
             constructed[info.path] = info.type_(**kwargs)
         if consumed != available:
             raise ValueError('Incompatible array')  # noqa: TRY003
-        return cast(P, constructed[()])
+        return cast('P', constructed[()])
 
     @classmethod
     def flatten(cls,

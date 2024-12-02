@@ -454,7 +454,7 @@ class CircularBoundedSupport(VectorSupport):
             return y
         # y is in the plane.  Map it to the disk of the given radius.
         assert y.shape[-1] == dimensions
-        corrected_magnitude = cast(JaxRealArray, jnp.linalg.norm(y, 2, axis=-1, keepdims=True))
+        corrected_magnitude = cast('JaxRealArray', jnp.linalg.norm(y, 2, axis=-1, keepdims=True))
         magnitude = self.radius * (jss.expit(corrected_magnitude) - 0.5) * 2.0
         return y * magnitude / corrected_magnitude
 
