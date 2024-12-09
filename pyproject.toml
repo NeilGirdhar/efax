@@ -43,11 +43,12 @@ dev-dependencies = [
   'isort >= 5.13',
   'jupyter >= 1',
   'mypy >= 1.12',
-  'pylint >= 3.3.1',
+  'pre-commit >= 4',
+  'pylint >= 3.3',
   'pyright >= 0.0.13',
   'pytest >= 8',
   'pytest-xdist[psutil] >= 3',
-  'ruff >= 0.7',
+  'ruff >= 0.8',
 ]
 
 [tool.isort]
