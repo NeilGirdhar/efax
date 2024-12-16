@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
@@ -111,6 +111,14 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> GammaNP:
         return GammaNP(-n / self.mean, n)
+
+    @classmethod
+    @override
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
+                                          ) -> tuple[Self, JaxRealArray]:
+        assert isinstance(cp, GammaNP)
+        n = cp.shape_minus_one
+        return (cls(-n / cp.negative_rate), n)
 
     @override
     def conjugate_prior_observation(self) -> JaxRealArray:

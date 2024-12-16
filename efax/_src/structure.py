@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable, Mapping
-from dataclasses import replace
+from dataclasses import fields, replace
 from functools import partial, reduce
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast
 
@@ -213,6 +213,31 @@ class MaximumLikelihoodEstimator(Structure[P]):
             info, = self.infos
             g(info, x)
         return cast('P', constructed[()])
+
+    def from_conjugate_prior_distribution(self,
+                                          cp: 'NaturalParametrization[Any, Any]'
+                                          ) -> tuple[P, JaxRealArray]:
+        constructed: dict[Path, Distribution] = {}
+        from .interfaces.conjugate_prior import HasConjugatePrior  # noqa: PLC0415
+        n = None
+        for info in self.infos:
+            assert issubclass(info.type_, HasConjugatePrior)
+            fixed_parameters = {
+                    this_field.name: self.fixed_parameters[*info.path, this_field.name]
+                    for this_field in fields(info.type_)
+                    if this_field.metadata.get('parameter', False) and this_field.metadata['fixed']}
+            cp_i = cp
+            for path_element in info.path:
+                cp_i = cp_i.sub_distributions()[path_element]
+            p, n_i = info.type_.from_conjugate_prior_distribution(cp, **fixed_parameters)
+            if n is None:
+                n = n_i
+            else:
+                assert jnp.all(n == n_i)
+            constructed[info.path] = p
+        assert n is not None
+        p = constructed[()]
+        return cast('P', p), n
 
 
 @dataclass

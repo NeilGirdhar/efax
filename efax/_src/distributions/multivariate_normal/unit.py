@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
@@ -123,8 +123,17 @@ class MultivariateUnitNormalEP(
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-        negative_half_precision = -0.5 * n * jnp.ones(self.shape)
+        negative_half_precision = -0.5 * n
         return IsotropicNormalNP(n[..., jnp.newaxis] * self.mean, negative_half_precision)
+
+    @classmethod
+    @override
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
+                                          ) -> tuple[Self, JaxRealArray]:
+        assert isinstance(cp, IsotropicNormalNP)
+        n = -2.0 * cp.negative_half_precision
+        mean = cp.mean_times_precision / n[..., jnp.newaxis]
+        return (cls(mean), n)
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray

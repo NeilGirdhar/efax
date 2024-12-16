@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any
+from typing import Any, Self
 
 from tjax import JaxComplexArray, JaxRealArray
 
@@ -18,6 +18,20 @@ class HasConjugatePrior(ExpectationParametrization[Any]):
 
         Args:
             n: The nonnegative number of pseudo-observations.  Must have shape == self.shape.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
+                                          ) -> tuple[Self, JaxRealArray]:
+        """Given a conjugate prior distribution, find the distribution and observation count.
+
+        Args:
+            cp: The conjugate prior distribution.
+
+        Returns:
+            The distribution that gave rise to the conjguate prior, and the observation count.
         """
         raise NotImplementedError
 

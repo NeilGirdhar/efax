@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
@@ -116,6 +116,15 @@ class UnitNormalEP(HasEntropyEP[UnitNormalNP],
     def conjugate_prior_distribution(self, n: JaxRealArray) -> NormalNP:
         negative_half_precision = -0.5 * n
         return NormalNP(n * self.mean, negative_half_precision)
+
+    @classmethod
+    @override
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
+                                          ) -> tuple[Self, JaxRealArray]:
+        assert isinstance(cp, NormalNP)
+        n = -2.0 * cp.negative_half_precision
+        mean = cp.mean_times_precision / n
+        return (cls(mean), n)
 
     @override
     def conjugate_prior_observation(self) -> JaxRealArray:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
@@ -138,6 +138,18 @@ class MultivariateFixedVarianceNormalEP(
         negative_half_precision = -0.5 * n_over_variance
         return IsotropicNormalNP(n_over_variance[..., jnp.newaxis] * self.mean,
                                  negative_half_precision)
+
+    @classmethod
+    @override
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any],
+                                          variance: JaxRealArray | None = None
+                                          ) -> tuple[Self, JaxRealArray]:
+        assert isinstance(cp, IsotropicNormalNP)
+        assert variance is not None
+        n_over_variance = -2.0 * cp.negative_half_precision
+        n = n_over_variance * variance
+        mean = cp.mean_times_precision / n_over_variance[..., jnp.newaxis]
+        return cls(mean, variance), n
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray

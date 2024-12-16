@@ -5,9 +5,10 @@ from typing import Any
 import jax.numpy as jnp
 from jax import grad, vmap
 from numpy.random import Generator
+from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose
 
-from efax import HasConjugatePrior, HasGeneralizedConjugatePrior
+from efax import HasConjugatePrior, HasGeneralizedConjugatePrior, MaximumLikelihoodEstimator
 
 from .distribution_info import DistributionInfo
 
@@ -42,6 +43,26 @@ def test_conjugate_prior(generator: Generator,
     derivative = density_gradient(cp_q, cp_x)
     zero_derivative = jnp.zeros_like(derivative)
     assert_tree_allclose(derivative, zero_derivative, atol=1.5)
+
+
+def test_from_conjugate_prior(generator: Generator,
+                              cp_distribution_info: DistributionInfo[Any, Any, Any],
+                              distribution_name: str | None) -> None:
+    """Test that the conjugate prior is reversible."""
+    cp_distribution_info.skip_if_deselected(distribution_name)
+    shape = (4, 3)
+    n = 123.0 * jnp.ones(shape)
+
+    # Choose a random distribution.
+    p = cp_distribution_info.exp_parameter_generator(generator, shape=shape)
+    assert isinstance(p, HasConjugatePrior)
+
+    # Find its conjugate prior at that point with many observations.
+    cp_q = p.conjugate_prior_distribution(n)
+    p_estimator = MaximumLikelihoodEstimator.create_estimator(p)
+    p_prime, n_prime = p_estimator.from_conjugate_prior_distribution(cp_q)
+    assert_tree_allclose(p, p_prime, atol=1.5)
+    assert_allclose(n, n_prime, atol=1.5)
 
 
 def test_generalized_conjugate_prior(generator: Generator,

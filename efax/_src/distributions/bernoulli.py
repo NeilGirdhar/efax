@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Self
 
 import jax
 import jax.numpy as jnp
@@ -120,6 +120,16 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
     def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaNP:
         reshaped_n = n[..., np.newaxis]
         return BetaNP(reshaped_n * jnp.stack([self.probability, (1.0 - self.probability)], axis=-1))
+
+    @classmethod
+    @override
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
+                                          ) -> tuple[Self, JaxRealArray]:
+        assert isinstance(cp, BetaNP)
+        a = cp.alpha_minus_one
+        n = jnp.sum(a, axis=-1)
+        probability = (a[..., 0] / n)
+        return (cls(probability), n)
 
     @override
     def conjugate_prior_observation(self) -> JaxRealArray:
