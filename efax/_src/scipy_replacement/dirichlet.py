@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import numpy.typing as npt
 import scipy.special
 import scipy.stats as ss
 from numpy.random import Generator
@@ -23,7 +24,8 @@ class ScipyDirichletFixRVsAndPDF(mvd):
     @override
     def rvs(self,  # type: ignore[misc]
             size: ShapeLike | None = None,
-            random_state: Generator | None = None) -> NumpyRealArray:
+            random_state: Generator | None = None
+            ) -> npt.NDArray[np.float64]:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
@@ -45,7 +47,7 @@ class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
         dtype = alpha.dtype
         objects = np.empty(shape, dtype=ScipyDirichletFixRVsAndPDF)
         for i in np.ndindex(shape):
-            objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
+            objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])  # pyright: ignore
         super().__init__(shape, rvs_shape, dtype, objects)
 
     @override

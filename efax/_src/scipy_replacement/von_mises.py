@@ -21,7 +21,7 @@ class ScipyVonMises(ShapedDistribution[ss.vonmises]):
         loc = np.broadcast_to(loc, shape).astype(dtype)
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
-            objects[i] = ss.vonmises(kappa[i], loc[i])
+            objects[i] = ss.vonmises(kappa[i], loc[i])  # pyright: ignore
         super().__init__(shape, rvs_shape, dtype, objects)
 
 
@@ -37,5 +37,5 @@ class ScipyVonMisesFisher(ShapedDistribution[ss.vonmises_fisher]):
         mu = mu.astype(dtype)
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
-            objects[i] = ss.vonmises_fisher(mu[i], kappa[i])
+            objects[i] = ss.vonmises_fisher(mu[i], kappa[i])  # pyright: ignore
         super().__init__(shape, rvs_shape, dtype, objects)

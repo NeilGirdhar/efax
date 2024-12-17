@@ -51,5 +51,5 @@ class ScipyMultivariateNormal(ShapedDistribution[ScipyMultivariateNormalUnvector
         dtype = mean.dtype
         objects = np.empty(shape, dtype=ScipyMultivariateNormalUnvectorized)
         for i in np.ndindex(*shape):
-            objects[i] = ScipyMultivariateNormalUnvectorized(mean[i], cov[i])
+            objects[i] = ScipyMultivariateNormalUnvectorized(mean[i], cov[i])  # pyright: ignore
         return cls(shape, rvs_shape, dtype, objects)

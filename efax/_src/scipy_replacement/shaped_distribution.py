@@ -24,7 +24,7 @@ class ShapedDistribution(Generic[T]):
         self.shape = shape
         self.rvs_shape = rvs_shape
         self.rvs_dtype = rvs_dtype
-        self.real_dtype: np.dtype[Any] = np.zeros(0, dtype=rvs_dtype).real.dtype
+        self.real_dtype: np.dtype[Any] = np.real(np.zeros(0, dtype=rvs_dtype)).dtype
         self.objects = objects
 
     def rvs(self,

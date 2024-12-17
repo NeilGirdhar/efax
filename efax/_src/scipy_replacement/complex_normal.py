@@ -89,13 +89,14 @@ class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
         if mean is None:
             mean = np.zeros(shape, dtype=dtype)
         if variance is None:
-            variance = np.ones(shape, dtype=dtype).real
+            variance = np.real(np.ones(shape, dtype=dtype))
         if pseudo_variance is None:
             pseudo_variance = np.zeros(shape, dtype=dtype)
 
         objects = np.empty(shape, dtype=ScipyComplexNormalUnvectorized)
         for i in np.ndindex(*shape):
-            objects[i] = ScipyComplexNormalUnvectorized(mean[i], variance[i], pseudo_variance[i])
+            objects[i] = ScipyComplexNormalUnvectorized(  # pyright: ignore
+                    mean[i], variance[i], pseudo_variance[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 
     @classmethod
