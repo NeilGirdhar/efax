@@ -32,7 +32,7 @@ P = TypeVar('P', bound=Distribution)
 
 @dataclass
 class Structure(Generic[P]):
-    """Structure generalizes the notion of type for Distribution objects.
+    """This class generalizes the notion of type for Distribution objects.
 
     Structure implements a variety of functions that would normally be class methods, but can't be
     because of missing information in a class.  Specifically:
@@ -137,7 +137,7 @@ class Structure(Generic[P]):
 
 @dataclass
 class MaximumLikelihoodEstimator(Structure[P]):
-    """MaximumLikelihoodEstimator does maximum likelihood estimation.
+    """This class does maximum likelihood estimation.
 
     To do this, it needs to store the structure and the fixed parameters.
     """
@@ -243,17 +243,18 @@ class MaximumLikelihoodEstimator(Structure[P]):
 
 @dataclass
 class Flattener(MaximumLikelihoodEstimator[P]):
-    """Flattener can flatten and unflatten distributions.
+    """This class can flatten and unflatten distributions.
 
-    The flattener has two fundamental modes:
-    * Map-to-plane: This is useful when implementing machine learning algorithms since the variables
-      parameters are the inputs and outputs of neural networks.  We don't want catastrophic results
-      when the neural network produces values that are outside the support.
-    * Examples where map-to-plane is not used include:
-        * The ExpToNat subtracts flattened expectation parameters to calculate the gradient wrt to
-          the natural parameters.
-        * The Fisher information matrix and the Jacobian matrix are calculated wrt to flattened
-          parameters, and flattened outputs.
+    The flattener can optionally map the values to and from the full plane.  This is useful when
+    implementing machine learning algorithms since the variables parameters are the inputs and
+    outputs of neural networks.  We don't want catastrophic results when the neural network produces
+    values that are outside the support.
+
+    Examples where we want to disable mapping to the plane include:
+    * The ExpToNat subtracts flattened expectation parameters to calculate the gradient wrt to
+      the natural parameters.
+    * The Fisher information matrix and the Jacobian matrix are calculated wrt to flattened
+      parameters, and flattened outputs.
     """
     mapped_to_plane: bool = field(static=True)
 
