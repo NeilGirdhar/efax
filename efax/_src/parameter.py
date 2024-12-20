@@ -136,7 +136,7 @@ class ComplexField(Ring):
                 corrected_x = x * corrected_magnitude / magnitude
         else:
             corrected_x = x
-        return jnp.concatenate([corrected_x.real, corrected_x.imag], axis=-1)
+        return jnp.concat((corrected_x.real, corrected_x.imag), axis=-1)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:

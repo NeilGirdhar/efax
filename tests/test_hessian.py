@@ -30,7 +30,7 @@ def sample_using_flattened(flattened_parameters: JaxRealArray,
         return flattened_sample(p)
     sample_dict = p.general_method(flattened_sample)
     sample_flat = flatten_mapping(sample_dict)
-    return jnp.concatenate(list(sample_flat.values()), axis=-1)
+    return jnp.concat(tuple(sample_flat.values()), axis=-1)
 
 
 def calculate_jacobian(p: SimpleDistribution,

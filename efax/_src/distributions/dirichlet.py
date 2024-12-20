@@ -35,7 +35,7 @@ class DirichletNP(DirichletCommonNP['DirichletEP'],
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> DirichletEP:
         one_minus_total_x = 1.0 - jnp.sum(x, axis=-1, keepdims=True)
-        return DirichletEP(jnp.append(jnp.log(x), jnp.log(one_minus_total_x), axis=-1))
+        return DirichletEP(jnp.concat((jnp.log(x), jnp.log(one_minus_total_x)), axis=-1))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:

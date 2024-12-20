@@ -44,7 +44,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
             raise ValueError(msg)
 
     def pdf(self, z: NumpyComplexArray, out: None = None) -> np.floating[Any]:
-        zr = np.concatenate([z.real, z.imag], axis=-1)
+        zr = np.concat([z.real, z.imag], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
@@ -67,7 +67,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
     def _multivariate_normal_mean(self) -> NumpyRealArray:
         """Return the mean of a corresponding real distribution with double the size."""
-        return np.concatenate([self.mean.real, self.mean.imag])
+        return np.concat((self.mean.real, self.mean.imag))
 
     def _multivariate_normal_cov(self) -> NumpyRealArray:
         """Return the covariance of a corresponding real distribution with double the size."""

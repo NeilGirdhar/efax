@@ -84,7 +84,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         log_scaled_a = jnp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         p = jnp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis])
         final_p = 1.0 - jnp.sum(p, axis=-1, keepdims=True)
-        return jnp.append(p, final_p, axis=-1)
+        return jnp.concat((p, final_p), axis=-1)
 
     def nat_to_surprisal(self) -> JaxRealArray:
         total_p = self.nat_to_probability()
@@ -133,12 +133,12 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
     def conjugate_prior_distribution(self, n: JaxRealArray) -> DirichletNP:
         reshaped_n = n[..., np.newaxis]
         final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
-        return DirichletNP(reshaped_n * jnp.append(self.probability, final_p, axis=-1))
+        return DirichletNP(reshaped_n * jnp.concat((self.probability, final_p), axis=-1))
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray) -> GeneralizedDirichletNP:
         final_p = 1.0 - jnp.sum(self.probability, axis=-1, keepdims=True)
-        all_p = jnp.append(self.probability, final_p, axis=-1)
+        all_p = jnp.concat((self.probability, final_p), axis=-1)
         alpha = n * all_p
         beta = n * (1.0 - all_p)
         alpha_roll = jnp.roll(alpha, -1, axis=-1).at[..., -1].set(0.0)
