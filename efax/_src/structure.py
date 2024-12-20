@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import fields, replace
-from functools import partial, reduce
+from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast
 
 from array_api_compat import get_namespace
@@ -311,10 +311,7 @@ class Flattener(MaximumLikelihoodEstimator[P]):
                   for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p)
                   for x in xs]
 
-        def concatenate(x: JaxRealArray, y: JaxRealArray, /) -> JaxRealArray:
-            return xp.concat([x, y], axis=-1)
-
-        flattened_array = reduce(concatenate, arrays)
+        flattened_array = xp.concat(arrays, axis=-1)
         return (cls(cls._extract_distributions(p),
                     parameters(p, fixed=True),
                     map_to_plane),
