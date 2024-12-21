@@ -259,12 +259,21 @@ class Flattener(MaximumLikelihoodEstimator[P]):
     """
     mapped_to_plane: bool = field(static=True)
 
-    def unflatten(self, flattened: JaxRealArray) -> P:
+    def final_dimension_size(self) -> int:
+        return sum(this_support.num_elements(info.dimensions)
+                   for info in self.infos
+                   for this_support in support(info.type_, fixed=False).values())
+
+    def unflatten(self, flattened: JaxRealArray, *, return_vector: bool = False) -> P:
         """Unflatten an array into a Distribution.
 
         Args:
             flattened: The flattened array.
+            return_vector: If true, reshape the array so that a vector is returned.
         """
+        xp = get_namespace(flattened)
+        if return_vector:
+            flattened = xp.reshape(flattened, (-1, self.final_dimension_size()))
         consumed = 0
         constructed: dict[Path, Distribution] = {}
         available = flattened.shape[-1]
