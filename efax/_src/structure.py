@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import fields, replace
 from functools import partial
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast, overload
 
 from array_api_compat import get_namespace
 from numpy.random import Generator
@@ -28,6 +28,7 @@ class SubDistributionInfo:
 
 T = TypeVar('T')
 P = TypeVar('P', bound=Distribution)
+SP = TypeVar('SP', bound=SimpleDistribution)
 
 
 @dataclass
@@ -318,24 +319,41 @@ class Flattener(MaximumLikelihoodEstimator[P]):
                     map_to_plane),
                 flattened_array)
 
+    @overload
+    @classmethod
+    def create_flattener(cls,
+                         p: SP,
+                         *,
+                         override_unflattened_type: None = None,
+                         mapped_to_plane: bool = True
+                         ) -> 'Flattener[SP]': ...
+    @overload
     @classmethod
     def create_flattener(cls,
                          p: SimpleDistribution,
-                         q_cls: type[P],
                          *,
+                         override_unflattened_type: type[SP],
                          mapped_to_plane: bool = True
-                         ) -> 'Flattener[P]':
+                         ) -> 'Flattener[SP]': ...
+    @classmethod
+    def create_flattener(cls,
+                         p: SimpleDistribution,
+                         *,
+                         override_unflattened_type: type[SP] | None = None,
+                         mapped_to_plane: bool = True
+                         ) -> 'Flattener[SP]':
         """Create a Flattener.
 
         Args:
             p: The object from which to get dimensions and fixed parameters.
-            q_cls: The type of the returned Flattener.
+            override_unflattened_type: The type of the returned Flattener.
             mapped_to_plane: Whether the flattener should map from the plane.
         """
         if p.sub_distributions():
             raise ValueError
+        type_ = type(p) if override_unflattened_type is None else override_unflattened_type
         info = cls._make_info(p, path=())
-        info = replace(info, type_=q_cls)
+        info = replace(info, type_=type_)
         infos = [info]
         fixed_parameters = parameters(p, fixed=True, support=False)
         return Flattener(infos, fixed_parameters, mapped_to_plane)

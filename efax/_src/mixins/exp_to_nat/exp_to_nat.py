@@ -76,7 +76,10 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         This function should be monotonic.
         """
         np_cls = self.natural_parametrization_cls()
-        flattener = Flattener.create_flattener(self, np_cls, mapped_to_plane=True)
+        assert issubclass(np_cls, SimpleDistribution)
+        flattener = Flattener.create_flattener(self,
+                                               override_unflattened_type=np_cls,
+                                               mapped_to_plane=True)
         return flattener.unflatten(search_parameters)
 
     def search_gradient(self, search_parameters: SP) -> SP:
