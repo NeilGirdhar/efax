@@ -3,155 +3,156 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = 'efax'
+name = "efax"
 version = "1.17.3"
-description = 'Exponential families for JAX'
-readme = 'README.rst'
-requires-python = '>=3.11,<3.14'
-license = {file = 'LICENSE'}
-authors = [{email = 'mistersheik@gmail.com'}, {name = 'Neil Girdhar'}]
-maintainers = [{email = 'mistersheik@gmail.com'}, {name = 'Neil Girdhar'}]
+description = "Exponential families for JAX"
+readme = "README.rst"
+requires-python = ">=3.11,<3.14"
+license = {file = "LICENSE"}
+authors = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
+maintainers = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
 classifiers = [
-  'Development Status :: 5 - Production/Stable',
-  'Intended Audience :: Science/Research',
-  'Operating System :: OS Independent',
-  'Programming Language :: Python',
-  'Programming Language :: Python :: 3',
-  'Programming Language :: Python :: 3.11',
-  'Programming Language :: Python :: 3.12',
-  'Programming Language :: Python :: 3.13',
-  'Topic :: Scientific/Engineering :: Artificial Intelligence',
-  'Topic :: Software Development :: Libraries :: Python Modules',
-  'Typing :: Typed',
-  'License :: OSI Approved :: MIT License',
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
 ]
 dependencies = [
-  'array_api_compat >= 1.6',
-  'jax >= 0.4.34',
-  'numpy >= 1.23',
-  'optimistix>=0.0.9',
-  'scipy >= 1.10',
-  'tensorflow_probability >= 0.15',
-  'tjax >= 1.0.1',
-  'typing_extensions >= 4.8',
+  "array_api_compat >= 1.6",
+  "jax >= 0.4.34",
+  "numpy >= 1.23",
+  "optimistix>=0.0.9",
+  "scipy >= 1.10",
+  "tensorflow_probability >= 0.15",
+  "tjax >= 1.0.1",
+  "typing_extensions >= 4.8",
 ]
 
 [project.urls]
-repository = 'https://github.com/NeilGirdhar/efax'
+repository = "https://github.com/NeilGirdhar/efax"
 
 [tool.uv]
 dev-dependencies = [
-  'isort >= 5.13',
-  'jupyter >= 1',
-  'mypy >= 1.12',
-  'pre-commit >= 4',
-  'pylint >= 3.3',
-  'pyright >= 0.0.13',
-  'pytest >= 8',
-  'pytest-xdist[psutil] >= 3',
-  'ruff >= 0.8',
+  "isort >= 5.13",
+  "jupyter >= 1",
+  "mypy >= 1.12",
+  "pre-commit >= 4",
+  "pylint >= 3.3",
+  "pyright >= 0.0.13",
+  "pytest >= 8",
+  "pytest-xdist[psutil] >= 3",
+  "ruff >= 0.8",
 ]
 
 [tool.isort]
 line_length = 100
 multi_line_output = 0
-skip_glob = ['.pytype/*.py']
+skip_glob = [".pytype/*.py"]
 
 [tool.pylint.master]
 jobs = 0
-py-version = '3.11'
+py-version = "3.11"
 load-plugins = [
-  'pylint.extensions.bad_builtin',
-  'pylint.extensions.broad_try_clause',
-  'pylint.extensions.check_elif',
-  'pylint.extensions.code_style',
-  'pylint.extensions.comparison_placement',
-  'pylint.extensions.confusing_elif',
-  'pylint.extensions.consider_refactoring_into_while_condition',
-  'pylint.extensions.consider_ternary_expression',
-  'pylint.extensions.dict_init_mutate',
-  'pylint.extensions.docparams',
-  'pylint.extensions.docstyle',
-  'pylint.extensions.dunder',
-  'pylint.extensions.empty_comment',
-  'pylint.extensions.eq_without_hash',
-  'pylint.extensions.for_any_all',
-  'pylint.extensions.magic_value',
-  'pylint.extensions.mccabe',
-  'pylint.extensions.no_self_use',
-  'pylint.extensions.overlapping_exceptions',
-  'pylint.extensions.private_import',
-  'pylint.extensions.redefined_loop_name',
-  'pylint.extensions.redefined_variable_type',
-  'pylint.extensions.set_membership',
-  'pylint.extensions.typing',
-  'pylint.extensions.while_used',
+  "pylint.extensions.bad_builtin",
+  "pylint.extensions.broad_try_clause",
+  "pylint.extensions.check_elif",
+  "pylint.extensions.code_style",
+  "pylint.extensions.comparison_placement",
+  "pylint.extensions.confusing_elif",
+  "pylint.extensions.consider_refactoring_into_while_condition",
+  "pylint.extensions.consider_ternary_expression",
+  "pylint.extensions.dict_init_mutate",
+  "pylint.extensions.docparams",
+  "pylint.extensions.docstyle",
+  "pylint.extensions.dunder",
+  "pylint.extensions.empty_comment",
+  "pylint.extensions.eq_without_hash",
+  "pylint.extensions.for_any_all",
+  "pylint.extensions.magic_value",
+  "pylint.extensions.mccabe",
+  "pylint.extensions.no_self_use",
+  "pylint.extensions.overlapping_exceptions",
+  "pylint.extensions.private_import",
+  "pylint.extensions.redefined_loop_name",
+  "pylint.extensions.redefined_variable_type",
+  "pylint.extensions.set_membership",
+  "pylint.extensions.typing",
+  "pylint.extensions.while_used",
 ]
 extension-pkg-whitelist = [
-  'mypy.plugins.dataclasses',
+  "mypy.plugins.dataclasses",
 ]
 
 [tool.pylint.messages_control]
 disable = [
-  'abstract-method',
-  'arguments-differ',
-  'bad-dunder-name',
-  'confusing-consecutive-elif',
-  'consider-using-assignment-expr',
-  'consider-using-tuple',
-  'cyclic-import',
-  'duplicate-code',
-  'empty-comment',
-  'fixme',
-  'import-outside-toplevel',
-  'invalid-field-call',
-  'invalid-name',
-  'invalid-unary-operand-type',
-  'line-too-long',
-  'keyword-arg-before-vararg',
-  'magic-value-comparison',
-  'missing-docstring',
-  'no-member',
-  'no-self-use',
-  'not-callable',
-  'protected-access',
-  'redefined-builtin',
-  'redefined-outer-name',
-  'redefined-variable-type',
-  'signature-differs',
-  'too-complex',
-  'too-few-public-methods',
-  'too-many-ancestors',
-  'too-many-arguments',
-  'too-many-branches',
-  'too-many-instance-attributes',
-  'too-many-locals',
-  'too-many-return-statements',
-  'too-many-statements',
-  'too-many-try-statements',
-  'unexpected-keyword-arg',
-  'unused-argument',
-  'unused-import',
-  'use-set-for-membership',
-  'while-used',
+  "abstract-method",
+  "arguments-differ",
+  "bad-dunder-name",
+  "confusing-consecutive-elif",
+  "consider-using-assignment-expr",
+  "consider-using-tuple",
+  "cyclic-import",
+  "duplicate-code",
+  "empty-comment",
+  "fixme",
+  "import-outside-toplevel",
+  "invalid-field-call",
+  "invalid-name",
+  "invalid-unary-operand-type",
+  "line-too-long",
+  "keyword-arg-before-vararg",
+  "magic-value-comparison",
+  "missing-docstring",
+  "no-member",
+  "no-self-use",
+  "not-callable",
+  "protected-access",
+  "redefined-builtin",
+  "redefined-outer-name",
+  "redefined-variable-type",
+  "signature-differs",
+  "too-complex",
+  "too-few-public-methods",
+  "too-many-ancestors",
+  "too-many-arguments",
+  "too-many-branches",
+  "too-many-instance-attributes",
+  "too-many-locals",
+  "too-many-positional-arguments",
+  "too-many-return-statements",
+  "too-many-statements",
+  "too-many-try-statements",
+  "unexpected-keyword-arg",
+  "unused-argument",
+  "unused-import",
+  "use-set-for-membership",
+  "while-used",
 ]
 enable = [
-  'useless-suppression',
-  'use-symbolic-message-instead',
+  "useless-suppression",
+  "use-symbolic-message-instead",
 ]
 
 [tool.pylint.reports]
-output-format = 'colorized'
+output-format = "colorized"
 
 [tool.pylint.similarities]
 min-similarity-lines = 10
-ignore-imports = 'yes'
+ignore-imports = "yes"
 
 [tool.pyright]
-include = ['efax', 'tests', 'examples']
-stubPath = ''
-venvPath = '.'
-venv = '.venv'
+include = ["efax", "tests", "examples"]
+stubPath = ""
+venvPath = "."
+venv = ".venv"
 enableTypeIgnoreComments = false
 # reportImportCycles = true
 reportCallInDefaultInitializer = true
@@ -193,8 +194,8 @@ reportUnusedFunction = true
 reportUnusedVariable = true
 
 [tool.mypy]
-files = ['efax', 'tests', 'examples']
-disable_error_code = ['type-abstract']
+files = ["efax", "tests", "examples"]
+disable_error_code = ["type-abstract"]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -204,21 +205,22 @@ disallow_untyped_defs = true
 no_implicit_optional = true
 pretty = true
 show_error_codes = true
-show_error_context = true
+show_error_context = false
 strict_equality = true
+warn_no_return = true
 warn_redundant_casts = true
-# warn_return_any = true
+warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 module = [
-  'scipy',
-  'scipy.special',
-  'scipy.stats',
-  'tensorflow_probability.substrates',
-  'array_api_compat',
+  "scipy",
+  "scipy.special",
+  "scipy.stats",
+  "tensorflow_probability.substrates",
+  "array_api_compat",
 ]
 ignore_missing_imports = true
 
@@ -227,47 +229,48 @@ line-length = 100
 
 [tool.ruff.lint]
 preview = true
-select = ['ALL']
+select = ["ALL"]
 ignore = [
-  'ANN401', # Dynamically typed expressions (Any).
-  'ARG001', # Unused function argument.
-  'ARG002', # Unused method argument.
-  'ARG003', # Unused class method argument.
-  'ARG004', # Unused static method argument.
-  'B011', # Do not assert false.
-  'C901', # Complex structure.
-  'COM812', # Trailing comma missing.
-  'CPY001', # Missing copyright.
-  'D100', # Missing docstring in public module.
-  'D101', # Missing docstring in public class.
-  'D102', # Missing docstring in public method.
-  'D103', # Missing docstring in public function.
-  'D105', # Missing docstring in magic method.
-  'D107', # Missing docstring in __init__.
-  'DOC201', # return is not documented in docstring.
-  'DOC202', # Docstring should not have a returns section because the function doesn't return anything.
-  'DOC402', # DOC402 `yield` is not documented in docstring.
-  'DOC501', # Raised exception `ValueError` missing from docstring.
-  'ERA001', # Commented-out code.
-  'FBT003', # Boolean positional value in function call.
-  'FIX002', # Line contains TODO, consider resolving the issue.
-  'G004', # Logging statement uses f-string.
-  'I001', # Import block is un-sorted or un-formatted.
-  'PD008', # Use .loc instead of .at. If speed is important, use NumPy.
-  'PD013', # `.melt` is preferred to `.stack`; provides same functionality
-  'PGH003', # Use specific rule codes when ignoring type issues.
-  'PLR0913', # Too many arguments in function definition.
-  'PLR6301', # Method doesn't use self.
-  'PT013', # Found incorrect import of pytest, use simple import pytest instead.
-  'Q000', # Single quotes found but double quotes preferred.
-  'RUF021', # Parenthesize `a and b` expressions when chaining `and` and `or` together...
-  'S101', # Assert used.
-  'TC001', # Move application import into a type-checking block.
-  'TC002', # Move third-party import into a type-checking block.
-  'TC003', # Move standard library import into a type-checking block.
-  'TD002', # Missing author in TODO; try: # TODO(<author_name>): ....
-  'TD003', # Missing issue link on the line following this TODO.
-  'TID252', # Relative imports from parent modules are banned.
+  "ANN401", # Dynamically typed expressions (Any).
+  "ARG001", # Unused function argument.
+  "ARG002", # Unused method argument.
+  "ARG003", # Unused class method argument.
+  "ARG004", # Unused static method argument.
+  "B011", # Do not assert false.
+  "C901", # Complex structure.
+  "COM812", # Trailing comma missing.
+  "CPY001", # Missing copyright.
+  "D100", # Missing docstring in public module.
+  "D101", # Missing docstring in public class.
+  "D102", # Missing docstring in public method.
+  "D103", # Missing docstring in public function.
+  "D105", # Missing docstring in magic method.
+  "D107", # Missing docstring in __init__.
+  "DOC201", # return is not documented in docstring.
+  "DOC202", # Docstring should not have a returns section because the function doesn"t return anything.
+  "DOC402", # DOC402 `yield` is not documented in docstring.
+  "DOC501", # Raised exception `ValueError` missing from docstring.
+  "ERA001", # Commented-out code.
+  "F722", # Syntax error in forward annotation.
+  "FBT003", # Boolean positional value in function call.
+  "FIX002", # Line contains TODO, consider resolving the issue.
+  "G004", # Logging statement uses f-string.
+  "I001", # Import block is un-sorted or un-formatted.
+  "PD008", # Use .loc instead of .at. If speed is important, use NumPy.
+  "PD013", # `.melt` is preferred to `.stack`; provides same functionality
+  "PGH003", # Use specific rule codes when ignoring type issues.
+  "PLR0913", # Too many arguments in function definition.
+  "PLR6301", # Method doesn"t use self.
+  "PT013", # Found incorrect import of pytest, use simple import pytest instead.
+  "Q000", # Single quotes found but double quotes preferred.
+  "RUF021", # Parenthesize `a and b` expressions when chaining `and` and `or` together...
+  "S101", # Assert used.
+  "TC001", # Move application import into a type-checking block.
+  "TC002", # Move third-party import into a type-checking block.
+  "TC003", # Move standard library import into a type-checking block.
+  "TD002", # Missing author in TODO; try: # TODO(<author_name>): ....
+  "TD003", # Missing issue link on the line following this TODO.
+  "TID252", # Relative imports from parent modules are banned.
 ]
 
 [tool.ruff.lint.flake8-errmsg]
@@ -277,7 +280,7 @@ max-string-length = 40
 combine-as-imports = true
 
 [tool.ruff.lint.pydocstyle]
-convention = 'google'
+convention = "google"
 
 [tool.ruff.lint.pylint]
 max-args = 8

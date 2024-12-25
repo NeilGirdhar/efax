@@ -112,7 +112,7 @@ class ScipyComplexMultivariateNormal(
 
         objects = np.empty(shape, dtype=ScipyComplexMultivariateNormalUnvectorized)
         for i in np.ndindex(*shape):
-            objects[i] = ScipyComplexMultivariateNormalUnvectorized(  # pyright: ignore
+            objects[i] = ScipyComplexMultivariateNormalUnvectorized(
                     mean[i], variance[i], pseudo_variance[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 

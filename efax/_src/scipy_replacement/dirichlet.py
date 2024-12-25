@@ -47,7 +47,7 @@ class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
         dtype = alpha.dtype
         objects = np.empty(shape, dtype=ScipyDirichletFixRVsAndPDF)
         for i in np.ndindex(shape):
-            objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])  # pyright: ignore
+            objects[i] = ScipyDirichletFixRVsAndPDF(alpha[i])
         super().__init__(shape, rvs_shape, dtype, objects)
 
     @override
