@@ -110,7 +110,9 @@ class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, NumpyRealAr
 class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: NormalEP) -> Any:
-        return ss.norm(p.mean, np.sqrt(p.variance()))
+        mean = np.asarray(p.mean)
+        std_dev = np.sqrt(np.asarray(p.variance()))
+        return ss.Normal(mu=mean, sigma=std_dev)
 
     @override
     def exp_class(self) -> type[NormalEP]:
@@ -124,7 +126,8 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
 class UnitNormalInfo(DistributionInfo[UnitNormalNP, UnitNormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: UnitNormalEP) -> Any:
-        return ss.norm(p.mean, 1.0)
+        mean = np.asarray(p.mean)
+        return ss.Normal(mu=mean, sigma=np.ones_like(mean))
 
     @override
     def exp_class(self) -> type[UnitNormalEP]:
@@ -300,7 +303,7 @@ class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySym
 class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: ExponentialEP) -> Any:
-        return ss.expon(0, p.mean)
+        return ss.make_distribution(ss.expon)() * p.mean
 
     @override
     def exp_class(self) -> type[ExponentialEP]:
@@ -314,7 +317,8 @@ class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, NumpyRealAr
 class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: RayleighEP) -> Any:
-        return ss.rayleigh(scale=np.sqrt(p.chi / 2.0))
+        rayleigh = ss.make_distribution(ss.rayleigh)
+        return rayleigh() * np.sqrt(p.chi / 2.0)
 
     @override
     def exp_class(self) -> type[RayleighEP]:
@@ -332,7 +336,8 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: BetaNP) -> Any:
         n1 = q.alpha_minus_one + 1.0
-        return ss.beta(n1[..., 0], n1[..., 1])
+        beta = ss.make_distribution(ss.beta)
+        return beta(a=n1[..., 0], b=n1[..., 1])  # pyright: ignore
 
     @override
     def exp_class(self) -> type[BetaEP]:
@@ -348,7 +353,8 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
     def nat_to_scipy_distribution(self, q: GammaNP) -> Any:
         shape = q.shape_minus_one + 1.0
         scale = -1.0 / q.negative_rate
-        return ss.gamma(shape, scale=scale)
+        gamma = ss.make_distribution(ss.gamma)
+        return gamma(a=shape) * scale  # pyright: ignore
 
     @override
     def exp_class(self) -> type[GammaEP]:
@@ -443,7 +449,8 @@ class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, Nu
 class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: ChiSquareNP) -> Any:
-        return ss.chi2((q.k_over_two_minus_one + 1.0) * 2.0)
+        chi2 = ss.make_distribution(ss.chi2)
+        return chi2(df=(q.k_over_two_minus_one + 1.0) * 2.0)  # pyright: ignore
 
     @override
     def exp_class(self) -> type[ChiSquareEP]:
@@ -457,7 +464,8 @@ class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, NumpyRealArray]):
 class ChiInfo(DistributionInfo[ChiNP, ChiEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: ChiNP) -> Any:
-        return ss.chi((q.k_over_two_minus_one + 1.0) * 2.0)
+        chi = ss.make_distribution(ss.chi)
+        return chi(df=(q.k_over_two_minus_one + 1.0) * 2.0)  # pyright: ignore
 
     @override
     def exp_class(self) -> type[ChiEP]:
@@ -472,7 +480,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: WeibullEP) -> Any:
         scale = p.chi ** (1.0 / p.concentration)
-        return ss.weibull_min(p.concentration, scale=scale)
+        return ss.make_distribution(ss.weibull_min)(c=p.concentration) * scale  # pyright: ignore
 
     @override
     def exp_class(self) -> type[WeibullEP]:
