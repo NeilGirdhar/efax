@@ -78,7 +78,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any,
     distribution_shape = (10,)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=distribution_shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
-    scipy_x = scipy_distribution.rvs(random_state=generator)
+    scipy_x = scipy_distribution.sample(rng=generator)
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
     check_observation_shape(nat_parameters, efax_x, distribution_shape)
 
@@ -123,7 +123,7 @@ def test_maximum_likelihood_estimation(
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
     # Generate variates from the corresponding scipy distribution.
     scipy_distribution = distribution_info.exp_to_scipy_distribution(exp_parameters)
-    scipy_x = scipy_distribution.rvs(random_state=generator, size=n)
+    scipy_x = scipy_distribution.sample(rng=generator, shape=(n,))
     # Convert the variates to sufficient statistics.
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
     flat_efax_x = flat_dict_of_observations(efax_x)

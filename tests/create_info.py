@@ -56,7 +56,8 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: BetaNP) -> Any:
         n1 = q.alpha_minus_one + 1.0
-        return ss.beta(n1[..., 0], n1[..., 1])
+        beta = ss.make_distribution(ss.beta)
+        return beta(a=n1[..., 0], b=n1[..., 1])  # pyright: ignore
 
     @override
     def exp_class(self) -> type[BetaEP]:
