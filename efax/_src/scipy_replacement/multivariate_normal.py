@@ -5,7 +5,8 @@ from typing import Self
 import numpy as np
 import optype.numpy as onp
 import scipy.stats as ss
-from tjax import NumpyRealArray
+from numpy.random import Generator
+from tjax import NumpyRealArray, Shape
 
 from .shaped_distribution import ShapedDistribution
 
@@ -22,13 +23,9 @@ class ScipyMultivariateNormalUnvectorized:
     def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
         return np.asarray(self.distribution.pdf(x))
 
-    def rvs(self,
-            size: int | tuple[int, ...] = (),
-            random_state: np.random.Generator | None = None
-            ) -> onp.ArrayND[np.float64]:
-        retval = self.distribution.rvs(size=size, random_state=random_state)
-        size = (size,) if isinstance(size, int) else tuple(size)
-        return np.reshape(retval, size + self.distribution.mean.shape)
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> onp.ArrayND[np.float64]:
+        retval = self.distribution.rvs(size=shape, random_state=rng)
+        return np.reshape(retval, shape + self.distribution.mean.shape)
 
     def entropy(self) -> NumpyRealArray:
         return np.asarray(self.distribution.entropy())
