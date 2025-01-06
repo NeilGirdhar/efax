@@ -47,13 +47,13 @@ class ScipyComplexNormalUnvectorized:
                                                   size=size)
         return xy_rvs[..., 0] + 1j * xy_rvs[..., 1]
 
-    def entropy(self) -> NumpyRealArray:
-        return self.as_multivariate_normal().entropy()
+    def entropy(self) -> float:
+        return self.as_multivariate_normal().entropy().item()
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormalUnvectorized:
         mv_mean = self._multivariate_normal_mean()
         mv_cov = self._multivariate_normal_cov()
-        return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)  # pyright: ignore
+        return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)
 
     def _multivariate_normal_mean(self) -> NumpyRealArray:
         return np.stack([self.mean.real, self.mean.imag], axis=-1)

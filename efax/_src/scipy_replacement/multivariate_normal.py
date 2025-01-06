@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import Any, Self
 
 import numpy as np
+import optype.numpy as onp
 import scipy.stats as ss
-from numpy.random import Generator
-from tjax import NumpyRealArray, ShapeLike
+from tjax import NumpyRealArray
 from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
@@ -19,10 +19,10 @@ class ScipyMultivariateNormalUnvectorized(mvn):
     See https://github.com/scipy/scipy/issues/7689.
     """
     @override
-    def rvs(self,  # type: ignore[misc]
-            size: ShapeLike | None = None,
-            random_state: Generator | None = None) -> NumpyRealArray:
-        retval = super().rvs(size=size, random_state=random_state)  # pyright: ignore
+    def rvs(self,
+            size: Any = None,
+            random_state: Any = None) -> onp.ArrayND[np.float64]:
+        retval = super().rvs(size=size, random_state=random_state)
         if size is None:
             size = ()
         elif isinstance(size, int):

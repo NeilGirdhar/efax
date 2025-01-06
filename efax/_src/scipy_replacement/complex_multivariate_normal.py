@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
@@ -43,9 +41,9 @@ class ScipyComplexMultivariateNormalUnvectorized:
             msg = "The pseudo-variance is not symmetric."
             raise ValueError(msg)
 
-    def pdf(self, z: NumpyComplexArray, out: None = None) -> np.floating[Any]:
+    def pdf(self, z: NumpyComplexArray, out: None = None) -> float:
         zr = np.concat([z.real, z.imag], axis=-1)
-        return self.as_multivariate_normal().pdf(zr)
+        return self.as_multivariate_normal().pdf(zr).item()
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
         if isinstance(size, int):
@@ -57,13 +55,13 @@ class ScipyComplexMultivariateNormalUnvectorized:
                                                   size=size)
         return xy_rvs[..., :self.size] + 1j * xy_rvs[..., self.size:]
 
-    def entropy(self) -> NumpyRealArray:
-        return self.as_multivariate_normal().entropy()
+    def entropy(self) -> float:
+        return self.as_multivariate_normal().entropy().item()
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormalUnvectorized:
         mv_mean = self._multivariate_normal_mean()
         mv_cov = self._multivariate_normal_cov()
-        return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)  # pyright: ignore
+        return ScipyMultivariateNormalUnvectorized(mean=mv_mean, cov=mv_cov)
 
     def _multivariate_normal_mean(self) -> NumpyRealArray:
         """Return the mean of a corresponding real distribution with double the size."""

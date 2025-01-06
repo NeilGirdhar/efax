@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
-import numpy.typing as npt
+import optype.numpy as onp
 import scipy.special
 import scipy.stats as ss
 from numpy.random import Generator
@@ -22,20 +24,21 @@ class ScipyDirichletFixRVsAndPDF(mvd):
     See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.
     """
     @override
-    def rvs(self,  # type: ignore[misc]
-            size: ShapeLike | None = None,
-            random_state: Generator | None = None
-            ) -> npt.NDArray[np.float64]:
+    def rvs(self,
+            size: Any = None,
+            random_state: Any = None
+            ) -> onp.ArrayND[np.float64]:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
-        return super().rvs(size=size, random_state=random_state)  # pyright: ignore
+        return super().rvs(size=size, random_state=random_state)
 
     @override
-    def pdf(self, x: NumpyRealArray) -> NumpyRealArray:  # type: ignore[misc]
+    def pdf(self, x: onp.ToFloatND) -> np.float64:
+        x = np.asarray(x)
         if x.ndim == 2:  # noqa: PLR2004
-            return super().pdf(x.T)
-        return super().pdf(x)
+            return np.float64(super().pdf(x.T))
+        return np.float64(super().pdf(x))
 
 
 class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):

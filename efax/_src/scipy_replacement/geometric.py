@@ -25,4 +25,4 @@ class ScipyGeometric:
         return np.asarray(self.geom.rvs(size=size, random_state=random_state))
 
     def entropy(self) -> NumpyRealArray:
-        return self.geom.entropy()
+        return np.asarray(self.geom.entropy())
