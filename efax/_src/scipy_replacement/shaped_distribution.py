@@ -1,10 +1,10 @@
 from __future__ import annotations
+from numpy.random import Generator
 
 from typing import Any, TypeVar, cast, override
 
 import numpy as np
 import numpy.typing as npt
-from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyIntegralArray, NumpyRealArray, Shape
 
 from .base import ScipyDiscreteDistribution, ScipyDistribution
@@ -37,17 +37,15 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
     def ndim(self) -> int:
         return len(self.shape)
 
-    def rvs(
-        self, size: int | Shape | None = None, random_state: Generator | None = None
-    ) -> NumpyRealArray:
-        if size is None:
-            size = ()
-        elif isinstance(size, int):
-            size = (size,)
-        retval = np.empty(self.shape + size + self.rvs_shape, dtype=self.rvs_dtype)
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyRealArray:
+        retval = np.empty(self.shape + shape + self.rvs_shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
-            retval[i] = this_object.rvs(size=size, random_state=random_state)
+            retval[i] = (
+                this_object.sample(shape=shape, rng=rng)
+                if hasattr(this_object, "sample")
+                else this_object.rvs(size=shape, random_state=rng)
+            )
         return retval
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
@@ -57,7 +55,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         retval = np.empty(final_shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
-            if not isinstance(this_object, ScipyDistribution):
+            if not hasattr(this_object, "pdf"):
                 raise NotImplementedError
             j_range = x.shape[self.ndim : -event_ndim] if event_ndim else x.shape[self.ndim :]
             for j in np.ndindex(*j_range):
@@ -76,7 +74,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         retval = np.empty(x.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
-            if not isinstance(this_object, ScipyDiscreteDistribution):
+            if not hasattr(this_object, "pmf"):
                 raise NotImplementedError
             for j in np.ndindex(*x.shape[self.ndim :]):
                 value = this_object.pmf(x[*i, *j])

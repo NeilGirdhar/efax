@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 from numpy.random import Generator
-from tjax import NumpyRealArray, NumpyRealNumeric, ShapeLike
+from tjax import NumpyRealArray, NumpyRealNumeric, Shape
 
 from efax._src.tools import join_mappings
 
@@ -19,11 +19,11 @@ class ScipyJointDistribution:
         joined = join_mappings(sub=self.sub_distributions, z=z)
         return prod(value["sub"].pdf(value["z"]) for value in joined.values())
 
-    def rvs(
-        self, size: ShapeLike | None = None, random_state: Generator | None = None
-    ) -> dict[str, Any]:
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> dict[str, Any]:
         return {
-            name: distribution.rvs(size, random_state)
+            name: distribution.sample(shape=shape, rng=rng)
+            if hasattr(distribution, "sample")
+            else distribution.rvs(shape, rng)
             for name, distribution in self.sub_distributions.items()
         }
 
