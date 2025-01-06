@@ -18,8 +18,7 @@ from efax import ScipyDirichlet, ScipyDistribution, ScipyMultivariateNormal
                           ])
 def test_shaped(generator: NumpyGenerator, distribution: ScipyDistribution, m: Shape, n: int
                 ) -> None:
-    assert distribution.rvs().shape == (*m, n)
-    assert distribution.rvs(1).shape == (*m, 1, n)
-    assert distribution.rvs((1,)).shape == (*m, 1, n)
-    assert distribution.rvs((1, 1, 1)).shape == (*m, 1, 1, 1, n)
-    assert distribution.rvs((1, 2, 3)).shape == (*m, 1, 2, 3, n)
+    assert distribution.sample().shape == (*m, n)
+    assert distribution.sample((1,)).shape == (*m, 1, n)
+    assert distribution.sample((1, 1, 1)).shape == (*m, 1, 1, 1, n)
+    assert distribution.sample((1, 2, 3)).shape == (*m, 1, 2, 3, n)

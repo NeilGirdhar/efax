@@ -4,7 +4,7 @@ from typing import override
 
 import numpy as np
 from numpy.random import Generator
-from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
+from tjax import NumpyComplexArray, NumpyRealArray, Shape
 
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
@@ -47,14 +47,12 @@ class ScipyComplexMultivariateNormalUnvectorized:
         zr = np.concat([np.real(z), np.imag(z)], axis=-1)
         return self.as_multivariate_normal().pdf(zr).item()
 
-    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
-        if isinstance(size, int):
-            size = (size,)
-        if random_state is None:
-            random_state = np.random.default_rng()
-        xy_rvs = random_state.multivariate_normal(mean=self._multivariate_normal_mean(),
-                                                  cov=self._multivariate_normal_cov(),
-                                                  size=size)
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyComplexArray:
+        if rng is None:
+            rng = np.random.default_rng()
+        xy_rvs = rng.multivariate_normal(mean=self._multivariate_normal_mean(),
+                                         cov=self._multivariate_normal_cov(),
+                                         size=shape)
         return xy_rvs[..., :self.size] + 1j * xy_rvs[..., self.size:]
 
     def entropy(self) -> float:

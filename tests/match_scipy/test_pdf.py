@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
+import scipy.stats as ss
 from jax import Array
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxComplexArray
 
-from efax import (JointDistributionN, Multidimensional, NaturalParametrization,
-                  ScipyDiscreteDistribution, ScipyDistribution, SimpleDistribution)
+from efax import JointDistributionN, Multidimensional, NaturalParametrization, SimpleDistribution
 
 from ..create_info import MultivariateDiagonalNormalInfo
 from ..distribution_info import DistributionInfo
@@ -39,16 +39,18 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
     distribution_shape = (10,)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=distribution_shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
-    scipy_x = scipy_distribution.rvs(random_state=generator)
+    scipy_x = scipy_distribution.sample(rng=generator)
     efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
     _check_observation_shape(nat_parameters, efax_x, distribution_shape)
 
     # Verify that the density matches scipy.
     efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
-    if isinstance(scipy_distribution, ScipyDistribution):
-        scipy_density = scipy_distribution.pdf(scipy_x)
+    if isinstance(scipy_distribution,
+                  ss._distribution_infrastructure.ContinuousDistribution):  # noqa: SLF001
+        scipy_density = scipy_distribution.pdf(scipy_x)  # pyright: ignore
     else:
-        assert isinstance(scipy_distribution, ScipyDiscreteDistribution)
+        assert isinstance(scipy_distribution,
+                          ss._distribution_infrastructure.DiscreteDistribution)  # noqa: SLF001
         scipy_density = scipy_distribution.pmf(scipy_x)  # type: ignore # pyright: ignore
 
     if isinstance(distribution_info, MultivariateDiagonalNormalInfo):

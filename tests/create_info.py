@@ -24,20 +24,37 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   MultivariateUnitVarianceNormalNP, NegativeBinomialEP, NegativeBinomialNP,
                   NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
                   ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
-                  ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution, ScipyLogNormal,
-                  ScipyMultivariateNormal, ScipySoftplusNormal, ScipyVonMises, ScipyVonMisesFisher,
-                  SoftplusNormalEP, SoftplusNormalNP, Structure, SubDistributionInfo,
-                  UnitVarianceLogNormalEP, UnitVarianceLogNormalNP, UnitVarianceNormalEP,
-                  UnitVarianceNormalNP, UnitVarianceSoftplusNormalEP, UnitVarianceSoftplusNormalNP,
-                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
+                  ScipyGeneralizedDirichlet, ScipyJointDistribution, ScipyMultivariateNormal,
+                  ScipyVonMises, ScipyVonMisesFisher, SoftplusNormalEP, SoftplusNormalNP, Structure,
+                  SubDistributionInfo, UnitVarianceLogNormalEP, UnitVarianceLogNormalNP,
+                  UnitVarianceNormalEP, UnitVarianceNormalNP, UnitVarianceSoftplusNormalEP,
+                  UnitVarianceSoftplusNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
+                  WeibullNP)
 
 from .distribution_info import DistributionInfo
+from .softplus import softplus_distribution
+
+Bernoulli = ss.make_distribution(ss.bernoulli)  # pyright: ignore
+Beta = ss.make_distribution(ss.beta)
+Chi = ss.make_distribution(ss.chi)
+ChiSquare = ss.make_distribution(ss.chi2)
+Exponential = ss.make_distribution(ss.expon)
+Gamma = ss.make_distribution(ss.gamma)
+Geometric = ss.make_distribution(ss.geom)  # pyright: ignore
+InverseGamma = ss.make_distribution(ss.invgamma)
+InverseGaussian = ss.make_distribution(ss.invgauss)
+LogNormal = ss.make_distribution(ss.lognorm)
+Logarithmic = ss.make_distribution(ss.logser)  # pyright: ignore
+NegativeBinomial = ss.make_distribution(ss.nbinom)  # pyright: ignore
+Poisson = ss.make_distribution(ss.poisson)  # pyright: ignore
+Rayleigh = ss.make_distribution(ss.rayleigh)
+Weibull = ss.make_distribution(ss.weibull_min)
 
 
 class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: BernoulliEP) -> Any:
-        return ss.bernoulli(p.probability)
+        return Bernoulli(p=p.probability)  # pyright: ignore
 
     @override
     def exp_class(self) -> type[BernoulliEP]:
@@ -55,7 +72,7 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: BetaNP) -> Any:
         n1 = q.alpha_minus_one + 1.0
-        return ss.beta(n1[..., 0], n1[..., 1])
+        return Beta(a=n1[..., 0], b=n1[..., 1])  # pyright: ignore
 
     @override
     def exp_class(self) -> type[BetaEP]:
@@ -69,7 +86,7 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
 class ChiInfo(DistributionInfo[ChiNP, ChiEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: ChiNP) -> Any:
-        return ss.chi((q.k_over_two_minus_one + 1.0) * 2.0)
+        return Chi(df=(q.k_over_two_minus_one + 1.0) * 2.0)  # pyright: ignore
 
     @override
     def exp_class(self) -> type[ChiEP]:
@@ -83,7 +100,7 @@ class ChiInfo(DistributionInfo[ChiNP, ChiEP, NumpyRealArray]):
 class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: ChiSquareNP) -> Any:
-        return ss.chi2((q.k_over_two_minus_one + 1.0) * 2.0)
+        return ChiSquare(df=(q.k_over_two_minus_one + 1.0) * 2.0)  # pyright: ignore
 
     @override
     def exp_class(self) -> type[ChiSquareEP]:
@@ -172,6 +189,8 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:
         return ScipyDirichlet(np.asarray(q.alpha_minus_one, dtype=np.float64) + 1.0)
+        # dirichlet = ss.make_distribution(ss.dirichlet)
+        # return dirichlet(np.asarray(q.alpha_minus_one, dtype=np.float64) + 1.0)
 
     @override
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
@@ -189,7 +208,7 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
 class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: ExponentialEP) -> Any:
-        return ss.expon(0, p.mean)
+        return Exponential() * p.mean
 
     @override
     def exp_class(self) -> type[ExponentialEP]:
@@ -205,7 +224,7 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
     def nat_to_scipy_distribution(self, q: GammaNP) -> Any:
         shape = np.asarray(q.shape_minus_one) + 1.0
         scale = -np.reciprocal(q.negative_rate)
-        return ss.gamma(shape, scale=scale)
+        return Gamma(a=shape) * scale  # pyright: ignore
 
     @override
     def exp_class(self) -> type[GammaEP]:
@@ -240,7 +259,7 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
     def exp_to_scipy_distribution(self, p: GeometricEP) -> Any:
         # Scipy uses a different definition geometric distribution.  The parameter p is inverse
         # odds.
-        return ScipyGeometric(np.reciprocal(1.0 + p.mean))
+        return Geometric(p=np.reciprocal(1.0 + p.mean))  # pyright: ignore
 
     @override
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
@@ -260,7 +279,7 @@ class InverseGammaInfo(DistributionInfo[InverseGammaNP, InverseGammaEP, NumpyRea
     def nat_to_scipy_distribution(self, q: InverseGammaNP) -> Any:
         shape = q.shape_minus_one + 1.0
         scale = -q.negative_scale
-        return ss.invgamma(shape, scale=scale)
+        return InverseGamma(a=shape) * scale  # pyright: ignore
 
     @override
     def exp_class(self) -> type[InverseGammaEP]:
@@ -276,7 +295,7 @@ class InverseGaussianInfo(DistributionInfo[InverseGaussianNP, InverseGaussianEP,
     def nat_to_scipy_distribution(self, q: InverseGaussianNP) -> Any:
         mu = np.sqrt(q.negative_lambda_over_two / q.negative_lambda_over_two_mu_squared)
         lambda_ = -np.asarray(q.negative_lambda_over_two) * 2.0
-        return ss.invgauss(mu=mu / lambda_, scale=lambda_)
+        return InverseGaussian(mu=mu / lambda_) * lambda_  # pyright: ignore
 
     @override
     def exp_class(self) -> type[InverseGaussianEP]:
@@ -360,7 +379,8 @@ class LogNormalInfo(DistributionInfo[LogNormalNP, LogNormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: LogNormalEP) -> Any:
         normal_dp = p.base_distribution().to_deviation_parametrization()
-        return ScipyLogNormal(np.asarray(normal_dp.mean), np.asarray(normal_dp.deviation))
+        return (LogNormal(s=np.asarray(normal_dp.deviation))  # pyright: ignore
+                * np.exp(np.asarray(normal_dp.mean)))
 
     @override
     def exp_class(self) -> type[LogNormalEP]:
@@ -374,7 +394,7 @@ class LogNormalInfo(DistributionInfo[LogNormalNP, LogNormalEP, NumpyRealArray]):
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: LogarithmicNP) -> Any:
-        return ss.logser(np.exp(q.log_probability))
+        return Logarithmic(p=np.exp(q.log_probability))  # pyright: ignore
 
     @override
     def exp_class(self) -> type[LogarithmicEP]:
@@ -467,7 +487,7 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
                                             NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: NegativeBinomialEP) -> Any:
-        return ss.nbinom(p.failures, np.reciprocal(1.0 + p.mean / p.failures))
+        return NegativeBinomial(n=p.failures, p=np.reciprocal(1.0 + p.mean / p.failures))  # pyright: ignore
 
     @override
     def exp_class(self) -> type[NegativeBinomialEP]:
@@ -481,7 +501,8 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
 class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: NormalEP) -> Any:
-        return ss.norm(p.mean, np.sqrt(p.variance()))
+        normal_dp = p.to_deviation_parametrization()
+        return ss.Normal() * np.sqrt(normal_dp.deviation) + normal_dp.mean
 
     @override
     def exp_class(self) -> type[NormalEP]:
@@ -495,7 +516,7 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
 class PoissonInfo(DistributionInfo[PoissonNP, PoissonEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: PoissonEP) -> Any:
-        return ss.poisson(p.mean)
+        return Poisson(mu=p.mean)  # pyright: ignore
 
     @override
     def exp_class(self) -> type[PoissonEP]:
@@ -509,7 +530,7 @@ class PoissonInfo(DistributionInfo[PoissonNP, PoissonEP, NumpyRealArray]):
 class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: RayleighEP) -> Any:
-        return ss.rayleigh(scale=np.sqrt(p.chi / 2.0))
+        return Rayleigh() * np.sqrt(p.chi / 2.0)
 
     @override
     def exp_class(self) -> type[RayleighEP]:
@@ -524,7 +545,7 @@ class SoftplusNormalInfo(DistributionInfo[SoftplusNormalNP, SoftplusNormalEP, Nu
     @override
     def exp_to_scipy_distribution(self, p: SoftplusNormalEP) -> Any:
         normal_dp = p.base_distribution().to_deviation_parametrization()
-        return ScipySoftplusNormal(np.asarray(normal_dp.mean), np.asarray(normal_dp.deviation))
+        return softplus_distribution(ss.Normal() * normal_dp.deviation + normal_dp.mean)
 
     @override
     def exp_class(self) -> type[SoftplusNormalEP]:
@@ -539,7 +560,7 @@ class UnitVarianceLogNormalInfo(
         DistributionInfo[UnitVarianceLogNormalNP, UnitVarianceLogNormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: UnitVarianceLogNormalEP) -> Any:
-        return ScipyLogNormal(np.asarray(p.mean), np.ones_like(p.mean))
+        return LogNormal(s=np.ones_like(p.mean)) * np.exp(np.asarray(p.mean))  # pyright: ignore
 
     @override
     def exp_class(self) -> type[UnitVarianceLogNormalEP]:
@@ -554,7 +575,7 @@ class UnitVarianceNormalInfo(
         DistributionInfo[UnitVarianceNormalNP, UnitVarianceNormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: UnitVarianceNormalEP) -> Any:
-        return ss.norm(p.mean, 1.0)
+        return ss.Normal() + p.mean
 
     @override
     def exp_class(self) -> type[UnitVarianceNormalEP]:
@@ -570,7 +591,7 @@ class UnitVarianceSoftplusNormalInfo(
                          NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: UnitVarianceSoftplusNormalEP) -> Any:
-        return ScipySoftplusNormal(np.asarray(p.mean), np.ones_like(p.mean))
+        return softplus_distribution(ss.Normal() + p.mean)
 
     @override
     def exp_class(self) -> type[UnitVarianceSoftplusNormalEP]:
@@ -626,7 +647,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: WeibullEP) -> Any:
         scale = np.asarray(p.chi) ** np.reciprocal(p.concentration)
-        return ss.weibull_min(p.concentration, scale=scale)
+        return Weibull(c=p.concentration) * scale  # pyright: ignore
 
     @override
     def exp_class(self) -> type[WeibullEP]:

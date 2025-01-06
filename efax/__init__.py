@@ -61,11 +61,8 @@ from ._src.scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistrib
 from ._src.scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from ._src.scipy_replacement.complex_normal import ScipyComplexNormal
 from ._src.scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
-from ._src.scipy_replacement.geometric import ScipyGeometric
 from ._src.scipy_replacement.joint import ScipyJointDistribution
-from ._src.scipy_replacement.log_normal import ScipyLogNormal
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
-from ._src.scipy_replacement.softplus_normal import ScipySoftplusNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
 from ._src.structure.estimator import MaximumLikelihoodEstimator
 from ._src.structure.flattener import Flattener
@@ -161,11 +158,8 @@ __all__ = [
         'ScipyDiscreteDistribution',
         'ScipyDistribution',
         'ScipyGeneralizedDirichlet',
-        'ScipyGeometric',
         'ScipyJointDistribution',
-        'ScipyLogNormal',
         'ScipyMultivariateNormal',
-        'ScipySoftplusNormal',
         'ScipyVonMises',
         'ScipyVonMisesFisher',
         'SimpleDistribution',

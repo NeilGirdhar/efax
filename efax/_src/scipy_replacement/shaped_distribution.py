@@ -35,18 +35,12 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
     def ndim(self) -> int:
         return len(self.shape)
 
-    def rvs(self,
-            size: int | Shape | None = None,
-            random_state: Generator | None = None) -> NumpyRealArray:
-        if size is None:
-            size = ()
-        elif isinstance(size, int):
-            size = (size,)
-        retval = np.empty(self.shape + size + self.rvs_shape,
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyRealArray:
+        retval = np.empty(self.shape + shape + self.rvs_shape,
                           dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast('T', self.objects[i])
-            retval[i] = this_object.rvs(size=size, random_state=random_state)
+            retval[i] = this_object.sample(shape=shape, rng=rng)
         return retval
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:

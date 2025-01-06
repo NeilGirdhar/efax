@@ -52,7 +52,7 @@ def test_univariate_rvs(generator: Generator) -> None:
     rvs_shape = (50, 100)
     rvs_axes = tuple(range(-len(rvs_shape), 0))
     dist = _build_uvcn(generator, shape)
-    rvs = dist.rvs(random_state=generator, size=rvs_shape)
+    rvs = dist.sample(shape=rvs_shape, rng=generator)
     assert rvs.shape == shape + rvs_shape
 
     estimated_mean = np.average(rvs, axis=rvs_axes)
@@ -74,7 +74,7 @@ def test_multivariate_rvs(generator: Generator) -> None:
     rvs_axes = tuple(range(-len(rvs_shape) - 1, -1))
     rvs_axes2 = tuple(range(-len(rvs_shape) - 2, -2))
     dist = _build_mvcn(generator, shape, dimensions)
-    rvs = dist.rvs(random_state=generator, size=rvs_shape)
+    rvs = dist.sample(shape=rvs_shape, rng=generator)
     assert rvs.shape == shape + rvs_shape + (dimensions,)
 
     estimated_mean = np.average(rvs, axis=rvs_axes)

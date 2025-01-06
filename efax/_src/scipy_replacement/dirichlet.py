@@ -7,7 +7,7 @@ import optype.numpy as onp
 import scipy.stats as ss
 from numpy.random import Generator
 from scipy.special import beta as scipy_beta
-from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
+from tjax import NumpyComplexArray, NumpyRealArray, Shape
 
 from .shaped_distribution import ShapedDistribution
 
@@ -27,15 +27,9 @@ class ScipyDirichletFixRVsAndPDF:
             return np.float64(self.distribution.pdf(x.T))
         return np.float64(self.distribution.pdf(x))
 
-    def rvs(self,
-            size: tuple[int, ...] | None = None,
-            random_state: np.random.Generator | None = None
-            ) -> onp.ArrayND[np.float64]:
-        if size is None:
-            size = ()
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> onp.ArrayND[np.float64]:
         # This somehow fixes the behaviour of rvs.
-        return self.distribution.rvs(size=size,  # type: ignore # pyright: ignore
-                                     random_state=random_state)
+        return self.distribution.rvs(size=shape, random_state=rng)  # pyright: ignore
 
     def entropy(self) -> NumpyRealArray:
         return np.asarray(self.distribution.entropy())
@@ -78,13 +72,12 @@ class ScipyGeneralizedDirichlet:
         terms = x ** (self.alpha - 1.0) * (1.0 - cs_x) ** gamma / scipy_beta(self.alpha, self.beta)
         return np.prod(terms, axis=-1)
 
-    def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
-        sample_size: tuple[int, ...] = (((size,) if isinstance(size, int) else tuple(size))
-                                        + self.alpha.shape)
-        if random_state is None:
-            random_state = np.random.default_rng()
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyComplexArray:
+        sample_size = shape + self.alpha.shape
+        if rng is None:
+            rng = np.random.default_rng()
         dimensions = self.alpha.shape[-1]
-        beta_samples = random_state.beta(self.alpha, self.beta, size=sample_size)
+        beta_samples = rng.beta(self.alpha, self.beta, size=sample_size)
         q = np.zeros(beta_samples.shape[:-1])
         for i in range(dimensions):
             beta_samples[..., i] *= 1 - q
