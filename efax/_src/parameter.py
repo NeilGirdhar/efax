@@ -32,7 +32,7 @@ class Ring:
         raise NotImplementedError
 
     @abstractmethod
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
         raise NotImplementedError
 
     def clamp(self, x: JaxArray) -> JaxArray:
@@ -90,14 +90,18 @@ class RealField(Ring):
                 return y
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
         match self.minimum, self.maximum:
             case None, float(maximum):
-                return xp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale)
+                return xp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale
+                                  - safety)
             case float(minimum), None:
-                return xp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum)
+                return xp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum
+                                  + safety)
             case float(minimum), float(maximum):
-                return xp.asarray(minimum + (maximum - minimum) * rng.uniform(size=shape))
+                domain_width = xp.maximum(maximum - minimum - safety, 0.0)
+                true_minimum = xp.mean(minimum, maximum) - domain_width * 0.5
+                return xp.asarray(true_minimum + domain_width * rng.uniform(size=shape))
             case None, None:
                 return xp.asarray(rng.normal(scale=1.0, size=shape) * self.generation_scale)
             case _:
@@ -168,7 +172,7 @@ class ComplexField(Ring):
         return corrected_x * magnitude / corrected_magnitude
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
         return self._unflattened(xp.asarray(rng.normal(size=shape) + 1j * rng.normal(size=shape)))
 
 
@@ -188,7 +192,7 @@ class BooleanRing(Ring):
         return xp.asarray(y, dtype=xp.bool_)
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
         return xp.asarray(rng.binomial(1, 0.5, shape).astype(np.bool_))
 
 
@@ -212,10 +216,10 @@ class IntegralRing(Ring):
         return xp.asarray(y, dtype=canonicalize_dtype(int))
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape) -> JaxRealArray:
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
         field = RealField(minimum=None if self.minimum is None else float(self.minimum),
                       maximum=None if self.maximum is None else float(self.maximum))
-        real_values = field.generate(xp, rng, shape) * 10
+        real_values = field.generate(xp, rng, shape, safety) * 10
         return real_values.astype(canonicalize_dtype(int))
 
 
@@ -254,7 +258,7 @@ class Support:
         raise NotImplementedError
 
     @abstractmethod
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
                  ) -> JaxRealArray:
         raise NotImplementedError
 
@@ -287,9 +291,9 @@ class ScalarSupport(Support):
         return x[..., 0]
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
                  ) -> JaxRealArray:
-        return self.ring.generate(xp, rng, shape)
+        return self.ring.generate(xp, rng, shape, safety)
 
 
 class VectorSupport(Support):
@@ -316,9 +320,9 @@ class VectorSupport(Support):
         return x
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
                  ) -> JaxRealArray:
-        return self.ring.generate(xp, rng, (*shape, dimensions))
+        return self.ring.generate(xp, rng, (*shape, dimensions), safety)
 
 
 class SimplexSupport(Support):
@@ -353,7 +357,7 @@ class SimplexSupport(Support):
         return xp.clip(x, min=eps, max=1.0 - eps)
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
                  ) -> JaxRealArray:
         raise NotImplementedError
 
@@ -420,9 +424,9 @@ class SymmetricMatrixSupport(Support):
         return result
 
     @override
-    def generate(self, xp: Namespace, rng: Generator, shape: Shape, dimensions: int
+    def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
                  ) -> JaxRealArray:
-        m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions))
+        m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions), safety)
         mt = xp.matrix_transpose(m)
         if self.hermitian:
             mt = mt.conj()
@@ -430,7 +434,7 @@ class SymmetricMatrixSupport(Support):
             assert isinstance(self.ring, RealField | ComplexField)
             eig_field = (RealField(minimum=0.0)
                          if self.positive_semidefinite else RealField(maximum=0.0))
-            eig = eig_field.generate(xp, rng, (*shape, dimensions))
+            eig = eig_field.generate(xp, rng, (*shape, dimensions), safety)
             return xp.einsum('...ij,...j,...jk->...ik', m, eig, mt)
         return m + mt
 

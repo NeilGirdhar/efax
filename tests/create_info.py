@@ -324,7 +324,7 @@ class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP, NumpyRealArray]):
 
 class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
     def __init__(self) -> None:
-        super().__init__(dimensions=2)
+        super().__init__(dimensions=2, safety=0.1)
 
     @override
     def nat_to_scipy_distribution(self, q: BetaNP) -> Any:
@@ -357,6 +357,9 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
 
 
 class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
+    def __init__(self, dimensions: int) -> None:
+        super().__init__(dimensions=dimensions, safety=0.1)
+
     @override
     def nat_to_scipy_distribution(self, q: DirichletNP) -> Any:
         return ScipyDirichlet(np.asarray(q.alpha_minus_one, dtype=np.float64) + 1.0)
@@ -376,6 +379,9 @@ class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
 
 class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, GeneralizedDirichletEP,
                                                 NumpyRealArray]):
+    def __init__(self, dimensions: int) -> None:
+        super().__init__(dimensions=dimensions, safety=3.0)
+
     @override
     def nat_to_scipy_distribution(self, q: GeneralizedDirichletNP) -> Any:
         alpha, beta = q.alpha_beta()

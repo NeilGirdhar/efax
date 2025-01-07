@@ -17,9 +17,10 @@ Domain = TypeVar('Domain', bound=NumpyComplexArray | dict[str, Any])
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):
-    def __init__(self, dimensions: int = 1) -> None:
+    def __init__(self, dimensions: int = 1, safety: float = 0.0) -> None:
         super().__init__()
         self.dimensions = dimensions
+        self.safety = safety
 
     def exp_to_scipy_distribution(self, p: EP) -> Any:
         """Produce a corresponding scipy distribution from expectation parameters.
@@ -48,7 +49,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
     @final
     def nat_parameter_generator(self, rng: Generator, shape: Shape) -> NP:
         """Generate natural parameters."""
-        return self.nat_structure().generate_random(jnp, rng, shape)
+        return self.nat_structure().generate_random(jnp, rng, shape, self.safety)
 
     def scipy_to_exp_family_observation(self, x: Domain) -> JaxComplexArray | dict[str, Any]:
         """The observation that's expected by the exponential family.

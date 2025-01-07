@@ -4,7 +4,6 @@ import optimistix as optx
 from jax import jit
 from tjax import JaxRealArray
 from tjax.dataclasses import dataclass, field
-from tjax.gradient import Adam
 from typing_extensions import override
 
 from .exp_to_nat import ExpToNat, ExpToNatMinimizer
@@ -51,8 +50,8 @@ class OptimistixRootFinder(ExpToNatMinimizer):
 
 
 default_minimizer = OptimistixRootFinder(
-        solver=optx.OptaxMinimiser[JaxRealArray, None](optim=Adam(5e-2), rtol=0.0, atol=1e-7),
-        max_steps=1000)
+        solver=optx.Newton[JaxRealArray, JaxRealArray, None](rtol=0.0, atol=1e-7),
+        max_steps=8000)
 
 
 default_bisection_minimizer = OptimistixRootFinder(

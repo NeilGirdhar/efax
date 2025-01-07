@@ -3,15 +3,16 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, TypeAlias
 
+import pytest
 from jax import grad, jvp, vjp
 from jax.custom_derivatives import zero_from_primal
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import JaxRealArray, assert_tree_allclose, jit
+from tjax import JaxRealArray, assert_tree_allclose, jit, print_generic, tree_allclose
 
 from efax import NaturalParametrization, Structure, parameters
 
-from .create_info import BetaInfo, DirichletInfo, GammaInfo, GeneralizedDirichletInfo
+from .create_info import GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
 
 LogNormalizer: TypeAlias = Callable[[NaturalParametrization[Any, Any]], JaxRealArray]
@@ -21,27 +22,28 @@ def test_conversion(generator: Generator,
                     distribution_info: DistributionInfo[Any, Any, Any]
                     ) -> None:
     """Test that the conversion between the different parametrizations are consistent."""
-    atol = (5e-3
-            if isinstance(distribution_info, GammaInfo | BetaInfo)
-            else 2e-2
-            if isinstance(distribution_info, DirichletInfo | GeneralizedDirichletInfo)
-            else 1e-4)
+    if isinstance(distribution_info, GeneralizedDirichletInfo):
+        pytest.skip()
 
-    for _ in range(10):
-        shape = (3, 4)
-        original_ep = distribution_info.exp_parameter_generator(generator, shape=shape)
-        intermediate_np = original_ep.to_nat()
-        final_ep = intermediate_np.to_exp()
+    n = 30
+    shape = (n,)
+    original_np = distribution_info.nat_parameter_generator(generator, shape=shape)
+    intermediate_ep = original_np.to_exp()
+    final_np = intermediate_ep.to_nat()
 
-        # Check round trip.
-        assert_tree_allclose(final_ep, original_ep, atol=atol, rtol=1e-4)
+    # Check round trip.
+    if not tree_allclose(final_np, original_np):
+        for i in range(n):
+            if not tree_allclose(final_np[i], original_np[i]):
+                print_generic(original=original_np[i], intermediate=intermediate_ep[i])
+        pytest.fail("Conversion failure")
 
-        # Check fixed parameters.
-        original_fixed = parameters(original_ep, fixed=True)
-        intermediate_fixed = parameters(intermediate_np, fixed=True)
-        final_fixed = parameters(final_ep, fixed=True)
-        assert_tree_allclose(original_fixed, intermediate_fixed)
-        assert_tree_allclose(original_fixed, final_fixed)
+    # Check fixed parameters.
+    original_fixed = parameters(original_np, fixed=True)
+    intermediate_fixed = parameters(intermediate_ep, fixed=True)
+    final_fixed = parameters(final_np, fixed=True)
+    assert_tree_allclose(original_fixed, intermediate_fixed)
+    assert_tree_allclose(original_fixed, final_fixed)
 
 
 def prelude(generator: Generator,

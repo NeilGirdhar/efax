@@ -101,14 +101,14 @@ class Structure(Generic[P]):
                 for info in self.infos
                 if issubclass(info.type_, SimpleDistribution)}
 
-    def generate_random(self, xp: Namespace, rng: Generator, shape: Shape) -> P:
+    def generate_random(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> P:
         """Generate a random distribution."""
         path_and_values = {}
         for info in self.infos:
             kwargs: dict[str, JaxComplexArray] = {}
             for name in support(info.type_):
                 s = info.type_.adjust_support(name, **kwargs)
-                value = s.generate(xp, rng, shape, info.dimensions)
+                value = s.generate(xp, rng, shape, safety, info.dimensions)
                 path_and_values[*info.path, name] = kwargs[name] = value
         return self.assemble(path_and_values)
 
