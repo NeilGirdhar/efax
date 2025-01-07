@@ -193,7 +193,7 @@ class BooleanRing(Ring):
 
     @override
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
-        return xp.asarray(rng.binomial(1, 0.5, shape).astype(np.bool_))
+        return xp.asarray(rng.binomial(1, 0.5, shape), dtype=xp.bool_)
 
 
 @dataclass
@@ -220,7 +220,7 @@ class IntegralRing(Ring):
         field = RealField(minimum=None if self.minimum is None else float(self.minimum),
                       maximum=None if self.maximum is None else float(self.maximum))
         real_values = field.generate(xp, rng, shape, safety) * 10
-        return real_values.astype(canonicalize_dtype(int))
+        return xp.astype(real_values, canonicalize_dtype(int))
 
 
 real_field = RealField()

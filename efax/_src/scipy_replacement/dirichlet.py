@@ -55,7 +55,7 @@ class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
 
     @override
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
-        x = x.astype(np.float64)
+        x = np.astype(x, np.float64)
         y = np.sum(x, axis=-1)
         if not np.all(np.isclose(y, np.ones(y.shape), atol=1e-5, rtol=0)):
             raise ValueError

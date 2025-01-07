@@ -17,8 +17,8 @@ class ScipyVonMises(ShapedDistribution[ss.vonmises]):
         shape = np.broadcast(kappa, loc).shape
         rvs_shape = ()
         dtype = np.result_type(kappa.dtype, loc.dtype)
-        kappa = np.broadcast_to(kappa, shape).astype(dtype)
-        loc = np.broadcast_to(loc, shape).astype(dtype)
+        kappa = np.astype(np.broadcast_to(kappa, shape), dtype)
+        loc = np.astype(np.broadcast_to(loc, shape), dtype)
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
             objects[i] = ss.vonmises(kappa[i], loc[i])
@@ -33,8 +33,8 @@ class ScipyVonMisesFisher(ShapedDistribution[ss.vonmises_fisher]):
         shape = kappa.shape
         rvs_shape = (mu.shape[-1],)
         dtype = np.result_type(kappa.dtype, mu.dtype)
-        kappa = kappa.astype(dtype)
-        mu = mu.astype(dtype)
+        kappa = np.astype(kappa, dtype)
+        mu = np.astype(mu, dtype)
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
             objects[i] = ss.vonmises_fisher(mu[i], kappa[i])
