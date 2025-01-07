@@ -426,16 +426,21 @@ class SymmetricMatrixSupport(Support):
     @override
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
                  ) -> JaxRealArray:
+        # Generate a random matrix.
         m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions), safety)
-        mt = xp.matrix_transpose(m)
-        if self.hermitian:
-            mt = xp.conj(mt)
         if self.negative_semidefinite or self.positive_semidefinite:
+            # Perform QR decomposition to obtain an orthogonal matrix Q
+            q, _ = np.linalg.qr(m)
+            # Generate Eigenvalues.
             assert isinstance(self.ring, RealField | ComplexField)
             eig_field = (RealField(minimum=0.0)
                          if self.positive_semidefinite else RealField(maximum=0.0))
             eig = eig_field.generate(xp, rng, (*shape, dimensions), safety)
-            return xp.einsum('...ij,...j,...jk->...ik', m, eig, mt)
+            # Return Q.T @ diag(eig) @ Q.
+            return xp.einsum('...ji,...j,...jk->...ik', xp.conj(q) if self.hermitian else q, eig, q)
+        mt = xp.matrix_transpose(m)
+        if self.hermitian:
+            mt = xp.conj(mt)
         return m + mt
 
 
