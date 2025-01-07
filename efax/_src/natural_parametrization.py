@@ -119,7 +119,7 @@ class NaturalParametrization(Distribution,
         xp = self.get_namespace()
         flattener, _ = Flattener.flatten(self)
         fisher_matrix = self._fisher_information_matrix()
-        fisher_diagonal = xp.diagonal(fisher_matrix)
+        fisher_diagonal = xp.linalg.diagonal(fisher_matrix)
         return flattener.unflatten(fisher_diagonal)
 
     @final

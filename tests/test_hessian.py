@@ -58,7 +58,7 @@ def calculate_curvature(p: SimpleDistribution,
     parameters_hessian = jnp.sum(parameters_hessian, axis=0)
 
     assert parameters_hessian.shape[-2] == parameters_hessian.shape[-1]
-    diagonal_hessian = jnp.diagonal(parameters_hessian, axis1=-2, axis2=-1)
+    diagonal_hessian = jnp.linalg.diagonal(parameters_hessian)
     # There's one element for each sample element.  Just sum over the curvatures.
     return jnp.sum(diagonal_hessian, axis=0)
 
