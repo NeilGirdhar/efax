@@ -1,6 +1,7 @@
 """These tests are related to entropy."""
 from __future__ import annotations
 
+from functools import partial
 from typing import Any
 
 import jax.numpy as jnp
@@ -17,7 +18,7 @@ from .create_info import BetaInfo, DirichletInfo
 from .distribution_info import DistributionInfo
 
 
-def sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any], /) -> JaxRealArray:
+def sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any]) -> JaxRealArray:
     x = flattener.unflatten(flattened)
     return jnp.sum(x.entropy())
 
@@ -37,7 +38,8 @@ def check_entropy_gradient(distribution: HasEntropy, /) -> None:
             print_generic(bad_distributions, console=console)
         msg = f"Non-finite gradient found for distributions: {capture.get()}"
         raise AssertionError(msg)
-    check_grads(sum_entropy, (flattened, flattener), order=1, atol=1e-4, rtol=1e-2)
+    check_grads(partial(sum_entropy, flattener=flattener), (flattened,), order=1, atol=1e-4,
+                rtol=1e-2)
 
 
 def test_nat_entropy_gradient(generator: Generator,

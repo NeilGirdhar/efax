@@ -207,6 +207,9 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
 
 class MultivariateNormalInfo(DistributionInfo[MultivariateNormalNP, MultivariateNormalEP,
                                               NumpyRealArray]):
+    def __init__(self, dimensions: int) -> None:
+        super().__init__(dimensions=dimensions, safety=0.1)
+
     @override
     def exp_to_scipy_distribution(self, p: MultivariateNormalEP) -> Any:
         # Correct numerical errors introduced by various conversions.
