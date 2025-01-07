@@ -34,7 +34,7 @@ def build_mvcn(generator: Generator,
     z = random_complex_array(generator, (*shape, dimensions, directions))
     regularizer = np.tile(np.eye(dimensions), (*shape, 1, 1))
     variance = (
-        np.average(z.conjugate()[..., np.newaxis, :, :] * z[..., np.newaxis, :],
+        np.average(np.conj(z)[..., np.newaxis, :, :] * z[..., np.newaxis, :],
                    weights=weights,
                    axis=-1)
         + regularizer)
@@ -56,8 +56,8 @@ def test_univariate_rvs(generator: Generator) -> None:
 
     estimated_mean = np.average(rvs, axis=rvs_axes)
     centered_rvs = rvs - dist.mean[(...,) + (np.newaxis,) * len(rvs_shape)]
-    estimated_variance = np.average(
-        centered_rvs.conjugate() * centered_rvs, axis=rvs_axes).real
+    estimated_variance = np.real(np.average(
+        np.conj(centered_rvs) * centered_rvs, axis=rvs_axes))
     estimated_pseudo_variance = np.average(np.square(centered_rvs), axis=rvs_axes)
     assert_allclose(estimated_mean, dist.mean, rtol=0.0, atol=2e-2)
     assert_allclose(estimated_variance, dist.variance, rtol=3e-2, atol=2e-2)
@@ -78,9 +78,9 @@ def test_multivariate_rvs(generator: Generator) -> None:
 
     estimated_mean = np.average(rvs, axis=rvs_axes)
     centered_rvs = rvs - dist.mean[(...,) + (np.newaxis,) * len(rvs_shape) + (slice(None),)]
-    estimated_variance = np.average(
-        centered_rvs[..., np.newaxis] * centered_rvs.conjugate()[..., np.newaxis, :],
-        axis=rvs_axes2).real
+    estimated_variance = np.real(np.average(
+        centered_rvs[..., np.newaxis] * np.conj(centered_rvs)[..., np.newaxis, :],
+        axis=rvs_axes2))
     estimated_pseudo_variance = np.average(
         centered_rvs[..., np.newaxis] * centered_rvs[..., np.newaxis, :], axis=rvs_axes2)
     assert_allclose(estimated_mean, dist.mean, rtol=1e-2, atol=1e-2)
@@ -94,7 +94,7 @@ def test_univariate_multivariate_consistency(generator: Generator) -> None:
     mv = build_mvcn(generator, (), 1, polarization=0.5)
     component = mv.access_object(())
     mean: NumpyComplexArray = np.asarray(component.mean[0])
-    variance: NumpyRealArray = np.asarray(component.variance[0, 0].real)
+    variance: NumpyRealArray = np.real(np.asarray(component.variance[0, 0]))
     pseudo_variance: NumpyComplexArray = np.asarray(component.pseudo_variance[0, 0])
     uv = ScipyComplexNormal(mean, variance, pseudo_variance)
     x = random_complex_array(generator)

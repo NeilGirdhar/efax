@@ -34,7 +34,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
         if not np.all(np.linalg.eigvals(variance) >= 0):
             msg = "The variance is not positive semidefinite."
             raise ValueError(msg)
-        if not np.all(np.isclose(variance, variance.T.conjugate())):
+        if not np.all(np.isclose(variance, np.conj(variance.T))):
             msg = "The variance is not Hermitian."
             raise ValueError(msg)
         if not np.all(np.isclose(pseudo_variance, pseudo_variance.T)):
@@ -42,7 +42,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
             raise ValueError(msg)
 
     def pdf(self, z: NumpyComplexArray, out: None = None) -> float:
-        zr = np.concat([z.real, z.imag], axis=-1)
+        zr = np.concat([np.real(z), np.imag(z)], axis=-1)
         return self.as_multivariate_normal().pdf(zr).item()
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
@@ -65,16 +65,16 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
     def _multivariate_normal_mean(self) -> NumpyRealArray:
         """Return the mean of a corresponding real distribution with double the size."""
-        return np.concat((self.mean.real, self.mean.imag))
+        return np.concat((np.real(self.mean), np.imag(self.mean)))
 
     def _multivariate_normal_cov(self) -> NumpyRealArray:
         """Return the covariance of a corresponding real distribution with double the size."""
         cov_sum = self.variance + self.pseudo_variance
         cov_diff = self.variance - self.pseudo_variance
-        xx = 0.5 * cov_sum.real
-        xy = 0.5 * -cov_diff.imag
-        yx = 0.5 * cov_sum.imag
-        yy = 0.5 * cov_diff.real
+        xx = 0.5 * np.real(cov_sum)
+        xy = 0.5 * np.imag(-cov_diff)
+        yx = 0.5 * np.imag(cov_sum)
+        yy = 0.5 * np.real(cov_diff)
         return np.block([[xx, xy], [yx, yy]])
 
 

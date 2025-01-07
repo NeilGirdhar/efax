@@ -51,7 +51,8 @@ class ComplexUnitNormalNP(HasEntropyNP['ComplexUnitNormalEP'],
 
     @override
     def to_exp(self) -> ComplexUnitNormalEP:
-        return ComplexUnitNormalEP(self.two_mean_conjugate.conjugate() * 0.5)
+        xp = self.get_namespace()
+        return ComplexUnitNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -98,7 +99,8 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
 
     @override
     def to_nat(self) -> ComplexUnitNormalNP:
-        return ComplexUnitNormalNP(self.mean.conjugate() * 2.0)
+        xp = self.get_namespace()
+        return ComplexUnitNormalNP(xp.conj(self.mean) * 2.0)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

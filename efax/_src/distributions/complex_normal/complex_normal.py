@@ -58,7 +58,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
         det_s = s
         det_h = -self.negative_precision
         return (-abs_square(mu) * self.negative_precision
-                - (xp.square(mu) * self.pseudo_precision).real
+                - xp.real(xp.square(mu) * self.pseudo_precision)
                 + 0.5 * xp.log(det_s)
                 - 0.5 * xp.log(det_h)
                 + math.log(math.pi))
@@ -67,7 +67,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
     def to_exp(self) -> ComplexNormalEP:
         xp = self.get_namespace()
         r, s, mu = self._r_s_mu()
-        u = (r * s).conjugate()
+        u = xp.conj(r * s)
         return ComplexNormalEP(mu, s + abs_square(mu), u + xp.square(mu))
 
     @override
@@ -83,12 +83,12 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
         return ComplexNormalEP(x, abs_square(x), xp.square(x))
 
     def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
+        xp = self.get_namespace()
         r = -self.pseudo_precision / self.negative_precision
         s = 1.0 / ((abs_square(r) - 1.0) * self.negative_precision)
         k = self.pseudo_precision / self.negative_precision
         l_eta = 0.5 * self.mean_times_precision / ((abs_square(k) - 1.0) * self.negative_precision)
-        mu = (l_eta.conjugate()
-              - (self.pseudo_precision / self.negative_precision).conjugate() * l_eta)
+        mu = xp.conj(l_eta) - xp.conj(self.pseudo_precision / self.negative_precision) * l_eta
         return r, s, mu
 
     @override
@@ -143,12 +143,12 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         variance = self.second_moment - abs_square(self.mean)
         pseudo_variance = self.pseudo_second_moment - xp.square(self.mean)
 
-        r = pseudo_variance.conjugate() / variance
-        p_c = variance - (r * pseudo_variance).conjugate()
+        r = xp.conj(pseudo_variance) / variance
+        p_c = variance - xp.conj(r * pseudo_variance)
         p_inv_c = 1.0 / p_c
-        precision = -p_inv_c.real
+        precision = xp.real(-p_inv_c)
         pseudo_precision = r * p_inv_c
-        mean_times_precision = -2.0 * (precision * self.mean.conjugate()
+        mean_times_precision = -2.0 * (precision * xp.conj(self.mean)
                                        + pseudo_precision * self.mean)
         return ComplexNormalNP(mean_times_precision, precision, pseudo_precision)
 
@@ -170,9 +170,9 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         xp = self.get_namespace()
         variance = self.second_moment - abs_square(self.mean)
         pseudo_variance = self.pseudo_second_moment - xp.square(self.mean)
-        xx = variance + pseudo_variance.real
-        xy = pseudo_variance.imag
-        yy = variance - pseudo_variance.real
+        xx = variance + xp.real(pseudo_variance)
+        xy = xp.imag(pseudo_variance)
+        yy = variance - xp.real(pseudo_variance)
         xx_xy = xp.stack([xx, xy], axis=-1)
         yx_yy = xp.stack([xy, yy], axis=-1)
         return 0.5 * xp.stack([xx_xy, yx_yy], axis=-2)
@@ -184,7 +184,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         else:
             shape = self.shape
         xp = self.get_namespace()
-        mn_mean = xp.stack([self.mean.real, self.mean.imag], axis=-1)
+        mn_mean = xp.stack([xp.real(self.mean), xp.imag(self.mean)], axis=-1)
         mn_cov = self._multivariate_normal_cov()
         mn_sample = jax.random.multivariate_normal(key, mn_mean, mn_cov, shape)
         return mn_sample[..., 0] + 1j * mn_sample[..., 1]

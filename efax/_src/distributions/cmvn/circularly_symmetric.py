@@ -52,14 +52,14 @@ class ComplexCircularlySymmetricNormalNP(
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = self.get_namespace()
-        log_det_s = xp.log(xp.linalg.det(-self.negative_precision).real)
+        log_det_s = xp.log(xp.real(xp.linalg.det(-self.negative_precision)))
         return -log_det_s + self.dimensions() * math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexCircularlySymmetricNormalEP:
         xp = self.get_namespace()
         return ComplexCircularlySymmetricNormalEP(
-            xp.linalg.inv(-self.negative_precision).conjugate())
+            xp.conj(xp.linalg.inv(-self.negative_precision)))
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -115,8 +115,7 @@ class ComplexCircularlySymmetricNormalEP(
     @override
     def to_nat(self) -> ComplexCircularlySymmetricNormalNP:
         xp = self.get_namespace()
-        return ComplexCircularlySymmetricNormalNP(
-            -xp.linalg.inv(self.variance).conjugate())
+        return ComplexCircularlySymmetricNormalNP(xp.conj(-xp.linalg.inv(self.variance)))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
@@ -149,8 +148,8 @@ class ComplexCircularlySymmetricNormalEP(
     def _multivariate_normal_cov(self) -> JaxRealArray:
         """Return the covariance of a corresponding real distribution with double the size."""
         xp = self.get_namespace()
-        gamma_r = 0.5 * self.variance.real
-        gamma_i = 0.5 * self.variance.imag
+        gamma_r = 0.5 * xp.real(self.variance)
+        gamma_i = 0.5 * xp.imag(self.variance)
         return xp.concat([xp.concat([gamma_r, -gamma_i], axis=-1),
                           xp.concat([gamma_i, gamma_r], axis=-1)],
                          axis=-2)

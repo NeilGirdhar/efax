@@ -145,7 +145,7 @@ class ComplexField(Ring):
                 corrected_x = x * corrected_magnitude / magnitude
         else:
             corrected_x = x
-        return xp.concat([corrected_x.real, corrected_x.imag], axis=-1)
+        return xp.concat([xp.real(corrected_x), xp.imag(corrected_x)], axis=-1)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
@@ -429,7 +429,7 @@ class SymmetricMatrixSupport(Support):
         m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions), safety)
         mt = xp.matrix_transpose(m)
         if self.hermitian:
-            mt = mt.conj()
+            mt = xp.conj(mt)
         if self.negative_semidefinite or self.positive_semidefinite:
             assert isinstance(self.ring, RealField | ComplexField)
             eig_field = (RealField(minimum=0.0)

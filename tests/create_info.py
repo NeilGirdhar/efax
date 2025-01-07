@@ -233,7 +233,7 @@ class ComplexUnitNormalInfo(DistributionInfo[ComplexUnitNormalNP, ComplexUnitNor
     @override
     def exp_to_scipy_distribution(self, p: ComplexUnitNormalEP) -> Any:
         mean = np.asarray(p.mean, dtype=np.complex128)
-        variance = np.ones_like(mean.real)
+        variance = np.ones_like(np.real(mean))
         pseudo_variance = np.zeros_like(mean)
         return ScipyComplexNormal(mean, variance, pseudo_variance)
 
