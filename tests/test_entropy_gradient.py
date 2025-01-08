@@ -6,11 +6,12 @@ from typing import Any
 
 import jax.numpy as jnp
 import pytest
-from jax import grad, tree, value_and_grad
+from jax import grad, jit, tree, value_and_grad
 from jax.test_util import check_grads
 from numpy.random import Generator
 from rich.console import Console
-from tjax import JaxRealArray, assert_tree_allclose, print_generic
+from tjax import (JaxBooleanArray, JaxRealArray, assert_tree_allclose, dynamic_tree_all,
+                  print_generic)
 
 from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
@@ -18,18 +19,21 @@ from .create_info import BetaInfo, DirichletInfo
 from .distribution_info import DistributionInfo
 
 
+@jit
 def sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any]) -> JaxRealArray:
     x = flattener.unflatten(flattened)
     return jnp.sum(x.entropy())
 
 
-def all_finite(some_tree: Any, /) -> bool:
-    return tree.all(tree.map(lambda x: jnp.all(jnp.isfinite(x)), some_tree))
+@jit
+def all_finite(some_tree: Any, /) -> JaxBooleanArray:
+    return dynamic_tree_all(tree.map(lambda x: jnp.all(jnp.isfinite(x)), some_tree))
 
 
 def check_entropy_gradient(distribution: HasEntropy, /) -> None:
     flattener, flattened = Flattener.flatten(distribution, map_to_plane=False)
-    calculated_gradient = grad(sum_entropy)(flattened, flattener)
+    p_sum_entropy = partial(sum_entropy, flattener=flattener)
+    calculated_gradient = grad(p_sum_entropy)(flattened)
     if not all_finite(calculated_gradient):
         indices = jnp.argwhere(jnp.isnan(calculated_gradient))
         bad_distributions = [distribution[tuple(index)[:-1]] for index in indices]
@@ -37,9 +41,8 @@ def check_entropy_gradient(distribution: HasEntropy, /) -> None:
         with console.capture() as capture:
             print_generic(bad_distributions, console=console)
         msg = f"Non-finite gradient found for distributions: {capture.get()}"
-        raise AssertionError(msg)
-    check_grads(partial(sum_entropy, flattener=flattener), (flattened,), order=1, atol=1e-4,
-                rtol=1e-2)
+        pytest.fail(msg)
+    check_grads(p_sum_entropy, (flattened,), order=1, atol=1e-4, rtol=1e-2)
 
 
 def test_nat_entropy_gradient(generator: Generator,
