@@ -55,46 +55,47 @@ def test_exp_entropy(generator: Generator,
 
 
 def check_observation_shape(nat_parameters: NaturalParametrization[Any, Any],
-                            efax_x: JaxComplexArray | dict[str, Any]
+                            efax_x: JaxComplexArray | dict[str, Any],
+                            distribution_shape: tuple[int, ...],
                             ) -> None:
     """Verify that the sufficient statistics have the right shape."""
     if isinstance(nat_parameters, JointDistributionN):
         assert isinstance(efax_x, dict)
         for name, value in nat_parameters.sub_distributions().items():
-            check_observation_shape(value, efax_x[name])
+            check_observation_shape(value, efax_x[name], distribution_shape)
         return
     assert isinstance(nat_parameters, SimpleDistribution)
     assert isinstance(efax_x, Array)
     dimensions = (nat_parameters.dimensions()  # type: ignore[attr-defined]
                   if isinstance(nat_parameters, Multidimensional)  # type: ignore[unreachable]
                   else 0)
-    ideal_shape = nat_parameters.domain_support().shape(dimensions)
+    ideal_shape = distribution_shape + nat_parameters.domain_support().shape(dimensions)
     assert efax_x.shape == ideal_shape
 
 
 def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
     """Test that the density/mass function calculation matches scipy's."""
-    for _ in range(10):
-        nat_parameters = distribution_info.nat_parameter_generator(generator, shape=())
-        scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
-        scipy_x = scipy_distribution.rvs(random_state=generator)
-        efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
-        check_observation_shape(nat_parameters, efax_x)
+    distribution_shape = (10,)
+    nat_parameters = distribution_info.nat_parameter_generator(generator, shape=distribution_shape)
+    scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
+    scipy_x = scipy_distribution.rvs(random_state=generator)
+    efax_x = distribution_info.scipy_to_exp_family_observation(scipy_x)
+    check_observation_shape(nat_parameters, efax_x, distribution_shape)
 
-        # Verify that the density matches scipy.
-        efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
-        try:
-            scipy_density = scipy_distribution.pdf(scipy_x)
-        except AttributeError:
-            scipy_density = scipy_distribution.pmf(scipy_x)
+    # Verify that the density matches scipy.
+    efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
+    try:
+        scipy_density = scipy_distribution.pdf(scipy_x)
+    except AttributeError:
+        scipy_density = scipy_distribution.pmf(scipy_x)
 
-        if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
-            atol = 1e-5
-            rtol = 3e-4
-        else:
-            atol = 1e-5
-            rtol = 1e-4
-        assert_allclose(efax_density, scipy_density, rtol=rtol, atol=atol)
+    if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
+        atol = 1e-5
+        rtol = 3e-4
+    else:
+        atol = 1e-5
+        rtol = 1e-4
+    assert_allclose(efax_density, scipy_density, rtol=rtol, atol=atol)
 
 
 def test_maximum_likelihood_estimation(
