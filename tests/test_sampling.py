@@ -44,13 +44,7 @@ def produce_samples(generator: Generator,
         samples = sampling_object.domain_support().clamp(samples)
     else:
         assert isinstance(sampling_object, JointDistribution)
-
-        def f(x: Distribution, /) -> JaxComplexArray:
-            assert isinstance(x, Samplable)
-            sample = x.sample(key, sample_shape)
-            return x.domain_support().clamp(sample)
-
-        samples = sampling_object.general_method(f)
+        samples = sampling_object.general_sample(key, sample_shape)
     return exp_parameters, samples
 
 

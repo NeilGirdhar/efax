@@ -25,7 +25,7 @@ class JointDistribution(Distribution):
     def general_method(self,
                        f: Callable[[Distribution], Any],
                        t: type[Distribution] = Distribution
-                       ) -> Any:
+                       ) -> dict[str, Any]:
         return {name: (value.general_method(f, t)
                        if isinstance(value, JointDistribution) else f(value))
                 for name, value in self._sub_distributions.items()
