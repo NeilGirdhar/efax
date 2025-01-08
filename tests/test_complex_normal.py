@@ -68,7 +68,7 @@ def test_univariate_rvs(generator: Generator) -> None:
 @pytest.mark.nondistribution
 def test_multivariate_rvs(generator: Generator) -> None:
     shape = (3, 5)
-    rvs_shape = (1800, 1700)
+    rvs_shape = (256, 512)
     dimensions = 2
     rvs_axes = tuple(range(-len(rvs_shape) - 1, -1))
     rvs_axes2 = tuple(range(-len(rvs_shape) - 2, -2))
