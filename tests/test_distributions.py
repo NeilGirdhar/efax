@@ -49,7 +49,7 @@ def test_conversion(generator: Generator,
 def prelude(generator: Generator,
             distribution_info: DistributionInfo[Any, Any, Any]
             ) -> tuple[LogNormalizer, LogNormalizer]:
-    cls = type(distribution_info.nat_parameter_generator(generator, shape=()))
+    cls = distribution_info.nat_class()
     original_ln = cls._original_log_normalizer
     optimized_ln = cls.log_normalizer
     return original_ln, optimized_ln
