@@ -7,6 +7,7 @@ from itertools import starmap
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from array_api_compat import get_namespace
+from jax import jit
 from tensorflow_probability.substrates import jax as tfp
 from tjax import JaxComplexArray, JaxRealArray
 
@@ -16,6 +17,7 @@ from .structure import Structure
 from .types import Axis
 
 
+@jit
 def parameter_dot_product(x: NaturalParametrization[Any, Any], y: Any, /) -> JaxRealArray:
     """Return the vectorized dot product over all of the variable parameters."""
     def dotted_fields() -> Iterable[JaxRealArray]:
