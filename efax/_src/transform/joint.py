@@ -32,14 +32,7 @@ class JointDistribution(Distribution):
                 if isinstance(value, JointDistribution | t)}
 
     def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
-        count = 0
-
-        def g(x: Distribution, /) -> None:
-            nonlocal count
-            count += 1
-
-        self.general_method(g, Samplable)
-        keys = split(key, count)
+        keys = split(key, self._count_samplable_distributions())
         count = 0
 
         def f(x: Distribution, /) -> JaxComplexArray:
@@ -48,14 +41,12 @@ class JointDistribution(Distribution):
             retval = x.sample(keys[count], shape)
             count += 1
             return retval
-
         return self.general_method(f, Samplable)
 
     def as_dict(self) -> dict[str, Any]:
         def f(x: Distribution, /) -> SimpleDistribution:
             assert isinstance(x, SimpleDistribution)
             return x
-
         return self.general_method(f)
 
     @property
@@ -64,6 +55,15 @@ class JointDistribution(Distribution):
         for distribution in self._sub_distributions.values():
             return distribution.shape
         raise ValueError
+
+    def _count_samplable_distributions(self) -> int:
+        count = 0
+
+        def g(x: Distribution, /) -> None:
+            nonlocal count
+            count += 1
+        self.general_method(g, Samplable)
+        return count
 
 
 @dataclass
