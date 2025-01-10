@@ -46,7 +46,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = self.get_namespace()
-        max_q = xp.maximum(0.0, xp.amax(self.log_odds, axis=-1))
+        max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return max_q + log_scaled_a
@@ -54,7 +54,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
     @override
     def to_exp(self) -> MultinomialEP:
         xp = self.get_namespace()
-        max_q = xp.maximum(0.0, xp.amax(self.log_odds, axis=-1))
+        max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return MultinomialEP(xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
@@ -83,7 +83,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
     def nat_to_probability(self) -> JaxRealArray:
         xp = self.get_namespace()
-        max_q = xp.maximum(0.0, xp.amax(self.log_odds, axis=-1))
+        max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         p = xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis])
