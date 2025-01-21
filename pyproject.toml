@@ -26,15 +26,15 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "array_api_compat >= 1.6",
-  "jax >= 0.4.34",
-  "numpy >= 1.23",
+  "array_api_compat>=1.10",
+  "jax>=0.4.34",
+  "numpy>=1.25",
   "optimistix>=0.0.9",
   "optype>=0.8.0",
-  "scipy >= 1.10",
-  "tensorflow_probability >= 0.15",
-  "tjax >= 1.0.1",
-  "typing_extensions >= 4.8",
+  "scipy>=1.11",
+  "tensorflow_probability>=0.15",
+  "tjax>=1.0.1",
+  "typing_extensions>=4.8",
 ]
 
 [project.urls]
@@ -42,15 +42,15 @@ repository = "https://github.com/NeilGirdhar/efax"
 
 [tool.uv]
 dev-dependencies = [
-  "isort >= 5.13",
-  "jupyter >= 1",
-  "mypy >= 1.12",
-  "pre-commit >= 4",
-  "pylint >= 3.3",
-  "pyright >= 0.0.13",
-  "pytest >= 8",
-  "pytest-xdist[psutil] >= 3",
-  "ruff >= 0.8",
+  "isort>=5.13",
+  "jupyter>=1",
+  "mypy>=1.12",
+  "pre-commit>=4",
+  "pylint>=3.3",
+  "pyright>=0.0.13",
+  "pytest>=8",
+  "pytest-xdist[psutil]>=3",
+  "ruff>=0.8",
   "scipy-stubs>=1.15",
 ]
 
