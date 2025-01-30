@@ -18,6 +18,9 @@ class ScipyMultivariateNormalUnvectorized(mvn):
 
     See https://github.com/scipy/scipy/issues/7689.
     """
+    def __init__(self, mean: NumpyRealArray, cov: NumpyRealArray) -> None:
+        super().__init__(mean=mean, cov=cov)  # pyright: ignore
+
     @override
     def rvs(self,
             size: Any = None,
