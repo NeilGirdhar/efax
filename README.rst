@@ -1,20 +1,27 @@
-=================================
-EFAX: Exponential Families in JAX
-=================================
-
-|pypi| |py_versions|
-
-.. |pypi| image:: https://img.shields.io/pypi/v/efax
-   :alt: PyPI - Version
-
-.. |py_versions| image:: https://img.shields.io/pypi/pyversions/efax
-   :alt: PyPI - Python Version
-
 .. role:: bash(code)
     :language: bash
 
 .. role:: python(code)
     :language: python
+
+.. image:: https://img.shields.io/pypi/v/efax
+   :target: https://pypi.org/project/efax/
+   :alt: PyPI - Version
+   :align: center
+.. image:: https://img.shields.io/badge/version_scheme-EffVer-0097a7
+   :alt: EffVer Versioning
+   :target: https://jacobtomlinson.dev/effver
+.. image:: https://img.shields.io/badge/SPEC-0-blue
+   :target: https://scientific-python.org/specs/spec-0000/
+   :alt: SPEC-0
+   :align: center
+.. image:: https://img.shields.io/pypi/pyversions/efax
+   :alt: PyPI - Python Version
+   :align: center
+
+=================================
+EFAX: Exponential Families in JAX
+=================================
 
 This library provides a set of tools for working with *exponential family distributions* in the
 differential programming library `JAX <https://github.com/google/jax/>`_.
