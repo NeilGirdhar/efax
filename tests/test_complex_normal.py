@@ -34,9 +34,10 @@ def build_mvcn(generator: Generator,
     z = random_complex_array(generator, (*shape, dimensions, directions))
     regularizer = np.tile(np.eye(dimensions), (*shape, 1, 1))
     variance = (
-        np.average(np.conj(z)[..., np.newaxis, :, :] * z[..., np.newaxis, :],
-                   weights=weights,
-                   axis=-1)
+        np.average(
+            np.conj(z)[..., np.newaxis, :, :] * z[..., np.newaxis, :],  # type: ignore[arg-type]
+            weights=weights,
+            axis=-1)
         + regularizer)
     pseudo_variance = np.average(z[..., np.newaxis, :, :] * z[..., np.newaxis, :],
                                  weights=weights,

@@ -39,9 +39,10 @@ def produce_samples(generator: Generator,
         sampling_object = exp_parameters = sampling_distribution_info.exp_parameter_generator(
                 generator, distribution_shape)
 
+    samples: dict[str, Any] | JaxComplexArray
     if isinstance(sampling_object, Samplable):
-        samples = sampling_object.sample(key, sample_shape)
-        samples = sampling_object.domain_support().clamp(samples)
+        unclamped_samples = sampling_object.sample(key, sample_shape)
+        samples = sampling_object.domain_support().clamp(unclamped_samples)
     else:
         assert isinstance(sampling_object, JointDistribution)
         samples = sampling_object.general_sample(key, sample_shape)

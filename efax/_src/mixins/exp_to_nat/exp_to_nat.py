@@ -77,7 +77,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         """
         np_cls = self.natural_parametrization_cls()
         assert issubclass(np_cls, SimpleDistribution)
-        flattener = Flattener.create_flattener(self,
+        flattener = Flattener.create_flattener(self,  # type: ignore[unreachable]
                                                override_unflattened_type=np_cls,
                                                mapped_to_plane=True)
         return flattener.unflatten(search_parameters)

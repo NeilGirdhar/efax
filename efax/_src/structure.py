@@ -218,8 +218,9 @@ class MaximumLikelihoodEstimator(Structure[P]):
     def from_conjugate_prior_distribution(self,
                                           cp: 'NaturalParametrization[Any, Any]'
                                           ) -> tuple[P, JaxRealArray]:
-        constructed: dict[Path, Distribution] = {}
         from .interfaces.conjugate_prior import HasConjugatePrior  # noqa: PLC0415
+        from .transform.joint import JointDistributionN  # noqa: PLC0415
+        constructed: dict[Path, Distribution] = {}
         n = None
         for info in self.infos:
             assert issubclass(info.type_, HasConjugatePrior)
@@ -229,6 +230,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
                     if this_field.metadata.get('parameter', False) and this_field.metadata['fixed']}
             cp_i = cp
             for path_element in info.path:
+                assert isinstance(cp_i, JointDistributionN)
                 cp_i = cp_i.sub_distributions()[path_element]
             p, n_i = info.type_.from_conjugate_prior_distribution(cp, **fixed_parameters)
             if n is None:
@@ -238,8 +240,8 @@ class MaximumLikelihoodEstimator(Structure[P]):
                 assert xp.all(n == n_i)
             constructed[info.path] = p
         assert n is not None
-        p = constructed[()]
-        return cast('P', p), n
+        return_p = constructed[()]
+        return cast('P', return_p), n
 
 
 @dataclass

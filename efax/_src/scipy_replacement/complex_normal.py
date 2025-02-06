@@ -34,7 +34,7 @@ class ScipyComplexNormalUnvectorized:
             raise ValueError(msg)
 
     def pdf(self, z: NumpyComplexNumeric, out: None = None) -> NumpyRealNumeric:
-        zr = np.stack([np.real(z), np.imag(z)], axis=-1)
+        zr: NumpyRealArray = np.stack([np.real(z), np.imag(z)], axis=-1)  # type: ignore[list-item]
         return self.as_multivariate_normal().pdf(zr)
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
@@ -109,7 +109,7 @@ class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
         mean_array = np.asarray(mean)
         variance_array = np.asarray(variance)
         pseudo_variance_array = np.asarray(r * variance)
-        return cls(mean_array, variance_array, pseudo_variance_array)
+        return cls(mean_array, variance_array, pseudo_variance_array)  # type: ignore[arg-type]
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
         objects = np.empty(self.shape, dtype=ScipyMultivariateNormalUnvectorized)

@@ -64,10 +64,10 @@ def check_observation_shape(nat_parameters: NaturalParametrization[Any, Any],
         for name, value in nat_parameters.sub_distributions().items():
             check_observation_shape(value, efax_x[name], distribution_shape)
         return
-    assert isinstance(nat_parameters, SimpleDistribution)
-    assert isinstance(efax_x, Array)
-    dimensions = (nat_parameters.dimensions()  # type: ignore[attr-defined]
-                  if isinstance(nat_parameters, Multidimensional)  # type: ignore[unreachable]
+    assert isinstance(nat_parameters, SimpleDistribution)  # type: ignore[unreachable]
+    assert isinstance(efax_x, Array)  # type: ignore[unreachable]
+    dimensions = (nat_parameters.dimensions()
+                  if isinstance(nat_parameters, Multidimensional)
                   else 0)
     ideal_shape = distribution_shape + nat_parameters.domain_support().shape(dimensions)
     assert efax_x.shape == ideal_shape

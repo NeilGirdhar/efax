@@ -16,7 +16,7 @@ class ScipyGeometric:
         self.geom = ss.geom(p)
 
     def pmf(self, z: NumpyRealNumeric, out: None = None) -> NumpyRealArray:
-        return self.geom.pmf(z)  # pyright: ignore
+        return np.asarray(self.geom.pmf(z))
 
     def rvs(self,
             size: ShapeLike | None = None,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Self
 
 import jax
 import numpy as np
@@ -142,6 +142,13 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
         reshaped_n = n[..., np.newaxis]
         final_p = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
         return DirichletNP(reshaped_n * xp.concat((self.probability, final_p), axis=-1))
+
+    @classmethod
+    @override
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any],
+                                          ) -> tuple[Self, JaxRealArray]:
+        assert isinstance(cp, GeneralizedDirichletNP)
+        raise NotImplementedError
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray) -> GeneralizedDirichletNP:
