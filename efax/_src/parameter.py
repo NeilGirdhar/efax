@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from math import comb, sqrt
 from typing import Any, cast
 
+import array_api_extra as xpx
 import numpy as np
 from array_api_compat import get_namespace
 from jax.dtypes import canonicalize_dtype
@@ -14,7 +15,6 @@ from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplu
 from tjax.dataclasses import field
 from typing_extensions import override
 
-from .array_tools import array_at
 from .types import Namespace
 
 
@@ -417,10 +417,10 @@ class SymmetricMatrixSupport(Support):
         result = xp.empty(x.shape[:-1] + (dimensions, dimensions), dtype=x.dtype)
         for k, (i, j) in enumerate(zip(index_a, index_b, strict=True)):
             xk = x[..., k]
-            result = array_at(result)[..., i, j].set(xk)
+            result = xpx.at(result)[..., i, j].set(xk)
             if i != j:
                 cxk = xp.conj(xk) if self.hermitian else xk
-                result = array_at(result)[..., j, i].set(cxk)
+                result = xpx.at(result)[..., j, i].set(cxk)
         return result
 
     @override

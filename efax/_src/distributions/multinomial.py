@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Self
 
+import array_api_extra as xpx
 import jax
 import numpy as np
 from jax.nn import one_hot
@@ -10,7 +11,6 @@ from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..array_tools import array_at
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ..interfaces.multidimensional import Multidimensional
@@ -157,7 +157,7 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
         all_p = xp.concat((self.probability, final_p), axis=-1)
         alpha = n * all_p
         beta = n * (1.0 - all_p)
-        alpha_roll = array_at(xp.roll(alpha, -1, axis=-1))[..., -1].set(0.0)
+        alpha_roll = xpx.at(xp.roll(alpha, -1, axis=-1))[..., -1].set(0.0)
         gamma = -xp.diff(beta, append=1.0) - alpha_roll
         return GeneralizedDirichletNP(alpha - 1.0, gamma)
 
