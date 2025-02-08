@@ -275,6 +275,20 @@ ignore = [
   "TID252", # Relative imports from parent modules are banned.
 ]
 
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+"array_api_extra" = "xpx"
+"equinox" = "eqx"
+"itertools" = "it"
+"jax.numpy" = "jnp"
+"jax.random" = "jr"
+"jax.scipy.special" = "jss"
+"networkx" = "nx"
+"numpy.typing" = "npt"
+"optimistix" = "optx"
+"optype.numpy" = "onp"
+"pyqtgraph" = "pg"
+"seaborn" = "sns"
+
 [tool.ruff.lint.flake8-errmsg]
 max-string-length = 40
 
