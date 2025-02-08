@@ -1,6 +1,6 @@
 root = true
 
-[*.{py,toml,tex}]
+[*.{py,rst,toml}]
 indent_style = space
 end_of_line = lf
 trim_trailing_whitespace = true
@@ -10,10 +10,10 @@ insert_final_newline = true
 max_line_length = 100
 indent_size = 4
 
-[*.toml]
-max_line_length = 150
+[*.rst]
+max_line_length = 100
 indent_size = 2
 
-[*.tex]
-max_line_length = 0
+[*.toml]
+max_line_length = 150
 indent_size = 2
