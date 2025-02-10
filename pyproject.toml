@@ -219,9 +219,6 @@ warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 module = [
-  "scipy",
-  "scipy.special",
-  "scipy.stats",
   "tensorflow_probability.substrates",
   "array_api_compat",
 ]
