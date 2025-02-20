@@ -39,12 +39,12 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.log(-xp.log1p(-xp.exp(self.log_probability)))
 
     @override
     def to_exp(self) -> LogarithmicEP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         probability = xp.exp(self.log_probability)
         chi = xp.where(self.log_probability < log_probability_floor,
                        xp.asarray(1.0),
@@ -56,7 +56,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return -xp.log(x)
 
     @override
@@ -96,7 +96,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
 
     @override
     def to_nat(self) -> LogarithmicNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         z: LogarithmicNP = super().to_nat()
         return LogarithmicNP(xp.where(self.chi < 1.0,
                                       xp.asarray(xp.nan),

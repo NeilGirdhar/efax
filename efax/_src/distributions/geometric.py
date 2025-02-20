@@ -78,7 +78,7 @@ class GeometricEP(HasEntropyEP[GeometricNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.zeros(self.mean.shape)
 
     @override

@@ -34,7 +34,7 @@ class DirichletCommonNP(HasEntropyNP[EP],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         q = self.alpha_minus_one
         return (xp.sum(jss.gammaln(q + 1.0), axis=-1)
                 - jss.gammaln(xp.sum(q, axis=-1) + self.dimensions()))
@@ -50,7 +50,7 @@ class DirichletCommonNP(HasEntropyNP[EP],
         return self.alpha_minus_one.shape[-1]
 
     def _exp_helper(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         q = self.alpha_minus_one
         return jss.digamma(q + 1.0) - jss.digamma(xp.sum(q, axis=-1, keepdims=True) + q.shape[-1])
 
@@ -73,7 +73,7 @@ class DirichletCommonEP(HasEntropyEP[NP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.zeros(self.shape)
 
     @override

@@ -63,7 +63,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         Returns a real array of shape (self.shape, n) for some n.
         """
         _, flattened = Flattener.flatten(self)
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.zeros_like(flattened)
 
     def search_to_natural(self, search_parameters: SP) -> NP:

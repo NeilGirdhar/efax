@@ -40,12 +40,12 @@ class PoissonNP(Samplable,
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.exp(self.log_mean)
 
     @override
     def to_exp(self) -> PoissonEP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return PoissonEP(xp.exp(self.log_mean))
 
     @override
@@ -92,7 +92,7 @@ class PoissonEP(HasConjugatePrior,
 
     @override
     def to_nat(self) -> PoissonNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return PoissonNP(xp.log(self.mean))
 
     # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of

@@ -33,7 +33,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return -self._failures() * xp.log1p(-xp.exp(self.log_not_p))
 
     @override
@@ -43,7 +43,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
         return gammaln(a + 1) - gammaln(x + 1) - gammaln(a - x + 1)
 
     def _mean(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return self._failures() / xp.expm1(-self.log_not_p)
 
     @abstractmethod
@@ -73,7 +73,7 @@ class NBCommonEP(ExpectationParametrization[NP],
     #     return BetaPrimeNP(n * self._failures() * (self.mean, xp.ones_like(self.mean)))
 
     def _log_not_p(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return -xp.log1p(self._failures() / self.mean)
 
     @abstractmethod

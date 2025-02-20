@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from tjax import JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -34,13 +34,13 @@ class DirichletNP(DirichletCommonNP['DirichletEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> DirichletEP:
-        xp = get_namespace(x)
+        xp = array_namespace(x)
         one_minus_total_x = 1.0 - xp.sum(x, axis=-1, keepdims=True)
         return DirichletEP(xp.concat((xp.log(x), xp.log(one_minus_total_x)), axis=-1))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return xp.zeros(x.shape[:len(x.shape) - 1])
 
 

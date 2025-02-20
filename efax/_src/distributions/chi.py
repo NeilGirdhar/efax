@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from jax.scipy import special as jss
 from tjax import Array, JaxRealArray
 from tjax.dataclasses import dataclass
@@ -56,12 +56,12 @@ class ChiNP(HasEntropyNP['ChiEP'],
     @override
     @classmethod
     def sample_to_base_sample(cls, x: Array, **fixed_parameters: Any) -> JaxRealArray:
-        xp = get_namespace(x)
+        xp = array_namespace(x)
         return xp.square(x)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return xp.log(2.0 * x) - xp.square(x) * 0.5
 
 

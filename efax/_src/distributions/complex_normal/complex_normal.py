@@ -4,7 +4,7 @@ import math
 from typing import Any
 
 import jax
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -53,7 +53,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         _, s, mu = self._r_s_mu()
         det_s = s
         det_h = -self.negative_precision
@@ -65,25 +65,25 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
     @override
     def to_exp(self) -> ComplexNormalEP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         r, s, mu = self._r_s_mu()
         u = xp.conj(r * s)
         return ComplexNormalEP(mu, s + abs_square(mu), u + xp.square(mu))
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return xp.zeros(x.shape)
 
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: Any
                               ) -> ComplexNormalEP:
-        xp = get_namespace(x)
+        xp = array_namespace(x)
         return ComplexNormalEP(x, abs_square(x), xp.square(x))
 
     def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         r = -self.pseudo_precision / self.negative_precision
         s = 1.0 / ((abs_square(r) - 1.0) * self.negative_precision)
         k = self.pseudo_precision / self.negative_precision
@@ -97,7 +97,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
         if name != 'pseudo_precision':
             return super().adjust_support(name, **kwargs)
         precision = -kwargs['negative_precision']
-        xp = get_namespace(precision)
+        xp = array_namespace(precision)
         return ScalarSupport(ring=ComplexField(maximum_modulus=xp.abs(precision)))
 
     @override
@@ -139,7 +139,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
 
     @override
     def to_nat(self) -> ComplexNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         variance = self.second_moment - abs_square(self.mean)
         pseudo_variance = self.pseudo_second_moment - xp.square(self.mean)
 
@@ -154,7 +154,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.zeros(self.shape)
 
     @override
@@ -163,11 +163,11 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         if name != 'pseudo_precision':
             return super().adjust_support(name, **kwargs)
         precision = -kwargs['negative_precision']
-        xp = get_namespace(precision)
+        xp = array_namespace(precision)
         return ScalarSupport(ring=ComplexField(maximum_modulus=xp.abs(precision)))
 
     def _multivariate_normal_cov(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         variance = self.second_moment - abs_square(self.mean)
         pseudo_variance = self.pseudo_second_moment - xp.square(self.mean)
         xx = variance + xp.real(pseudo_variance)
@@ -183,7 +183,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
             shape += self.shape
         else:
             shape = self.shape
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         mn_mean = xp.stack([xp.real(self.mean), xp.imag(self.mean)], axis=-1)
         mn_cov = self._multivariate_normal_cov()
         mn_sample = jax.random.multivariate_normal(key, mn_mean, mn_cov, shape)

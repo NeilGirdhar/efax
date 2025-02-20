@@ -86,7 +86,7 @@ def test_gradient_log_normalizer_primals(generator: Generator,
 
 def unit_tangent(nat_parameters: NaturalParametrization[Any, Any]
                  ) -> NaturalParametrization[Any, Any]:
-    xp = nat_parameters.get_namespace()
+    xp = nat_parameters.array_namespace()
     new_variable_parameters = {path: xp.ones_like(value)
                                for path, value in parameters(nat_parameters, fixed=False).items()}
     new_fixed_parameters = {path: zero_from_primal(value, symbolic_zeros=False)

@@ -45,7 +45,7 @@ class ExpectationParametrization(Distribution, Generic[NP]):
         """
         if self_nat is None:
             self_nat = self.to_nat()
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         difference = parameter_map(xp.subtract, self_nat, q)
         return (parameter_dot_product(difference, self)
                 + q.log_normalizer()

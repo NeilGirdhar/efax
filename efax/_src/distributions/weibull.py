@@ -4,7 +4,7 @@ from typing import Any
 
 import jax
 import numpy as np
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -44,7 +44,7 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return -xp.log(-self.eta) - xp.log(self.concentration)
 
     @override
@@ -53,7 +53,7 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return (self.concentration - 1.0) * xp.log(x)
 
     @override
@@ -62,7 +62,7 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
                               x: JaxRealArray,
                               **fixed_parameters: Any
                               ) -> WeibullEP:
-        xp = get_namespace(x)
+        xp = array_namespace(x)
         concentration = fixed_parameters['concentration']
         return WeibullEP(xp.broadcast_to(concentration, x.shape), x ** concentration)
 
@@ -107,7 +107,7 @@ class WeibullEP(HasEntropyEP[WeibullNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         k = self.concentration
         one_minus_one_over_k = 1.0 - 1.0 / k
         return one_minus_one_over_k * xp.log(self.chi) - np.euler_gamma * one_minus_one_over_k

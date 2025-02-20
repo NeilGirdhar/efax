@@ -45,7 +45,7 @@ class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return 0.5 * (xp.sum(xp.square(self.mean), axis=-1)
                       + self.dimensions() * math.log(math.pi * 2.0))
 
@@ -56,7 +56,7 @@ class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         # The second moment of a delta distribution at x.
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return -0.5 * xp.sum(xp.square(x), axis=-1)
 
     @override
@@ -116,7 +116,7 @@ class MultivariateUnitNormalEP(
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return -0.5 * (xp.sum(xp.square(self.mean), axis=-1) + self.dimensions())
 
     @override
@@ -125,7 +125,7 @@ class MultivariateUnitNormalEP(
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         negative_half_precision = -0.5 * n
         return IsotropicNormalNP(n[..., xp.newaxis] * self.mean, negative_half_precision)
 
@@ -134,7 +134,7 @@ class MultivariateUnitNormalEP(
     def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
                                           ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, IsotropicNormalNP)
-        xp = cp.get_namespace()
+        xp = cp.array_namespace()
         n = -2.0 * cp.negative_half_precision
         mean = cp.mean_times_precision / n[..., xp.newaxis]
         return (cls(mean), n)

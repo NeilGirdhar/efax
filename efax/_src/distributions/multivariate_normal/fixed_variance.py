@@ -49,21 +49,21 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         eta = self.mean_times_precision
         return 0.5 * (xp.sum(xp.square(eta), axis=-1) * self.variance
                       + self.dimensions() * xp.log(math.pi * 2.0 * self.variance))
 
     @override
     def to_exp(self) -> MultivariateFixedVarianceNormalEP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return MultivariateFixedVarianceNormalEP(
             self.mean_times_precision * self.variance[..., xp.newaxis],
             variance=self.variance)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return -0.5 * xp.sum(xp.square(x), axis=-1) / self.variance
 
     @override
@@ -117,18 +117,18 @@ class MultivariateFixedVarianceNormalEP(
 
     @override
     def to_nat(self) -> MultivariateFixedVarianceNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return MultivariateFixedVarianceNormalNP(self.mean / self.variance[..., xp.newaxis],
                                                  variance=self.variance)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return -0.5 * (xp.sum(xp.square(self.mean), axis=-1) / self.variance + self.dimensions())
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         if shape is not None:
             shape += self.mean.shape
         else:
@@ -139,7 +139,7 @@ class MultivariateFixedVarianceNormalEP(
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         n_over_variance = n / self.variance
         negative_half_precision = -0.5 * n_over_variance
         return IsotropicNormalNP(n_over_variance[..., xp.newaxis] * self.mean,
@@ -152,7 +152,7 @@ class MultivariateFixedVarianceNormalEP(
                                           ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, IsotropicNormalNP)
         assert variance is not None
-        xp = cp.get_namespace()
+        xp = cp.array_namespace()
         n_over_variance = -2.0 * cp.negative_half_precision
         n = n_over_variance * variance
         mean = cp.mean_times_precision / n_over_variance[..., xp.newaxis]
@@ -161,7 +161,7 @@ class MultivariateFixedVarianceNormalEP(
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray
                                                  ) -> MultivariateDiagonalNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         n_over_variance = n / self.variance[..., xp.newaxis]
         negative_half_precision = -0.5 * n_over_variance
         return MultivariateDiagonalNormalNP(n_over_variance * self.mean, negative_half_precision)

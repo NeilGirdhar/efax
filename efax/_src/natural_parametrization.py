@@ -92,7 +92,7 @@ class NaturalParametrization(Distribution,
         Args:
             x: The sample.
         """
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.exp(self.log_pdf(x))
 
     @jit
@@ -116,7 +116,7 @@ class NaturalParametrization(Distribution,
 
         See also: apply_fisher_information.
         """
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         flattener, _ = Flattener.flatten(self)
         fisher_matrix = self._fisher_information_matrix()
         fisher_diagonal = xp.linalg.diagonal(fisher_matrix)
@@ -131,7 +131,7 @@ class NaturalParametrization(Distribution,
 
         See also: apply_fisher_information.
         """
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         fisher_information_diagonal = self.fisher_information_diagonal()
         structure = Structure.create(self)
         final_parameters = parameters(self)
@@ -150,7 +150,7 @@ class NaturalParametrization(Distribution,
 
     @final
     def jeffreys_prior(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         fisher_matrix = self._fisher_information_matrix()
         return xp.sqrt(xp.linalg.det(fisher_matrix))
 

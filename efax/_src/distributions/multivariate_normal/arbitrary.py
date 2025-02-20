@@ -43,7 +43,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         eta = self.mean_times_precision
         h_inv = xp.linalg.inv(self.negative_half_precision)
         a = matrix_dot_product(h_inv, outer_product(eta, eta))
@@ -55,7 +55,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
         return self.to_variance_parametrization().sample(key, shape)
 
     def variance(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         h_inv: JaxRealArray = xp.linalg.inv(self.negative_half_precision)
         return -0.5 * h_inv
 
@@ -70,7 +70,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
     @override
     def to_exp(self) -> MultivariateNormalEP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         h_inv = xp.linalg.inv(self.negative_half_precision)
         h_inv = cast('JaxRealArray', h_inv)
         h_inv_times_eta = matrix_vector_mul(h_inv, self.mean_times_precision)
@@ -80,7 +80,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return xp.zeros(x.shape[:-1])
 
     @override
@@ -119,7 +119,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
 
     @override
     def to_nat(self) -> MultivariateNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         precision = xp.linalg.inv(self.variance())
         precision = cast('JaxRealArray', precision)
         mean_times_precision = matrix_vector_mul(precision, self.mean)
@@ -127,7 +127,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.zeros(self.shape)
 
     @override

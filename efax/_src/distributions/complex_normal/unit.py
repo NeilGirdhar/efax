@@ -51,7 +51,7 @@ class ComplexUnitNormalNP(HasEntropyNP['ComplexUnitNormalEP'],
 
     @override
     def to_exp(self) -> ComplexUnitNormalEP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return ComplexUnitNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
 
     @override
@@ -99,7 +99,7 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
 
     @override
     def to_nat(self) -> ComplexUnitNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return ComplexUnitNormalNP(xp.conj(self.mean) * 2.0)
 
     @override

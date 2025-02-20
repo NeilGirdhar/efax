@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from jax.random import split
 from tjax import JaxIntegralArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -42,7 +42,7 @@ class NegativeBinomialNP(Samplable,
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> NegativeBinomialEP:
-        xp = get_namespace(x)
+        xp = array_namespace(x)
         return NegativeBinomialEP(x, xp.broadcast_to(fixed_parameters['failures'], x.shape))
 
     @override

@@ -3,7 +3,7 @@ from dataclasses import fields, replace
 from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, cast, overload
 
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
@@ -236,7 +236,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
             if n is None:
                 n = n_i
             else:
-                xp = get_namespace(n)
+                xp = array_namespace(n)
                 assert xp.all(n == n_i)
             constructed[info.path] = p
         assert n is not None
@@ -273,7 +273,7 @@ class Flattener(MaximumLikelihoodEstimator[P]):
             flattened: The flattened array.
             return_vector: If true, reshape the array so that a vector is returned.
         """
-        xp = get_namespace(flattened)
+        xp = array_namespace(flattened)
         if return_vector:
             flattened = xp.reshape(flattened, (-1, self.final_dimension_size()))
         consumed = 0
@@ -319,7 +319,7 @@ class Flattener(MaximumLikelihoodEstimator[P]):
                 values (e.g., when taking a different of expectation parameters).  It should be true
                 when passing to a neural network.
         """
-        xp = p.get_namespace()
+        xp = p.array_namespace()
         arrays = [x
                   for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p)
                   for x in xs]

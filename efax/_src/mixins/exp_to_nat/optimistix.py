@@ -22,7 +22,7 @@ class OptimistixRootFinder(ExpToNatMinimizer):
 
     @override
     def solve(self, exp_to_nat: ExpToNat[Any]) -> JaxRealArray:
-        xp = exp_to_nat.get_namespace()
+        xp = exp_to_nat.array_namespace()
 
         @jit
         def f(x: JaxRealArray, args: None, /) -> JaxRealArray:

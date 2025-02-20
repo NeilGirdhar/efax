@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from jax.scipy.special import betaln, digamma
 from tjax import JaxRealArray, Shape, softplus
 from tjax.dataclasses import dataclass
@@ -44,7 +44,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         alpha, beta = self.alpha_beta()
         return xp.sum(betaln(alpha, beta), axis=-1)
 
@@ -54,7 +54,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
         # alpha_bar_direct = d y / d alpha = betaln'(alpha, beta) = digamma(alpha) - digamma(alpha +
         # beta)
         # beta_bar = d y / d beta = betaln'(alpha, beta) = digamma(beta) - digamma(alpha + beta)
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         alpha, beta = self.alpha_beta()
         digamma_sum = digamma(alpha + beta)
         alpha_bar_direct = digamma(alpha) - digamma_sum
@@ -69,14 +69,14 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
                               ) -> GeneralizedDirichletEP:
-        xp = get_namespace(x)
+        xp = array_namespace(x)
         cs_x = xp.cumulative_sum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
         return GeneralizedDirichletEP(xp.log(x), xp.log1p(-cs_x))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return xp.zeros(x.shape[:len(x.shape) - 1])
 
     @override
@@ -84,7 +84,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
         return self.alpha_minus_one.shape[-1]
 
     def alpha_beta(self) -> tuple[JaxRealArray, JaxRealArray]:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         alpha = self.alpha_minus_one + 1.0
         # cs_alpha[i] = sum_{j>=i} alpha[j]
         # cs_gamma[i] = sum_{j>=i} gamma[j]
@@ -131,7 +131,7 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return xp.zeros(self.shape)
 
     @override

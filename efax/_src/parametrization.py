@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Mapping
+from types import ModuleType
 from typing import Any, Self, override
 
-from array_api_compat import get_namespace
+from array_api_compat import array_namespace
 from tjax import JaxAbstractClass, JaxArray, Shape
 from tjax.dataclasses import dataclass
 
@@ -38,10 +39,10 @@ class Distribution(JaxAbstractClass):
         from .iteration import support  # noqa: PLC0415
         return support(cls)[name]
 
-    def get_namespace(self, *x: Any) -> Any:
+    def array_namespace(self, *x: Any) -> ModuleType:
         from .iteration import parameters  # noqa: PLC0415
         values = parameters(self, support=False).values()
-        return get_namespace(*values)
+        return array_namespace(*values)
 
 
 @dataclass

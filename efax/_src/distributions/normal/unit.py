@@ -42,7 +42,7 @@ class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return 0.5 * (xp.square(self.mean) + math.log(math.pi * 2.0))
 
     @override
@@ -52,7 +52,7 @@ class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         # The second moment of a delta distribution at x.
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return -0.5 * xp.square(x)
 
     @override
@@ -107,7 +107,7 @@ class UnitNormalEP(HasEntropyEP[UnitNormalNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return -0.5 * (xp.square(self.mean) + 1.0)
 
     @override

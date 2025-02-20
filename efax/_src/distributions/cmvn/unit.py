@@ -49,18 +49,18 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNorma
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         mean_conjugate = self.two_mean_conjugate * 0.5
         return xp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexMultivariateUnitNormalEP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return ComplexMultivariateUnitNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
-        xp = self.get_namespace(x)
+        xp = self.array_namespace(x)
         return -xp.sum(abs_square(x), axis=-1)
 
     @override
@@ -109,12 +109,12 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
 
     @override
     def to_nat(self) -> ComplexMultivariateUnitNormalNP:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         return ComplexMultivariateUnitNormalNP(xp.conj(self.mean) * 2.0)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
         # The second moment of a normal distribution with the given mean.
         return -(xp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
 

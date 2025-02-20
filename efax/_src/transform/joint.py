@@ -88,7 +88,7 @@ class JointDistributionE(JointDistribution,
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
 
         def f(x: ExpectationParametrization[Any]) -> JaxRealArray:
             assert isinstance(x, HasEntropyEP)
@@ -109,7 +109,7 @@ class JointDistributionN(JointDistribution,
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
 
         return reduce(xp.add,
                       (x.log_normalizer() for x in self._sub_distributions.values()))
@@ -121,7 +121,7 @@ class JointDistributionN(JointDistribution,
 
     @override
     def carrier_measure(self, x: dict[str, Any]) -> JaxRealArray:
-        xp = self.get_namespace()
+        xp = self.array_namespace()
 
         joined = join_mappings(sub=self._sub_distributions, x=x)
         return reduce(xp.add,
