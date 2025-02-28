@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import jax.numpy as jnp
 from abc import abstractmethod
 from dataclasses import dataclass
 from math import comb, sqrt
@@ -8,7 +9,6 @@ from typing import Any, cast
 import array_api_extra as xpx
 import numpy as np
 from array_api_compat import array_namespace
-from jax.dtypes import canonicalize_dtype
 from jax.scipy import special as jss
 from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplus, softplus
@@ -48,7 +48,7 @@ class RealField(Ring):
     max_open: bool = True  # Open interval
 
     def __post_init__(self) -> None:
-        dtype = canonicalize_dtype(float)
+        dtype = jnp.empty((), dtype=float).dtype  # This is canonicalize_dtype(float).
         eps = float(np.finfo(dtype).eps)
         if self.min_open and self.minimum is not None:
             self.minimum = float(max(self.minimum + eps,
@@ -184,7 +184,7 @@ class BooleanRing(Ring):
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
         xp = array_namespace(x)
-        return xp.asarray(x, dtype=canonicalize_dtype(float))
+        return xp.asarray(x, dtype=float)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
@@ -208,19 +208,19 @@ class IntegralRing(Ring):
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
         xp = array_namespace(x)
-        return xp.asarray(x, dtype=canonicalize_dtype(float))
+        return xp.asarray(x, dtype=float)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
         xp = array_namespace(y)
-        return xp.asarray(y, dtype=canonicalize_dtype(int))
+        return xp.asarray(y, dtype=int)
 
     @override
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
         field = RealField(minimum=None if self.minimum is None else float(self.minimum),
                       maximum=None if self.maximum is None else float(self.maximum))
         real_values = field.generate(xp, rng, shape, safety) * 10
-        return xp.astype(real_values, canonicalize_dtype(int))
+        return xp.astype(real_values, int)
 
 
 real_field = RealField()
