@@ -473,7 +473,7 @@ requires-dist = [
     { name = "scipy", specifier = ">=1.11" },
     { name = "scipy-stubs", marker = "extra == 'dev'", specifier = ">=1.15" },
     { name = "tensorflow-probability", specifier = ">=0.15" },
-    { name = "tjax", specifier = ">=1.0.1" },
+    { name = "tjax", specifier = ">=1.2.0" },
     { name = "typing-extensions", specifier = ">=4.8" },
 ]
 provides-extras = ["dev"]
@@ -2106,7 +2106,7 @@ wheels = [
 
 [[package]]
 name = "tjax"
-version = "1.1.5"
+version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "array-api-compat" },
@@ -2117,9 +2117,9 @@ dependencies = [
     { name = "rich" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/17/b6/27c90945470fd0e02bf221e9d694d6ee587ec1dc6ee32f26c4751fc3d594/tjax-1.1.5.tar.gz", hash = "sha256:3cf65eb0490654690ab0725f8c321668bc4ce09bed71ccf1c14d2b6254850cea", size = 128026 }
+sdist = { url = "https://files.pythonhosted.org/packages/35/c3/ffb666085854fbc8e0503596820f81dad0c92907764934dba667854550ec/tjax-1.2.0.tar.gz", hash = "sha256:45b5e2cf5ab3b42f12db66d292307032c97e2ad8a878ac459a04657098b35ad0", size = 128210 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/08/82/0e19801bedf6bb8376e0f3a666a4a6675057bd5ea00210bbbe5d28994de8/tjax-1.1.5-py3-none-any.whl", hash = "sha256:22b14921ad1f5c318977de4a1f771c340e535eeaa7a9b2e569c3a3094c689238", size = 51421 },
+    { url = "https://files.pythonhosted.org/packages/df/6e/f787ab5582e1dd2f9dad8bab39630f0752a0a6a65d243853a5193f51c1fc/tjax-1.2.0-py3-none-any.whl", hash = "sha256:9e8de7e86b484a41e785ff9a82c6f56f9406be689c3582f0015d3abb12117f01", size = 51129 },
 ]
 
 [[package]]
