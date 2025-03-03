@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import math
-from typing import Any
 
 import jax
-from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape, outer_product
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, outer_product
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -68,7 +67,7 @@ class ComplexCircularlySymmetricNormalNP(
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
                               ) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(outer_product(x, x))
 

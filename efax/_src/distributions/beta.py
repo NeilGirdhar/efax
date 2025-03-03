@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
-
 import jax
 from array_api_compat import array_namespace
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -38,7 +36,7 @@ class BetaNP(DirichletCommonNP['BetaEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> BetaEP:
         xp = array_namespace(x)
         return BetaEP(xp.stack([xp.log(x), xp.log1p(-x)], axis=-1))

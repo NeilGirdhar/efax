@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import jax.numpy as jnp
 from abc import abstractmethod
 from dataclasses import dataclass
 from math import comb, sqrt
 from typing import Any, cast
 
 import array_api_extra as xpx
+import jax.numpy as jnp
 import numpy as np
 from array_api_compat import array_namespace
 from jax.scipy import special as jss

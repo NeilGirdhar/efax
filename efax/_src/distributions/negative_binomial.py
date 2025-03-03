@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
-
 from array_api_compat import array_namespace
 from jax.random import split
-from tjax import JaxIntegralArray, JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxIntegralArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -40,7 +38,7 @@ class NegativeBinomialNP(Samplable,
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> NegativeBinomialEP:
         xp = array_namespace(x)
         return NegativeBinomialEP(x, xp.broadcast_to(fixed_parameters['failures'], x.shape))

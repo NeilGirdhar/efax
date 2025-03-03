@@ -3,7 +3,7 @@ from functools import reduce
 from typing import Any, override
 
 from jax.random import split
-from tjax import JaxComplexArray, JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -130,6 +130,6 @@ class JointDistributionN(JointDistribution,
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: dict[str, Any], **fixed_parameters: Any
+    def sufficient_statistics(cls, x: dict[str, Any], **fixed_parameters: JaxArray
                               ) -> JointDistributionE:
         raise NotImplementedError

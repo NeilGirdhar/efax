@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
-
 from array_api_compat import array_namespace
 from jax.random import gamma as random_gamma
 from jax.scipy import special as jss
-from tjax import JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -64,7 +62,7 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> GammaEP:
         xp = array_namespace(x)
         return GammaEP(x, xp.log(x))

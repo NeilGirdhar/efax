@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from typing import Any
 
 import jax
 from array_api_compat import array_namespace
@@ -77,7 +76,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
                               ) -> ComplexNormalEP:
         xp = array_namespace(x)
         return ComplexNormalEP(x, abs_square(x), xp.square(x))

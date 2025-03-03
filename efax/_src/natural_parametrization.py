@@ -4,7 +4,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, final, get_type_hints
 
 from jax import grad, jacfwd, vjp, vmap
-from tjax import (JaxAbstractClass, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
+from tjax import (JaxAbstractClass, JaxArray, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
 from tjax.dataclasses import dataclass
 
@@ -68,7 +68,7 @@ class NaturalParametrization(Distribution,
 
     @classmethod
     @abstractmethod
-    def sufficient_statistics(cls, x: Domain, **fixed_parameters: Any) -> EP:
+    def sufficient_statistics(cls, x: Domain, **fixed_parameters: JaxArray) -> EP:
         """The sufficient statistics corresponding to an observation.
 
         This is typically used in maximum likelihood estimation.

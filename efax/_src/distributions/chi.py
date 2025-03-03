@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import math
-from typing import Any
 
 from array_api_compat import array_namespace
 from jax.scipy import special as jss
-from tjax import Array, JaxRealArray
+from tjax import Array, JaxArray, JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -55,7 +54,7 @@ class ChiNP(HasEntropyNP['ChiEP'],
 
     @override
     @classmethod
-    def sample_to_base_sample(cls, x: Array, **fixed_parameters: Any) -> JaxRealArray:
+    def sample_to_base_sample(cls, x: Array, **fixed_parameters: JaxArray) -> JaxRealArray:
         xp = array_namespace(x)
         return xp.square(x)
 

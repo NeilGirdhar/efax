@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import math
-from typing import Any, cast
+from typing import cast
 
 import jax
-from tjax import JaxRealArray, KeyArray, Shape, matrix_dot_product, matrix_vector_mul, outer_product
+from tjax import (JaxArray, JaxRealArray, KeyArray, Shape, matrix_dot_product, matrix_vector_mul,
+                  outer_product)
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -85,7 +86,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> MultivariateNormalEP:
         return MultivariateNormalEP(x, outer_product(x, x))
 

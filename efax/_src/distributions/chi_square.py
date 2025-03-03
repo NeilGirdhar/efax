@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import math
-from typing import Any
 
 from array_api_compat import array_namespace
 from jax.random import chisquare
 from jax.scipy import special as jss
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -59,7 +58,7 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> ChiSquareEP:
         xp = array_namespace(x)
         return ChiSquareEP(xp.log(x))

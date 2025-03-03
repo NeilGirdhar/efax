@@ -7,11 +7,9 @@ and Computation, volume 97, pp165-181
 """
 from __future__ import annotations
 
-from typing import Any
-
 from array_api_compat import array_namespace
 from jax.scipy.special import betaln, digamma
-from tjax import JaxRealArray, Shape, softplus
+from tjax import JaxArray, JaxRealArray, Shape, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -67,7 +65,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> GeneralizedDirichletEP:
         xp = array_namespace(x)
         cs_x = xp.cumulative_sum(x, axis=-1)

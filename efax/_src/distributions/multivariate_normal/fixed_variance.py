@@ -4,7 +4,7 @@ import math
 from typing import Any, Self
 
 import jax
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -68,7 +68,7 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> MultivariateFixedVarianceNormalEP:
         return MultivariateFixedVarianceNormalEP(x, variance=fixed_parameters['variance'])
 

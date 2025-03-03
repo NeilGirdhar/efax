@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
-
 import jax
 import numpy as np
 from array_api_compat import array_namespace
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -60,7 +58,7 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
     @classmethod
     def sufficient_statistics(cls,
                               x: JaxRealArray,
-                              **fixed_parameters: Any
+                              **fixed_parameters: JaxArray
                               ) -> WeibullEP:
         xp = array_namespace(x)
         concentration = fixed_parameters['concentration']

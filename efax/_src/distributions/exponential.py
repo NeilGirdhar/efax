@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Self
 
 import jax
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -53,7 +53,7 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> ExponentialEP:
         return ExponentialEP(x)
 

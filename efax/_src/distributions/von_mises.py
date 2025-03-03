@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import math
-from typing import Any, cast
+from typing import cast
 
-from tjax import JaxRealArray, Shape, inverse_softplus, softplus
+from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -64,7 +64,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> VonMisesFisherEP:
         return VonMisesFisherEP(x)
 

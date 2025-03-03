@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
-
-from tjax import JaxRealArray, Shape
+from tjax import JaxArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -61,7 +59,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> LogarithmicEP:
         return LogarithmicEP(x)
 

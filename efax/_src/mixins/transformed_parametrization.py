@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Generic, TypeVar
 
-from tjax import JaxComplexArray, JaxRealArray, Shape
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -33,7 +33,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
 
     @classmethod
     @abstractmethod
-    def sample_to_base_sample(cls, x: Domain, **fixed_parameters: Any) -> Domain:
+    def sample_to_base_sample(cls, x: Domain, **fixed_parameters: JaxArray) -> Domain:
         raise NotImplementedError
 
     @property
@@ -53,7 +53,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: Domain, **fixed_parameters: Any) -> TEP:
+    def sufficient_statistics(cls, x: Domain, **fixed_parameters: JaxArray) -> TEP:
         y = cls.sample_to_base_sample(x, **fixed_parameters)
         base_cls = cls.base_distribution_cls()
         return cls.create_expectation(base_cls.sufficient_statistics(y, **fixed_parameters))

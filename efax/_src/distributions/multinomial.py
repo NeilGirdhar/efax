@@ -7,7 +7,7 @@ import jax
 import numpy as np
 from jax.nn import one_hot
 from jax.scipy import special as jss
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -66,7 +66,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> MultinomialEP:
         return MultinomialEP(x)
 

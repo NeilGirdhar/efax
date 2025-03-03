@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
-
 from array_api_compat import array_namespace
-from tjax import JaxRealArray
+from tjax import JaxArray, JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -32,7 +30,7 @@ class DirichletNP(DirichletCommonNP['DirichletEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> DirichletEP:
         xp = array_namespace(x)
         one_minus_total_x = 1.0 - xp.sum(x, axis=-1, keepdims=True)

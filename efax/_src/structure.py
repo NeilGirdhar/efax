@@ -147,7 +147,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
     @classmethod
     def create_simple_estimator(cls,
                                 type_p: type[SimpleDistribution],
-                                **fixed_parameters: Any
+                                **fixed_parameters: JaxArray
                                 ) -> 'MaximumLikelihoodEstimator[Any]':
         """Create an estimator for a simple expectation parametrization class.
 

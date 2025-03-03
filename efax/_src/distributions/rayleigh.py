@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import math
-from typing import Any
 
 import numpy as np
 from array_api_compat import array_namespace
 from jax.random import rayleigh
-from tjax import Array, JaxRealArray, KeyArray, Shape
+from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -56,7 +55,7 @@ class RayleighNP(Samplable,
 
     @override
     @classmethod
-    def sample_to_base_sample(cls, x: Array, **fixed_parameters: Any
+    def sample_to_base_sample(cls, x: Array, **fixed_parameters: JaxArray
                               ) -> JaxRealArray:
         xp = array_namespace(x)
         return xp.square(x)

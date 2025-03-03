@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
-
 from jax.random import geometric
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -38,7 +36,7 @@ class GeometricNP(HasEntropyNP['GeometricEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> GeometricEP:
         return GeometricEP(x)
 

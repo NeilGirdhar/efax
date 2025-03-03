@@ -6,7 +6,7 @@ import jax
 import numpy as np
 from array_api_compat import array_namespace
 from jax.scipy import special as jss
-from tjax import JaxBooleanArray, JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxBooleanArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
@@ -58,7 +58,7 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: Any
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
                               ) -> BernoulliEP:
         return BernoulliEP(x)
 
