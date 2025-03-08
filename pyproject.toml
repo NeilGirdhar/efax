@@ -49,7 +49,7 @@ dev = [
   "pyright>=0.0.13",
   "pytest-xdist[psutil]>=3",
   "pytest>=8",
-  "ruff>=0.8",
+  "ruff>=0.9.10",
 ]
 
 [project.urls]

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, TypeAlias, TypeVar
 
 import optimistix as optx
 from jax import jit
@@ -8,7 +8,10 @@ from typing_extensions import override
 
 from .exp_to_nat import ExpToNat, ExpToNatMinimizer
 
-type RootFinder[Y, Out, Aux] = (
+Y = TypeVar('Y')
+Out = TypeVar('Out')
+Aux = TypeVar('Aux')
+RootFinder: TypeAlias = (
         optx.AbstractRootFinder[Y, Out, Aux, Any]
         | optx.AbstractLeastSquaresSolver[Y, Out, Aux, Any]
         | optx.AbstractMinimiser[Y, Aux, Any])
