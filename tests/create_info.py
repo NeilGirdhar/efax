@@ -3,10 +3,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+import array_api_extra as xpx
 import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
-from tjax import JaxRealArray, NumpyComplexArray, NumpyRealArray, abs_square, create_diagonal_array
+from tjax import JaxRealArray, NumpyComplexArray, NumpyRealArray, abs_square
 from typing_extensions import override
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
@@ -193,7 +194,8 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
     @override
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
         variance = np.asarray(p.variance())
-        covariance = create_diagonal_array(variance)
+        covariance = xpx.create_diagonal(variance)
+        assert isinstance(covariance, np.ndarray)
         return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
 
     @override

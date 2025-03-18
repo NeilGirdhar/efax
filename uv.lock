@@ -456,7 +456,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-compat", specifier = ">=1.10" },
-    { name = "array-api-extra", specifier = ">=0.6" },
+    { name = "array-api-extra", specifier = ">=0.7" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13" },
     { name = "jax", specifier = ">=0.4.34" },
     { name = "jupyter", marker = "extra == 'dev'", specifier = ">=1" },
