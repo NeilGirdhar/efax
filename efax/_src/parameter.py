@@ -421,6 +421,7 @@ class SymmetricMatrixSupport(Support):
             if i != j:
                 cxk = xp.conj(xk) if self.hermitian else xk
                 result = xpx.at(result)[..., j, i].set(cxk)
+        assert isinstance(result, JaxArray)
         return result
 
     @override
