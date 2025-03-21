@@ -8,7 +8,7 @@ version = "1.18.2"
 description = "Exponential families for JAX"
 readme = "README.rst"
 requires-python = ">=3.11,<3.14"
-license = {file = "LICENSE"}
+license = "Apache-2.0"
 authors = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
 maintainers = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
 classifiers = [
