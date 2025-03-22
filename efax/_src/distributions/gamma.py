@@ -73,7 +73,7 @@ class GammaNP(HasEntropyNP['GammaEP'],
             shape += self.shape
         return -random_gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
 
-    def to_var(self) -> GammaVP:
+    def to_variance_parametrization(self) -> GammaVP:
         rate = -self.negative_rate
         shape = self.shape_minus_one + 1.0
         mean = shape / rate

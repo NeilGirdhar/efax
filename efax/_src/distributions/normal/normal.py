@@ -65,12 +65,12 @@ class NormalNP(HasEntropyNP['NormalEP'],
         xp = array_namespace(x)
         return NormalEP(x, xp.square(x))
 
-    def to_var(self) -> NormalVP:
-        return self.to_exp().to_var()
+    def to_variance_parametrization(self) -> NormalVP:
+        return self.to_exp().to_variance_parametrization()
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        return self.to_var().sample(key, shape)
+        return self.to_variance_parametrization().sample(key, shape)
 
 
 @dataclass
@@ -125,7 +125,7 @@ class NormalEP(HasEntropyEP[NormalNP],
         xp = self.array_namespace()
         return self.second_moment - xp.square(self.mean)
 
-    def to_var(self) -> NormalVP:
+    def to_variance_parametrization(self) -> NormalVP:
         return NormalVP(self.mean, self.variance())
 
 
