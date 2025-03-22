@@ -68,6 +68,9 @@ class NormalNP(HasEntropyNP['NormalEP'],
     def to_variance_parametrization(self) -> NormalVP:
         return self.to_exp().to_variance_parametrization()
 
+    def to_deviation_parametrization(self) -> NormalDP:
+        return self.to_variance_parametrization().to_deviation_parametrization()
+
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         return self.to_variance_parametrization().sample(key, shape)
@@ -113,13 +116,7 @@ class NormalEP(HasEntropyEP[NormalNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
-        deviation = xp.sqrt(self.variance())
-        return jax.random.normal(key, shape) * deviation + self.mean
+        return self.to_variance_parametrization().sample(key, shape)
 
     def variance(self) -> JaxRealArray:
         xp = self.array_namespace()
@@ -127,6 +124,9 @@ class NormalEP(HasEntropyEP[NormalNP],
 
     def to_variance_parametrization(self) -> NormalVP:
         return NormalVP(self.mean, self.variance())
+
+    def to_deviation_parametrization(self) -> NormalDP:
+        return self.to_variance_parametrization().to_deviation_parametrization()
 
 
 @dataclass
@@ -176,3 +176,53 @@ class NormalVP(Samplable, SimpleDistribution):
         mean_times_precision = self.mean * precision
         negative_half_precision = -0.5 * precision
         return NormalNP(mean_times_precision, negative_half_precision)
+
+    def to_deviation_parametrization(self) -> NormalDP:
+        xp = self.array_namespace()
+        return NormalDP(self.mean, xp.sqrt(self.variance))
+
+
+@dataclass
+class NormalDP(Samplable, SimpleDistribution):
+    """The deviation parametrization of the normal distribution.
+
+    Args:
+        mean: The mean.
+        deviation: The standard deviation.
+    """
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    deviation: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.mean.shape
+
+    @override
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        if shape is not None:
+            shape += self.mean.shape
+        else:
+            shape = self.mean.shape
+        return jax.random.normal(key, shape) * self.deviation + self.mean
+
+    def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
+        return self.to_nat().log_pdf(x)
+
+    def pdf(self, x: JaxRealArray) -> JaxRealArray:
+        return self.to_nat().pdf(x)
+
+    def to_exp(self) -> NormalEP:
+        return self.to_variance_parametrization().to_exp()
+
+    def to_nat(self) -> NormalNP:
+        return self.to_variance_parametrization().to_nat()
+
+    def to_variance_parametrization(self) -> NormalVP:
+        xp = self.array_namespace()
+        return NormalVP(self.mean, xp.square(self.deviation))
