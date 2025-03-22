@@ -28,7 +28,7 @@ from ._src.distributions.multivariate_normal.isotropic import IsotropicNormalEP,
 from ._src.distributions.multivariate_normal.unit import (MultivariateUnitNormalEP,
                                                           MultivariateUnitNormalNP)
 from ._src.distributions.negative_binomial import NegativeBinomialEP, NegativeBinomialNP
-from ._src.distributions.normal.normal import NormalEP, NormalNP, NormalVP
+from ._src.distributions.normal.normal import NormalDP, NormalEP, NormalNP, NormalVP
 from ._src.distributions.normal.unit import UnitNormalEP, UnitNormalNP
 from ._src.distributions.poisson import PoissonEP, PoissonNP
 from ._src.distributions.rayleigh import RayleighEP, RayleighNP
@@ -120,6 +120,7 @@ __all__ = [
     'NaturalParametrization',
     'NegativeBinomialEP',
     'NegativeBinomialNP',
+    'NormalDP',
     'NormalEP',
     'NormalNP',
     'NormalVP',
