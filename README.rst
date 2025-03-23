@@ -194,6 +194,7 @@ EFAX supports the following distributions:
   - gamma
   - log-normal
   - Rayleigh
+  - softplus-normal
   - Weibull
 
 - on the simplex:

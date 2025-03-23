@@ -6,7 +6,6 @@ from jax.scipy import special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
-from .normal.log_normal import LogNormalNP, LogNormalEP
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
@@ -16,6 +15,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import (RealField, ScalarSupport, distribution_parameter, negative_support,
                          positive_support)
 from ..parametrization import SimpleDistribution
+from .normal.log_normal import LogNormalEP, LogNormalNP
 from .normal.normal import NormalVP
 
 

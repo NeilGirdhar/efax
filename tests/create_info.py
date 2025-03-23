@@ -25,9 +25,9 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
                   ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
                   ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution, ScipyLogNormal,
-                  ScipyMultivariateNormal, ScipyVonMises, ScipyVonMisesFisher, Structure,
-                  SubDistributionInfo, UnitNormalEP, UnitNormalNP, VonMisesFisherEP,
-                  VonMisesFisherNP, WeibullEP, WeibullNP)
+                  ScipyMultivariateNormal, ScipySoftplusNormal, ScipyVonMises, ScipyVonMisesFisher,
+                  SoftplusNormalEP, SoftplusNormalNP, Structure, SubDistributionInfo, UnitNormalEP,
+                  UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -483,6 +483,21 @@ class RayleighInfo(DistributionInfo[RayleighNP, RayleighEP, NumpyRealArray]):
         return RayleighNP
 
 
+class SoftplusNormalInfo(DistributionInfo[SoftplusNormalNP, SoftplusNormalEP, NumpyRealArray]):
+    @override
+    def exp_to_scipy_distribution(self, p: SoftplusNormalEP) -> Any:
+        normal_dp = p.base_distribution().to_deviation_parametrization()
+        return ScipySoftplusNormal(np.asarray(normal_dp.mean), np.asarray(normal_dp.deviation))
+
+    @override
+    def exp_class(self) -> type[SoftplusNormalEP]:
+        return SoftplusNormalEP
+
+    @override
+    def nat_class(self) -> type[SoftplusNormalNP]:
+        return SoftplusNormalNP
+
+
 class UnitNormalInfo(DistributionInfo[UnitNormalNP, UnitNormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: UnitNormalEP) -> Any:
@@ -580,6 +595,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             NormalInfo(),
             PoissonInfo(),
             RayleighInfo(),
+            SoftplusNormalInfo(),
             UnitNormalInfo(),
             VonMisesFisherInfo(dimensions=5),
             VonMisesInfo(),

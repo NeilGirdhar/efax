@@ -30,6 +30,7 @@ from ._src.distributions.multivariate_normal.unit import (MultivariateUnitNormal
 from ._src.distributions.negative_binomial import NegativeBinomialEP, NegativeBinomialNP
 from ._src.distributions.normal.log_normal import LogNormalEP, LogNormalNP
 from ._src.distributions.normal.normal import NormalDP, NormalEP, NormalNP, NormalVP
+from ._src.distributions.normal.softplus import SoftplusNormalEP, SoftplusNormalNP
 from ._src.distributions.normal.unit import UnitNormalEP, UnitNormalNP
 from ._src.distributions.poisson import PoissonEP, PoissonNP
 from ._src.distributions.rayleigh import RayleighEP, RayleighNP
@@ -54,6 +55,7 @@ from ._src.scipy_replacement.geometric import ScipyGeometric
 from ._src.scipy_replacement.joint import ScipyJointDistribution
 from ._src.scipy_replacement.log_normal import ScipyLogNormal
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
+from ._src.scipy_replacement.softplus_normal import ScipySoftplusNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
 from ._src.structure import Flattener, MaximumLikelihoodEstimator, Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
@@ -144,9 +146,12 @@ __all__ = [
     'ScipyJointDistribution',
     'ScipyLogNormal',
     'ScipyMultivariateNormal',
+    'ScipySoftplusNormal',
     'ScipyVonMises',
     'ScipyVonMisesFisher',
     'SimpleDistribution',
+    'SoftplusNormalEP',
+    'SoftplusNormalNP',
     'SquareMatrixSupport',
     'Structure',
     'SubDistributionInfo',
