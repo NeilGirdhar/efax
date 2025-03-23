@@ -50,7 +50,7 @@ class RayleighNP(Samplable,
 
     @override
     @classmethod
-    def create_expectation(cls, expectation_parametrization: ExponentialEP) -> RayleighEP:
+    def create_expectation_from_base(cls, expectation_parametrization: ExponentialEP) -> RayleighEP:
         return RayleighEP(expectation_parametrization.mean)
 
     @override
@@ -105,7 +105,7 @@ class RayleighEP(Samplable,
 
     @override
     @classmethod
-    def create_natural(cls, natural_parametrization: ExponentialNP) -> RayleighNP:
+    def create_natural_from_base(cls, natural_parametrization: ExponentialNP) -> RayleighNP:
         return RayleighNP(natural_parametrization.negative_rate)
 
     @override

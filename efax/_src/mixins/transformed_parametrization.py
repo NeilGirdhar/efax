@@ -28,7 +28,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
 
     @classmethod
     @abstractmethod
-    def create_expectation(cls, expectation_parametrization: EP) -> TEP:
+    def create_expectation_from_base(cls, expectation_parametrization: EP) -> TEP:
         raise NotImplementedError
 
     @classmethod
@@ -49,14 +49,15 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
     @override
     def to_exp(self) -> TEP:
         """The corresponding expectation parameters."""
-        return self.create_expectation(self.base_distribution().to_exp())
+        return self.create_expectation_from_base(self.base_distribution().to_exp())
 
     @override
     @classmethod
     def sufficient_statistics(cls, x: Domain, **fixed_parameters: JaxArray) -> TEP:
         y = cls.sample_to_base_sample(x, **fixed_parameters)
         base_cls = cls.base_distribution_cls()
-        return cls.create_expectation(base_cls.sufficient_statistics(y, **fixed_parameters))
+        return cls.create_expectation_from_base(
+                base_cls.sufficient_statistics(y, **fixed_parameters))
 
 
 TNP = TypeVar('TNP', bound=TransformedNaturalParametrization[Any, Any, Any, Any])
@@ -76,7 +77,7 @@ class TransformedExpectationParametrization(ExpectationParametrization[TNP],
 
     @classmethod
     @abstractmethod
-    def create_natural(cls, natural_parametrization: NP) -> TNP:
+    def create_natural_from_base(cls, natural_parametrization: NP) -> TNP:
         raise NotImplementedError
 
     @property
@@ -87,4 +88,4 @@ class TransformedExpectationParametrization(ExpectationParametrization[TNP],
     @override
     def to_nat(self) -> TNP:
         """The corresponding natural parameters."""
-        return self.create_natural(self.base_distribution().to_nat())
+        return self.create_natural_from_base(self.base_distribution().to_nat())

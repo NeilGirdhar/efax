@@ -49,7 +49,7 @@ class LogNormalNP(Samplable,
 
     @override
     @classmethod
-    def create_expectation(cls, expectation_parametrization: NormalEP) -> LogNormalEP:
+    def create_expectation_from_base(cls, expectation_parametrization: NormalEP) -> LogNormalEP:
         return LogNormalEP(expectation_parametrization.mean,
                            expectation_parametrization.second_moment)
 
@@ -108,7 +108,7 @@ class LogNormalEP(Samplable,
 
     @override
     @classmethod
-    def create_natural(cls, natural_parametrization: NormalNP) -> LogNormalNP:
+    def create_natural_from_base(cls, natural_parametrization: NormalNP) -> LogNormalNP:
         return LogNormalNP(natural_parametrization.mean_times_precision,
                            natural_parametrization.negative_half_precision)
 

@@ -49,7 +49,7 @@ class ChiNP(HasEntropyNP['ChiEP'],
 
     @override
     @classmethod
-    def create_expectation(cls, expectation_parametrization: ChiSquareEP) -> ChiEP:
+    def create_expectation_from_base(cls, expectation_parametrization: ChiSquareEP) -> ChiEP:
         return ChiEP(expectation_parametrization.mean_log)
 
     @override
@@ -96,7 +96,7 @@ class ChiEP(HasEntropyEP[ChiNP],
 
     @override
     @classmethod
-    def create_natural(cls, natural_parametrization: ChiSquareNP) -> ChiNP:
+    def create_natural_from_base(cls, natural_parametrization: ChiSquareNP) -> ChiNP:
         return ChiNP(natural_parametrization.k_over_two_minus_one)
 
     @override
