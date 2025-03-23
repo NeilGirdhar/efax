@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import numpy as np
-import scipy.special
 import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyRealArray, NumpyRealNumeric, ShapeLike
-
-scipy_beta = scipy.special.beta
 
 
 class ScipyGeometric:
