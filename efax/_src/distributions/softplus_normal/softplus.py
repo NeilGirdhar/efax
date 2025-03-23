@@ -11,14 +11,14 @@ from ...interfaces.samplable import Samplable
 from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                    TransformedNaturalParametrization)
 from ...parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
-from .normal import NormalEP, NormalNP
+from ..normal.normal import NormalEP, NormalNP
 
 
 @dataclass
 class SoftplusNormalNP(
         Samplable,
         TransformedNaturalParametrization[NormalNP, NormalEP, 'SoftplusNormalEP', JaxRealArray]):
-    """The natural parametrization of the SoftplusNormal distribution."""
+    """The natural parametrization of the softplus-normal distribution."""
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
     negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport(
         ring=negative_support))
@@ -72,7 +72,7 @@ class SoftplusNormalNP(
 @dataclass
 class SoftplusNormalEP(Samplable,
                        TransformedExpectationParametrization[NormalEP, NormalNP, SoftplusNormalNP]):
-    """The expectation parametrization of the SoftplusNormal distribution."""
+    """The expectation parametrization of the softplus-normal distribution."""
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 

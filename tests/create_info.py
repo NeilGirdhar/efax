@@ -27,7 +27,8 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution, ScipyLogNormal,
                   ScipyMultivariateNormal, ScipySoftplusNormal, ScipyVonMises, ScipyVonMisesFisher,
                   SoftplusNormalEP, SoftplusNormalNP, Structure, SubDistributionInfo, UnitNormalEP,
-                  UnitNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
+                  UnitNormalNP, UnitSoftplusNormalEP, UnitSoftplusNormalNP, VonMisesFisherEP,
+                  VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -512,6 +513,21 @@ class UnitNormalInfo(DistributionInfo[UnitNormalNP, UnitNormalEP, NumpyRealArray
         return UnitNormalNP
 
 
+class UnitSoftplusNormalInfo(DistributionInfo[UnitSoftplusNormalNP, UnitSoftplusNormalEP,
+                                              NumpyRealArray]):
+    @override
+    def exp_to_scipy_distribution(self, p: UnitSoftplusNormalEP) -> Any:
+        return ScipySoftplusNormal(np.asarray(p.mean), np.ones_like(p.mean))
+
+    @override
+    def exp_class(self) -> type[UnitSoftplusNormalEP]:
+        return UnitSoftplusNormalEP
+
+    @override
+    def nat_class(self) -> type[UnitSoftplusNormalNP]:
+        return UnitSoftplusNormalNP
+
+
 class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: VonMisesFisherNP) -> Any:
@@ -597,6 +613,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             RayleighInfo(),
             SoftplusNormalInfo(),
             UnitNormalInfo(),
+            UnitSoftplusNormalInfo(),
             VonMisesFisherInfo(dimensions=5),
             VonMisesInfo(),
             WeibullInfo(),

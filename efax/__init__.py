@@ -30,10 +30,11 @@ from ._src.distributions.multivariate_normal.unit import (MultivariateUnitNormal
 from ._src.distributions.negative_binomial import NegativeBinomialEP, NegativeBinomialNP
 from ._src.distributions.normal.log_normal import LogNormalEP, LogNormalNP
 from ._src.distributions.normal.normal import NormalDP, NormalEP, NormalNP, NormalVP
-from ._src.distributions.normal.softplus import SoftplusNormalEP, SoftplusNormalNP
 from ._src.distributions.normal.unit import UnitNormalEP, UnitNormalNP
 from ._src.distributions.poisson import PoissonEP, PoissonNP
 from ._src.distributions.rayleigh import RayleighEP, RayleighNP
+from ._src.distributions.softplus_normal.softplus import SoftplusNormalEP, SoftplusNormalNP
+from ._src.distributions.softplus_normal.unit import UnitSoftplusNormalEP, UnitSoftplusNormalNP
 from ._src.distributions.von_mises import VonMisesFisherEP, VonMisesFisherNP
 from ._src.distributions.weibull import WeibullEP, WeibullNP
 from ._src.expectation_parametrization import ExpectationParametrization
@@ -159,6 +160,8 @@ __all__ = [
     'SymmetricMatrixSupport',
     'UnitNormalEP',
     'UnitNormalNP',
+    'UnitSoftplusNormalEP',
+    'UnitSoftplusNormalNP',
     'VectorSupport',
     'VonMisesFisherEP',
     'VonMisesFisherNP',
