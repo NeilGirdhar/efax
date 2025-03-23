@@ -6,6 +6,7 @@ from jax.scipy import special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
+from .normal.log_normal import LogNormalNP, LogNormalEP
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
@@ -15,6 +16,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import (RealField, ScalarSupport, distribution_parameter, negative_support,
                          positive_support)
 from ..parametrization import SimpleDistribution
+from .normal.normal import NormalVP
 
 
 @dataclass
@@ -79,6 +81,17 @@ class GammaNP(HasEntropyNP['GammaEP'],
         mean = shape / rate
         variance = mean / rate
         return GammaVP(mean, variance)
+
+    def to_approximate_log_normal(self) -> LogNormalNP:
+        xp = self.array_namespace()
+        shape = self.shape_minus_one + 1.0
+        rate = -self.negative_rate
+        mean = shape / rate
+        variance = shape / (rate ** 2)
+        normal_variance = xp.log(1 + variance / (mean ** 2))
+        normal_mean = xp.log(mean) - 0.5 * normal_variance
+        normal_vp = NormalVP(normal_mean, normal_variance)
+        return LogNormalEP.create_natural(normal_vp.to_nat())
 
 
 @dataclass

@@ -192,6 +192,7 @@ EFAX supports the following distributions:
   - chi-square
   - exponential
   - gamma
+  - log-normal
   - Rayleigh
   - Weibull
 

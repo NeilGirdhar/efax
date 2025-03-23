@@ -17,13 +17,14 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   DirichletNP, ExponentialEP, ExponentialNP, GammaEP, GammaNP,
                   GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
                   IsotropicNormalEP, IsotropicNormalNP, JointDistributionE, JointDistributionN,
-                  LogarithmicEP, LogarithmicNP, MultivariateDiagonalNormalEP,
-                  MultivariateDiagonalNormalNP, MultivariateFixedVarianceNormalEP,
-                  MultivariateFixedVarianceNormalNP, MultivariateNormalEP, MultivariateNormalNP,
-                  MultivariateUnitNormalEP, MultivariateUnitNormalNP, NegativeBinomialEP,
-                  NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP,
-                  RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
-                  ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution,
+                  LogarithmicEP, LogarithmicNP, LogNormalEP, LogNormalNP,
+                  MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
+                  MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
+                  MultivariateNormalEP, MultivariateNormalNP, MultivariateUnitNormalEP,
+                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
+                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
+                  ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
+                  ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution, ScipyLogNormal,
                   ScipyMultivariateNormal, ScipyVonMises, ScipyVonMisesFisher, Structure,
                   SubDistributionInfo, UnitNormalEP, UnitNormalNP, VonMisesFisherEP,
                   VonMisesFisherNP, WeibullEP, WeibullNP)
@@ -319,6 +320,21 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
         return JointDistributionN
 
 
+class LogNormal(DistributionInfo[LogNormalNP, LogNormalEP, NumpyRealArray]):
+    @override
+    def exp_to_scipy_distribution(self, p: LogNormalEP) -> Any:
+        normal_dp = p.base_distribution().to_deviation_parametrization()
+        return ScipyLogNormal(np.asarray(normal_dp.mean), np.asarray(normal_dp.deviation))
+
+    @override
+    def exp_class(self) -> type[LogNormalEP]:
+        return LogNormalEP
+
+    @override
+    def nat_class(self) -> type[LogNormalNP]:
+        return LogNormalNP
+
+
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: LogarithmicNP) -> Any:
@@ -553,18 +569,19 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             GeneralizedDirichletInfo(dimensions=5),
             GeometricInfo(),
             IsotropicNormalInfo(dimensions=5),
+            JointInfo(infos={'gamma': GammaInfo(), 'normal': NormalInfo()}),
+            LogNormal(),
             LogarithmicInfo(),
             MultivariateDiagonalNormalInfo(dimensions=4),
             MultivariateFixedVarianceNormalInfo(dimensions=2),
             MultivariateNormalInfo(dimensions=4),
             MultivariateUnitNormalInfo(dimensions=5),
             NegativeBinomialInfo(),
-            JointInfo(infos={'gamma': GammaInfo(), 'normal': NormalInfo()}),
             NormalInfo(),
             PoissonInfo(),
             RayleighInfo(),
             UnitNormalInfo(),
-            VonMisesInfo(),
             VonMisesFisherInfo(dimensions=5),
+            VonMisesInfo(),
             WeibullInfo(),
             ]
