@@ -74,8 +74,9 @@ class TransformedExpectationParametrization(ExpectationParametrization[TNP],
     def base_distribution(self) -> EP:
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def create_natural(self, natural_parametrization: NP) -> TNP:
+    def create_natural(cls, natural_parametrization: NP) -> TNP:
         raise NotImplementedError
 
     @property

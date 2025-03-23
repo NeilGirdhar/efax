@@ -105,7 +105,8 @@ class RayleighEP(Samplable,
         return ExponentialEP(self.chi)
 
     @override
-    def create_natural(self, natural_parametrization: ExponentialNP) -> RayleighNP:
+    @classmethod
+    def create_natural(cls, natural_parametrization: ExponentialNP) -> RayleighNP:
         return RayleighNP(natural_parametrization.negative_rate)
 
     @override

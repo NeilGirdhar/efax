@@ -95,7 +95,8 @@ class ChiEP(HasEntropyEP[ChiNP],
         return ChiSquareEP(self.mean_log)
 
     @override
-    def create_natural(self, natural_parametrization: ChiSquareNP) -> ChiNP:
+    @classmethod
+    def create_natural(cls, natural_parametrization: ChiSquareNP) -> ChiNP:
         return ChiNP(natural_parametrization.k_over_two_minus_one)
 
     @override
