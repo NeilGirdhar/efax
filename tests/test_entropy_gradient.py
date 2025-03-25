@@ -15,7 +15,7 @@ from tjax import (JaxBooleanArray, JaxRealArray, assert_tree_allclose, dynamic_t
 
 from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
-from .create_info import BetaInfo, DirichletInfo
+from .create_info import BetaInfo, DirichletInfo, GammaInfo
 from .distribution_info import DistributionInfo
 
 
@@ -65,7 +65,9 @@ def test_exp_entropy_gradient(generator: Generator,
     check_entropy_gradient(exp_parameters)
 
 
-def test_gamma_vp_entropy_gradient() -> None:
+def test_gamma_vp_entropy_gradient(distribution_name: str | None) -> None:
+    GammaInfo.skip_if_deselected(distribution_name)
+
     def f(flattened: JaxRealArray, flattener: Flattener[GammaEP]) -> JaxRealArray:
         x_e = flattener.unflatten(flattened)
         return x_e.entropy()

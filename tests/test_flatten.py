@@ -29,6 +29,7 @@ def test_flatten(generator: Generator,
     assert_tree_allclose(flattener.unflatten(flattened), p)
 
 
+@pytest.mark.nondistribution
 def test_raises() -> None:
     """Test that unflattening raises for bad shapes."""
     m = MultivariateUnitNormalNP(jnp.zeros(10))
