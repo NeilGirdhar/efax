@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import Any, Self, cast
 
 import jax.random as jr
 from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
+from ...interfaces.conjugate_prior import HasConjugatePrior
 from ...interfaces.samplable import Samplable
 from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                    TransformedNaturalParametrization)
+from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, distribution_parameter
+from ..normal.normal import NormalNP
 from ..normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 
 
@@ -69,6 +72,7 @@ class UnitVarianceSoftplusNormalNP(
 
 @dataclass
 class UnitVarianceSoftplusNormalEP(
+        HasConjugatePrior,
         Samplable,
         TransformedExpectationParametrization[UnitVarianceNormalEP, UnitVarianceNormalNP,
                                               UnitVarianceSoftplusNormalNP]):
@@ -107,3 +111,19 @@ class UnitVarianceSoftplusNormalEP(
         else:
             shape = self.shape
         return softplus(jr.normal(key, shape) + self.mean)
+
+    @override
+    def conjugate_prior_distribution(self, n: JaxRealArray) -> NormalNP:
+        normal_np = self.base_distribution().conjugate_prior_distribution(n)
+        return NormalNP(normal_np.mean_times_precision, normal_np.negative_half_precision)
+
+    @classmethod
+    @override
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
+                                          ) -> tuple[Self, JaxRealArray]:
+        uvn, n = UnitVarianceNormalEP.from_conjugate_prior_distribution(cp)
+        return (cls(uvn.mean), n)
+
+    @override
+    def conjugate_prior_observation(self) -> JaxRealArray:
+        return self.mean
