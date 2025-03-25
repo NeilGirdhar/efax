@@ -16,11 +16,11 @@ from ...parameter import VectorSupport, complex_field, distribution_parameter
 
 
 @dataclass
-class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNormalEP'],
-                                      NaturalParametrization['ComplexMultivariateUnitNormalEP',
-                                                             JaxComplexArray],
-                                      Multidimensional,
-                                      Samplable):
+class ComplexMultivariateUnitVarianceNormalNP(
+        HasEntropyNP['ComplexMultivariateUnitVarianceNormalEP'],
+        NaturalParametrization['ComplexMultivariateUnitVarianceNormalEP', JaxComplexArray],
+        Multidimensional,
+        Samplable):
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.
 
     This is a curved exponential family.
@@ -53,9 +53,9 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNorma
         return xp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
 
     @override
-    def to_exp(self) -> ComplexMultivariateUnitNormalEP:
+    def to_exp(self) -> ComplexMultivariateUnitVarianceNormalEP:
         xp = self.array_namespace()
-        return ComplexMultivariateUnitNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
+        return ComplexMultivariateUnitVarianceNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -65,8 +65,8 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNorma
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
-                              ) -> ComplexMultivariateUnitNormalEP:
-        return ComplexMultivariateUnitNormalEP(x)
+                              ) -> ComplexMultivariateUnitVarianceNormalEP:
+        return ComplexMultivariateUnitVarianceNormalEP(x)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
@@ -78,10 +78,11 @@ class ComplexMultivariateUnitNormalNP(HasEntropyNP['ComplexMultivariateUnitNorma
 
 
 @dataclass
-class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormalNP],
-                                      ExpectationParametrization[ComplexMultivariateUnitNormalNP],
-                                      Multidimensional,
-                                      Samplable):
+class ComplexMultivariateUnitVarianceNormalEP(
+        HasEntropyEP[ComplexMultivariateUnitVarianceNormalNP],
+        ExpectationParametrization[ComplexMultivariateUnitVarianceNormalNP],
+        Multidimensional,
+        Samplable):
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.
 
     This is a curved exponential family.
@@ -103,13 +104,13 @@ class ComplexMultivariateUnitNormalEP(HasEntropyEP[ComplexMultivariateUnitNormal
 
     @classmethod
     @override
-    def natural_parametrization_cls(cls) -> type[ComplexMultivariateUnitNormalNP]:
-        return ComplexMultivariateUnitNormalNP
+    def natural_parametrization_cls(cls) -> type[ComplexMultivariateUnitVarianceNormalNP]:
+        return ComplexMultivariateUnitVarianceNormalNP
 
     @override
-    def to_nat(self) -> ComplexMultivariateUnitNormalNP:
+    def to_nat(self) -> ComplexMultivariateUnitVarianceNormalNP:
         xp = self.array_namespace()
-        return ComplexMultivariateUnitNormalNP(xp.conj(self.mean) * 2.0)
+        return ComplexMultivariateUnitVarianceNormalNP(xp.conj(self.mean) * 2.0)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

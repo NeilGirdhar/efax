@@ -11,13 +11,14 @@ from ...interfaces.samplable import Samplable
 from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                    TransformedNaturalParametrization)
 from ...parameter import ScalarSupport, distribution_parameter
-from ..normal.unit import UnitNormalEP, UnitNormalNP
+from ..normal.unit import UnitVarianceNormalEP, UnitVarianceNormalNP
 
 
 @dataclass
-class UnitSoftplusNormalNP(
+class UnitVarianceSoftplusNormalNP(
         Samplable,
-        TransformedNaturalParametrization[UnitNormalNP, UnitNormalEP, 'UnitSoftplusNormalEP',
+        TransformedNaturalParametrization[UnitVarianceNormalNP, UnitVarianceNormalEP,
+                                          'UnitVarianceSoftplusNormalEP',
                                           JaxRealArray]):
     """natural parametrization of the softplus-normal distribution with unit variance."""
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
@@ -29,23 +30,23 @@ class UnitSoftplusNormalNP(
 
     @override
     @classmethod
-    def expectation_parametrization_cls(cls) -> type[UnitSoftplusNormalEP]:
-        return UnitSoftplusNormalEP
+    def expectation_parametrization_cls(cls) -> type[UnitVarianceSoftplusNormalEP]:
+        return UnitVarianceSoftplusNormalEP
 
     @override
     @classmethod
-    def base_distribution_cls(cls) -> type[UnitNormalNP]:
-        return UnitNormalNP
+    def base_distribution_cls(cls) -> type[UnitVarianceNormalNP]:
+        return UnitVarianceNormalNP
 
     @override
-    def base_distribution(self) -> UnitNormalNP:
-        return UnitNormalNP(self.mean)
+    def base_distribution(self) -> UnitVarianceNormalNP:
+        return UnitVarianceNormalNP(self.mean)
 
     @override
     @classmethod
-    def create_expectation_from_base(cls, expectation_parametrization: UnitNormalEP
-                                     ) -> UnitSoftplusNormalEP:
-        return UnitSoftplusNormalEP(expectation_parametrization.mean)
+    def create_expectation_from_base(cls, expectation_parametrization: UnitVarianceNormalEP
+                                     ) -> UnitVarianceSoftplusNormalEP:
+        return UnitVarianceSoftplusNormalEP(expectation_parametrization.mean)
 
     @override
     @classmethod
@@ -67,9 +68,10 @@ class UnitSoftplusNormalNP(
 
 
 @dataclass
-class UnitSoftplusNormalEP(Samplable,
-                           TransformedExpectationParametrization[UnitNormalEP, UnitNormalNP,
-                                                                 UnitSoftplusNormalNP]):
+class UnitVarianceSoftplusNormalEP(
+        Samplable,
+        TransformedExpectationParametrization[UnitVarianceNormalEP, UnitVarianceNormalNP,
+                                              UnitVarianceSoftplusNormalNP]):
     """The expectation parametrization of the softplus-normal distribution with unit variance."""
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -80,23 +82,23 @@ class UnitSoftplusNormalEP(Samplable,
 
     @classmethod
     @override
-    def natural_parametrization_cls(cls) -> type[UnitSoftplusNormalNP]:
-        return UnitSoftplusNormalNP
+    def natural_parametrization_cls(cls) -> type[UnitVarianceSoftplusNormalNP]:
+        return UnitVarianceSoftplusNormalNP
 
     @override
     @classmethod
-    def base_distribution_cls(cls) -> type[UnitNormalEP]:
-        return UnitNormalEP
+    def base_distribution_cls(cls) -> type[UnitVarianceNormalEP]:
+        return UnitVarianceNormalEP
 
     @override
-    def base_distribution(self) -> UnitNormalEP:
-        return UnitNormalEP(self.mean)
+    def base_distribution(self) -> UnitVarianceNormalEP:
+        return UnitVarianceNormalEP(self.mean)
 
     @override
     @classmethod
-    def create_natural_from_base(cls, natural_parametrization: UnitNormalNP
-                                 ) -> UnitSoftplusNormalNP:
-        return UnitSoftplusNormalNP(natural_parametrization.mean)
+    def create_natural_from_base(cls, natural_parametrization: UnitVarianceNormalNP
+                                 ) -> UnitVarianceSoftplusNormalNP:
+        return UnitVarianceSoftplusNormalNP(natural_parametrization.mean)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

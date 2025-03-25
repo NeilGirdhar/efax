@@ -12,23 +12,24 @@ from typing_extensions import override
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,
-                  ComplexMultivariateUnitNormalEP, ComplexMultivariateUnitNormalNP, ComplexNormalEP,
-                  ComplexNormalNP, ComplexUnitNormalEP, ComplexUnitNormalNP, DirichletEP,
-                  DirichletNP, ExponentialEP, ExponentialNP, GammaEP, GammaNP,
-                  GeneralizedDirichletEP, GeneralizedDirichletNP, GeometricEP, GeometricNP,
-                  IsotropicNormalEP, IsotropicNormalNP, JointDistributionE, JointDistributionN,
-                  LogarithmicEP, LogarithmicNP, LogNormalEP, LogNormalNP,
-                  MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
+                  ComplexMultivariateUnitVarianceNormalEP, ComplexMultivariateUnitVarianceNormalNP,
+                  ComplexNormalEP, ComplexNormalNP, ComplexUnitVarianceNormalEP,
+                  ComplexUnitVarianceNormalNP, DirichletEP, DirichletNP, ExponentialEP,
+                  ExponentialNP, GammaEP, GammaNP, GeneralizedDirichletEP, GeneralizedDirichletNP,
+                  GeometricEP, GeometricNP, IsotropicNormalEP, IsotropicNormalNP,
+                  JointDistributionE, JointDistributionN, LogarithmicEP, LogarithmicNP, LogNormalEP,
+                  LogNormalNP, MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
                   MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
-                  MultivariateNormalEP, MultivariateNormalNP, MultivariateUnitNormalEP,
-                  MultivariateUnitNormalNP, NegativeBinomialEP, NegativeBinomialNP, NormalEP,
-                  NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
+                  MultivariateNormalEP, MultivariateNormalNP, MultivariateUnitVarianceNormalEP,
+                  MultivariateUnitVarianceNormalNP, NegativeBinomialEP, NegativeBinomialNP,
+                  NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
                   ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
                   ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution, ScipyLogNormal,
                   ScipyMultivariateNormal, ScipySoftplusNormal, ScipyVonMises, ScipyVonMisesFisher,
-                  SoftplusNormalEP, SoftplusNormalNP, Structure, SubDistributionInfo, UnitNormalEP,
-                  UnitNormalNP, UnitSoftplusNormalEP, UnitSoftplusNormalNP, VonMisesFisherEP,
-                  VonMisesFisherNP, WeibullEP, WeibullNP)
+                  SoftplusNormalEP, SoftplusNormalNP, Structure, SubDistributionInfo,
+                  UnitVarianceNormalEP, UnitVarianceNormalNP, UnitVarianceSoftplusNormalEP,
+                  UnitVarianceSoftplusNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
+                  WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -109,20 +110,21 @@ class ComplexCircularlySymmetricNormalInfo(DistributionInfo[ComplexCircularlySym
         return ComplexCircularlySymmetricNormalNP
 
 
-class ComplexMultivariateUnitNormalInfo(DistributionInfo[ComplexMultivariateUnitNormalNP,
-                                                         ComplexMultivariateUnitNormalEP,
-                                                         NumpyComplexArray]):
+class ComplexMultivariateUnitVarianceNormalInfo(
+        DistributionInfo[ComplexMultivariateUnitVarianceNormalNP,
+                         ComplexMultivariateUnitVarianceNormalEP,
+                         NumpyComplexArray]):
     @override
-    def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitNormalEP) -> Any:
+    def exp_to_scipy_distribution(self, p: ComplexMultivariateUnitVarianceNormalEP) -> Any:
         return ScipyComplexMultivariateNormal(mean=np.asarray(p.mean))
 
     @override
-    def exp_class(self) -> type[ComplexMultivariateUnitNormalEP]:
-        return ComplexMultivariateUnitNormalEP
+    def exp_class(self) -> type[ComplexMultivariateUnitVarianceNormalEP]:
+        return ComplexMultivariateUnitVarianceNormalEP
 
     @override
-    def nat_class(self) -> type[ComplexMultivariateUnitNormalNP]:
-        return ComplexMultivariateUnitNormalNP
+    def nat_class(self) -> type[ComplexMultivariateUnitVarianceNormalNP]:
+        return ComplexMultivariateUnitVarianceNormalNP
 
 
 class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, NumpyComplexArray]):
@@ -144,22 +146,23 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         return ComplexNormalNP
 
 
-class ComplexUnitNormalInfo(DistributionInfo[ComplexUnitNormalNP, ComplexUnitNormalEP,
-                                             NumpyComplexArray]):
+class ComplexUnitVarianceNormalInfo(
+        DistributionInfo[ComplexUnitVarianceNormalNP, ComplexUnitVarianceNormalEP,
+                         NumpyComplexArray]):
     @override
-    def exp_to_scipy_distribution(self, p: ComplexUnitNormalEP) -> Any:
+    def exp_to_scipy_distribution(self, p: ComplexUnitVarianceNormalEP) -> Any:
         mean = np.asarray(p.mean, dtype=np.complex128)
         variance = np.ones_like(np.real(mean))
         pseudo_variance = np.zeros_like(mean)
         return ScipyComplexNormal(mean, variance, pseudo_variance)
 
     @override
-    def exp_class(self) -> type[ComplexUnitNormalEP]:
-        return ComplexUnitNormalEP
+    def exp_class(self) -> type[ComplexUnitVarianceNormalEP]:
+        return ComplexUnitVarianceNormalEP
 
     @override
-    def nat_class(self) -> type[ComplexUnitNormalNP]:
-        return ComplexUnitNormalNP
+    def nat_class(self) -> type[ComplexUnitVarianceNormalNP]:
+        return ComplexUnitVarianceNormalNP
 
 
 class DirichletInfo(DistributionInfo[DirichletNP, DirichletEP, NumpyRealArray]):
@@ -411,20 +414,20 @@ class MultivariateNormalInfo(DistributionInfo[MultivariateNormalNP, Multivariate
         return MultivariateNormalNP
 
 
-class MultivariateUnitNormalInfo(DistributionInfo[MultivariateUnitNormalNP,
-                                                  MultivariateUnitNormalEP,
+class MultivariateUnitVarianceNormalInfo(DistributionInfo[MultivariateUnitVarianceNormalNP,
+                                                  MultivariateUnitVarianceNormalEP,
                                                   NumpyRealArray]):
     @override
-    def exp_to_scipy_distribution(self, p: MultivariateUnitNormalEP) -> Any:
+    def exp_to_scipy_distribution(self, p: MultivariateUnitVarianceNormalEP) -> Any:
         return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean))
 
     @override
-    def exp_class(self) -> type[MultivariateUnitNormalEP]:
-        return MultivariateUnitNormalEP
+    def exp_class(self) -> type[MultivariateUnitVarianceNormalEP]:
+        return MultivariateUnitVarianceNormalEP
 
     @override
-    def nat_class(self) -> type[MultivariateUnitNormalNP]:
-        return MultivariateUnitNormalNP
+    def nat_class(self) -> type[MultivariateUnitVarianceNormalNP]:
+        return MultivariateUnitVarianceNormalNP
 
 
 class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomialEP,
@@ -499,33 +502,35 @@ class SoftplusNormalInfo(DistributionInfo[SoftplusNormalNP, SoftplusNormalEP, Nu
         return SoftplusNormalNP
 
 
-class UnitNormalInfo(DistributionInfo[UnitNormalNP, UnitNormalEP, NumpyRealArray]):
+class UnitVarianceNormalInfo(
+        DistributionInfo[UnitVarianceNormalNP, UnitVarianceNormalEP, NumpyRealArray]):
     @override
-    def exp_to_scipy_distribution(self, p: UnitNormalEP) -> Any:
+    def exp_to_scipy_distribution(self, p: UnitVarianceNormalEP) -> Any:
         return ss.norm(p.mean, 1.0)
 
     @override
-    def exp_class(self) -> type[UnitNormalEP]:
-        return UnitNormalEP
+    def exp_class(self) -> type[UnitVarianceNormalEP]:
+        return UnitVarianceNormalEP
 
     @override
-    def nat_class(self) -> type[UnitNormalNP]:
-        return UnitNormalNP
+    def nat_class(self) -> type[UnitVarianceNormalNP]:
+        return UnitVarianceNormalNP
 
 
-class UnitSoftplusNormalInfo(DistributionInfo[UnitSoftplusNormalNP, UnitSoftplusNormalEP,
-                                              NumpyRealArray]):
+class UnitVarianceSoftplusNormalInfo(
+        DistributionInfo[UnitVarianceSoftplusNormalNP, UnitVarianceSoftplusNormalEP,
+                         NumpyRealArray]):
     @override
-    def exp_to_scipy_distribution(self, p: UnitSoftplusNormalEP) -> Any:
+    def exp_to_scipy_distribution(self, p: UnitVarianceSoftplusNormalEP) -> Any:
         return ScipySoftplusNormal(np.asarray(p.mean), np.ones_like(p.mean))
 
     @override
-    def exp_class(self) -> type[UnitSoftplusNormalEP]:
-        return UnitSoftplusNormalEP
+    def exp_class(self) -> type[UnitVarianceSoftplusNormalEP]:
+        return UnitVarianceSoftplusNormalEP
 
     @override
-    def nat_class(self) -> type[UnitSoftplusNormalNP]:
-        return UnitSoftplusNormalNP
+    def nat_class(self) -> type[UnitVarianceSoftplusNormalNP]:
+        return UnitVarianceSoftplusNormalNP
 
 
 class VonMisesFisherInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, NumpyRealArray]):
@@ -591,9 +596,9 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             ChiInfo(),
             ChiSquareInfo(),
             ComplexCircularlySymmetricNormalInfo(dimensions=3),
-            ComplexMultivariateUnitNormalInfo(dimensions=4),
+            ComplexMultivariateUnitVarianceNormalInfo(dimensions=4),
             ComplexNormalInfo(),
-            ComplexUnitNormalInfo(),
+            ComplexUnitVarianceNormalInfo(),
             DirichletInfo(dimensions=5),
             ExponentialInfo(),
             GammaInfo(),
@@ -606,14 +611,14 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             MultivariateDiagonalNormalInfo(dimensions=4),
             MultivariateFixedVarianceNormalInfo(dimensions=2),
             MultivariateNormalInfo(dimensions=4),
-            MultivariateUnitNormalInfo(dimensions=5),
+            MultivariateUnitVarianceNormalInfo(dimensions=5),
             NegativeBinomialInfo(),
             NormalInfo(),
             PoissonInfo(),
             RayleighInfo(),
             SoftplusNormalInfo(),
-            UnitNormalInfo(),
-            UnitSoftplusNormalInfo(),
+            UnitVarianceNormalInfo(),
+            UnitVarianceSoftplusNormalInfo(),
             VonMisesFisherInfo(dimensions=5),
             VonMisesInfo(),
             WeibullInfo(),

@@ -15,9 +15,10 @@ from ...parameter import ScalarSupport, complex_field, distribution_parameter
 
 
 @dataclass
-class ComplexUnitNormalNP(HasEntropyNP['ComplexUnitNormalEP'],
-                          NaturalParametrization['ComplexUnitNormalEP', JaxComplexArray],
-                          Samplable):
+class ComplexUnitVarianceNormalNP(
+        HasEntropyNP['ComplexUnitVarianceNormalEP'],
+        NaturalParametrization['ComplexUnitVarianceNormalEP', JaxComplexArray],
+        Samplable):
     """The natural parametrization of the complex unit normal distribution.
 
     It has unit variance, and zero pseudo-variance. This is a curved exponential family.
@@ -49,9 +50,9 @@ class ComplexUnitNormalNP(HasEntropyNP['ComplexUnitNormalEP'],
         return abs_square(mean_conjugate) + math.log(math.pi)
 
     @override
-    def to_exp(self) -> ComplexUnitNormalEP:
+    def to_exp(self) -> ComplexUnitVarianceNormalEP:
         xp = self.array_namespace()
-        return ComplexUnitNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
+        return ComplexUnitVarianceNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -60,8 +61,8 @@ class ComplexUnitNormalNP(HasEntropyNP['ComplexUnitNormalEP'],
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
-                              ) -> ComplexUnitNormalEP:
-        return ComplexUnitNormalEP(x)
+                              ) -> ComplexUnitVarianceNormalEP:
+        return ComplexUnitVarianceNormalEP(x)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
@@ -69,9 +70,10 @@ class ComplexUnitNormalNP(HasEntropyNP['ComplexUnitNormalEP'],
 
 
 @dataclass
-class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
-                          ExpectationParametrization[ComplexUnitNormalNP],
-                          Samplable):
+class ComplexUnitVarianceNormalEP(
+        HasEntropyEP[ComplexUnitVarianceNormalNP],
+        ExpectationParametrization[ComplexUnitVarianceNormalNP],
+        Samplable):
     """The expectation parametrization of the complex unit normal distribution.
 
     It has unit variance, and zero pseudo-variance. This is a curved exponential family.
@@ -93,13 +95,13 @@ class ComplexUnitNormalEP(HasEntropyEP[ComplexUnitNormalNP],
 
     @classmethod
     @override
-    def natural_parametrization_cls(cls) -> type[ComplexUnitNormalNP]:
-        return ComplexUnitNormalNP
+    def natural_parametrization_cls(cls) -> type[ComplexUnitVarianceNormalNP]:
+        return ComplexUnitVarianceNormalNP
 
     @override
-    def to_nat(self) -> ComplexUnitNormalNP:
+    def to_nat(self) -> ComplexUnitVarianceNormalNP:
         xp = self.array_namespace()
-        return ComplexUnitNormalNP(xp.conj(self.mean) * 2.0)
+        return ComplexUnitVarianceNormalNP(xp.conj(self.mean) * 2.0)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

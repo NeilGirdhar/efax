@@ -20,10 +20,11 @@ from .isotropic import IsotropicNormalNP
 
 
 @dataclass
-class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
-                               NaturalParametrization['MultivariateUnitNormalEP', JaxRealArray],
-                               Multidimensional,
-                               Samplable):
+class MultivariateUnitVarianceNormalNP(
+        HasEntropyNP['MultivariateUnitVarianceNormalEP'],
+        NaturalParametrization['MultivariateUnitVarianceNormalEP', JaxRealArray],
+        Multidimensional,
+        Samplable):
     """The natural parametrization of the multivariate normal distribution with unit variance.
 
     This is a curved exponential family.
@@ -50,8 +51,8 @@ class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
                       + self.dimensions() * math.log(math.pi * 2.0))
 
     @override
-    def to_exp(self) -> MultivariateUnitNormalEP:
-        return MultivariateUnitNormalEP(self.mean)
+    def to_exp(self) -> MultivariateUnitVarianceNormalEP:
+        return MultivariateUnitVarianceNormalEP(self.mean)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -62,8 +63,8 @@ class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
     @override
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> MultivariateUnitNormalEP:
-        return MultivariateUnitNormalEP(x)
+                              ) -> MultivariateUnitVarianceNormalEP:
+        return MultivariateUnitVarianceNormalEP(x)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -79,11 +80,11 @@ class MultivariateUnitNormalNP(HasEntropyNP['MultivariateUnitNormalEP'],
 
 
 @dataclass
-class MultivariateUnitNormalEP(
-        HasEntropyEP[MultivariateUnitNormalNP],
+class MultivariateUnitVarianceNormalEP(
+        HasEntropyEP[MultivariateUnitVarianceNormalNP],
         HasGeneralizedConjugatePrior,
         Samplable,
-        ExpectationParametrization[MultivariateUnitNormalNP],
+        ExpectationParametrization[MultivariateUnitVarianceNormalNP],
         Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with unit variance.
 
@@ -106,12 +107,12 @@ class MultivariateUnitNormalEP(
 
     @classmethod
     @override
-    def natural_parametrization_cls(cls) -> type[MultivariateUnitNormalNP]:
-        return MultivariateUnitNormalNP
+    def natural_parametrization_cls(cls) -> type[MultivariateUnitVarianceNormalNP]:
+        return MultivariateUnitVarianceNormalNP
 
     @override
-    def to_nat(self) -> MultivariateUnitNormalNP:
-        return MultivariateUnitNormalNP(self.mean)
+    def to_nat(self) -> MultivariateUnitVarianceNormalNP:
+        return MultivariateUnitVarianceNormalNP(self.mean)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

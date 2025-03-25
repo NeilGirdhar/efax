@@ -18,9 +18,9 @@ from .normal import NormalNP
 
 
 @dataclass
-class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
-                   NaturalParametrization['UnitNormalEP', JaxRealArray],
-                   Samplable):
+class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
+                           NaturalParametrization['UnitVarianceNormalEP', JaxRealArray],
+                           Samplable):
     """The natural parametrization of the normal distribution with unit variance.
 
     This is a curved exponential family.
@@ -46,8 +46,8 @@ class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
         return 0.5 * (xp.square(self.mean) + math.log(math.pi * 2.0))
 
     @override
-    def to_exp(self) -> UnitNormalEP:
-        return UnitNormalEP(self.mean)
+    def to_exp(self) -> UnitVarianceNormalEP:
+        return UnitVarianceNormalEP(self.mean)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -59,8 +59,8 @@ class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray,
                               **fixed_parameters: JaxArray
-                              ) -> UnitNormalEP:
-        return UnitNormalEP(x)
+                              ) -> UnitVarianceNormalEP:
+        return UnitVarianceNormalEP(x)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -72,10 +72,10 @@ class UnitNormalNP(HasEntropyNP['UnitNormalEP'],
 
 
 @dataclass
-class UnitNormalEP(HasEntropyEP[UnitNormalNP],
-                   HasConjugatePrior,
-                   Samplable,
-                   ExpectationParametrization[UnitNormalNP]):
+class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP],
+                           HasConjugatePrior,
+                           Samplable,
+                           ExpectationParametrization[UnitVarianceNormalNP]):
     """The expectation parametrization of the normal distribution with unit variance.
 
     This is a curved exponential family.
@@ -97,12 +97,12 @@ class UnitNormalEP(HasEntropyEP[UnitNormalNP],
 
     @classmethod
     @override
-    def natural_parametrization_cls(cls) -> type[UnitNormalNP]:
-        return UnitNormalNP
+    def natural_parametrization_cls(cls) -> type[UnitVarianceNormalNP]:
+        return UnitVarianceNormalNP
 
     @override
-    def to_nat(self) -> UnitNormalNP:
-        return UnitNormalNP(self.mean)
+    def to_nat(self) -> UnitVarianceNormalNP:
+        return UnitVarianceNormalNP(self.mean)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

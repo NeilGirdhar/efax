@@ -8,7 +8,7 @@ import pytest
 from numpy.random import Generator
 from tjax import assert_tree_allclose
 
-from efax import Flattener, MultivariateUnitNormalNP
+from efax import Flattener, MultivariateUnitVarianceNormalNP
 
 from .distribution_info import DistributionInfo
 
@@ -32,7 +32,7 @@ def test_flatten(generator: Generator,
 @pytest.mark.nondistribution
 def test_raises() -> None:
     """Test that unflattening raises for bad shapes."""
-    m = MultivariateUnitNormalNP(jnp.zeros(10))
+    m = MultivariateUnitVarianceNormalNP(jnp.zeros(10))
     flattener, flattened = Flattener.flatten(m)
     assert flattened.shape == (10,)
     with pytest.raises(ValueError, match="Incompatible array"):
