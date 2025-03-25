@@ -153,26 +153,35 @@ EFAX supports the following distributions:
 
   - univariate real:
 
-    - with fixed unit variance
-    - with arbitrary variance
+    - with unit variance
+    - with arbitrary parameters
 
   - univariate complex
 
-    - with fixed unit variance and zero pseudo-variance
-    - with arbitrary variance
+    - with unit variance and zero pseudo-variance
+    - with arbitrary parameters
 
   - multivariate real:
 
-    - with fixed unit variance
+    - with unit variance
     - with fixed variance
     - with isotropic variance
     - with diagonal variance
-    - with arbitrary variance
+    - with arbitrary parameters
 
   - multivariate complex:
 
-    - with fixed unit variance and zero pseudo-variance
+    - with unit variance and zero pseudo-variance
     - circularly symmetric
+
+  - softplus-transformed:
+
+    - with unit variance
+    - with arbitrary parameters
+
+  - log-normal (exponential-transformed):
+
+    - with arbitrary parameters
 
 - on a finite set:
 
@@ -192,10 +201,7 @@ EFAX supports the following distributions:
   - chi-square
   - exponential
   - gamma
-  - log-normal
   - Rayleigh
-  - softplus-normal
-  - unit-softplus-normal
   - Weibull
 
 - on the simplex:
