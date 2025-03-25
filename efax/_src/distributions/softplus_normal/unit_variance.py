@@ -11,7 +11,7 @@ from ...interfaces.samplable import Samplable
 from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                    TransformedNaturalParametrization)
 from ...parameter import ScalarSupport, distribution_parameter
-from ..normal.unit import UnitVarianceNormalEP, UnitVarianceNormalNP
+from ..normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 
 
 @dataclass

@@ -5,11 +5,11 @@ from ._src.distributions.chi import ChiEP, ChiNP
 from ._src.distributions.chi_square import ChiSquareEP, ChiSquareNP
 from ._src.distributions.cmvn.circularly_symmetric import (ComplexCircularlySymmetricNormalEP,
                                                            ComplexCircularlySymmetricNormalNP)
-from ._src.distributions.cmvn.unit import (ComplexMultivariateUnitVarianceNormalEP,
-                                           ComplexMultivariateUnitVarianceNormalNP)
+from ._src.distributions.cmvn.unit_variance import (ComplexMultivariateUnitVarianceNormalEP,
+                                                    ComplexMultivariateUnitVarianceNormalNP)
 from ._src.distributions.complex_normal.complex_normal import ComplexNormalEP, ComplexNormalNP
-from ._src.distributions.complex_normal.unit import (ComplexUnitVarianceNormalEP,
-                                                     ComplexUnitVarianceNormalNP)
+from ._src.distributions.complex_normal.unit_variance import (ComplexUnitVarianceNormalEP,
+                                                              ComplexUnitVarianceNormalNP)
 from ._src.distributions.dirichlet import DirichletEP, DirichletNP
 from ._src.distributions.exponential import ExponentialEP, ExponentialNP
 from ._src.distributions.gamma import GammaEP, GammaNP, GammaVP
@@ -29,16 +29,16 @@ from ._src.distributions.multivariate_normal.diagonal import (MultivariateDiagon
 from ._src.distributions.multivariate_normal.fixed_variance import (
     MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP)
 from ._src.distributions.multivariate_normal.isotropic import IsotropicNormalEP, IsotropicNormalNP
-from ._src.distributions.multivariate_normal.unit import (MultivariateUnitVarianceNormalEP,
-                                                          MultivariateUnitVarianceNormalNP)
+from ._src.distributions.multivariate_normal.unit_variance import (MultivariateUnitVarianceNormalEP,
+                                                                   MultivariateUnitVarianceNormalNP)
 from ._src.distributions.negative_binomial import NegativeBinomialEP, NegativeBinomialNP
 from ._src.distributions.normal.normal import NormalDP, NormalEP, NormalNP, NormalVP
-from ._src.distributions.normal.unit import UnitVarianceNormalEP, UnitVarianceNormalNP
+from ._src.distributions.normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 from ._src.distributions.poisson import PoissonEP, PoissonNP
 from ._src.distributions.rayleigh import RayleighEP, RayleighNP
 from ._src.distributions.softplus_normal.softplus import SoftplusNormalEP, SoftplusNormalNP
-from ._src.distributions.softplus_normal.unit import (UnitVarianceSoftplusNormalEP,
-                                                      UnitVarianceSoftplusNormalNP)
+from ._src.distributions.softplus_normal.unit_variance import (UnitVarianceSoftplusNormalEP,
+                                                               UnitVarianceSoftplusNormalNP)
 from ._src.distributions.von_mises import VonMisesFisherEP, VonMisesFisherNP
 from ._src.distributions.weibull import WeibullEP, WeibullNP
 from ._src.expectation_parametrization import ExpectationParametrization
