@@ -23,6 +23,9 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
                                    Samplable):
     """The natural parametrization of the normal distribution with diagonal variance.
 
+    This distribution exists because it's the generalized conjugate prior of
+    MultivariateFixedVarianceNormal.
+
     Args:
         mean_times_precision: E(x) / Var(x).
         negative_half_precision: The diagonal elements of -0.5 / Var(x).
