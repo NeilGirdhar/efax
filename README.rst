@@ -181,6 +181,7 @@ EFAX supports the following distributions:
 
   - log-normal (exponential-transformed):
 
+    - with unit variance
     - with arbitrary parameters
 
 - on a finite set:

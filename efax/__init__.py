@@ -16,6 +16,8 @@ from ._src.distributions.gamma import GammaEP, GammaNP, GammaVP
 from ._src.distributions.gen_dirichlet import GeneralizedDirichletEP, GeneralizedDirichletNP
 from ._src.distributions.geometric import GeometricEP, GeometricNP
 from ._src.distributions.log_normal.log_normal import LogNormalEP, LogNormalNP
+from ._src.distributions.log_normal.unit_variance import (UnitVarianceLogNormalEP,
+                                                          UnitVarianceLogNormalNP)
 from ._src.distributions.logarithmic import LogarithmicEP, LogarithmicNP
 from ._src.distributions.multinomial import MultinomialEP, MultinomialNP
 from ._src.distributions.multivariate_normal.arbitrary import (MultivariateNormalEP,
@@ -160,6 +162,8 @@ __all__ = [
     'SubDistributionInfo',
     'Support',
     'SymmetricMatrixSupport',
+    'UnitVarianceLogNormalEP',
+    'UnitVarianceLogNormalNP',
     'UnitVarianceNormalEP',
     'UnitVarianceNormalNP',
     'UnitVarianceSoftplusNormalEP',
