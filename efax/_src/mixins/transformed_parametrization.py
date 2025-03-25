@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, TypeVar
+from functools import partial
+from typing import Any, Generic, TypeVar, cast
 
+from jax import jacobian, vmap
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
 from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
+from ..iteration import parameters
 from ..natural_parametrization import EP, NaturalParametrization
 
 TEP = TypeVar('TEP', bound=ExpectationParametrization[Any])
@@ -50,6 +53,32 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
     def to_exp(self) -> TEP:
         """The corresponding expectation parameters."""
         return self.create_expectation_from_base(self.base_distribution().to_exp())
+
+    @override
+    def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
+        xp = self.array_namespace(x)
+        casted_x = cast('Domain', x)
+        fixed_parameters = parameters(self, fixed=True, recurse=False)
+        bound_fy = partial(self.sample_to_base_sample, **fixed_parameters)
+        y = bound_fy(casted_x)
+
+        def log_abs_jac_y(x: JaxComplexArray) -> JaxRealArray:
+            jac_y = jacobian(bound_fy)(x)
+            if jac_y.ndim == 0:
+                pass
+            elif jac_y.ndim == 2:  # noqa: PLR2004
+                jac_y = xp.linalg.det(jac_y)
+            else:
+                raise RuntimeError
+            return xp.log(xp.abs(jac_y))
+
+        for _ in range(self.ndim):
+            log_abs_jac_y = vmap(log_abs_jac_y)
+
+        # The carrier measure is the sum of:
+        # * The base distrubtion's carrier measure applied to the base sample y, and
+        # * log(abs(det(jac(y)))).
+        return self.base_distribution().carrier_measure(y) + log_abs_jac_y(casted_x)
 
     @override
     @classmethod
