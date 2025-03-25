@@ -11,7 +11,7 @@ from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
                                                    TransformedNaturalParametrization)
 from ...parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
-from .normal import NormalEP, NormalNP
+from ..normal.normal import NormalEP, NormalNP
 
 
 @dataclass

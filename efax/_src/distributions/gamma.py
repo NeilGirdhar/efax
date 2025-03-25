@@ -15,7 +15,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import (RealField, ScalarSupport, distribution_parameter, negative_support,
                          positive_support)
 from ..parametrization import SimpleDistribution
-from .normal.log_normal import LogNormalEP, LogNormalNP
+from .log_normal.log_normal import LogNormalEP, LogNormalNP
 from .normal.normal import NormalVP
 
 

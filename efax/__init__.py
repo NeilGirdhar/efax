@@ -15,6 +15,7 @@ from ._src.distributions.exponential import ExponentialEP, ExponentialNP
 from ._src.distributions.gamma import GammaEP, GammaNP, GammaVP
 from ._src.distributions.gen_dirichlet import GeneralizedDirichletEP, GeneralizedDirichletNP
 from ._src.distributions.geometric import GeometricEP, GeometricNP
+from ._src.distributions.log_normal.log_normal import LogNormalEP, LogNormalNP
 from ._src.distributions.logarithmic import LogarithmicEP, LogarithmicNP
 from ._src.distributions.multinomial import MultinomialEP, MultinomialNP
 from ._src.distributions.multivariate_normal.arbitrary import (MultivariateNormalEP,
@@ -29,7 +30,6 @@ from ._src.distributions.multivariate_normal.isotropic import IsotropicNormalEP,
 from ._src.distributions.multivariate_normal.unit import (MultivariateUnitVarianceNormalEP,
                                                           MultivariateUnitVarianceNormalNP)
 from ._src.distributions.negative_binomial import NegativeBinomialEP, NegativeBinomialNP
-from ._src.distributions.normal.log_normal import LogNormalEP, LogNormalNP
 from ._src.distributions.normal.normal import NormalDP, NormalEP, NormalNP, NormalVP
 from ._src.distributions.normal.unit import UnitVarianceNormalEP, UnitVarianceNormalNP
 from ._src.distributions.poisson import PoissonEP, PoissonNP
