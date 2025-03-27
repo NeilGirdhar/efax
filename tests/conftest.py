@@ -16,8 +16,8 @@ from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
                   Structure)
 
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
-                          DirichletInfo, GammaInfo, GeneralizedDirichletInfo, JointInfo,
-                          create_infos)
+                          DirichletInfo, GammaInfo, GeneralizedDirichletInfo, InverseGammaInfo,
+                          JointInfo, create_infos)
 
 
 @pytest.fixture(autouse=True)
@@ -101,7 +101,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              if not any_integral_supports(structure)
              if not isinstance(info,
                                ComplexCircularlySymmetricNormalInfo | BetaInfo | DirichletInfo
-                               | ChiSquareInfo | GammaInfo | JointInfo)
+                               | ChiSquareInfo | GammaInfo | InverseGammaInfo | JointInfo)
              if info.tests_selected(distribution_name_option)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,

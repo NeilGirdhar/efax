@@ -198,12 +198,13 @@ EFAX supports the following distributions:
 
 - on the positive reals:
 
+  - Rayleigh
+  - Weibull
   - chi
   - chi-square
   - exponential
   - gamma
-  - Rayleigh
-  - Weibull
+  - inverse gamma
 
 - on the simplex:
 

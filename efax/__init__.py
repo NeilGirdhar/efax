@@ -15,6 +15,7 @@ from ._src.distributions.exponential import ExponentialEP, ExponentialNP
 from ._src.distributions.gamma import GammaEP, GammaNP, GammaVP
 from ._src.distributions.gen_dirichlet import GeneralizedDirichletEP, GeneralizedDirichletNP
 from ._src.distributions.geometric import GeometricEP, GeometricNP
+from ._src.distributions.inverse_gamma import InverseGammaEP, InverseGammaNP
 from ._src.distributions.log_normal.log_normal import LogNormalEP, LogNormalNP
 from ._src.distributions.log_normal.unit_variance import (UnitVarianceLogNormalEP,
                                                           UnitVarianceLogNormalNP)
@@ -105,6 +106,8 @@ __all__ = [
     'HasEntropyNP',
     'HasGeneralizedConjugatePrior',
     'IntegralRing',
+    'InverseGammaEP',
+    'InverseGammaNP',
     'IsotropicNormalEP',
     'IsotropicNormalNP',
     'JointDistribution',
