@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import math
 
+import jax.random as jr
 from array_api_compat import array_namespace
-from jax.random import chisquare
 from jax.scipy import special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -68,7 +68,7 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
         if shape is not None:
             shape += self.shape
         degrees_of_freedom = (self.k_over_two_minus_one + 1.0) * 2.0
-        return chisquare(key, degrees_of_freedom, shape)
+        return jr.chisquare(key, degrees_of_freedom, shape)
 
 
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.

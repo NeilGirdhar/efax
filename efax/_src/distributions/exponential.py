@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Self
 
-import jax
+import jax.random as jr
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -63,7 +63,7 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
             shape += self.shape
         else:
             shape = self.shape
-        return -jax.random.exponential(key, shape) / self.negative_rate
+        return -jr.exponential(key, shape) / self.negative_rate
 
 
 @dataclass
@@ -108,7 +108,7 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.exponential(key, shape) * self.mean
+        return jr.exponential(key, shape) * self.mean
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> GammaNP:

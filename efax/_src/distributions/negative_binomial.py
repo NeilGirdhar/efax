@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import jax.random as jr
 from array_api_compat import array_namespace
-from jax.random import split
 from tjax import JaxArray, JaxIntegralArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -83,7 +83,7 @@ class NegativeBinomialEP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        gamma_key, poisson_key = split(key)
+        gamma_key, poisson_key = jr.split(key)
         r = self._failures()
         negative_rate = -r / self.mean
         shape_minus_one = r - 1.0

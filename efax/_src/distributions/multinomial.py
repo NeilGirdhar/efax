@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Self
 
 import array_api_extra as xpx
-import jax
+import jax.random as jr
 import numpy as np
 from jax.nn import one_hot
 from jax.scipy import special as jss
@@ -74,7 +74,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        return one_hot(jax.random.categorical(key, self.log_odds, shape=shape),
+        return one_hot(jr.categorical(key, self.log_odds, shape=shape),
                        self.dimensions())
 
     @override

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import jax
+import jax.random as jr
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -127,7 +127,7 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
         else:
             shape = self.mean.shape
         deviation = xp.sqrt(self.variance())
-        return jax.random.normal(key, shape) * deviation[..., xp.newaxis] + self.mean
+        return jr.normal(key, shape) * deviation[..., xp.newaxis] + self.mean
 
     @override
     def dimensions(self) -> int:

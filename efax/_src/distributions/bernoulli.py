@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Self
 
-import jax
+import jax.random as jr
 import numpy as np
 from array_api_compat import array_namespace
 from jax.scipy import special as jss
@@ -119,7 +119,7 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxBooleanArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.bernoulli(key, self.probability, shape)
+        return jr.bernoulli(key, self.probability, shape)
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaNP:

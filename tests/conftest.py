@@ -3,11 +3,11 @@ from __future__ import annotations
 from collections.abc import Generator
 from typing import Any
 
+import jax.random as jr
 import numpy as np
 import pytest
 from jax import enable_custom_prng
 from jax.experimental import enable_x64
-from jax.random import key as jax_key
 from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
 
@@ -38,7 +38,7 @@ def generator() -> NumpyGenerator:
 @pytest.fixture
 def key() -> KeyArray:
     with enable_custom_prng():
-        return jax_key(123)
+        return jr.key(123)
 
 
 def pytest_configure(config: pytest.Config) -> None:

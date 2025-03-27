@@ -6,7 +6,7 @@ Suppose you have some samples from a distribution family with unknown parameters
 estimate the maximum likelihood parmaters of the distribution.
 """
 import jax.numpy as jnp
-from jax.random import key
+import jax.random as jr
 
 from efax import DirichletEP, DirichletNP, MaximumLikelihoodEstimator, parameter_mean
 
@@ -16,7 +16,7 @@ source_distribution = DirichletNP(alpha_minus_one=alpha - 1.0)
 
 # Let's sample from it.
 n_samples = 10000
-key_a = key(123)
+key_a = jr.key(123)
 samples = source_distribution.sample(key_a, (n_samples,))
 
 # Now, let's find the maximum likelihood Dirichlet distribution that fits it.

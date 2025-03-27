@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from typing import cast
 
-import jax
+import jax.random as jr
 from tjax import (JaxArray, JaxRealArray, KeyArray, Shape, matrix_dot_product, matrix_vector_mul,
                   outer_product)
 from tjax.dataclasses import dataclass
@@ -173,7 +173,7 @@ class MultivariateNormalVP(Samplable, Multidimensional):
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.multivariate_normal(key, self.mean, self.variance, shape)
+        return jr.multivariate_normal(key, self.mean, self.variance, shape)
 
     @override
     def dimensions(self) -> int:

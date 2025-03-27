@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-import jax
+import jax.random as jr
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
@@ -185,5 +185,5 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         xp = self.array_namespace()
         mn_mean = xp.stack([xp.real(self.mean), xp.imag(self.mean)], axis=-1)
         mn_cov = self._multivariate_normal_cov()
-        mn_sample = jax.random.multivariate_normal(key, mn_mean, mn_cov, shape)
+        mn_sample = jr.multivariate_normal(key, mn_mean, mn_cov, shape)
         return mn_sample[..., 0] + 1j * mn_sample[..., 1]

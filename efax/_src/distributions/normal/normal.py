@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import jax
+import jax.random as jr
 import numpy as np
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
@@ -158,7 +158,7 @@ class NormalVP(Samplable, SimpleDistribution):
         else:
             shape = self.mean.shape
         deviation = xp.sqrt(self.variance)
-        return jax.random.normal(key, shape) * deviation + self.mean
+        return jr.normal(key, shape) * deviation + self.mean
 
     def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
         return self.to_nat().log_pdf(x)
@@ -209,7 +209,7 @@ class NormalDP(Samplable, SimpleDistribution):
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        return jax.random.normal(key, shape) * self.deviation + self.mean
+        return jr.normal(key, shape) * self.deviation + self.mean
 
     def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
         return self.to_nat().log_pdf(x)

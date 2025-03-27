@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping
 from functools import reduce
 from typing import Any, override
 
-from jax.random import split
+import jax.random as jr
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
@@ -32,7 +32,7 @@ class JointDistribution(Distribution):
                 if isinstance(value, JointDistribution | t)}
 
     def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
-        keys = split(key, self._count_samplable_distributions())
+        keys = jr.split(key, self._count_samplable_distributions())
         count = 0
 
         def f(x: Distribution, /) -> JaxComplexArray:

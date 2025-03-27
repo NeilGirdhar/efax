@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from typing import Any, Self
 
-import jax
+import jax.random as jr
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -68,7 +68,7 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        return jax.random.normal(key, shape) + self.mean
+        return jr.normal(key, shape) + self.mean
 
 
 @dataclass

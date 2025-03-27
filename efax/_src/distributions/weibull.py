@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import jax
+import jax.random as jr
 import numpy as np
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
@@ -117,4 +117,4 @@ class WeibullEP(HasEntropyEP[WeibullNP],
         else:
             shape = self.shape
         lambda_ = self.chi ** (1.0 / self.concentration)
-        return jax.random.weibull_min(key, lambda_, self.concentration, shape)
+        return jr.weibull_min(key, lambda_, self.concentration, shape)

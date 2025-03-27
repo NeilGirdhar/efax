@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import jax
+import jax.random as jr
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -51,7 +51,7 @@ class BetaNP(DirichletCommonNP['BetaEP'],
         if shape is not None:
             shape += self.shape
         alpha = 1.0 + self.alpha_minus_one
-        return jax.random.beta(key, alpha[..., 0], alpha[..., 1], shape)
+        return jr.beta(key, alpha[..., 0], alpha[..., 1], shape)
 
 
 @dataclass

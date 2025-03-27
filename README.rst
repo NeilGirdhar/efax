@@ -323,7 +323,7 @@ of samples).
 .. code:: python
 
     import jax.numpy as jnp
-    from jax.random import key
+    import jax.random as jr
 
     from efax import DirichletNP, parameter_mean
 
@@ -333,7 +333,7 @@ of samples).
 
     # Let's sample from it.
     n_samples = 10000
-    key_a = key(123)
+    key_a = jr.key(123)
     samples = source_distribution.sample(key_a, (n_samples,))
 
     # Now, let's find the maximum likelihood Dirichlet distribution that fits it.

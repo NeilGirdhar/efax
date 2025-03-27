@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import jax
+import jax.random as jr
 import numpy as np
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
@@ -165,7 +165,7 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
             shape = self.mean.shape
         xp = self.array_namespace()
         deviation = xp.sqrt(self.variance)
-        return jax.random.normal(key, shape) * deviation + self.mean
+        return jr.normal(key, shape) * deviation + self.mean
 
     @override
     def dimensions(self) -> int:

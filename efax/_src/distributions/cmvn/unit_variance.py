@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-import jax
+import jax.random as jr
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -124,8 +124,8 @@ class ComplexMultivariateUnitVarianceNormalEP(
             shape += self.mean.shape
         else:
             shape = self.mean.shape
-        a = jax.random.normal(key, shape)
-        b = jax.random.normal(key, shape)
+        a = jr.normal(key, shape)
+        b = jr.normal(key, shape)
         return a + 1j * b + self.mean
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:

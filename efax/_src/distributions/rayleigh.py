@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import math
 
+import jax.random as jr
 import numpy as np
 from array_api_compat import array_namespace
-from jax.random import rayleigh
 from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -70,7 +70,7 @@ class RayleighNP(Samplable,
         if shape is not None:
             shape += self.shape
         sigma = xp.sqrt(-0.5 / self.eta)
-        return rayleigh(key, sigma, shape)
+        return jr.rayleigh(key, sigma, shape)
 
 
 @dataclass
@@ -119,4 +119,4 @@ class RayleighEP(Samplable,
         if shape is not None:
             shape += self.shape
         sigma = xp.sqrt(0.5 * self.chi)
-        return rayleigh(key, sigma, shape)
+        return jr.rayleigh(key, sigma, shape)

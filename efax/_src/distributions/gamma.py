@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import jax.random as jr
 from array_api_compat import array_namespace
-from jax.random import gamma as random_gamma
 from jax.scipy import special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
@@ -73,7 +73,7 @@ class GammaNP(HasEntropyNP['GammaEP'],
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        return -random_gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
+        return -jr.gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
 
     def to_variance_parametrization(self) -> GammaVP:
         rate = -self.negative_rate

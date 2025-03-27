@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Self
 
-import jax
+import jax.random as jr
 from jax.scipy import special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -104,7 +104,7 @@ class PoissonEP(HasConjugatePrior,
             shape += self.shape
         else:
             shape = self.shape
-        return jax.random.poisson(key, self.mean, shape)
+        return jr.poisson(key, self.mean, shape)
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> GammaNP:

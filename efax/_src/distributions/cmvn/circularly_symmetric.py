@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-import jax
+import jax.random as jr
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, outer_product
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -128,7 +128,7 @@ class ComplexCircularlySymmetricNormalEP(
             shape += self.shape
         else:
             shape = self.shape
-        xy_rvs = jax.random.multivariate_normal(key,
+        xy_rvs = jr.multivariate_normal(key,
                                                 self._multivariate_normal_mean(),
                                                 self._multivariate_normal_cov(),
                                                 shape)

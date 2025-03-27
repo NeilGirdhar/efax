@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, TypeVar
 
-import jax
+import jax.random as jr
 from jax.scipy import special as jss
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -43,7 +43,7 @@ class DirichletCommonNP(HasEntropyNP[EP],
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        return jax.random.dirichlet(key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
+        return jr.dirichlet(key, 1.0 + self.alpha_minus_one, shape)[..., :-1]
 
     @override
     def dimensions(self) -> int:

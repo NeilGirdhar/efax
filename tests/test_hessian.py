@@ -4,8 +4,8 @@ from __future__ import annotations
 from typing import Any
 
 import jax.numpy as jnp
+import jax.random as jr
 from jax import jacrev, jit, vmap
-from jax.random import split
 from numpy.random import Generator
 from tjax import JaxArray, JaxRealArray, KeyArray, hessian
 
@@ -81,7 +81,7 @@ def test_sampling_cotangents(generator: Generator,
     info = sampling_wc_distribution_info
     info.skip_if_deselected(distribution_name)
     distribution_shape = (23,)
-    keys = split(key, distribution_shape)
+    keys = jr.split(key, distribution_shape)
     p: SimpleDistribution = (info.nat_parameter_generator(generator, distribution_shape)
                              if natural
                              else info.exp_parameter_generator(generator, distribution_shape))

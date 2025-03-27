@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from jax.random import geometric
+import jax.random as jr
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -84,7 +84,7 @@ class GeometricEP(HasEntropyEP[GeometricNP],
         if shape is not None:
             shape += self.shape
         p = 1.0 / self.mean
-        return geometric(key, p, shape)
+        return jr.geometric(key, p, shape)
 
     @override
     def _failures(self) -> int:
