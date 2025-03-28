@@ -6,33 +6,36 @@ import numpy as np
 import optype.numpy as onp
 import scipy.stats as ss
 from tjax import NumpyRealArray
-from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 
-mvn: type = ss._multivariate.multivariate_normal_frozen  # noqa: SLF001
 
-
-class ScipyMultivariateNormalUnvectorized(mvn):
+class ScipyMultivariateNormalUnvectorized:
     """This class repairs multivariate_normal.
 
     See https://github.com/scipy/scipy/issues/7689.
     """
     def __init__(self, mean: NumpyRealArray, cov: NumpyRealArray) -> None:
-        super().__init__(mean=mean, cov=cov)
+        super().__init__()
+        self.distribution = ss.multivariate_normal(mean=mean, cov=cov)
 
-    @override
+    def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
+        return np.asarray(self.distribution.pdf(x))
+
     def rvs(self,
             size: Any = None,
             random_state: Any = None) -> onp.ArrayND[np.float64]:
-        retval = super().rvs(size=size, random_state=random_state)
+        retval = self.distribution.rvs(size=size, random_state=random_state)
         if size is None:
             size = ()
         elif isinstance(size, int):
             size = (size,)
         else:
             size = tuple(size)
-        return np.reshape(retval, size + self.mean.shape)
+        return np.reshape(retval, size + self.distribution.mean.shape)
+
+    def entropy(self) -> NumpyRealArray:
+        return np.asarray(self.distribution.entropy())
 
 
 class ScipyMultivariateNormal(ShapedDistribution[ScipyMultivariateNormalUnvectorized]):

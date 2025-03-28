@@ -4,26 +4,30 @@ from typing import Any
 
 import numpy as np
 import optype.numpy as onp
-import scipy.special
 import scipy.stats as ss
 from numpy.random import Generator
+from scipy.special import beta as scipy_beta
 from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
 from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 
-scipy_beta = scipy.special.beta
 
-
-mvd: type = ss._multivariate.dirichlet_frozen  # noqa: SLF001
-
-
-class ScipyDirichletFixRVsAndPDF(mvd):
+class ScipyDirichletFixRVsAndPDF:
     """This class repairs dirichlet.
 
     See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.
     """
-    @override
+    def __init__(self, alpha: NumpyRealArray) -> None:
+        super().__init__()
+        self.distribution = ss.dirichlet(alpha=alpha)
+
+    def pdf(self, x: onp.ToFloatND) -> np.float64:
+        x = np.asarray(x)
+        if x.ndim == 2:  # noqa: PLR2004
+            return np.float64(self.distribution.pdf(x.T))
+        return np.float64(self.distribution.pdf(x))
+
     def rvs(self,
             size: Any = None,
             random_state: Any = None
@@ -31,14 +35,10 @@ class ScipyDirichletFixRVsAndPDF(mvd):
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
-        return super().rvs(size=size, random_state=random_state)
+        return self.distribution.rvs(size=size, random_state=random_state)
 
-    @override
-    def pdf(self, x: onp.ToFloatND) -> np.float64:
-        x = np.asarray(x)
-        if x.ndim == 2:  # noqa: PLR2004
-            return np.float64(super().pdf(x.T))
-        return np.float64(super().pdf(x))
+    def entropy(self) -> NumpyRealArray:
+        return np.asarray(self.distribution.entropy())
 
 
 class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
