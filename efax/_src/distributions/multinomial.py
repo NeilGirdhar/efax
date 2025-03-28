@@ -4,9 +4,9 @@ from typing import Any, Self
 
 import array_api_extra as xpx
 import jax.random as jr
+import jax.scipy.special as jss
 import numpy as np
 from jax.nn import one_hot
-from jax.scipy import special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override

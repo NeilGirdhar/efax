@@ -3,8 +3,8 @@ from __future__ import annotations
 import math
 
 import jax.random as jr
+import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from jax.scipy import special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override

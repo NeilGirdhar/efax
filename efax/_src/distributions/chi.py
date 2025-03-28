@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import math
 
+import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from jax.scipy import special as jss
 from tjax import Array, JaxArray, JaxRealArray
 from tjax.dataclasses import dataclass
 from typing_extensions import override

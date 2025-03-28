@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, TypeVar
 
-from jax.scipy.special import gammaln
+import jax.scipy.special as jss
 from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -40,7 +40,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         a = x + self._failures() - 1
         # Return log(a choose x).
-        return gammaln(a + 1) - gammaln(x + 1) - gammaln(a - x + 1)
+        return jss.gammaln(a + 1) - jss.gammaln(x + 1) - jss.gammaln(a - x + 1)
 
     def _mean(self) -> JaxRealArray:
         xp = self.array_namespace()

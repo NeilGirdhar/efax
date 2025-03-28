@@ -7,8 +7,8 @@ and Computation, volume 97, pp165-181
 """
 from __future__ import annotations
 
+import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from jax.scipy.special import betaln, digamma
 from tjax import JaxArray, JaxRealArray, Shape, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -44,19 +44,20 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
     def log_normalizer(self) -> JaxRealArray:
         xp = self.array_namespace()
         alpha, beta = self.alpha_beta()
-        return xp.sum(betaln(alpha, beta), axis=-1)
+        return xp.sum(jss.betaln(alpha, beta), axis=-1)
 
     @override
     def to_exp(self) -> GeneralizedDirichletEP:
         # Given a log-normalizer y.
-        # alpha_bar_direct = d y / d alpha = betaln'(alpha, beta) = digamma(alpha) - digamma(alpha +
-        # beta)
-        # beta_bar = d y / d beta = betaln'(alpha, beta) = digamma(beta) - digamma(alpha + beta)
+        # alpha_bar_direct = d y / d alpha = jss.betaln'(alpha, beta)
+        # = jss.digamma(alpha) - jss.digamma(alpha + beta)
+        # beta_bar = d y / d beta = jss.betaln'(alpha, beta)
+        # = jss.digamma(beta) - jss.digamma(alpha + beta)
         xp = self.array_namespace()
         alpha, beta = self.alpha_beta()
-        digamma_sum = digamma(alpha + beta)
-        alpha_bar_direct = digamma(alpha) - digamma_sum
-        beta_bar = digamma(beta) - digamma_sum
+        digamma_sum = jss.digamma(alpha + beta)
+        alpha_bar_direct = jss.digamma(alpha) - digamma_sum
+        beta_bar = jss.digamma(beta) - digamma_sum
         cs_beta_bar = xp.cumulative_sum(beta_bar, axis=-1, include_initial=True)
         gamma_bar = cs_beta_bar[..., 1:]
         alpha_bar_indirect = cs_beta_bar[..., :-1]

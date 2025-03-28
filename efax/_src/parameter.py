@@ -7,9 +7,9 @@ from typing import Any, cast
 
 import array_api_extra as xpx
 import jax.numpy as jnp
+import jax.scipy.special as jss
 import numpy as np
 from array_api_compat import array_namespace
-from jax.scipy import special as jss
 from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import field

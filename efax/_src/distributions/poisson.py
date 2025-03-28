@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Self
 
 import jax.random as jr
-from jax.scipy import special as jss
+import jax.scipy.special as jss
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
