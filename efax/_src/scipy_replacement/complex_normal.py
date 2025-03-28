@@ -108,8 +108,8 @@ class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
         r: NumpyComplexArray = polarization_np * np.exp(1j * 2 * np.pi * angle * 2)
         mean_array = np.asarray(mean)
         variance_array = np.asarray(variance)
-        pseudo_variance_array = np.asarray(r * variance)
-        return cls(mean_array, variance_array, pseudo_variance_array)  # type: ignore[arg-type]
+        pseudo_variance_array = r * np.asarray(variance)
+        return cls(mean_array, variance_array, pseudo_variance_array)
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
         objects = np.empty(self.shape, dtype=ScipyMultivariateNormalUnvectorized)

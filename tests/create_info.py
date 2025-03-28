@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, cast
 
 import array_api_extra as xpx
 import jax.numpy as jnp
@@ -135,7 +135,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         second_moment = np.asarray(p.second_moment, dtype=np.float64)
         pseudo_second_moment = np.asarray(p.pseudo_second_moment, dtype=np.complex128)
         return ScipyComplexNormal(mean,
-                                  second_moment - abs_square(mean),  # pyright: ignore
+                                  second_moment - cast('NumpyRealArray', abs_square(mean)),
                                   pseudo_second_moment - np.square(mean))
 
     @override
@@ -376,9 +376,10 @@ class MultivariateDiagonalNormalInfo(DistributionInfo[MultivariateDiagonalNormal
     @override
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
         variance = np.asarray(p.variance())
-        covariance = xpx.create_diagonal(variance)
-        assert isinstance(covariance, np.ndarray)
-        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
+        covariance = xpx.create_diagonal(variance)  # type: ignore[arg-type]
+        assert isinstance(covariance, np.ndarray)  # type: ignore[unreachable]
+        return ScipyMultivariateNormal.from_mc(  # type: ignore[unreachable]
+                mean=np.asarray(p.mean), cov=covariance)
 
     @override
     def exp_class(self) -> type[MultivariateDiagonalNormalEP]:

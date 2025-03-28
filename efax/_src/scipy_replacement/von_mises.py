@@ -8,7 +8,7 @@ from typing_extensions import override
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyVonMises(ShapedDistribution[ss.vonmises]):
+class ScipyVonMises(ShapedDistribution[object]):
     """This class allows distributions having a non-empty shape."""
     @override
     def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None) -> None:
@@ -25,7 +25,7 @@ class ScipyVonMises(ShapedDistribution[ss.vonmises]):
         super().__init__(shape, rvs_shape, dtype, objects)
 
 
-class ScipyVonMisesFisher(ShapedDistribution[ss.vonmises_fisher]):
+class ScipyVonMisesFisher(ShapedDistribution[object]):
     """This class allows distributions having a non-empty shape."""
     @override
     def __init__(self, mu: NumpyRealArray, kappa: NumpyRealArray) -> None:
