@@ -68,8 +68,7 @@ class JointDistribution(Distribution):
 
 @dataclass
 class JointDistributionE(JointDistribution,
-                         HasEntropyEP['JointDistributionN'],
-                         ExpectationParametrization['JointDistributionN']):
+                         HasEntropyEP['JointDistributionN']):
     _sub_distributions: Mapping[str, ExpectationParametrization[Any]]
 
     @override

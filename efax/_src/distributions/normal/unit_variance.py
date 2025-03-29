@@ -8,7 +8,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.conjugate_prior import HasConjugatePrior
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -74,8 +73,7 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
 @dataclass
 class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP],
                            HasConjugatePrior,
-                           Samplable,
-                           ExpectationParametrization[UnitVarianceNormalNP]):
+                           Samplable):
     """The expectation parametrization of the normal distribution with unit variance.
 
     This is a curved exponential family.

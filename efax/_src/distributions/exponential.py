@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasConjugatePrior
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -69,8 +68,7 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 @dataclass
 class ExponentialEP(HasEntropyEP[ExponentialNP],
                     HasConjugatePrior,
-                    Samplable,
-                    ExpectationParametrization[ExponentialNP]):
+                    Samplable):
     """The expectation parametrization of the exponential distribution.
 
     Args:

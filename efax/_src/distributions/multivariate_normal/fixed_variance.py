@@ -8,7 +8,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
@@ -86,7 +85,6 @@ class MultivariateFixedVarianceNormalEP(
         HasEntropyEP[MultivariateFixedVarianceNormalNP],
         HasGeneralizedConjugatePrior,
         Samplable,
-        ExpectationParametrization[MultivariateFixedVarianceNormalNP],
         Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with fixed variance.
 

@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -84,7 +83,6 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
 
 @dataclass
 class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
-                                   ExpectationParametrization[MultivariateDiagonalNormalNP],
                                    Multidimensional,
                                    Samplable):
     """The expectation parametrization of the normal distribution with diagonal variance.

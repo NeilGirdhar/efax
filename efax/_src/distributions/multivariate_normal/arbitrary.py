@@ -9,7 +9,6 @@ from tjax import (JaxArray, JaxRealArray, KeyArray, Shape, matrix_dot_product, m
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -97,7 +96,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
 @dataclass
 class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
-                           ExpectationParametrization[MultivariateNormalNP], Multidimensional,
+                           Multidimensional,
                            Samplable):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     second_moment: JaxRealArray = distribution_parameter(SymmetricMatrixSupport(

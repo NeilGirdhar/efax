@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
@@ -78,7 +77,6 @@ class NormalNP(HasEntropyNP['NormalEP'],
 
 @dataclass
 class NormalEP(HasEntropyEP[NormalNP],
-               ExpectationParametrization[NormalNP],
                Samplable,
                SimpleDistribution):
     """The expectation parametrization of the normal distribution.

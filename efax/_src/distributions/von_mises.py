@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -91,8 +90,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
 @dataclass
 class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
                        ExpToNat[VonMisesFisherNP],
-                       Multidimensional,
-                       ExpectationParametrization[VonMisesFisherNP]):
+                       Multidimensional):
     """The expectation parametrization of the von Mises-Fisher distribution.
 
     Args:

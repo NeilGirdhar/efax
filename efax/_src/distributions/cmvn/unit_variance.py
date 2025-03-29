@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_s
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -80,7 +79,6 @@ class ComplexMultivariateUnitVarianceNormalNP(
 @dataclass
 class ComplexMultivariateUnitVarianceNormalEP(
         HasEntropyEP[ComplexMultivariateUnitVarianceNormalNP],
-        ExpectationParametrization[ComplexMultivariateUnitVarianceNormalNP],
         Multidimensional,
         Samplable):
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.

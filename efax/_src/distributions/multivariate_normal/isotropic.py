@@ -6,7 +6,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -79,7 +78,6 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
 
 @dataclass
 class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
-                        ExpectationParametrization[IsotropicNormalNP],
                         Samplable,
                         Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with Var(x) = kI.

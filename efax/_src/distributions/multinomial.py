@@ -11,7 +11,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ..interfaces.multidimensional import Multidimensional
 from ..interfaces.samplable import Samplable
@@ -100,7 +99,6 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 class MultinomialEP(HasEntropyEP[MultinomialNP],
                     Samplable,
                     HasGeneralizedConjugatePrior,
-                    ExpectationParametrization[MultinomialNP],
                     Multidimensional):
     """The expectation parametrization of the multinomial distribution.
 

@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, outer
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -83,7 +82,6 @@ class ComplexCircularlySymmetricNormalNP(
 @dataclass
 class ComplexCircularlySymmetricNormalEP(
         HasEntropyEP[ComplexCircularlySymmetricNormalNP],
-        ExpectationParametrization[ComplexCircularlySymmetricNormalNP],
         Multidimensional,
         Samplable):
     """The expectation parameters of the circularly symmetric complex normal distribution.

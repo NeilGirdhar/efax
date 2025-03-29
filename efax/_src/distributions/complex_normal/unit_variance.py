@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_s
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ...expectation_parametrization import ExpectationParametrization
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
@@ -72,7 +71,6 @@ class ComplexUnitVarianceNormalNP(
 @dataclass
 class ComplexUnitVarianceNormalEP(
         HasEntropyEP[ComplexUnitVarianceNormalNP],
-        ExpectationParametrization[ComplexUnitVarianceNormalNP],
         Samplable):
     """The expectation parametrization of the complex unit normal distribution.
 

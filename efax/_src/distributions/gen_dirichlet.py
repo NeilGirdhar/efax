@@ -13,7 +13,6 @@ from tjax import JaxArray, JaxRealArray, Shape, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -96,7 +95,6 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 @dataclass
 class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
                              ExpToNat[GeneralizedDirichletNP],
-                             ExpectationParametrization[GeneralizedDirichletNP],
                              Multidimensional):
     # E({log(x_i)}_i)
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport(

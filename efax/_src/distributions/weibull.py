@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
@@ -71,7 +70,6 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
 @dataclass
 class WeibullEP(HasEntropyEP[WeibullNP],
-                ExpectationParametrization[WeibullNP],
                 Samplable,
                 SimpleDistribution):
     """The expectation parametrization of the Weibull distribution.

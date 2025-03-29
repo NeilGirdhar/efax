@@ -9,7 +9,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -76,7 +75,6 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
 class ChiSquareEP(HasEntropyEP[ChiSquareNP],
                   Samplable,
                   ExpToNat[ChiSquareNP],
-                  ExpectationParametrization[ChiSquareNP],
                   SimpleDistribution):
     """The expectation parameters of the chi-square distribution with k degrees of freedom.
 

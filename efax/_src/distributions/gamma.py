@@ -7,7 +7,6 @@ from tjax import JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, soft
 from tjax.dataclasses import dataclass
 from typing_extensions import override
 
-from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -98,7 +97,6 @@ class GammaNP(HasEntropyNP['GammaEP'],
 class GammaEP(HasEntropyEP[GammaNP],
               Samplable,
               ExpToNat[GammaNP],
-              ExpectationParametrization[GammaNP],
               SimpleDistribution):
     """The expectation parametrization of the Gamma distribution.
 
