@@ -4,8 +4,8 @@ from typing import Any, Self
 
 import array_api_extra as xpx
 import jax.random as jr
-import jax.scipy.special as jss
 import numpy as np
+import scipy.special as sc
 from jax.nn import one_hot
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -47,7 +47,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         xp = self.array_namespace()
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
         return max_q + log_scaled_a
 
     @override
@@ -55,7 +55,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         xp = self.array_namespace()
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
         return MultinomialEP(xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
 
     @override
@@ -84,7 +84,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         xp = self.array_namespace()
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
+        log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
         p = xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis])
         final_p = 1.0 - xp.sum(p, axis=-1, keepdims=True)
         return xp.concat((p, final_p), axis=-1)

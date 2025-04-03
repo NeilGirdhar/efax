@@ -33,7 +33,7 @@ dependencies = [
   "optimistix>=0.0.9",
   "optype>=0.8.0",
   "scipy-stubs>=1.15",
-  "scipy>=1.11",
+  "scipy>=1.15",
   "tensorflow_probability>=0.15",
   "tjax>=1.2.0",
   "typing_extensions>=4.8",
@@ -247,6 +247,7 @@ ignore = [
 "optimistix" = "optx"
 "optype.numpy" = "onp"
 "pyqtgraph" = "pg"
+"scipy.special" = "sc"
 "seaborn" = "sns"
 
 [tool.ruff.lint.flake8-errmsg]
