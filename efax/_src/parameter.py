@@ -414,7 +414,7 @@ class SymmetricMatrixSupport(Support):
             raise ValueError
         dimensions = (i_sqrt_discriminant - 1) // 2
         index_a, index_b = np.triu_indices(dimensions)
-        result = xp.empty(x.shape[:-1] + (dimensions, dimensions), dtype=x.dtype)
+        result = xp.empty((*x.shape[:-1], dimensions, dimensions), dtype=x.dtype)
         for k, (i_, j_) in enumerate(zip(index_a, index_b, strict=True)):
             i = int(i_)
             j = int(j_)
