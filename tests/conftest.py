@@ -17,7 +17,7 @@ from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
 
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
                           DirichletInfo, GammaInfo, GeneralizedDirichletInfo, InverseGammaInfo,
-                          JointInfo, create_infos)
+                          InverseGaussianInfo, JointInfo, create_infos)
 
 
 @pytest.fixture(autouse=True)

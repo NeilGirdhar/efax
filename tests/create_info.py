@@ -16,21 +16,21 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ComplexNormalEP, ComplexNormalNP, ComplexUnitVarianceNormalEP,
                   ComplexUnitVarianceNormalNP, DirichletEP, DirichletNP, ExponentialEP,
                   ExponentialNP, GammaEP, GammaNP, GeneralizedDirichletEP, GeneralizedDirichletNP,
-                  GeometricEP, GeometricNP, InverseGammaEP, InverseGammaNP, IsotropicNormalEP,
-                  IsotropicNormalNP, JointDistributionE, JointDistributionN, LogarithmicEP,
-                  LogarithmicNP, LogNormalEP, LogNormalNP, MultivariateDiagonalNormalEP,
-                  MultivariateDiagonalNormalNP, MultivariateFixedVarianceNormalEP,
-                  MultivariateFixedVarianceNormalNP, MultivariateNormalEP, MultivariateNormalNP,
-                  MultivariateUnitVarianceNormalEP, MultivariateUnitVarianceNormalNP,
-                  NegativeBinomialEP, NegativeBinomialNP, NormalEP, NormalNP, PoissonEP, PoissonNP,
-                  RayleighEP, RayleighNP, ScipyComplexMultivariateNormal, ScipyComplexNormal,
-                  ScipyDirichlet, ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution,
-                  ScipyLogNormal, ScipyMultivariateNormal, ScipySoftplusNormal, ScipyVonMises,
-                  ScipyVonMisesFisher, SoftplusNormalEP, SoftplusNormalNP, Structure,
-                  SubDistributionInfo, UnitVarianceLogNormalEP, UnitVarianceLogNormalNP,
-                  UnitVarianceNormalEP, UnitVarianceNormalNP, UnitVarianceSoftplusNormalEP,
-                  UnitVarianceSoftplusNormalNP, VonMisesFisherEP, VonMisesFisherNP, WeibullEP,
-                  WeibullNP)
+                  GeometricEP, GeometricNP, InverseGammaEP, InverseGammaNP, InverseGaussianEP,
+                  InverseGaussianNP, IsotropicNormalEP, IsotropicNormalNP, JointDistributionE,
+                  JointDistributionN, LogarithmicEP, LogarithmicNP, LogNormalEP, LogNormalNP,
+                  MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
+                  MultivariateFixedVarianceNormalEP, MultivariateFixedVarianceNormalNP,
+                  MultivariateNormalEP, MultivariateNormalNP, MultivariateUnitVarianceNormalEP,
+                  MultivariateUnitVarianceNormalNP, NegativeBinomialEP, NegativeBinomialNP,
+                  NormalEP, NormalNP, PoissonEP, PoissonNP, RayleighEP, RayleighNP,
+                  ScipyComplexMultivariateNormal, ScipyComplexNormal, ScipyDirichlet,
+                  ScipyGeneralizedDirichlet, ScipyGeometric, ScipyJointDistribution, ScipyLogNormal,
+                  ScipyMultivariateNormal, ScipySoftplusNormal, ScipyVonMises, ScipyVonMisesFisher,
+                  SoftplusNormalEP, SoftplusNormalNP, Structure, SubDistributionInfo,
+                  UnitVarianceLogNormalEP, UnitVarianceLogNormalNP, UnitVarianceNormalEP,
+                  UnitVarianceNormalNP, UnitVarianceSoftplusNormalEP, UnitVarianceSoftplusNormalNP,
+                  VonMisesFisherEP, VonMisesFisherNP, WeibullEP, WeibullNP)
 
 from .distribution_info import DistributionInfo
 
@@ -270,6 +270,22 @@ class InverseGammaInfo(DistributionInfo[InverseGammaNP, InverseGammaEP, NumpyRea
     @override
     def nat_class(self) -> type[InverseGammaNP]:
         return InverseGammaNP
+
+
+class InverseGaussianInfo(DistributionInfo[InverseGaussianNP, InverseGaussianEP, NumpyRealArray]):
+    @override
+    def nat_to_scipy_distribution(self, q: InverseGaussianNP) -> Any:
+        mu = np.sqrt(q.negative_lambda_over_two / q.negative_lambda_over_two_mu_squared)
+        lambda_ = -np.asarray(q.negative_lambda_over_two) * 2.0
+        return ss.invgauss(mu=mu / lambda_, scale=lambda_)
+
+    @override
+    def exp_class(self) -> type[InverseGaussianEP]:
+        return InverseGaussianEP
+
+    @override
+    def nat_class(self) -> type[InverseGaussianNP]:
+        return InverseGaussianNP
 
 
 class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP, NumpyRealArray]):
@@ -638,6 +654,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             GeneralizedDirichletInfo(dimensions=5),
             GeometricInfo(),
             InverseGammaInfo(),
+            InverseGaussianInfo(),
             IsotropicNormalInfo(dimensions=5),
             JointInfo(infos={'gamma': GammaInfo(), 'normal': NormalInfo()}),
             LogNormal(),

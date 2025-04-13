@@ -122,14 +122,11 @@ class ComplexCircularlySymmetricNormalEP(
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         n = self.dimensions()
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
+        shape = self.shape if shape is None else shape + self.shape
         xy_rvs = jr.multivariate_normal(key,
-                                                self._multivariate_normal_mean(),
-                                                self._multivariate_normal_cov(),
-                                                shape)
+                                        self._multivariate_normal_mean(),
+                                        self._multivariate_normal_cov(),
+                                        shape)
         return xy_rvs[..., :n] + 1j * xy_rvs[..., n:]
 
     @override

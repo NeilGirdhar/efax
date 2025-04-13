@@ -17,7 +17,7 @@ class Distribution(JaxAbstractClass):
     """The Distribution is the base class of all distributions."""
     def __getitem__(self, key: Any) -> Self:
         from .iteration import parameters  # noqa: PLC0415
-        from .structure import Structure  # noqa: PLC0415
+        from .structure.structure import Structure  # noqa: PLC0415
         parameters_ = {path: value[key] for path, value in parameters(self).items()}
         return Structure.create(self).assemble(parameters_)
 
@@ -35,13 +35,12 @@ class Distribution(JaxAbstractClass):
         return len(self.shape)
 
     @classmethod
-    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
-        from .iteration import support  # noqa: PLC0415
-        return support(cls)[name]
+    def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
+        return support
 
     def array_namespace(self, *x: Any) -> ModuleType:
         from .iteration import parameters  # noqa: PLC0415
-        values = parameters(self, support=False).values()
+        values = parameters(self).values()
         return array_namespace(*values)
 
 

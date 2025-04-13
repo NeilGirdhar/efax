@@ -10,7 +10,9 @@ from tjax.dataclasses import dataclass
 
 from .iteration import parameters
 from .parametrization import Distribution
-from .structure import Flattener, MaximumLikelihoodEstimator, Structure
+from .structure.estimator import MaximumLikelihoodEstimator
+from .structure.flattener import Flattener
+from .structure.structure import Structure
 from .tools import parameter_dot_product
 
 if TYPE_CHECKING:

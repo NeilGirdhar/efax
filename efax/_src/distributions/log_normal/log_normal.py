@@ -66,11 +66,8 @@ class LogNormalNP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        shape = self.shape if shape is None else shape + self.shape
         xp = self.array_namespace()
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
         normal_dp = self.base_distribution().to_deviation_parametrization()
         return jr.lognormal(key, normal_dp.deviation, shape) * xp.exp(normal_dp.mean)
 
@@ -118,10 +115,7 @@ class LogNormalEP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        shape = self.shape if shape is None else shape + self.shape
         xp = self.array_namespace()
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
         normal_dp = self.base_distribution().to_deviation_parametrization()
         return jr.lognormal(key, normal_dp.deviation, shape) * xp.exp(normal_dp.mean)

@@ -35,8 +35,9 @@ def test_conversion(generator: Generator,
     if not tree_allclose(final_np, original_np):
         for i in range(n):
             if not tree_allclose(final_np[i], original_np[i]):
-                print_generic(original=original_np[i], intermediate=intermediate_ep[i])
-        pytest.fail("Conversion failure")
+                print_generic(original=original_np[i], intermediate=intermediate_ep[i],
+                              final=final_np[i])
+                pytest.fail("Conversion failure")
 
     # Check fixed parameters.
     original_fixed = parameters(original_np, fixed=True)
@@ -69,8 +70,8 @@ def test_gradient_log_normalizer_primals(generator: Generator,
         structure_ep = Structure.create(generated_ep)
 
         # Original GLN.
-        origianl_gln_np = original_gln(generated_np)
-        original_gln_ep = structure_ep.reinterpret(origianl_gln_np)
+        original_gln_np = original_gln(generated_np)
+        original_gln_ep = structure_ep.reinterpret(original_gln_np)
         original_gln_parameters = parameters(original_gln_ep, fixed=False)
 
         # Optimized GLN.

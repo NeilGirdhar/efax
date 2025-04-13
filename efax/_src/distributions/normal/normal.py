@@ -150,11 +150,8 @@ class NormalVP(Samplable, SimpleDistribution):
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        shape = self.shape if shape is None else shape + self.shape
         xp = self.array_namespace()
-        if shape is not None:
-            shape += self.mean.shape
-        else:
-            shape = self.mean.shape
         deviation = xp.sqrt(self.variance)
         return jr.normal(key, shape) * deviation + self.mean
 
@@ -204,10 +201,7 @@ class NormalDP(Samplable, SimpleDistribution):
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        if shape is not None:
-            shape += self.mean.shape
-        else:
-            shape = self.mean.shape
+        shape = self.shape if shape is None else shape + self.shape
         return jr.normal(key, shape) * self.deviation + self.mean
 
     def log_pdf(self, x: JaxRealArray) -> JaxRealArray:

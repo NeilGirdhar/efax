@@ -16,6 +16,7 @@ from ._src.distributions.gamma import GammaEP, GammaNP, GammaVP
 from ._src.distributions.gen_dirichlet import GeneralizedDirichletEP, GeneralizedDirichletNP
 from ._src.distributions.geometric import GeometricEP, GeometricNP
 from ._src.distributions.inverse_gamma import InverseGammaEP, InverseGammaNP
+from ._src.distributions.inverse_gaussian import InverseGaussianEP, InverseGaussianNP
 from ._src.distributions.log_normal.log_normal import LogNormalEP, LogNormalNP
 from ._src.distributions.log_normal.unit_variance import (UnitVarianceLogNormalEP,
                                                           UnitVarianceLogNormalNP)
@@ -47,12 +48,14 @@ from ._src.interfaces.conjugate_prior import HasConjugatePrior, HasGeneralizedCo
 from ._src.interfaces.multidimensional import Multidimensional
 from ._src.interfaces.samplable import Samplable
 from ._src.iteration import (flat_dict_of_observations, flat_dict_of_parameters, flatten_mapping,
-                             parameters, support, unflatten_mapping)
+                             parameters, unflatten_mapping)
 from ._src.mixins.has_entropy import HasEntropy, HasEntropyEP, HasEntropyNP
 from ._src.natural_parametrization import NaturalParametrization
-from ._src.parameter import (BooleanRing, ComplexField, IntegralRing, RealField, Ring,
-                             ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
-                             VectorSupport)
+from ._src.parameter.parameter import distribution_parameter
+from ._src.parameter.ring import BooleanRing, ComplexField, IntegralRing, RealField, Ring
+from ._src.parameter.support import (CircularBoundedSupport, ScalarSupport, SimplexSupport,
+                                     SquareMatrixSupport, Support, SymmetricMatrixSupport,
+                                     VectorSupport)
 from ._src.parametrization import Distribution, SimpleDistribution
 from ._src.scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from ._src.scipy_replacement.complex_normal import ScipyComplexNormal
@@ -63,7 +66,9 @@ from ._src.scipy_replacement.log_normal import ScipyLogNormal
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.softplus_normal import ScipySoftplusNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
-from ._src.structure import Flattener, MaximumLikelihoodEstimator, Structure, SubDistributionInfo
+from ._src.structure.estimator import MaximumLikelihoodEstimator
+from ._src.structure.flattener import Flattener
+from ._src.structure.structure import Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
 from ._src.transform.joint import JointDistribution, JointDistributionE, JointDistributionN
 
@@ -77,6 +82,7 @@ __all__ = [
     'ChiNP',
     'ChiSquareEP',
     'ChiSquareNP',
+    'CircularBoundedSupport',
     'ComplexCircularlySymmetricNormalEP',
     'ComplexCircularlySymmetricNormalNP',
     'ComplexField',
@@ -108,6 +114,8 @@ __all__ = [
     'IntegralRing',
     'InverseGammaEP',
     'InverseGammaNP',
+    'InverseGaussianEP',
+    'InverseGaussianNP',
     'IsotropicNormalEP',
     'IsotropicNormalNP',
     'JointDistribution',
@@ -158,6 +166,7 @@ __all__ = [
     'ScipyVonMises',
     'ScipyVonMisesFisher',
     'SimpleDistribution',
+    'SimplexSupport',
     'SoftplusNormalEP',
     'SoftplusNormalNP',
     'SquareMatrixSupport',
@@ -176,6 +185,7 @@ __all__ = [
     'VonMisesFisherNP',
     'WeibullEP',
     'WeibullNP',
+    'distribution_parameter',
     'flat_dict_of_observations',
     'flat_dict_of_parameters',
     'flatten_mapping',
@@ -183,6 +193,5 @@ __all__ = [
     'parameter_map',
     'parameter_mean',
     'parameters',
-    'support',
     'unflatten_mapping',
 ]

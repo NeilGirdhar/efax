@@ -66,9 +66,9 @@ class RayleighNP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
         if shape is not None:
             shape += self.shape
+        xp = self.array_namespace()
         sigma = xp.sqrt(-0.5 / self.eta)
         return jr.rayleigh(key, sigma, shape)
 
@@ -115,8 +115,8 @@ class RayleighEP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
         if shape is not None:
             shape += self.shape
+        xp = self.array_namespace()
         sigma = xp.sqrt(0.5 * self.chi)
         return jr.rayleigh(key, sigma, shape)

@@ -11,7 +11,7 @@ from typing_extensions import override
 from ...expectation_parametrization import ExpectationParametrization
 from ...natural_parametrization import NaturalParametrization
 from ...parametrization import SimpleDistribution
-from ...structure import Flattener
+from ...structure.flattener import Flattener
 
 NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
 SP: TypeAlias = JaxRealArray

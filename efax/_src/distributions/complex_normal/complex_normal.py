@@ -91,9 +91,9 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
     @override
     @classmethod
-    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
+    def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
         if name != 'pseudo_precision':
-            return super().adjust_support(name, **kwargs)
+            return super().adjust_support(support, name, **kwargs)
         precision = -kwargs['negative_precision']
         xp = array_namespace(precision)
         return ScalarSupport(ring=ComplexField(maximum_modulus=xp.abs(precision)))
@@ -156,9 +156,9 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
 
     @override
     @classmethod
-    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
+    def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
         if name != 'pseudo_precision':
-            return super().adjust_support(name, **kwargs)
+            return super().adjust_support(support, name, **kwargs)
         precision = -kwargs['negative_precision']
         xp = array_namespace(precision)
         return ScalarSupport(ring=ComplexField(maximum_modulus=xp.abs(precision)))
@@ -176,10 +176,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
+        shape = self.shape if shape is None else shape + self.shape
         xp = self.array_namespace()
         mn_mean = xp.stack([xp.real(self.mean), xp.imag(self.mean)], axis=-1)
         mn_cov = self._multivariate_normal_cov()

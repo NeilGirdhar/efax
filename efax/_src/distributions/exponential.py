@@ -59,10 +59,7 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
+        shape = self.shape if shape is None else shape + self.shape
         return -jr.exponential(key, shape) / self.negative_rate
 
 
@@ -104,10 +101,7 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
+        shape = self.shape if shape is None else shape + self.shape
         return jr.exponential(key, shape) * self.mean
 
     @override

@@ -112,10 +112,7 @@ class WeibullEP(HasEntropyEP[WeibullNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        shape = self.shape if shape is None else shape + self.shape
         xp = self.array_namespace()
-        if shape is not None:
-            shape += self.shape
-        else:
-            shape = self.shape
         lambda_ = self.chi ** xp.reciprocal(self.concentration)
         return jr.weibull_min(key, lambda_, self.concentration, shape)

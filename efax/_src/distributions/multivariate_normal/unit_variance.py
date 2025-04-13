@@ -67,10 +67,7 @@ class MultivariateUnitVarianceNormalNP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        if shape is not None:
-            shape += self.mean.shape
-        else:
-            shape = self.mean.shape
+        shape = self.mean.shape if shape is None else shape + self.mean.shape
         return jr.normal(key, shape) + self.mean
 
     @override
