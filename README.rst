@@ -204,6 +204,7 @@ EFAX supports the following distributions:
   - chi-square
   - exponential
   - gamma
+  - inverse Gaussian
   - inverse gamma
 
 - on the simplex:
