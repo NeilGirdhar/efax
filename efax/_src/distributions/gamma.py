@@ -143,7 +143,7 @@ class GammaEP(HasEntropyEP[GammaNP],
         shape = softplus(search_parameters[..., 0])
         log_mean_minus_mean_log = xp.log(self.mean) - self.mean_log
         return (log_mean_minus_mean_log - xp.log(shape) + jss.digamma(shape))[..., xp.newaxis]
-        # gradient is 1.0 / shape - jss.polygamma(1, shape)
+        # gradient is xp.reciprocal(shape) - jss.polygamma(1, shape)
         # where polygamma(1) is trigamma
 
     @override

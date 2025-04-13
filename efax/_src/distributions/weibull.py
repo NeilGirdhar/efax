@@ -46,7 +46,8 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
     @override
     def to_exp(self) -> WeibullEP:
-        return WeibullEP(self.concentration, -1.0 / self.eta)
+        xp = self.array_namespace()
+        return WeibullEP(self.concentration, -xp.reciprocal(self.eta))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -99,20 +100,22 @@ class WeibullEP(HasEntropyEP[WeibullNP],
 
     @override
     def to_nat(self) -> WeibullNP:
-        return WeibullNP(self.concentration, -1.0 / self.chi)
+        xp = self.array_namespace()
+        return WeibullNP(self.concentration, -xp.reciprocal(self.chi))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         xp = self.array_namespace()
         k = self.concentration
-        one_minus_one_over_k = 1.0 - 1.0 / k
+        one_minus_one_over_k = 1.0 - xp.reciprocal(k)
         return one_minus_one_over_k * xp.log(self.chi) - np.euler_gamma * one_minus_one_over_k
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.array_namespace()
         if shape is not None:
             shape += self.shape
         else:
             shape = self.shape
-        lambda_ = self.chi ** (1.0 / self.concentration)
+        lambda_ = self.chi ** xp.reciprocal(self.concentration)
         return jr.weibull_min(key, lambda_, self.concentration, shape)

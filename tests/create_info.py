@@ -204,8 +204,8 @@ class ExponentialInfo(DistributionInfo[ExponentialNP, ExponentialEP, NumpyRealAr
 class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: GammaNP) -> Any:
-        shape = q.shape_minus_one + 1.0
-        scale = -1.0 / q.negative_rate
+        shape = np.asarray(q.shape_minus_one) + 1.0
+        scale = -np.reciprocal(q.negative_rate)
         return ss.gamma(shape, scale=scale)
 
     @override
@@ -241,7 +241,7 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
     def exp_to_scipy_distribution(self, p: GeometricEP) -> Any:
         # Scipy uses a different definition geometric distribution.  The parameter p is inverse
         # odds.
-        return ScipyGeometric(np.asarray(1.0 / (1.0 + p.mean)))
+        return ScipyGeometric(np.reciprocal(1.0 + p.mean))
 
     @override
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
@@ -452,7 +452,7 @@ class NegativeBinomialInfo(DistributionInfo[NegativeBinomialNP, NegativeBinomial
                                             NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: NegativeBinomialEP) -> Any:
-        return ss.nbinom(p.failures, 1.0 / (1.0 + p.mean / p.failures))
+        return ss.nbinom(p.failures, np.reciprocal(1.0 + p.mean / p.failures))
 
     @override
     def exp_class(self) -> type[NegativeBinomialEP]:
@@ -610,7 +610,7 @@ class VonMisesInfo(DistributionInfo[VonMisesFisherNP, VonMisesFisherEP, NumpyRea
 class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: WeibullEP) -> Any:
-        scale = p.chi ** (1.0 / p.concentration)
+        scale = np.asarray(p.chi) ** np.reciprocal(p.concentration)
         return ss.weibull_min(p.concentration, scale=scale)
 
     @override

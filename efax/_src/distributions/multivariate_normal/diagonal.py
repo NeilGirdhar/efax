@@ -178,7 +178,8 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
         return MultivariateDiagonalNormalEP(self.mean, second_moment)
 
     def to_nat(self) -> MultivariateDiagonalNormalNP:
-        precision = 1.0 / self.variance
+        xp = self.array_namespace()
+        precision = xp.reciprocal(self.variance)
         mean_times_precision = self.mean * precision
         negative_half_precision = -0.5 * precision
         return MultivariateDiagonalNormalNP(mean_times_precision, negative_half_precision)

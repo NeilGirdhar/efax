@@ -43,7 +43,8 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     def to_exp(self) -> ExponentialEP:
-        return ExponentialEP(-1.0 / self.negative_rate)
+        xp = self.array_namespace()
+        return ExponentialEP(-xp.reciprocal(self.negative_rate))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -93,7 +94,8 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
 
     @override
     def to_nat(self) -> ExponentialNP:
-        return ExponentialNP(-1.0 / self.mean)
+        xp = self.array_namespace()
+        return ExponentialNP(-xp.reciprocal(self.mean))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

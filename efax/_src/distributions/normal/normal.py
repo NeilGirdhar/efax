@@ -170,7 +170,8 @@ class NormalVP(Samplable, SimpleDistribution):
         return NormalEP(self.mean, second_moment)
 
     def to_nat(self) -> NormalNP:
-        precision = 1.0 / self.variance
+        xp = self.array_namespace()
+        precision = xp.reciprocal(self.variance)
         mean_times_precision = self.mean * precision
         negative_half_precision = -0.5 * precision
         return NormalNP(mean_times_precision, negative_half_precision)

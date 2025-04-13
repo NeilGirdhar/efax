@@ -83,7 +83,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
     def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
         xp = self.array_namespace()
         r = -self.pseudo_precision / self.negative_precision
-        s = 1.0 / ((abs_square(r) - 1.0) * self.negative_precision)
+        s = xp.reciprocal((abs_square(r) - 1.0) * self.negative_precision)
         k = self.pseudo_precision / self.negative_precision
         l_eta = 0.5 * self.mean_times_precision / ((abs_square(k) - 1.0) * self.negative_precision)
         mu = xp.conj(l_eta) - xp.conj(self.pseudo_precision / self.negative_precision) * l_eta
@@ -142,7 +142,7 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
 
         r = xp.conj(pseudo_variance) / variance
         p_c = variance - xp.conj(r * pseudo_variance)
-        p_inv_c = 1.0 / p_c
+        p_inv_c = xp.reciprocal(p_c)
         precision = xp.real(-p_inv_c)
         pseudo_precision = r * p_inv_c
         mean_times_precision = -2.0 * (precision * xp.conj(self.mean)

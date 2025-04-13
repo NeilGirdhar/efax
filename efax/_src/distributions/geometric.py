@@ -79,9 +79,10 @@ class GeometricEP(HasEntropyEP[GeometricNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.array_namespace()
         if shape is not None:
             shape += self.shape
-        p = 1.0 / self.mean
+        p = xp.reciprocal(self.mean)
         return jr.geometric(key, p, shape)
 
     @override
