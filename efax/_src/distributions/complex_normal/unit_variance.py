@@ -108,10 +108,7 @@ class ComplexUnitVarianceNormalEP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
-        if shape is not None:
-            shape += self.mean.shape
-        else:
-            shape = self.mean.shape
+        shape = self.shape if shape is None else shape + self.shape
         a = jr.normal(key, shape)
         b = jr.normal(key, shape)
         return a + 1j * b + self.mean

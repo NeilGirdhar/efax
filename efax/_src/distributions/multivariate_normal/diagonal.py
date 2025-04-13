@@ -157,10 +157,7 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        if shape is not None:
-            shape += self.mean.shape
-        else:
-            shape = self.mean.shape
+        shape = self.mean.shape if shape is None else shape + self.mean.shape
         xp = self.array_namespace()
         deviation = xp.sqrt(self.variance)
         return jr.normal(key, shape) * deviation + self.mean
