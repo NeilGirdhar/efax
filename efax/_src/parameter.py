@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import dataclass
 from math import comb, sqrt
+from types import ModuleType
 from typing import Any, cast
 
 import array_api_extra as xpx
@@ -39,10 +40,16 @@ class Ring:
         return x
 
 
+def general_array_namespace(x: JaxRealArray | float) -> ModuleType:
+    if isinstance(x, float):
+        return np
+    return array_namespace(x)
+
+
 @dataclass
 class RealField(Ring):
-    minimum: float | None = None
-    maximum: float | None = None
+    minimum: float | JaxRealArray | None = None
+    maximum: float | JaxRealArray | None = None
     generation_scale: float = 1.0  # Scale the generated random numbers to improve random testing.
     min_open: bool = True  # Open interval
     max_open: bool = True  # Open interval
@@ -51,11 +58,15 @@ class RealField(Ring):
         dtype = jnp.empty((), dtype=float).dtype  # This is canonicalize_dtype(float).
         eps = float(np.finfo(dtype).eps)
         if self.min_open and self.minimum is not None:
-            self.minimum = float(max(self.minimum + eps,
-                                     self.minimum * (1.0 + np.copysign(eps, self.minimum))))
+            xp = general_array_namespace(self.minimum)
+            self.minimum = jnp.asarray(jnp.maximum(
+                self.minimum + eps,
+                self.minimum * (1.0 + xp.copysign(eps, self.minimum))))
         if self.max_open and self.maximum is not None:
-            self.maximum = float(min(self.maximum - eps,
-                                     self.maximum * (1.0 + np.copysign(eps, -self.maximum))))
+            xp = general_array_namespace(self.maximum)
+            self.maximum = jnp.asarray(jnp.minimum(
+                self.maximum - eps,
+                self.maximum * (1.0 + xp.copysign(eps, -self.maximum))))
 
     @override
     def num_elements(self, support_num_element: int) -> int:
@@ -63,49 +74,55 @@ class RealField(Ring):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
+        xp = array_namespace(x)
         if not map_to_plane:
             return x
-        match self.minimum, self.maximum:
-            case None, float(maximum):
-                return -inverse_softplus(maximum - x)
-            case float(minimum), None:
-                return inverse_softplus(x - minimum)
-            case float(minimum), float(maximum):
-                return jss.logit((x - minimum) / (maximum - minimum))
-            case _:
-                return x
+        if self.minimum is None and self.maximum is not None:
+            maximum = xp.asarray(self.maximum)
+            return -inverse_softplus(maximum - x)
+        if self.minimum is not None and self.maximum is None:
+            minimum = xp.asarray(self.minimum)
+            return inverse_softplus(x - minimum)
+        if self.minimum is not None and self.maximum is not None:
+            minimum = xp.asarray(self.minimum)
+            maximum = xp.asarray(self.maximum)
+            return jss.logit((x - minimum) / (maximum - minimum))
+        return x
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
+        xp = array_namespace(y)
         if not map_from_plane:
             return y
-        match self.minimum, self.maximum:
-            case None, float(maximum):
-                return maximum - softplus(-y)
-            case float(minimum), None:
-                return softplus(y) + minimum
-            case float(minimum), float(maximum):
-                return minimum + jss.expit(y) * (maximum - minimum)
-            case _:
-                return y
+        if self.minimum is None and self.maximum is not None:
+            maximum = xp.asarray(self.maximum)
+            return maximum - softplus(-y)
+        if self.minimum is not None and self.maximum is None:
+            minimum = xp.asarray(self.minimum)
+            return softplus(y) + minimum
+        if self.minimum is not None and self.maximum is not None:
+            minimum = xp.asarray(self.minimum)
+            maximum = xp.asarray(self.maximum)
+            return minimum + jss.expit(y) * (maximum - minimum)
+        return y
 
     @override
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
-        match self.minimum, self.maximum:
-            case None, float(maximum):
-                return xp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale
-                                  - safety)
-            case float(minimum), None:
-                return xp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum
-                                  + safety)
-            case float(minimum), float(maximum):
-                domain_width = xp.maximum(maximum - minimum - safety, 0.0)
-                true_minimum = xp.mean(minimum, maximum) - domain_width * 0.5
-                return xp.asarray(true_minimum + domain_width * rng.uniform(size=shape))
-            case None, None:
-                return xp.asarray(rng.normal(scale=1.0, size=shape) * self.generation_scale)
-            case _:
-                raise TypeError
+        if self.minimum is None and self.maximum is not None:
+            maximum = xp.asarray(self.maximum)
+            return xp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale
+                              - safety)
+        if self.minimum is not None and self.maximum is None:
+            minimum = xp.asarray(self.minimum)
+            return xp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum
+                              + safety)
+        if self.minimum is not None and self.maximum is not None:
+            minimum = xp.asarray(self.minimum)
+            maximum = xp.asarray(self.maximum)
+            domain_width = xp.maximum(maximum - minimum - safety, 0.0)
+            true_minimum = xp.mean(minimum, maximum) - domain_width * 0.5
+            return xp.asarray(true_minimum + domain_width * rng.uniform(size=shape))
+        return xp.asarray(rng.normal(scale=1.0, size=shape) * self.generation_scale)
 
     @override
     def clamp(self, x: JaxRealArray) -> JaxRealArray:
