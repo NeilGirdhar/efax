@@ -148,41 +148,6 @@ def parameters(p: Distribution,
     return dict(_parameters(p, ()))
 
 
-def support(p: type[Distribution] | Distribution,
-            /,
-            *,
-            fixed: bool | None = None,
-            ) -> dict[str, Support]:
-    """Return the support of a distribution class.
-
-    Args:
-        p: The parametrization to walk.
-        fixed: If true or false, return the fixed or variable parameters, otherwise return both.
-
-    Returns:
-        The path, value, and support of each variable parameter.
-    """
-    def _parameters(q: type[Distribution],
-                    base_path: Path
-                    ) -> Iterable[tuple[str, Support]]:
-        for this_field in fields(q):
-            name = this_field.name
-            metadata = this_field.metadata
-            if not metadata.get('parameter', False):
-                continue
-            support = metadata['support']
-            is_fixed = metadata['fixed']
-            if not isinstance(is_fixed, bool):
-                raise TypeError
-            if fixed is not None and is_fixed != fixed:
-                continue
-            if not isinstance(support, Support):
-                raise TypeError
-            yield name, support
-    cls_p: type[Distribution] = type(p) if isinstance(p, Distribution) else p
-    return dict(_parameters(cls_p, ()))
-
-
 def flat_dict_of_parameters(d: Distribution) -> dict[Path, SimpleDistribution]:
     from .transform.joint import JointDistribution  # noqa: PLC0415
     if isinstance(d, JointDistribution):

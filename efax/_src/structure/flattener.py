@@ -6,10 +6,12 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray
 from tjax.dataclasses import dataclass, field
 
-from ..iteration import parameters, support
+from ..iteration import parameters
 from ..parametrization import Distribution, SimpleDistribution
 from ..types import Path
 from .estimator import MaximumLikelihoodEstimator
+from .parameter_names import parameter_names
+from .parameter_supports import parameter_supports
 
 P = TypeVar('P', bound=Distribution)
 SP = TypeVar('SP', bound=SimpleDistribution)
@@ -33,9 +35,9 @@ class Flattener(MaximumLikelihoodEstimator[P]):
     mapped_to_plane: bool = field(static=True)
 
     def final_dimension_size(self) -> int:
-        return sum(this_support.num_elements(info.dimensions)
+        return sum(support.num_elements(info.dimensions)
                    for info in self.infos
-                   for this_support in support(info.type_, fixed=False).values())
+                   for _, support, _ in parameter_supports(info.type_, fixed=False))
 
     def unflatten(self, flattened: JaxRealArray, *, return_vector: bool = False) -> P:
         """Unflatten an array into a Distribution.
@@ -52,19 +54,19 @@ class Flattener(MaximumLikelihoodEstimator[P]):
         available = flattened.shape[-1]
         for info in self.infos:
             regular_kwargs: dict[str, JaxArray] = {}
-            for name in support(info.type_, fixed=False):
-                this_support = info.type_.adjust_support(name, **regular_kwargs)
-                k = this_support.num_elements(info.dimensions)
+            for name, support, value_receptacle in parameter_supports(info.type_, fixed=False):
+                k = support.num_elements(info.dimensions)
                 if consumed + k > available:
                     raise ValueError('Incompatible array')  # noqa: TRY003
-                regular_kwargs[name] = this_support.unflattened(
+                value = regular_kwargs[name] = support.unflattened(
                         flattened[..., consumed: consumed + k],
                         info.dimensions,
                         map_from_plane=self.mapped_to_plane)
+                value_receptacle.set_value(value)
                 consumed += k
             kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = dict(
                     regular_kwargs)
-            for name in support(info.type_, fixed=True):
+            for name in parameter_names(info.type_, fixed=True):
                 kwargs[name] = self.fixed_parameters[*info.path, name]
             sub_distributions = {name: constructed[*info.path, name]
                                  for name in info.sub_distribution_names}
@@ -137,16 +139,17 @@ class Flattener(MaximumLikelihoodEstimator[P]):
         info = cls._make_info(p, path=())
         info = replace(info, type_=type_)
         infos = [info]
-        fixed_parameters = parameters(p, fixed=True, support=False)
+        fixed_parameters = parameters(p, fixed=True)
         return Flattener(infos, fixed_parameters, mapped_to_plane)
 
     @classmethod
     def _make_flat(cls, q: Distribution, path: Path, /, *, map_to_plane: bool
                    ) -> list[JaxRealArray]:
-        kwargs: dict[str, JaxComplexArray] = {}
         retval: list[JaxRealArray] = []
-        for name, value in parameters(q, fixed=False, support=False, recurse=False).items():
-            support_ = q.adjust_support(name, **kwargs)
-            kwargs[name] = value
-            retval.append(support_.flattened(value, map_to_plane=map_to_plane))
+        for value, (_, support, value_receptacle) in zip(
+                parameters(q, fixed=False, recurse=False).values(),
+                parameter_supports(q, fixed=False),
+                strict=True):
+            value_receptacle.set_value(value)
+            retval.append(support.flattened(value, map_to_plane=map_to_plane))
         return retval

@@ -5,10 +5,12 @@ from numpy.random import Generator
 from tjax import JaxComplexArray, Shape
 from tjax.dataclasses import dataclass, field
 
-from ..iteration import parameters, support
+from ..iteration import parameters
 from ..parameter import Support
 from ..parametrization import Distribution, SimpleDistribution
 from ..types import Namespace, Path
+from .parameter_names import parameter_names
+from .parameter_supports import parameter_supports
 
 
 @dataclass
@@ -70,7 +72,7 @@ class Structure(Generic[P]):
         for info in self.infos:
             kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = {
                     name: constructed[*info.path, name]
-                    for name in support(info.type_)}
+                    for name in parameter_names(info.type_)}
             sub_distributions = {name: constructed[*info.path, name]
                                  for name in info.sub_distribution_names}
             if sub_distributions:
@@ -84,8 +86,8 @@ class Structure(Generic[P]):
         """Reinterpret a distribution in one parametrization using the saved structure."""
         p_paths = [(*info.path, name)
                    for info in self.infos
-                   for name in support(info.type_)]
-        q_values = parameters(q, support=False).values()
+                   for name in parameter_names(info.type_)]
+        q_values = parameters(q).values()
         q_params_as_p = dict(zip(p_paths, q_values, strict=True))
         return self.assemble(q_params_as_p)
 
@@ -99,11 +101,10 @@ class Structure(Generic[P]):
         """Generate a random distribution."""
         path_and_values = {}
         for info in self.infos:
-            kwargs: dict[str, JaxComplexArray] = {}
-            for name in support(info.type_):
-                s = info.type_.adjust_support(name, **kwargs)
-                value = s.generate(xp, rng, shape, safety, info.dimensions)
-                path_and_values[*info.path, name] = kwargs[name] = value
+            for name, support, value_receptacle in parameter_supports(info.type_):
+                value = support.generate(xp, rng, shape, safety, info.dimensions)
+                path_and_values[*info.path, name] = value
+                value_receptacle.set_value(value)
         return self.assemble(path_and_values)
 
     @classmethod

@@ -5,9 +5,10 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray
 from tjax.dataclasses import dataclass
 
-from ..iteration import flatten_mapping, parameters, support
+from ..iteration import flatten_mapping, parameters
 from ..parametrization import Distribution, SimpleDistribution
 from ..types import Path
+from .parameter_names import parameter_names
 from .structure import Structure, SubDistributionInfo
 
 if TYPE_CHECKING:
@@ -73,7 +74,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
             assert issubclass(nat_cls, NaturalParametrization)
 
             fixed_parameters: dict[str, Any] = {name: self.fixed_parameters[*info.path, name]
-                                                for name in support(nat_cls, fixed=True)}
+                                                for name in parameter_names(nat_cls, fixed=True)}
             p = nat_cls.sufficient_statistics(x, **fixed_parameters)
             assert isinstance(p, ExpectationParametrization)
             constructed[info.path] = p

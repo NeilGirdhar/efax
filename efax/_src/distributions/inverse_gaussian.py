@@ -68,9 +68,9 @@ class InverseGaussianNP(Samplable,
 
     @override
     @classmethod
-    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
+    def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
         if name != 'negative_lambda_over_two':
-            return super().adjust_support(name, **kwargs)
+            return super().adjust_support(support, name, **kwargs)
         eta1 = kwargs['negative_lambda_over_two_mu_squared']
         xp = array_namespace(eta1)
         maximum = -xp.pow(-0.25 * eta1, 1.0 / 3.0)
@@ -119,9 +119,9 @@ class InverseGaussianEP(ExpectationParametrization[InverseGaussianNP],
 
     @override
     @classmethod
-    def adjust_support(cls, name: str, **kwargs: JaxArray) -> Support:
+    def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
         if name != 'mean_reciprocal':
-            return super().adjust_support(name, **kwargs)
+            return super().adjust_support(support, name, **kwargs)
         mean = kwargs['mean']
         xp = array_namespace(mean)
         return ScalarSupport(ring=RealField(minimum=xp.reciprocal(mean)))

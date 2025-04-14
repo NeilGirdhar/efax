@@ -48,7 +48,7 @@ from ._src.interfaces.conjugate_prior import HasConjugatePrior, HasGeneralizedCo
 from ._src.interfaces.multidimensional import Multidimensional
 from ._src.interfaces.samplable import Samplable
 from ._src.iteration import (flat_dict_of_observations, flat_dict_of_parameters, flatten_mapping,
-                             parameters, support, unflatten_mapping)
+                             parameters, unflatten_mapping)
 from ._src.mixins.has_entropy import HasEntropy, HasEntropyEP, HasEntropyNP
 from ._src.natural_parametrization import NaturalParametrization
 from ._src.parameter import (BooleanRing, ComplexField, IntegralRing, RealField, Ring,
@@ -188,6 +188,5 @@ __all__ = [
     'parameter_map',
     'parameter_mean',
     'parameters',
-    'support',
     'unflatten_mapping',
 ]
