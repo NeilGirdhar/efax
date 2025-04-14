@@ -13,7 +13,7 @@ from tjax import JaxComplexArray, JaxRealArray
 
 from .iteration import parameters
 from .parametrization import Distribution
-from .structure import Structure
+from .structure.structure import Structure
 from .types import Axis
 
 

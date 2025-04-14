@@ -17,7 +17,7 @@ class Distribution(JaxAbstractClass):
     """The Distribution is the base class of all distributions."""
     def __getitem__(self, key: Any) -> Self:
         from .iteration import parameters  # noqa: PLC0415
-        from .structure import Structure  # noqa: PLC0415
+        from .structure.structure import Structure  # noqa: PLC0415
         parameters_ = {path: value[key] for path, value in parameters(self).items()}
         return Structure.create(self).assemble(parameters_)
 
