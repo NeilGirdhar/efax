@@ -87,35 +87,29 @@ class RealField(Ring):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
-        xp = array_namespace(x)
+        minimum = fix_bound(self.minimum, x)
+        maximum = fix_bound(self.maximum, x)
         if not map_to_plane:
             return x
-        if self.minimum is None and self.maximum is not None:
-            maximum = xp.asarray(self.maximum)
+        if minimum is None and maximum is not None:
             return -inverse_softplus(maximum - x)
-        if self.minimum is not None and self.maximum is None:
-            minimum = xp.asarray(self.minimum)
+        if minimum is not None and maximum is None:
             return inverse_softplus(x - minimum)
-        if self.minimum is not None and self.maximum is not None:
-            minimum = xp.asarray(self.minimum)
-            maximum = xp.asarray(self.maximum)
+        if minimum is not None and maximum is not None:
             return jss.logit((x - minimum) / (maximum - minimum))
         return x
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
-        xp = array_namespace(y)
+        minimum = fix_bound(self.minimum, y)
+        maximum = fix_bound(self.maximum, y)
         if not map_from_plane:
             return y
-        if self.minimum is None and self.maximum is not None:
-            maximum = xp.asarray(self.maximum)
+        if minimum is None and maximum is not None:
             return maximum - softplus(-y)
-        if self.minimum is not None and self.maximum is None:
-            minimum = xp.asarray(self.minimum)
+        if minimum is not None and maximum is None:
             return softplus(y) + minimum
-        if self.minimum is not None and self.maximum is not None:
-            minimum = xp.asarray(self.minimum)
-            maximum = xp.asarray(self.maximum)
+        if minimum is not None and maximum is not None:
             return minimum + jss.expit(y) * (maximum - minimum)
         return y
 
@@ -538,14 +532,14 @@ def distribution_parameter(support: Support,
     return field(static=static, metadata={'support': support, 'fixed': fixed, 'parameter': True})
 
 
-def fix_bound(x: JaxArray | float | None, y: JaxArray) -> JaxArray | None:
-    xp = array_namespace(y)
-    if x is None:
-        return x
-    if isinstance(x, float):
-        x = xp.asarray(x)
-    assert isinstance(x, JaxArray)
-    xp = array_namespace(x, y)
-    while x.ndim < y.ndim:
-        x = x[..., xp.newaxis]
-    return x
+def fix_bound(bound: JaxArray | float | None, x: JaxArray) -> JaxArray | None:
+    xp = array_namespace(x)
+    if bound is None:
+        return bound
+    bound_x = xp.asarray(bound)
+    assert bound_x.shape == x.shape[:bound_x.ndim]
+    delta_ndim = x.ndim - bound_x.ndim
+    if delta_ndim == 0:
+        return bound_x
+    assert delta_ndim > 0
+    return xp.reshape(bound_x, (*bound_x.shape, *((1,) * delta_ndim)))
