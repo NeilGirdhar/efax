@@ -111,13 +111,13 @@ def parameters(p: Distribution,
     """Return the parameters of a distribution.
 
     Args:
-        p: The parametrization to walk.
+        p: The distribution to walk.
         fixed: If true or false, return the fixed or variable parameters, otherwise return both.
-        support: If true, yield the support also.
+        support: If true, return the support also.
         recurse: If true, recurse into sub-distributions.
 
     Returns:
-        The path, value, and support of each variable parameter.
+        A dict containing the path, value, and optionally the support of each parameter.
     """
     def _parameters(q: Distribution,
                     base_path: Path

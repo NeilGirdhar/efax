@@ -10,14 +10,14 @@ def parameter_names(p: type[Distribution] | Distribution,
                     *,
                     fixed: bool | None = None,
                     ) -> Generator[str]:
-    """Return the support of a distribution class.
+    """Return the parameter names in a distribution.
 
     Args:
-        p: The parametrization to walk.
+        p: The distribution to walk.
         fixed: If true or false, return the fixed or variable parameters, otherwise return both.
 
     Returns:
-        The path of each parameter.
+        The name of each parameter.
     """
     def _parameters(q: type[Distribution],
                     base_path: Path

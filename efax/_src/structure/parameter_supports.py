@@ -23,16 +23,16 @@ def parameter_supports(p: type[Distribution] | Distribution,
                        fixed: bool | None = None,
                        adjust: bool = True
                        ) -> Generator[tuple[str, Support, ValueReceptacle]]:
-    """Return the support of a distribution class.
+    """Return the parameter supports in a distribution.
 
     Args:
-        p: The parametrization to walk.
+        p: The distribution to walk.
         fixed: If true or false, return the fixed or variable parameters, otherwise return both.
         adjust: If true, the support takes into account other values, and values must be sent to the
             receptacle.
 
     Returns:
-        The path, value, and support of each variable parameter.
+        The name, support, and a receptacle for each parameter.
     """
     def _parameters(q: type[Distribution],
                     base_path: Path
