@@ -51,9 +51,11 @@ from ._src.iteration import (flat_dict_of_observations, flat_dict_of_parameters,
                              parameters, unflatten_mapping)
 from ._src.mixins.has_entropy import HasEntropy, HasEntropyEP, HasEntropyNP
 from ._src.natural_parametrization import NaturalParametrization
-from ._src.parameter import (BooleanRing, ComplexField, IntegralRing, RealField, Ring,
-                             ScalarSupport, SquareMatrixSupport, Support, SymmetricMatrixSupport,
-                             VectorSupport)
+from ._src.parameter.parameter import distribution_parameter
+from ._src.parameter.ring import BooleanRing, ComplexField, IntegralRing, RealField, Ring
+from ._src.parameter.support import (CircularBoundedSupport, ScalarSupport, SimplexSupport,
+                                     SquareMatrixSupport, Support, SymmetricMatrixSupport,
+                                     VectorSupport)
 from ._src.parametrization import Distribution, SimpleDistribution
 from ._src.scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from ._src.scipy_replacement.complex_normal import ScipyComplexNormal
@@ -80,6 +82,7 @@ __all__ = [
     'ChiNP',
     'ChiSquareEP',
     'ChiSquareNP',
+    'CircularBoundedSupport',
     'ComplexCircularlySymmetricNormalEP',
     'ComplexCircularlySymmetricNormalNP',
     'ComplexField',
@@ -163,6 +166,7 @@ __all__ = [
     'ScipyVonMises',
     'ScipyVonMisesFisher',
     'SimpleDistribution',
+    'SimplexSupport',
     'SoftplusNormalEP',
     'SoftplusNormalNP',
     'SquareMatrixSupport',
@@ -181,6 +185,7 @@ __all__ = [
     'VonMisesFisherNP',
     'WeibullEP',
     'WeibullNP',
+    'distribution_parameter',
     'flat_dict_of_observations',
     'flat_dict_of_parameters',
     'flatten_mapping',
