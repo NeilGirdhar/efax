@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from math import comb, sqrt
+from math import comb, isqrt
 from types import ModuleType
 from typing import Any, cast
 
@@ -17,6 +17,19 @@ from tjax.dataclasses import field
 from typing_extensions import override
 
 from .types import Namespace
+
+
+def triangular_number(k: int, /) -> int:
+    return comb(k + 1, 2)
+
+
+def triangular_number_index(k: int, /) -> int | None:
+    discriminant = 1 + 8 * k
+    sqrt_discriminant = isqrt(discriminant)
+    if discriminant != sqrt_discriminant ** 2:
+        return None
+    assert sqrt_discriminant % 2 == 1
+    return (sqrt_discriminant - 1) // 2
 
 
 class Ring:
@@ -404,7 +417,7 @@ class SymmetricMatrixSupport(Support):
 
     @override
     def num_elements(self, dimensions: int) -> int:
-        return self.ring.num_elements(comb(dimensions + 1, 2))
+        return self.ring.num_elements(triangular_number(dimensions))
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
@@ -421,15 +434,14 @@ class SymmetricMatrixSupport(Support):
     def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
         xp = array_namespace(y)
         x = self.ring.unflattened(y, map_from_plane=map_from_plane)
-        k = x.shape[-1]
-        sqrt_discriminant = sqrt(1 + 8 * k)
-        i_sqrt_discriminant = int(sqrt_discriminant)
-        if i_sqrt_discriminant != sqrt_discriminant:
-            msg = f"{k} {sqrt_discriminant}"
+        deduced_dimensions = triangular_number_index(x.shape[-1])
+        if deduced_dimensions is None:
+            msg = f"The final dimension of the flattened vector, {x.shape[-1]}, is not triangular"
             raise ValueError(msg)
-        if i_sqrt_discriminant % 2 != 1:
-            raise ValueError
-        dimensions = (i_sqrt_discriminant - 1) // 2
+        if deduced_dimensions != dimensions:
+            msg = (f"Deduced dimensions {deduced_dimensions} does not match provided dimensions"
+                   f"{dimensions}.")
+            raise ValueError(msg)
         index_a, index_b = np.triu_indices(dimensions)
         result = xp.empty((*x.shape[:-1], dimensions, dimensions), dtype=x.dtype)
         for k, (i_, j_) in enumerate(zip(index_a, index_b, strict=True)):
