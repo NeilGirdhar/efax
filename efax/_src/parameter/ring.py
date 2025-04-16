@@ -4,18 +4,18 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from types import ModuleType
 
-import jax.numpy as jnp
 import jax.scipy.special as jss
 import numpy as np
 from array_api_compat import array_namespace
 from numpy.random import Generator
-from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplus, softplus
+from tjax import (JaxArray, JaxComplexArray, JaxRealArray, RealNumeric, Shape, inverse_softplus,
+                  softplus)
 from typing_extensions import override
 
 from ..types import Namespace
 
 
-def _fix_bound(bound: JaxArray | float | None, x: JaxArray) -> JaxArray | None:
+def _fix_bound(bound: RealNumeric | None, x: JaxArray) -> JaxArray | None:
     xp = array_namespace(x)
     if bound is None:
         return bound
@@ -49,31 +49,36 @@ class Ring:
         return x
 
 
-def general_array_namespace(x: JaxRealArray | float) -> ModuleType:
+def general_array_namespace(x: RealNumeric) -> ModuleType:
     if isinstance(x, float):
         return np
     return array_namespace(x)
 
 
+def canonical_float_epsilon(xp: ModuleType) -> float:
+    dtype = xp.empty((), dtype=float).dtype  # For Jax, this is canonicalize_dtype(float).
+    return float(xp.finfo(dtype).eps)
+
+
 @dataclass
 class RealField(Ring):
-    minimum: float | JaxRealArray | None = None
-    maximum: float | JaxRealArray | None = None
+    minimum: RealNumeric | None = None
+    maximum: RealNumeric | None = None
     generation_scale: float = 1.0  # Scale the generated random numbers to improve random testing.
     min_open: bool = True  # Open interval
     max_open: bool = True  # Open interval
 
     def __post_init__(self) -> None:
-        dtype = jnp.empty((), dtype=float).dtype  # This is canonicalize_dtype(float).
-        eps = float(np.finfo(dtype).eps)
         if self.min_open and self.minimum is not None:
             xp = general_array_namespace(self.minimum)
-            self.minimum = jnp.asarray(jnp.maximum(
+            eps = canonical_float_epsilon(xp)
+            self.minimum = xp.asarray(xp.maximum(
                 self.minimum + eps,
                 self.minimum * (1.0 + xp.copysign(eps, self.minimum))))
         if self.max_open and self.maximum is not None:
             xp = general_array_namespace(self.maximum)
-            self.maximum = jnp.asarray(jnp.minimum(
+            eps = canonical_float_epsilon(xp)
+            self.maximum = xp.asarray(xp.minimum(
                 self.maximum - eps,
                 self.maximum * (1.0 + xp.copysign(eps, -self.maximum))))
 
@@ -138,8 +143,8 @@ class RealField(Ring):
 
 @dataclass
 class ComplexField(Ring):
-    minimum_modulus: float | JaxRealArray = 0.0
-    maximum_modulus: float | JaxRealArray | None = None
+    minimum_modulus: RealNumeric = 0.0
+    maximum_modulus: RealNumeric | None = None
 
     @override
     def num_elements(self, support_num_element: int) -> int:
