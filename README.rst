@@ -225,31 +225,91 @@ A basic use of the two parametrizations:
 
 .. code:: python
 
-    from __future__ import annotations
+    """Cross-entropy.
 
+    This example is based on section 1.4.1 from expfam.pdf, entitled Information
+    theoretic statistics.
+    """
     import jax.numpy as jnp
+    from tjax import print_generic
 
     from efax import BernoulliEP, BernoulliNP
 
-    # p is the expectation parameters of three Bernoulli distributions having probabilities 0.4, 0.5,
-    # and 0.6.
+    # p is the expectation parameters of three Bernoulli distributions having
+    # probabilities 0.4, 0.5, and 0.6.
     p = BernoulliEP(jnp.asarray([0.4, 0.5, 0.6]))
 
-    # q is the natural parameters of three Bernoulli distributions having log-odds 0, which is
-    # probability 0.5.
+    # q is the natural parameters of three Bernoulli distributions having log-odds
+    # 0, which is probability 0.5.
     q = BernoulliNP(jnp.zeros(3))
 
-    print(p.cross_entropy(q))  # noqa: T201
-    # [0.6931472 0.6931472 0.6931472]
+    print_generic(p.cross_entropy(q))
+    # Jax Array (3,) float32
+    # └──  0.6931 │ 0.6931 │ 0.6931
 
-    # q2 is natural parameters of Bernoulli distributions having a probability of 0.3.
+    # q2 is natural parameters of Bernoulli distributions having a probability of
+    # 0.3.
     p2 = BernoulliEP(0.3 * jnp.ones(3))
     q2 = p2.to_nat()
 
-    print(p.cross_entropy(q2))  # noqa: T201
-    # [0.6955941  0.78032386 0.86505365]
-    # A Bernoulli distribution with probability 0.3 predicts a Bernoulli observation with probability
-    # 0.4 better than the other observations.
+    # A Bernoulli distribution with probability 0.3 predicts a Bernoulli observation
+    # with probability 0.4 better than the other observations.
+    print_generic(p.cross_entropy(q2))
+    # Jax Array (3,) float32
+    # └──  0.6956 │ 0.7803 │ 0.8651
+
+Evidence combination:
+
+.. code:: python
+
+    """Bayesian evidence combination.
+
+    This example is based on section 1.2.1 from expfam.pdf, entitled Bayesian
+    evidence combination.
+
+    Suppose you have a prior, and a set of likelihoods, and you want to combine all
+    of the evidence into one distribution.
+    """
+    from operator import add
+
+    import jax.numpy as jnp
+    from tjax import print_generic
+
+    from efax import MultivariateDiagonalNormalVP, parameter_map
+
+    prior = MultivariateDiagonalNormalVP(mean=jnp.zeros(2),
+                                         variance=10 * jnp.ones(2))
+    likelihood = MultivariateDiagonalNormalVP(mean=jnp.asarray([1.1, -2.2]),
+                                              variance=jnp.asarray([3.0, 1.0]))
+
+    # Convert to the natural parametrization.
+    prior_np = prior.to_nat()
+    likelihood_np = likelihood.to_nat()
+
+    # Sum.  We use parameter_map to ensure that we don't accidentally add "fixed"
+    # parameters, e.g., the failure count of a negative binomial distribution.
+    posterior_np = parameter_map(add, prior_np, likelihood_np)
+
+    # Convert to the source parametrization.
+    posterior = posterior_np.to_variance_parametrization()
+    print_generic(prior=prior,
+                  likelihood=likelihood,
+                  posterior=posterior)
+    # likelihood=MultivariateDiagonalNormalVP[dataclass]
+    # ├── mean=Jax Array (2,) float32
+    # │   └──  1.1000 │ -2.2000
+    # └── variance=Jax Array (2,) float32
+    #     └──  3.0000 │ 1.0000
+    # posterior=MultivariateDiagonalNormalVP[dataclass]
+    # ├── mean=Jax Array (2,) float32
+    # │   └──  0.8462 │ -2.0000
+    # └── variance=Jax Array (2,) float32
+    #     └──  2.3077 │ 0.9091
+    # prior=MultivariateDiagonalNormalVP[dataclass]
+    # ├── mean=Jax Array (2,) float32
+    # │   └──  0.0000 │ 0.0000
+    # └── variance=Jax Array (2,) float32
+    #     └──  10.0000 │ 10.0000
 
 Optimization
 ------------
@@ -257,8 +317,13 @@ Using the cross entropy to iteratively optimize a prediction is simple:
 
 .. code:: python
 
-    from __future__ import annotations
+    """Optimization.
 
+    This example illustrates how this library fits in a typical machine learning
+    context.  Suppose we have an unknown target value, and a loss function based on
+    the cross-entropy between the target value and a predictive distribution.  We
+    will optimize the predictive distribution by a small fraction of its cotangent.
+    """
     import jax.numpy as jnp
     from jax import grad, lax
     from tjax import JaxBooleanArray, JaxRealArray, jit, print_generic
@@ -270,7 +335,7 @@ Using the cross entropy to iteratively optimize a prediction is simple:
         return jnp.sum(p.cross_entropy(q))
 
 
-    gce = jit(grad(cross_entropy_loss, 1))
+    gradient_cross_entropy = jit(grad(cross_entropy_loss, 1))
 
 
     def apply(x: JaxRealArray, x_bar: JaxRealArray) -> JaxRealArray:
@@ -278,56 +343,72 @@ Using the cross entropy to iteratively optimize a prediction is simple:
 
 
     def body_fun(q: BernoulliNP) -> BernoulliNP:
-        q_bar = gce(some_p, q)
+        q_bar = gradient_cross_entropy(target_distribution, q)
         return parameter_map(apply, q, q_bar)
 
 
     def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
-        q_bar = gce(some_p, q)
+        q_bar = gradient_cross_entropy(target_distribution, q)
         total = jnp.sum(parameter_dot_product(q_bar, q_bar))
         return total > 1e-6  # noqa: PLR2004
 
 
-    # some_p are expectation parameters of a Bernoulli distribution corresponding
-    # to probabilities 0.3, 0.4, and 0.7.
-    some_p = BernoulliEP(jnp.asarray([0.3, 0.4, 0.7]))
+    # The target_distribution is represented as the expectation parameters of a
+    # Bernoulli distribution corresponding to probabilities 0.3, 0.4, and 0.7.
+    target_distribution = BernoulliEP(jnp.asarray([0.3, 0.4, 0.7]))
 
-    # some_q are natural parameters of a Bernoulli distribution corresponding to
-    # log-odds 0, which is probability 0.5.
-    some_q = BernoulliNP(jnp.zeros(3))
+    # The initial predictive distribution is represented as the natural parameters
+    # of a Bernoulli distribution corresponding to log-odds 0, which is probability
+    # 0.5.
+    initial_predictive_distribution = BernoulliNP(jnp.zeros(3))
 
-    # Optimize the predictive distribution iteratively, and output the natural parameters of the
-    # prediction.
-    optimized_q = lax.while_loop(cond_fun, body_fun, some_q)
-    print_generic(optimized_q)
-    # BernoulliNP
+    # Optimize the predictive distribution iteratively.
+    predictive_distribution = lax.while_loop(cond_fun, body_fun,
+                                             initial_predictive_distribution)
+
+    # Compare the optimized predictive distribution with the target value in the
+    # same natural parametrization.
+    print_generic(predictive_distribution=predictive_distribution,
+                  target_distribution=target_distribution.to_nat())
+    # predictive_distribution=BernoulliNP[dataclass]
     # └── log_odds=Jax Array (3,) float32
     #     └──  -0.8440 │ -0.4047 │ 0.8440
-
-    # Compare with the true value.
-    print_generic(some_p.to_nat())
-    # BernoulliNP
+    # target_distribution=BernoulliNP[dataclass]
     # └── log_odds=Jax Array (3,) float32
     #     └──  -0.8473 │ -0.4055 │ 0.8473
 
-    # Print optimized natural parameters as expectation parameters.
-    print_generic(optimized_q.to_exp())
-    # BernoulliEP
+    # Do the same in the expectation parametrization.
+    print_generic(predictive_distribution=predictive_distribution.to_exp(),
+                  target_distribution=target_distribution)
+    # predictive_distribution=BernoulliEP[dataclass]
     # └── probability=Jax Array (3,) float32
     #     └──  0.3007 │ 0.4002 │ 0.6993
+    # target_distribution=BernoulliEP[dataclass]
+    # └── probability=Jax Array (3,) float32
+    #     └──  0.3000 │ 0.4000 │ 0.7000
 
 Maximum likelihood estimation
 -----------------------------
-Maximum likelihood estimation is often using the conjugate prior, but this can be done using only
-the expectation parametrization (which is equivalent less one parameter that represents the number
-of samples).
+Maximum likelihood estimation often uses the conjugate prior, which can require exotic conjugate
+prior distributions to have been implemented.  It is simpler to use the expectation parametrization
+instead.
 
 .. code:: python
 
+    """Maximum likelihood estimation.
+
+    This example is based on section 1.3.2 from expfam.pdf, entitled Maximum
+    likelihood estimation.
+
+    Suppose you have some samples from a distribution family with unknown
+    parameters, and you want to estimate the maximum likelihood parmaters of the
+    distribution.
+    """
     import jax.numpy as jnp
     import jax.random as jr
+    from tjax import print_generic
 
-    from efax import DirichletNP, parameter_mean
+    from efax import DirichletEP, DirichletNP, MaximumLikelihoodEstimator, parameter_mean
 
     # Consider a Dirichlet distribution with a given alpha.
     alpha = jnp.asarray([2.0, 3.0, 4.0])
@@ -340,27 +421,34 @@ of samples).
 
     # Now, let's find the maximum likelihood Dirichlet distribution that fits it.
     # First, convert the samples to their sufficient statistics.
-    ss = DirichletNP.sufficient_statistics(samples)
-    # ss has type DirichletEP.  This is similar to the conjguate prior of the Dirichlet distribution.
+    estimator = MaximumLikelihoodEstimator.create_simple_estimator(DirichletEP)
+    ss = estimator.sufficient_statistics(samples)
+    # ss has type DirichletEP.  This is similar to the conjguate prior of the
+    # Dirichlet distribution.
 
     # Take the mean over the first axis.
     ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
     # Convert this back to the natural parametrization.
     estimated_distribution = ss_mean.to_nat()
-    print(estimated_distribution.alpha_minus_one + 1.0)  # [1.9849904 3.0065458 3.963935 ]  # noqa: T201
+    print_generic(estimated_distribution=estimated_distribution,
+                  source_distribution=source_distribution)
+    # estimated_distribution=DirichletNP[dataclass]
+    # └── alpha_minus_one=Jax Array (3,) float32
+    #     └──  0.9797 │ 1.9539 │ 2.9763
+    # source_distribution=DirichletNP[dataclass]
+    # └── alpha_minus_one=Jax Array (3,) float32
+    #     └──  1.0000 │ 2.0000 │ 3.0000
 
 Contribution guidelines
 =======================
 
-Contributions are welcome!
+Contributions are welcome! I'm open to both new features, design ideas, and new distributions.
 
-It's not hard to add a new distribution.  The steps are:
+It's not hard to add a new distribution.  It's usually around only one hundred lines of code. The
+steps are:
 
 - Create an issue for the new distribution.
-
-- Solve for or research the equations needed to fill the blanks in the overview pdf, and put them in
-  the issue.  I'll add them to the pdf for you.
 
 - Implement the natural and expectation parametrizations, either:
 
@@ -373,14 +461,16 @@ It's not hard to add a new distribution.  The steps are:
 
 - Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.
 
-Implementation should respect PEP8.
-The tests can be run using :bash:`pytest . -n auto`.  Specific distributions can be run with
-:bash:`pytest . -n auto --distribution=Gamma` where the names match the class names in
+The implementation should be consistent with the surrounding style, be type annotated, and pass the
+linters below.
+
+The tests can be run using :bash:`pytest -n auto`.  Specific distributions can be run with
+:bash:`pytest -n auto --distribution=Gamma` where the names match the class names in
 `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.
 
 There are a few tools to clean and check the source:
 
-- :bash:`ruff check .`
+- :bash:`ruff check`
 - :bash:`pyright`
 - :bash:`mypy`
 - :bash:`isort .`
