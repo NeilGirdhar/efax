@@ -28,14 +28,14 @@ classifiers = [
 dependencies = [
   "array_api_compat>=1.10",
   "array_api_extra>=0.7",
-  "jax>=0.4.34,<0.6",
+  "jax>=0.6.1",
   "numpy>=1.25",
   "optimistix>=0.0.9",
   "optype>=0.8.0",
   "scipy-stubs>=1.15",
   "scipy>=1.15",
   "tensorflow_probability>=0.15",
-  "tjax>=1.2.0",
+  "tjax>=1.3.1",
   "typing_extensions>=4.8",
 ]
 
