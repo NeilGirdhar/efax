@@ -15,8 +15,8 @@ from efax import (HasEntropyEP, HasEntropyNP, JointDistributionN, MaximumLikelih
                   flat_dict_of_observations, flat_dict_of_parameters, parameter_map,
                   unflatten_mapping)
 
-from .create_info import (BetaInfo, ComplexCircularlySymmetricNormalInfo, ComplexNormalInfo,
-                          DirichletInfo, IsotropicNormalInfo, MultivariateDiagonalNormalInfo,
+from .create_info import (ChiInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
+                          IsotropicNormalInfo, MultivariateDiagonalNormalInfo,
                           MultivariateFixedVarianceNormalInfo, MultivariateNormalInfo,
                           VonMisesFisherInfo)
 from .distribution_info import DistributionInfo
@@ -44,11 +44,9 @@ def test_exp_entropy(generator: Generator,
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
     assert isinstance(exp_parameters, HasEntropyEP)
     scipy_distribution = entropy_distribution_info.exp_to_scipy_distribution(exp_parameters)
-    rtol = (8e-2
-            if isinstance(entropy_distribution_info, BetaInfo)
-            else 4e-2
-            if isinstance(entropy_distribution_info, DirichletInfo)
-            else 2e-5)
+    rtol = (1e-5
+            if isinstance(entropy_distribution_info, ChiInfo | ChiSquareInfo)
+            else 1e-6)
     my_entropy = exp_parameters.entropy()
     scipy_entropy = scipy_distribution.entropy()
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
@@ -107,17 +105,15 @@ def test_maximum_likelihood_estimation(
     Test that maximum likelihood estimation from scipy-generated variates produce the same
     distribution from which they were drawn.
     """
+    rtol = 2e-2
     if isinstance(distribution_info,
                   ComplexCircularlySymmetricNormalInfo | MultivariateNormalInfo
                   | VonMisesFisherInfo | MultivariateFixedVarianceNormalInfo):
-        atol = 2e-2
-        rtol = 2e-2
-    elif isinstance(distribution_info, ComplexNormalInfo | IsotropicNormalInfo):
+        atol = 1e-2
+    elif isinstance(distribution_info, IsotropicNormalInfo):
         atol = 1e-3
-        rtol = 2e-2
     else:
-        atol = 1e-4
-        rtol = 2e-2
+        atol = 1e-6
     n = 70000
     # Generate a distribution with expectation parameters.
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
