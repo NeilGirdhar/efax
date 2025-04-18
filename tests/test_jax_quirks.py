@@ -12,3 +12,4 @@ def jax_is_initialized() -> bool:
 @pytest.mark.nondistribution
 def test_jax_not_initialized() -> None:
     assert not jax_is_initialized()
+
