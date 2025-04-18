@@ -9,3 +9,4 @@ def jax_is_initialized() -> bool:
 
 def test_jax_not_initialized() -> None:
     assert not jax_is_initialized()
+
