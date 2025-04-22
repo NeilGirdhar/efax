@@ -87,8 +87,6 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              for info in _all_infos
              for natural in (False, True)
              if supports(info.nat_structure() if natural else info.exp_structure(), Samplable)
-             # TODO: This seems to be a problem with SciPy.
-             if not isinstance(info, InverseGaussianInfo)
              if info.tests_selected(distribution_name_option)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_distribution_info", "natural"), p,
