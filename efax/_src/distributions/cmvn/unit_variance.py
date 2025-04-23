@@ -119,8 +119,9 @@ class ComplexMultivariateUnitVarianceNormalEP(
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         shape = self.mean.shape if shape is None else shape + self.mean.shape
-        a = jr.normal(key, shape)
-        b = jr.normal(key, shape)
+        key_a, key_b = jr.split(key)
+        a = jr.normal(key_a, shape)
+        b = jr.normal(key_b, shape)
         return a + 1j * b + self.mean
 
     # def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:

@@ -11,7 +11,8 @@ from efax import (Distribution, ExpectationParametrization, JointDistribution,
                   MaximumLikelihoodEstimator, NaturalParametrization, Samplable, SimpleDistribution,
                   Structure, flat_dict_of_observations, flatten_mapping, parameter_mean)
 
-from .create_info import (ComplexCircularlySymmetricNormalInfo, MultivariateDiagonalNormalInfo,
+from .create_info import (ComplexCircularlySymmetricNormalInfo,
+                          ComplexMultivariateUnitVarianceNormalInfo, MultivariateDiagonalNormalInfo,
                           MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
 
@@ -71,7 +72,8 @@ def verify_maximum_likelihood_estimate(
         ) -> None:
     atol = (1e-2
             if isinstance(sampling_distribution_info,
-                          ComplexCircularlySymmetricNormalInfo | MultivariateNormalInfo)
+                          ComplexCircularlySymmetricNormalInfo
+                          | ComplexMultivariateUnitVarianceNormalInfo | MultivariateNormalInfo)
             else 1e-3
             if isinstance(sampling_distribution_info,
                           MultivariateDiagonalNormalInfo)

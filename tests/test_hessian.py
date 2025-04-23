@@ -65,9 +65,10 @@ def _calculate_curvature(p: SimpleDistribution,
 
 @jit
 def _calculate_jacobian_and_curvature(p: SimpleDistribution,
-                                      keys: KeyArray
+                                      jacobian_keys: KeyArray,
+                                      curvature_keys: KeyArray,
                                       ) -> tuple[JaxRealArray, JaxRealArray]:
-    return _calculate_jacobian(p, keys), _calculate_curvature(p, keys)
+    return _calculate_jacobian(p, jacobian_keys), _calculate_curvature(p, curvature_keys)
 
 
 def test_sampling_cotangents(generator: Generator,
@@ -81,10 +82,10 @@ def test_sampling_cotangents(generator: Generator,
     info = sampling_wc_distribution_info
     info.skip_if_deselected(distribution_name)
     distribution_shape = (23,)
-    keys = jr.split(key, distribution_shape)
+    jacobian_keys, curvature_keys = jr.split(key, (2, *distribution_shape))
     p: SimpleDistribution = (info.nat_parameter_generator(generator, distribution_shape)
                              if natural
                              else info.exp_parameter_generator(generator, distribution_shape))
-    jacobian, curvature = _calculate_jacobian_and_curvature(p, keys)
+    jacobian, curvature = _calculate_jacobian_and_curvature(p, jacobian_keys, curvature_keys)
     assert jacobian.shape == curvature.shape
     assert jnp.all((jacobian != 0) | (curvature != 0))
