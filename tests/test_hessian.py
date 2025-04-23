@@ -5,7 +5,7 @@ from typing import Any
 
 import jax.numpy as jnp
 import jax.random as jr
-from jax import jacrev, jit, vmap
+from jax import jacobian, jit, vmap
 from numpy.random import Generator
 from tjax import JaxArray, JaxRealArray, KeyArray, hessian
 
@@ -37,7 +37,7 @@ def _calculate_jacobian(p: SimpleDistribution,
                         keys: KeyArray,
                         ) -> JaxRealArray:
     flattener, flattened = Flattener.flatten(p)
-    jacobian_sample = vmap(jacrev(_sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
+    jacobian_sample = vmap(jacobian(_sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
     parameters_jacobian, = jacobian_sample(flattened, flattener, keys)
     assert parameters_jacobian.shape[0: 1] == p.shape
     parameters_jacobian = jnp.sum(parameters_jacobian, axis=0)
