@@ -83,18 +83,18 @@ class InverseGaussianNP(Samplable,
         nu = jr.normal(key1, shape)
         z = jr.uniform(key2, shape)
         xp = self.array_namespace()
-        
+
         # Convert natural parameters to mu and lambda
         lambda_ = -2.0 * self.negative_lambda_over_two
         mu_squared = lambda_ / (-2.0 * self.negative_lambda_over_two_mu_squared)
         mu = xp.sqrt(mu_squared)
-        
+
         # Sample using the algorithm
         y = xp.square(nu)
         x = mu + 0.5 * mu_squared / lambda_ * y - (
                 mu / (2.0 * lambda_)
                 * xp.sqrt(4.0 * mu * lambda_ * y + mu_squared * xp.square(y)))
-        
+
         return xp.where(z <= mu / (mu + x), x, mu_squared / x)
 
 
