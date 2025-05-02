@@ -63,8 +63,7 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        shape = self.shape if shape is None else shape + self.shape
-        return jr.normal(key, shape) + self.mean
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass
@@ -107,7 +106,10 @@ class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        return self.to_nat().sample(key, shape)
+        xp = self.array_namespace()
+        shape = self.shape if shape is None else shape + self.shape
+        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        return jr.normal(key, shape) + self.mean[grow]
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> NormalNP:

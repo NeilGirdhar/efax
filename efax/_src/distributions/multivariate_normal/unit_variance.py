@@ -67,8 +67,10 @@ class MultivariateUnitVarianceNormalNP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.array_namespace()
         shape = self.mean.shape if shape is None else shape + self.mean.shape
-        return jr.normal(key, shape) + self.mean
+        grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
+        return jr.normal(key, shape) + self.mean[grow]
 
     @override
     def dimensions(self) -> int:

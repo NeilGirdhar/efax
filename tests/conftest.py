@@ -20,8 +20,8 @@ from .create_info import (BetaInfo, ChiSquareInfo, DirichletInfo, GammaInfo,
 
 
 @pytest.fixture(autouse=True, scope='session')
-def _jax_enable64(request: pytest.FixtureRequest) -> Generator[None]:  # pyright: ignore
-    with jax.debug_key_reuse(True), enable_x64():
+def _jax_fixture(request: pytest.FixtureRequest) -> Generator[None]:  # pyright: ignore
+    with jax.debug_key_reuse(True), jax.numpy_rank_promotion('raise'), enable_x64():
         yield
 
 
