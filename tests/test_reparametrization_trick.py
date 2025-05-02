@@ -19,6 +19,6 @@ def test_normal(distribution_name: str | None,
     d = normal_np.to_deviation_parametrization()
     samples, f_vjp = vjp(partial(type(d).sample, key=key, shape=(n_samples,)), d)
     d_bar, = f_vjp(jnp.ones_like(samples))
-    epsilon = (samples - d.mean) / d.deviation
+    epsilon = (samples - d.mean[jnp.newaxis]) / d.deviation[jnp.newaxis]
     assert jnp.all(jnp.isclose(d_bar.mean, jnp.ones(shape) * float(n_samples)))
     assert jnp.all(jnp.isclose(d_bar.deviation, jnp.sum(epsilon, axis=0)))

@@ -63,8 +63,7 @@ class UnitVarianceSoftplusNormalNP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        shape = self.shape if shape is None else shape + self.shape
-        return softplus(jr.normal(key, shape) + self.mean)
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass
@@ -103,8 +102,10 @@ class UnitVarianceSoftplusNormalEP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.array_namespace()
         shape = self.shape if shape is None else shape + self.shape
-        return softplus(jr.normal(key, shape) + self.mean)
+        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        return softplus(jr.normal(key, shape) + self.mean[grow])
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> NormalNP:

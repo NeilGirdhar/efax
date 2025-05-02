@@ -126,11 +126,11 @@ class MultivariateFixedVarianceNormalEP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        shape = self.mean.shape if shape is None else shape + self.mean.shape
         xp = self.array_namespace()
-        variance = self.variance[..., xp.newaxis]
-        deviation = xp.sqrt(variance)
-        return jr.normal(key, shape) * deviation + self.mean
+        shape = self.mean.shape if shape is None else shape + self.mean.shape
+        grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
+        deviation = xp.sqrt(self.variance)[*grow, ..., xp.newaxis]
+        return jr.normal(key, shape) * deviation + self.mean[grow]
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:

@@ -114,7 +114,7 @@ class NormalEP(HasEntropyEP[NormalNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        return self.to_variance_parametrization().sample(key, shape)
+        return self.to_deviation_parametrization().sample(key, shape)
 
     def variance(self) -> JaxRealArray:
         xp = self.array_namespace()
@@ -150,10 +150,7 @@ class NormalVP(Samplable, SimpleDistribution):
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        shape = self.shape if shape is None else shape + self.shape
-        xp = self.array_namespace()
-        deviation = xp.sqrt(self.variance)
-        return jr.normal(key, shape) * deviation + self.mean
+        return self.to_deviation_parametrization().sample(key, shape)
 
     def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
         return self.to_nat().log_pdf(x)
@@ -201,8 +198,10 @@ class NormalDP(Samplable, SimpleDistribution):
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = self.array_namespace()
         shape = self.shape if shape is None else shape + self.shape
-        return jr.normal(key, shape) * self.deviation + self.mean
+        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        return jr.normal(key, shape) * self.deviation[grow] + self.mean[grow]
 
     def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
         return self.to_nat().log_pdf(x)

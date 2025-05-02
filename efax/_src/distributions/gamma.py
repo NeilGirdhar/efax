@@ -70,9 +70,10 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        if shape is not None:
-            shape += self.shape
-        return -jr.gamma(key, self.shape_minus_one + 1.0, shape) / self.negative_rate
+        xp = self.array_namespace()
+        shape = self.shape if shape is None else shape + self.shape
+        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        return -jr.gamma(key, self.shape_minus_one[grow] + 1.0, shape) / self.negative_rate[grow]
 
     def to_variance_parametrization(self) -> GammaVP:
         rate = -self.negative_rate

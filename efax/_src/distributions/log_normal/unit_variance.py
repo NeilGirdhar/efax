@@ -67,9 +67,7 @@ class UnitVarianceLogNormalNP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
-        shape = self.shape if shape is None else shape + self.shape
-        return jr.lognormal(key, shape=shape) * xp.exp(self.mean)
+        return self.to_exp().sample(key, shape)
 
 
 @dataclass
@@ -116,7 +114,8 @@ class UnitVarianceLogNormalEP(
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = self.array_namespace()
         shape = self.shape if shape is None else shape + self.shape
-        return jr.lognormal(key, shape=shape) * xp.exp(self.mean)
+        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        return jr.lognormal(key, shape=shape) * xp.exp(self.mean)[grow]
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> NormalNP:
