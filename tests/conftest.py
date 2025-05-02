@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Generator
-from contextlib import ExitStack
 from typing import Any
 
 import jax
@@ -22,18 +21,13 @@ from .create_info import (BetaInfo, ChiSquareInfo, DirichletInfo, GammaInfo,
 
 @pytest.fixture(autouse=True, scope='session')
 def _jax_enable64(request: pytest.FixtureRequest) -> Generator[None]:  # pyright: ignore
-    with ExitStack() as stack:
-        if request.config.getoption("--check_rng_reuse"):
-            stack.enter_context(jax.debug_key_reuse(True))
-        with enable_x64():
-            yield
+    with jax.debug_key_reuse(True), enable_x64():
+        yield
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption('--distribution', action='store', default=None,
                      help="Only check the distribution given; matches class names in create_info.")
-    parser.addoption('--check_rng_reuse', action='store_true', default=False,
-                     help="Check that RNGs are not being reused.  This costs execution speed.")
 
 
 @pytest.fixture
