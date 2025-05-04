@@ -16,7 +16,8 @@ from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSqu
                   ComplexNormalEP, ComplexNormalNP, ComplexUnitVarianceNormalEP,
                   ComplexUnitVarianceNormalNP, DirichletEP, DirichletNP, ExponentialEP,
                   ExponentialNP, GammaEP, GammaNP, GeneralizedDirichletEP, GeneralizedDirichletNP,
-                  GeometricEP, GeometricNP, InverseGammaEP, InverseGammaNP, InverseGaussianEP,
+                  GeometricEP, GeometricNP, GeneralizedInverseGaussianEP, GeneralizedInverseGaussianNP,
+                  InverseGammaEP, InverseGammaNP, InverseGaussianEP,
                   InverseGaussianNP, IsotropicNormalEP, IsotropicNormalNP, JointDistributionE,
                   JointDistributionN, LogarithmicEP, LogarithmicNP, LogNormalEP, LogNormalNP,
                   MultivariateDiagonalNormalEP, MultivariateDiagonalNormalNP,
@@ -234,6 +235,24 @@ class GeneralizedDirichletInfo(DistributionInfo[GeneralizedDirichletNP, Generali
     @override
     def nat_class(self) -> type[GeneralizedDirichletNP]:
         return GeneralizedDirichletNP
+
+
+class GeneralizedInverseGaussianInfo(DistributionInfo[GeneralizedInverseGaussianNP, GeneralizedInverseGaussianEP, NumpyRealArray]):
+    @override
+    def nat_to_scipy_distribution(self, q: GeneralizedInverseGaussianNP) -> Any:
+        # Convert natural parameters to standard parameters
+        p = q.p_minus_one + 1.0
+        b = -2.0 * q.negative_a_over_two
+        scale = -2.0 * q.negative_b_over_two
+        return ss.geninvgauss(p=p, b=b, scale=scale)
+
+    @override
+    def exp_class(self) -> type[GeneralizedInverseGaussianEP]:
+        return GeneralizedInverseGaussianEP
+
+    @override
+    def nat_class(self) -> type[GeneralizedInverseGaussianNP]:
+        return GeneralizedInverseGaussianNP
 
 
 class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
@@ -652,6 +671,7 @@ def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
             ExponentialInfo(),
             GammaInfo(),
             GeneralizedDirichletInfo(dimensions=5),
+            GeneralizedInverseGaussianInfo(),
             GeometricInfo(),
             InverseGammaInfo(),
             InverseGaussianInfo(),
