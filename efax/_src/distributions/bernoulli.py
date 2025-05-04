@@ -115,9 +115,13 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxBooleanArray:
+        xp = self.array_namespace()
         if shape is not None:
+            grow = (xp.newaxis,) * len(shape)
             shape += self.shape
-        return jr.bernoulli(key, self.probability, shape)
+        else:
+            grow = ()
+        return jr.bernoulli(key, self.probability[grow], shape)
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaNP:

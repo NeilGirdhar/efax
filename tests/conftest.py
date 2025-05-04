@@ -3,10 +3,10 @@ from __future__ import annotations
 from collections.abc import Generator
 from typing import Any
 
+import jax
 import jax.random as jr
 import numpy as np
 import pytest
-from jax import enable_custom_prng
 from jax.experimental import enable_x64
 from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
@@ -20,14 +20,15 @@ from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNor
                           InverseGaussianInfo, JointInfo, create_infos)
 
 
-@pytest.fixture(autouse=True)
-def _jax_enable64() -> Generator[None]:  # pyright: ignore
-    with enable_x64():
+@pytest.fixture(autouse=True, scope='session')
+def _jax_fixture(request: pytest.FixtureRequest) -> Generator[None]:  # pyright: ignore
+    with jax.debug_key_reuse(True), jax.numpy_rank_promotion('raise'), enable_x64():
         yield
 
 
-def pytest_addoption(parser: Any) -> None:
-    parser.addoption('--distribution', action='store', default=None)
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption('--distribution', action='store', default=None,
+                     help="Only check the distribution given; matches class names in create_info.")
 
 
 @pytest.fixture
@@ -37,7 +38,7 @@ def generator() -> NumpyGenerator:
 
 @pytest.fixture
 def key() -> KeyArray:
-    with enable_custom_prng():
+    with jax.enable_custom_prng():
         return jr.key(123)
 
 
@@ -59,8 +60,8 @@ _all_infos = create_infos()
 
 
 @pytest.fixture
-def distribution_name(request: Any) -> str | None:
-    return request.config.getoption("--distribution")
+def distribution_name(request: pytest.FixtureRequest) -> str | None:
+    return request.config.getoption("--distribution")  # pyright: ignore
 
 
 def supports(s: Structure[Any], abc: type[Any]) -> bool:

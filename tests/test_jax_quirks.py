@@ -5,10 +5,10 @@ import efax  # noqa: F401
 
 
 def jax_is_initialized() -> bool:
-    return bool(xb._backends)  # noqa: SLF001  # pyright: ignore
+    return bool(xb._backends)  # noqa: SLF001
 
 
-@pytest.mark.first
+@pytest.mark.run(order=1)
 @pytest.mark.nondistribution
 def test_jax_not_initialized() -> None:
     assert not jax_is_initialized()
