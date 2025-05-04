@@ -116,11 +116,8 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxBooleanArray:
         xp = self.array_namespace()
-        if shape is not None:
-            grow = (xp.newaxis,) * len(shape)
-            shape += self.shape
-        else:
-            grow = ()
+        shape = self.shape if shape is None else shape + self.shape
+        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return jr.bernoulli(key, self.probability[grow], shape)
 
     @override
