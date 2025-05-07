@@ -8,8 +8,8 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override, Tuple
-from logbesselk.jax import log_bessel_k, bessel_kratio
-
+# from logbesselk.jax import log_bessel_k, bessel_kratio
+from ..tools import log_kve
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -57,13 +57,12 @@ class GeneralizedInverseGaussianNP(HasEntropyNP['GeneralizedInverseGaussianEP'],
         y = xp.sqrt(b / a)
         z = xp.sqrt(a * b)
         
-        if p.ndim == 0:
-            log_2k = xp.log(2.0) + log_bessel_k(p, z)
-        else:
-            log_k = jax.jit(jax.vmap(log_bessel_k, 0))
-            log_2k = xp.log(2.0) + log_k(p, z)
-        log_ratio_term = p * xp.log(y)
-        return log_2k + log_ratio_term
+        # if p.ndim == 0:
+        #     log_2k = xp.log(2.0) + log_kve(p, z)
+        # else:
+        #     log_k = jax.jit(jax.vmap(log_bessel_k, 0))
+        #     log_2k = xp.log(2.0) + log_k(p, z)
+        return xp.log(2.0) + log_kve(p, z) - z + p * xp.log(y)
 
     @override
     def to_exp(self) -> GeneralizedInverseGaussianEP:
@@ -83,15 +82,19 @@ class GeneralizedInverseGaussianNP(HasEntropyNP['GeneralizedInverseGaussianEP'],
         # Issue: https://github.com/tk2lab/logbesselk/issues/33
         # mean_log = xp.log(y) + dlogk_dp(p, z)
         # eps = 1e-6 would cause numerical issue in log_bessel_k
-        if p.ndim == 0:
-            eps = 1e-5
-            kratio = xp.exp(log_bessel_k(p + 1, z) - log_bessel_k(p, z))
-            dlogk_dp = (log_bessel_k(p + eps, z) - log_bessel_k(p - eps, z)) / (2.0 * eps)
-        else:
-            eps = xp.ones_like(p) * 1e-5
-            logk = jax.jit(jax.vmap(log_bessel_k, 0))
-            kratio = xp.exp(logk(p + xp.ones_like(p), z) - logk(p, z))
-            dlogk_dp = (logk(p + eps, z) - logk(p - eps, z)) / (2.0 * eps)
+        # if p.ndim == 0:
+        #     eps = 1e-5
+        #     kratio = xp.exp(log_bessel_k(p + 1, z) - log_bessel_k(p, z))
+        #     dlogk_dp = (log_bessel_k(p + eps, z) - log_bessel_k(p - eps, z)) / (2.0 * eps)
+        # else:
+        #     eps = xp.ones_like(p) * 1e-5
+        #     logk = jax.jit(jax.vmap(log_bessel_k, 0))
+        #     kratio = xp.exp(logk(p + xp.ones_like(p), z) - logk(p, z))
+        #     dlogk_dp = (logk(p + eps, z) - logk(p - eps, z)) / (2.0 * eps)
+
+        eps = 1e-6
+        dlogk_dp = (log_kve(p + eps, z) - log_kve(p - eps, z)) / (2.0 * eps)
+        kratio = xp.exp(log_kve(p + 1, z) - log_kve(p, z))
         
         mean_log = xp.log(y) + dlogk_dp
         mean = kratio * y
@@ -220,3 +223,5 @@ class GeneralizedInverseGaussianEP(HasEntropyEP[GeneralizedInverseGaussianNP],
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         return self.to_nat().sample(key, shape)
+
+

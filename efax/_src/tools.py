@@ -7,7 +7,7 @@ from itertools import starmap
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from array_api_compat import array_namespace
-from jax import jit
+from jax import jit, grad, custom_jvp
 from tensorflow_probability.substrates import jax as tfp
 from tjax import JaxComplexArray, JaxRealArray
 
@@ -83,6 +83,31 @@ def join_mappings(**field_to_map: Mapping[_T, _V]) -> dict[_T, dict[str, _V]]:
 
 iv_ratio = tfp.math.bessel_iv_ratio
 log_ive = tfp.math.log_bessel_ive
+
+
+# TensorFlow Probability log_bessel_kve is not differentiable with respect to v
+# Need to use custom_vjp to define the gradient
+@custom_jvp
+def log_kve(v: JaxRealArray, z: JaxRealArray) -> JaxRealArray:
+    return tfp.math.log_bessel_kve(v, z)
+
+# Define the custom JVP (forward-mode) rule
+@log_kve.defjvp
+def log_kve_jvp(primals: tuple[JaxRealArray, JaxRealArray], tangents: tuple[JaxRealArray, JaxRealArray]) -> tuple[JaxRealArray, JaxRealArray]:
+    v, z = primals
+    v_dot, z_dot = tangents
+    
+    # Use finite difference for the v derivative
+    eps = 1e-6
+    grad_v = (tfp.math.log_bessel_kve(v + eps, z) - tfp.math.log_bessel_kve(v - eps, z)) / (2.0 * eps)
+    
+    # Use automatic differentiation for the z derivative
+    grad_z = grad(lambda z: tfp.math.log_bessel_kve(v, z))(z)
+    
+    # Compute the tangent
+    tangent_out = grad_v * v_dot + grad_z * z_dot
+    
+    return log_kve(v, z), tangent_out
 
 
 # Private functions --------------------------------------------------------------------------------
