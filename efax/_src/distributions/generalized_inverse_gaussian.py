@@ -92,7 +92,7 @@ class GeneralizedInverseGaussianNP(HasEntropyNP['GeneralizedInverseGaussianEP'],
         #     kratio = xp.exp(logk(p + xp.ones_like(p), z) - logk(p, z))
         #     dlogk_dp = (logk(p + eps, z) - logk(p - eps, z)) / (2.0 * eps)
 
-        eps = 1e-6
+        eps = 1e-10
         dlogk_dp = (log_kve(p + eps, z) - log_kve(p - eps, z)) / (2.0 * eps)
         kratio = xp.exp(log_kve(p + 1, z) - log_kve(p, z))
         

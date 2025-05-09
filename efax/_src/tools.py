@@ -98,7 +98,7 @@ def log_kve_jvp(primals: tuple[JaxRealArray, JaxRealArray], tangents: tuple[JaxR
     v_dot, z_dot = tangents
     
     # Use finite difference for the v derivative
-    eps = 1e-6
+    eps = 1e-10
     grad_v = (tfp.math.log_bessel_kve(v + eps, z) - tfp.math.log_bessel_kve(v - eps, z)) / (2.0 * eps)
     
     # Use automatic differentiation for the z derivative
