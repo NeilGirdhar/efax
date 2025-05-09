@@ -9,9 +9,9 @@ distribution.
 """
 import jax.numpy as jnp
 import jax.random as jr
-from tjax import print_generic
 
 from efax import DirichletEP, DirichletNP, MaximumLikelihoodEstimator, parameter_mean
+from tjax import print_generic
 
 # Consider a Dirichlet distribution with a given alpha.
 alpha = jnp.asarray([2.0, 3.0, 4.0])

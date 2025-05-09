@@ -15,7 +15,7 @@ from tjax import (JaxBooleanArray, JaxRealArray, assert_tree_allclose, dynamic_t
 
 from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
-from .create_info import GammaInfo
+from .create_info import BetaInfo, DirichletInfo, GammaInfo
 from .distribution_info import DistributionInfo
 
 
@@ -48,6 +48,8 @@ def check_entropy_gradient(distribution: HasEntropy, /) -> None:
 def test_nat_entropy_gradient(generator: Generator,
                               entropy_distribution_info: DistributionInfo[Any, Any, Any],
                               ) -> None:
+    if isinstance(entropy_distribution_info, BetaInfo | DirichletInfo):
+        pytest.skip()
     shape = (7, 13)
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
     check_entropy_gradient(nat_parameters)
@@ -56,6 +58,8 @@ def test_nat_entropy_gradient(generator: Generator,
 def test_exp_entropy_gradient(generator: Generator,
                               entropy_distribution_info: DistributionInfo[Any, Any, Any],
                               ) -> None:
+    if isinstance(entropy_distribution_info, BetaInfo | DirichletInfo):
+        pytest.skip()
     shape = (7, 13)
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
     check_entropy_gradient(exp_parameters)

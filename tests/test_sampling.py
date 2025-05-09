@@ -75,8 +75,7 @@ def verify_maximum_likelihood_estimate(
                           ComplexCircularlySymmetricNormalInfo
                           | ComplexMultivariateUnitVarianceNormalInfo | MultivariateNormalInfo)
             else 1e-3
-            if isinstance(sampling_distribution_info,
-                          MultivariateDiagonalNormalInfo)
+            if isinstance(sampling_distribution_info, JointInfo | PoissonInfo)
             else 1e-6)
     rtol = 4e-2
     sample_axes = tuple(range(len(sample_shape)))
