@@ -28,21 +28,22 @@ posterior_np = parameter_map(add, prior_np, likelihood_np)
 
 # Convert to the source parametrization.
 posterior = posterior_np.to_variance_parametrization()
-print_generic(prior=prior,
-              likelihood=likelihood,
-              posterior=posterior)
-# likelihood=MultivariateDiagonalNormalVP[dataclass]
-# ├── mean=Jax Array (2,) float32
-# │   └──  1.1000 │ -2.2000
-# └── variance=Jax Array (2,) float32
-#     └──  3.0000 │ 1.0000
-# posterior=MultivariateDiagonalNormalVP[dataclass]
-# ├── mean=Jax Array (2,) float32
-# │   └──  0.8462 │ -2.0000
-# └── variance=Jax Array (2,) float32
-#     └──  2.3077 │ 0.9091
-# prior=MultivariateDiagonalNormalVP[dataclass]
-# ├── mean=Jax Array (2,) float32
-# │   └──  0.0000 │ 0.0000
-# └── variance=Jax Array (2,) float32
-#     └──  10.0000 │ 10.0000
+print_generic({"prior": prior,
+               "likelihood": likelihood,
+               "posterior": posterior})
+# dict
+# ├── likelihood=MultivariateDiagonalNormalVP[dataclass]
+# │   ├── mean=Jax Array (2,) float32
+# │   │   └──  1.1000 │ -2.2000
+# │   └── variance=Jax Array (2,) float32
+# │       └──  3.0000 │ 1.0000
+# ├── posterior=MultivariateDiagonalNormalVP[dataclass]
+# │   ├── mean=Jax Array (2,) float32
+# │   │   └──  0.8462 │ -2.0000
+# │   └── variance=Jax Array (2,) float32
+# │       └──  2.3077 │ 0.9091
+# └── prior=MultivariateDiagonalNormalVP[dataclass]
+#     ├── mean=Jax Array (2,) float32
+#     │   └──  0.0000 │ 0.0000
+#     └── variance=Jax Array (2,) float32
+#         └──  10.0000 │ 10.0000

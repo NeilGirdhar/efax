@@ -35,8 +35,9 @@ def test_conversion(generator: Generator,
     if not tree_allclose(final_np, original_np):
         for i in range(n):
             if not tree_allclose(final_np[i], original_np[i]):
-                print_generic(original=original_np[i], intermediate=intermediate_ep[i],
-                              final=final_np[i])
+                print_generic({"original": original_np[i],
+                               "intermediate": intermediate_ep[i],
+                               "final": final_np[i]})
                 pytest.fail("Conversion failure")
 
     # Check fixed parameters.

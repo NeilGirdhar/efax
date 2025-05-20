@@ -35,4 +35,4 @@ def test_gamma_sampling_explosion(generator: Generator, key: KeyArray) -> None:
     key = jr.wrap_key_data(jnp.asarray([4093016152, 3163742808], jnp.uint32))
     samples, f_vjp = vjp(partial(GammaNP.sample, key=key), d)
     d_bar, = f_vjp(jnp.asarray([3096.8057, 2845.2410]))
-    print_generic(samples=samples, d_bar=d_bar)
+    print_generic({"samples": samples, "d_bar": d_bar})

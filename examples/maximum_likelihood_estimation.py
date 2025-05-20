@@ -34,11 +34,12 @@ ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
 # Convert this back to the natural parametrization.
 estimated_distribution = ss_mean.to_nat()
-print_generic(estimated_distribution=estimated_distribution,
-              source_distribution=source_distribution)
-# estimated_distribution=DirichletNP[dataclass]
-# └── alpha_minus_one=Jax Array (3,) float32
-#     └──  0.9797 │ 1.9539 │ 2.9763
-# source_distribution=DirichletNP[dataclass]
-# └── alpha_minus_one=Jax Array (3,) float32
-#     └──  1.0000 │ 2.0000 │ 3.0000
+print_generic({"estimated_distribution": estimated_distribution,
+               "source_distribution": source_distribution})
+# dict
+# ├── estimated_distribution=DirichletNP[dataclass]
+# │   └── alpha_minus_one=Jax Array (3,) float32
+# │       └──  0.9797 │ 1.9539 │ 2.9763
+# └── source_distribution=DirichletNP[dataclass]
+#     └── alpha_minus_one=Jax Array (3,) float32
+#         └──  1.0000 │ 2.0000 │ 3.0000

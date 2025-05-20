@@ -49,21 +49,23 @@ predictive_distribution = lax.while_loop(cond_fun, body_fun,
 
 # Compare the optimized predictive distribution with the target value in the
 # same natural parametrization.
-print_generic(predictive_distribution=predictive_distribution,
-              target_distribution=target_distribution.to_nat())
-# predictive_distribution=BernoulliNP[dataclass]
-# └── log_odds=Jax Array (3,) float32
-#     └──  -0.8440 │ -0.4047 │ 0.8440
-# target_distribution=BernoulliNP[dataclass]
-# └── log_odds=Jax Array (3,) float32
-#     └──  -0.8473 │ -0.4055 │ 0.8473
+print_generic({"predictive_distribution": predictive_distribution,
+               "target_distribution": target_distribution.to_nat()})
+# dict
+# ├── predictive_distribution=BernoulliNP[dataclass]
+# │   └── log_odds=Jax Array (3,) float32
+# │       └──  -0.8440 │ -0.4047 │ 0.8440
+# └── target_distribution=BernoulliNP[dataclass]
+#     └── log_odds=Jax Array (3,) float32
+#         └──  -0.8473 │ -0.4055 │ 0.8473
 
 # Do the same in the expectation parametrization.
-print_generic(predictive_distribution=predictive_distribution.to_exp(),
-              target_distribution=target_distribution)
-# predictive_distribution=BernoulliEP[dataclass]
-# └── probability=Jax Array (3,) float32
-#     └──  0.3007 │ 0.4002 │ 0.6993
-# target_distribution=BernoulliEP[dataclass]
-# └── probability=Jax Array (3,) float32
-#     └──  0.3000 │ 0.4000 │ 0.7000
+print_generic({"predictive_distribution": predictive_distribution.to_exp(),
+               "target_distribution": target_distribution})
+# dict
+# ├── predictive_distribution=BernoulliEP[dataclass]
+# │   └── probability=Jax Array (3,) float32
+# │       └──  0.3007 │ 0.4002 │ 0.6993
+# └── target_distribution=BernoulliEP[dataclass]
+#     └── probability=Jax Array (3,) float32
+#         └──  0.3000 │ 0.4000 │ 0.7000

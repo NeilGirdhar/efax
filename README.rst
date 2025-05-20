@@ -292,24 +292,25 @@ Evidence combination:
 
     # Convert to the source parametrization.
     posterior = posterior_np.to_variance_parametrization()
-    print_generic(prior=prior,
-                  likelihood=likelihood,
-                  posterior=posterior)
-    # likelihood=MultivariateDiagonalNormalVP[dataclass]
-    # ├── mean=Jax Array (2,) float32
-    # │   └──  1.1000 │ -2.2000
-    # └── variance=Jax Array (2,) float32
-    #     └──  3.0000 │ 1.0000
-    # posterior=MultivariateDiagonalNormalVP[dataclass]
-    # ├── mean=Jax Array (2,) float32
-    # │   └──  0.8462 │ -2.0000
-    # └── variance=Jax Array (2,) float32
-    #     └──  2.3077 │ 0.9091
-    # prior=MultivariateDiagonalNormalVP[dataclass]
-    # ├── mean=Jax Array (2,) float32
-    # │   └──  0.0000 │ 0.0000
-    # └── variance=Jax Array (2,) float32
-    #     └──  10.0000 │ 10.0000
+    print_generic({"prior": prior,
+                   "likelihood": likelihood,
+                   "posterior": posterior})
+    # dict
+    # ├── likelihood=MultivariateDiagonalNormalVP[dataclass]
+    # │   ├── mean=Jax Array (2,) float32
+    # │   │   └──  1.1000 │ -2.2000
+    # │   └── variance=Jax Array (2,) float32
+    # │       └──  3.0000 │ 1.0000
+    # ├── posterior=MultivariateDiagonalNormalVP[dataclass]
+    # │   ├── mean=Jax Array (2,) float32
+    # │   │   └──  0.8462 │ -2.0000
+    # │   └── variance=Jax Array (2,) float32
+    # │       └──  2.3077 │ 0.9091
+    # └── prior=MultivariateDiagonalNormalVP[dataclass]
+    #     ├── mean=Jax Array (2,) float32
+    #     │   └──  0.0000 │ 0.0000
+    #     └── variance=Jax Array (2,) float32
+    #         └──  10.0000 │ 10.0000
 
 Optimization
 ------------
@@ -368,24 +369,26 @@ Using the cross entropy to iteratively optimize a prediction is simple:
 
     # Compare the optimized predictive distribution with the target value in the
     # same natural parametrization.
-    print_generic(predictive_distribution=predictive_distribution,
-                  target_distribution=target_distribution.to_nat())
-    # predictive_distribution=BernoulliNP[dataclass]
-    # └── log_odds=Jax Array (3,) float32
-    #     └──  -0.8440 │ -0.4047 │ 0.8440
-    # target_distribution=BernoulliNP[dataclass]
-    # └── log_odds=Jax Array (3,) float32
-    #     └──  -0.8473 │ -0.4055 │ 0.8473
+    print_generic({"predictive_distribution": predictive_distribution,
+                   "target_distribution": target_distribution.to_nat()})
+    # dict
+    # ├── predictive_distribution=BernoulliNP[dataclass]
+    # │   └── log_odds=Jax Array (3,) float32
+    # │       └──  -0.8440 │ -0.4047 │ 0.8440
+    # └── target_distribution=BernoulliNP[dataclass]
+    #     └── log_odds=Jax Array (3,) float32
+    #         └──  -0.8473 │ -0.4055 │ 0.8473
 
     # Do the same in the expectation parametrization.
-    print_generic(predictive_distribution=predictive_distribution.to_exp(),
-                  target_distribution=target_distribution)
-    # predictive_distribution=BernoulliEP[dataclass]
-    # └── probability=Jax Array (3,) float32
-    #     └──  0.3007 │ 0.4002 │ 0.6993
-    # target_distribution=BernoulliEP[dataclass]
-    # └── probability=Jax Array (3,) float32
-    #     └──  0.3000 │ 0.4000 │ 0.7000
+    print_generic({"predictive_distribution": predictive_distribution.to_exp(),
+                   "target_distribution": target_distribution})
+    # dict
+    # ├── predictive_distribution=BernoulliEP[dataclass]
+    # │   └── probability=Jax Array (3,) float32
+    # │       └──  0.3007 │ 0.4002 │ 0.6993
+    # └── target_distribution=BernoulliEP[dataclass]
+    #     └── probability=Jax Array (3,) float32
+    #         └──  0.3000 │ 0.4000 │ 0.7000
 
 Maximum likelihood estimation
 -----------------------------
@@ -431,14 +434,15 @@ instead.
 
     # Convert this back to the natural parametrization.
     estimated_distribution = ss_mean.to_nat()
-    print_generic(estimated_distribution=estimated_distribution,
-                  source_distribution=source_distribution)
-    # estimated_distribution=DirichletNP[dataclass]
-    # └── alpha_minus_one=Jax Array (3,) float32
-    #     └──  0.9797 │ 1.9539 │ 2.9763
-    # source_distribution=DirichletNP[dataclass]
-    # └── alpha_minus_one=Jax Array (3,) float32
-    #     └──  1.0000 │ 2.0000 │ 3.0000
+    print_generic({"estimated_distribution": estimated_distribution,
+                   "source_distribution": source_distribution})
+    # dict
+    # ├── estimated_distribution=DirichletNP[dataclass]
+    # │   └── alpha_minus_one=Jax Array (3,) float32
+    # │       └──  0.9797 │ 1.9539 │ 2.9763
+    # └── source_distribution=DirichletNP[dataclass]
+    #     └── alpha_minus_one=Jax Array (3,) float32
+    #         └──  1.0000 │ 2.0000 │ 3.0000
 
 Contribution guidelines
 =======================
