@@ -7,7 +7,7 @@ import jax.numpy as jnp
 import jax.random as jr
 from jax import jacobian, jit, vmap
 from numpy.random import Generator
-from tjax import JaxArray, JaxRealArray, KeyArray, hessian
+from tjax import JaxArray, JaxRealArray, KeyArray, RngStream, hessian
 
 from efax import Flattener, Samplable, SimpleDistribution, flatten_mapping
 
@@ -19,10 +19,11 @@ def _sample_using_flattened(flattened_parameters: JaxRealArray,
                             key: KeyArray,
                             ) -> JaxArray:
     p = flattener.unflatten(flattened_parameters)
+    stream = RngStream(key)
 
     def flattened_sample(q: SimpleDistribution) -> JaxRealArray:
         assert isinstance(q, Samplable)
-        ordinary_sample = q.sample(key)
+        ordinary_sample = q.sample(stream.key())
         support = q.domain_support()
         return support.flattened(ordinary_sample, map_to_plane=False)
 
