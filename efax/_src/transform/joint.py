@@ -2,8 +2,7 @@ from collections.abc import Callable, Mapping
 from functools import reduce
 from typing import Any, override
 
-import jax.random as jr
-from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, RngStream, Shape
 from tjax.dataclasses import dataclass
 
 from ..expectation_parametrization import ExpectationParametrization
@@ -32,15 +31,11 @@ class JointDistribution(Distribution):
                 if isinstance(value, JointDistribution | t)}
 
     def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
-        keys = jr.split(key, self._count_samplable_distributions())
-        count = 0
+        stream = RngStream(key)
 
         def f(x: Distribution, /) -> JaxComplexArray:
             assert isinstance(x, Samplable)
-            nonlocal keys, count
-            retval = x.sample(keys[count], shape)
-            count += 1
-            return retval
+            return x.sample(stream.key(), shape)
         return self.general_method(f, Samplable)
 
     def as_dict(self) -> dict[str, Any]:
@@ -55,15 +50,6 @@ class JointDistribution(Distribution):
         for distribution in self._sub_distributions.values():
             return distribution.shape
         raise ValueError
-
-    def _count_samplable_distributions(self) -> int:
-        count = 0
-
-        def g(x: Distribution, /) -> None:
-            nonlocal count
-            count += 1
-        self.general_method(g, Samplable)
-        return count
 
 
 @dataclass
