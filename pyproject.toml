@@ -54,7 +54,7 @@ dev = [
 ]
 
 [project.urls]
-repository = "https://github.com/NeilGirdhar/efax"
+source = "https://github.com/NeilGirdhar/efax"
 
 [tool.isort]
 line_length = 100
