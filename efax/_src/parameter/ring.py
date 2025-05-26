@@ -209,16 +209,16 @@ class BooleanRing(Ring):
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
         xp = array_namespace(x)
-        return xp.asarray(x, dtype=float)
+        return xp.astype(x, float)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
         xp = array_namespace(y)
-        return xp.asarray(y, dtype=xp.bool_)
+        return xp.astype(y, xp.bool_)
 
     @override
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
-        return xp.asarray(rng.binomial(1, 0.5, shape), dtype=xp.bool_)
+        return xp.astype(rng.binomial(1, 0.5, shape), xp.bool_)
 
 
 @dataclass
@@ -233,12 +233,12 @@ class IntegralRing(Ring):
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
         xp = array_namespace(x)
-        return xp.asarray(x, dtype=float)
+        return xp.astype(x, float)
 
     @override
     def unflattened(self, y: JaxRealArray, *, map_from_plane: bool) -> JaxArray:
         xp = array_namespace(y)
-        return xp.asarray(y, dtype=int)
+        return xp.astype(y, int)
 
     @override
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
