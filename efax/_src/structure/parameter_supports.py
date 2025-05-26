@@ -23,7 +23,7 @@ def parameter_supports(p: type[Distribution] | Distribution,
                        fixed: bool | None = None,
                        adjust: bool = True
                        ) -> Generator[tuple[str, Support, ValueReceptacle]]:
-    """Return the parameter supports in a distribution.
+    """The parameter supports in a distribution.
 
     Args:
         p: The distribution to walk.
