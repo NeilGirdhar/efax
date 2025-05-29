@@ -49,13 +49,13 @@ class Ring:
         return x
 
 
-def general_array_namespace(x: RealNumeric) -> ModuleType:
+def _general_array_namespace(x: RealNumeric) -> ModuleType:
     if isinstance(x, float):
         return np
     return array_namespace(x)
 
 
-def canonical_float_epsilon(xp: ModuleType) -> float:
+def _canonical_float_epsilon(xp: ModuleType) -> float:
     dtype = xp.empty((), dtype=float).dtype  # For Jax, this is canonicalize_dtype(float).
     return float(xp.finfo(dtype).eps)
 
@@ -70,14 +70,14 @@ class RealField(Ring):
 
     def __post_init__(self) -> None:
         if self.min_open and self.minimum is not None:
-            xp = general_array_namespace(self.minimum)
-            eps = canonical_float_epsilon(xp)
+            xp = _general_array_namespace(self.minimum)
+            eps = _canonical_float_epsilon(xp)
             self.minimum = xp.asarray(xp.maximum(
                 self.minimum + eps,
                 self.minimum * (1.0 + xp.copysign(eps, self.minimum))))
         if self.max_open and self.maximum is not None:
-            xp = general_array_namespace(self.maximum)
-            eps = canonical_float_epsilon(xp)
+            xp = _general_array_namespace(self.maximum)
+            eps = _canonical_float_epsilon(xp)
             self.maximum = xp.asarray(xp.minimum(
                 self.maximum - eps,
                 self.maximum * (1.0 + xp.copysign(eps, -self.maximum))))
