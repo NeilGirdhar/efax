@@ -45,20 +45,20 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape_minus_one + 1.0
         return jss.gammaln(shape) - shape * xp.log(-self.negative_rate)
 
     @override
     def to_exp(self) -> GammaEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape_minus_one + 1.0
         return GammaEP(-shape / self.negative_rate,
                        jss.digamma(shape) - xp.log(-self.negative_rate))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape)
 
     @override
@@ -70,7 +70,7 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return -jr.gamma(key, self.shape_minus_one[grow] + 1.0, shape) / self.negative_rate[grow]
@@ -83,7 +83,7 @@ class GammaNP(HasEntropyNP['GammaEP'],
         return GammaVP(mean, variance)
 
     def to_approximate_log_normal(self) -> LogNormalNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape_minus_one + 1.0
         rate = -self.negative_rate
         mean = shape / rate
@@ -125,7 +125,7 @@ class GammaEP(HasEntropyEP[GammaNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
@@ -140,7 +140,7 @@ class GammaEP(HasEntropyEP[GammaNP],
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = softplus(search_parameters[..., 0])
         log_mean_minus_mean_log = xp.log(self.mean) - self.mean_log
         return (log_mean_minus_mean_log - xp.log(shape) + jss.digamma(shape))[..., xp.newaxis]
@@ -149,7 +149,7 @@ class GammaEP(HasEntropyEP[GammaNP],
 
     @override
     def initial_search_parameters(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         log_mean_minus_mean_log = xp.log(self.mean) - self.mean_log
         initial_shape: JaxRealArray = (
             (3.0 - log_mean_minus_mean_log

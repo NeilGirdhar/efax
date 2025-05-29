@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -37,12 +38,12 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.log(-xp.log1p(-xp.exp(self.log_probability)))
 
     @override
     def to_exp(self) -> LogarithmicEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         probability = xp.exp(self.log_probability)
         chi = xp.where(self.log_probability < log_probability_floor,
                        xp.asarray(1.0),
@@ -54,7 +55,7 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -xp.log(x)
 
     @override
@@ -94,7 +95,7 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
 
     @override
     def to_nat(self) -> LogarithmicNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         z: LogarithmicNP = super().to_nat()
         return LogarithmicNP(xp.where(self.chi < 1.0,
                                       xp.asarray(xp.nan),

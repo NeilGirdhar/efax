@@ -60,7 +60,7 @@ class ChiNP(HasEntropyNP['ChiEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.log(2.0 * x) - xp.square(x) * 0.5
 
 

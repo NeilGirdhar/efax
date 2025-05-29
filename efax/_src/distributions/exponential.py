@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Self
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -38,17 +39,17 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return -xp.log(-self.negative_rate)
 
     @override
     def to_exp(self) -> ExponentialEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ExponentialEP(-xp.reciprocal(self.negative_rate))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape)
 
     @override
@@ -59,7 +60,7 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return -jr.exponential(key, shape) / self.negative_rate[grow]
@@ -93,17 +94,17 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
 
     @override
     def to_nat(self) -> ExponentialNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ExponentialNP(-xp.reciprocal(self.mean))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return jr.exponential(key, shape) * self.mean[grow]

@@ -38,7 +38,7 @@ class Distribution(JaxAbstractClass):
     def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
         return support
 
-    def array_namespace(self, *x: Any) -> ModuleType:
+    def __array_namespace__(self, api_version: str | None = None) -> ModuleType:  # noqa: PLW3201
         from .iteration import parameters  # noqa: PLC0415
         values = parameters(self).values()
         return array_namespace(*values)

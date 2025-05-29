@@ -92,7 +92,7 @@ class Flattener(MaximumLikelihoodEstimator[P]):
                 values (e.g., when taking a different of expectation parameters).  It should be true
                 when passing to a neural network.
         """
-        xp = p.array_namespace()
+        xp = array_namespace(p)
         arrays = [x
                   for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p)
                   for x in xs]

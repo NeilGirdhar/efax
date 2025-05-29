@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, final, get_type_hints
 
+from array_api_compat import array_namespace
 from jax import grad, jacfwd, vjp, vmap
 from tjax import (JaxAbstractClass, JaxArray, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
@@ -94,7 +95,7 @@ class NaturalParametrization(Distribution,
         Args:
             x: The sample.
         """
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.exp(self.log_pdf(x))
 
     @jit
@@ -118,7 +119,7 @@ class NaturalParametrization(Distribution,
 
         See also: apply_fisher_information.
         """
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         flattener, _ = Flattener.flatten(self)
         fisher_matrix = self._fisher_information_matrix()
         fisher_diagonal = xp.linalg.diagonal(fisher_matrix)
@@ -133,7 +134,7 @@ class NaturalParametrization(Distribution,
 
         See also: apply_fisher_information.
         """
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         fisher_information_diagonal = self.fisher_information_diagonal()
         structure = Structure.create(self)
         final_parameters = parameters(self)
@@ -152,7 +153,7 @@ class NaturalParametrization(Distribution,
 
     @final
     def jeffreys_prior(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         fisher_matrix = self._fisher_information_matrix()
         return xp.sqrt(xp.linalg.det(fisher_matrix))
 

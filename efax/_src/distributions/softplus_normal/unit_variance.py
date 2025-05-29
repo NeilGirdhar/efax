@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Self, cast
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -58,7 +59,7 @@ class UnitVarianceSoftplusNormalNP(
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -xp.log1p(-xp.exp(-x)) - 0.5 * xp.square(inverse_softplus(x))
 
     @override
@@ -102,7 +103,7 @@ class UnitVarianceSoftplusNormalEP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return softplus(jr.normal(key, shape) + self.mean[grow])

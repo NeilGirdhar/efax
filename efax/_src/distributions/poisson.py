@@ -4,6 +4,7 @@ from typing import Any, Self
 
 import jax.random as jr
 import jax.scipy.special as jss
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -40,12 +41,12 @@ class PoissonNP(Samplable,
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.exp(self.log_mean)
 
     @override
     def to_exp(self) -> PoissonEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return PoissonEP(xp.exp(self.log_mean))
 
     @override
@@ -92,7 +93,7 @@ class PoissonEP(HasConjugatePrior,
 
     @override
     def to_nat(self) -> PoissonNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return PoissonNP(xp.log(self.mean))
 
     # The expected_carrier_measure is -exp(-mean) * sum over k from zero to infinity of

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -47,18 +48,18 @@ class ComplexMultivariateUnitVarianceNormalNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         mean_conjugate = self.two_mean_conjugate * 0.5
         return xp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexMultivariateUnitVarianceNormalEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ComplexMultivariateUnitVarianceNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -xp.sum(abs_square(x), axis=-1)
 
     @override
@@ -107,18 +108,18 @@ class ComplexMultivariateUnitVarianceNormalEP(
 
     @override
     def to_nat(self) -> ComplexMultivariateUnitVarianceNormalNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ComplexMultivariateUnitVarianceNormalNP(xp.conj(self.mean) * 2.0)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         # The second moment of a normal distribution with the given mean.
         return -(xp.sum(abs_square(self.mean), axis=-1) + self.dimensions())
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.mean.shape if shape is None else shape + self.mean.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
         key_a, key_b = jr.split(key)

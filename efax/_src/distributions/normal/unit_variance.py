@@ -4,6 +4,7 @@ import math
 from typing import Any, Self
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -41,7 +42,7 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return 0.5 * (xp.square(self.mean) + math.log(math.pi * 2.0))
 
     @override
@@ -51,7 +52,7 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         # The second moment of a delta distribution at x.
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -0.5 * xp.square(x)
 
     @override
@@ -101,12 +102,12 @@ class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP],
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return -0.5 * (xp.square(self.mean) + 1.0)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return jr.normal(key, shape) + self.mean[grow]

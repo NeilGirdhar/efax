@@ -61,12 +61,12 @@ class LogNormalNP(Samplable,
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -xp.log(x)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         normal_dp = self.base_distribution().to_deviation_parametrization()
@@ -116,7 +116,7 @@ class LogNormalEP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         normal_dp = self.base_distribution().to_deviation_parametrization()

@@ -38,7 +38,7 @@ class DirichletNP(DirichletCommonNP['DirichletEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape[:len(x.shape) - 1])
 
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import cast
 
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -38,7 +39,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         half_k = self.dimensions() * 0.5
         kappa = xp.linalg.vector_norm(self.mean_times_concentration, axis=-1)
         return (kappa
@@ -48,7 +49,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
 
     @override
     def to_exp(self) -> VonMisesFisherEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         q = self.mean_times_concentration
         kappa: JaxRealArray = xp.linalg.vector_norm(q, axis=-1, keepdims=True)
         return VonMisesFisherEP(
@@ -58,7 +59,7 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(self.shape)
 
     @override
@@ -72,13 +73,13 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
         return self.mean_times_concentration.shape[-1]
 
     def kappa(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.linalg.vector_norm(self.mean_times_concentration, axis=-1)
 
     def to_kappa_angle(self) -> tuple[JaxRealArray, JaxRealArray]:
         if self.dimensions() != 2:  # noqa: PLR2004
             raise ValueError
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         kappa = self.kappa()
         angle = xp.where(kappa == 0.0,
                          xp.asarray(0.0),
@@ -115,12 +116,12 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
     def initial_search_parameters(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         mu: JaxRealArray = xp.linalg.vector_norm(self.mean, axis=-1)
         # 0 <= mu <= 1.0
         initial_kappa = xp.where(mu == 1.0,
@@ -131,7 +132,7 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
 
     @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> VonMisesFisherNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         kappa = softplus(search_parameters)
         mu = xp.linalg.vector_norm(self.mean, axis=-1, keepdims=True)
         q = self.mean * (kappa / mu)
@@ -139,7 +140,7 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
 
     @override
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         kappa = softplus(search_parameters)
         mu = xp.linalg.vector_norm(self.mean, axis=-1)
         return _a_k(self.dimensions(), kappa) - mu

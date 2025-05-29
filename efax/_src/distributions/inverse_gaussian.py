@@ -41,14 +41,14 @@ class InverseGaussianNP(Samplable,
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return (-0.5 * xp.log(-2.0 * self.negative_lambda_over_two)
                 - 2.0 * xp.sqrt(self.negative_lambda_over_two_mu_squared
                                 * self.negative_lambda_over_two))
 
     @override
     def to_exp(self) -> InverseGaussianEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         mu = xp.sqrt(self.negative_lambda_over_two / self.negative_lambda_over_two_mu_squared)
         lambda_ = -2.0 * self.negative_lambda_over_two
         mean_reciprocal = xp.reciprocal(mu) + xp.reciprocal(lambda_)
@@ -56,7 +56,7 @@ class InverseGaussianNP(Samplable,
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -0.5 * (xp.log(2.0 * xp.pi) + 3.0 * xp.log(x))
 
     @override
@@ -78,7 +78,7 @@ class InverseGaussianNP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         key1, key2 = jr.split(key)
@@ -129,7 +129,7 @@ class InverseGaussianEP(ExpectationParametrization[InverseGaussianNP],
 
     @override
     def to_nat(self) -> InverseGaussianNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         lambda_ = xp.reciprocal(self.mean_reciprocal - xp.reciprocal(self.mean))
         eta2 = -0.5 * lambda_
         eta1 = eta2 / xp.square(self.mean)

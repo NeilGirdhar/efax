@@ -4,6 +4,7 @@ from abc import abstractmethod
 from functools import partial
 from typing import Any, Generic, TypeVar, cast
 
+from array_api_compat import array_namespace
 from jax import jacobian, vmap
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
 from typing_extensions import override
@@ -56,7 +57,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         casted_x = cast('Domain', x)
         fixed_parameters = parameters(self, fixed=True, recurse=False)
         bound_fy = partial(self.sample_to_base_sample, **fixed_parameters)

@@ -43,7 +43,7 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.logaddexp(self.log_odds, xp.asarray(0.0))
 
     @override
@@ -52,7 +52,7 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape)
 
     @override
@@ -62,13 +62,13 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
         return BernoulliEP(x)
 
     def nat_to_probability(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         p = jss.expit(self.log_odds)
         final_p = 1.0 - p
         return xp.stack([p, final_p], axis=-1)
 
     def nat_to_surprisal(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         total_p = self.nat_to_probability()
         return -xp.log(total_p)
 
@@ -110,19 +110,19 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxBooleanArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return jr.bernoulli(key, self.probability[grow], shape)
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> BetaNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         reshaped_n = n[..., np.newaxis]
         return BetaNP(reshaped_n * xp.stack([self.probability, (1.0 - self.probability)], axis=-1))
 

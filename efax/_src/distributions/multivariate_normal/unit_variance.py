@@ -4,6 +4,7 @@ import math
 from typing import Any, Self
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -45,7 +46,7 @@ class MultivariateUnitVarianceNormalNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return 0.5 * (xp.sum(xp.square(self.mean), axis=-1)
                       + self.dimensions() * math.log(math.pi * 2.0))
 
@@ -56,7 +57,7 @@ class MultivariateUnitVarianceNormalNP(
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         # The second moment of a delta distribution at x.
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -0.5 * xp.sum(xp.square(x), axis=-1)
 
     @override
@@ -67,7 +68,7 @@ class MultivariateUnitVarianceNormalNP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.mean.shape if shape is None else shape + self.mean.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
         return jr.normal(key, shape) + self.mean[grow]
@@ -114,7 +115,7 @@ class MultivariateUnitVarianceNormalEP(
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
         # The second moment of a normal distribution with the given mean.
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return -0.5 * (xp.sum(xp.square(self.mean), axis=-1) + self.dimensions())
 
     @override
@@ -123,7 +124,7 @@ class MultivariateUnitVarianceNormalEP(
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> IsotropicNormalNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         negative_half_precision = -0.5 * n
         return IsotropicNormalNP(n[..., xp.newaxis] * self.mean, negative_half_precision)
 
@@ -132,7 +133,7 @@ class MultivariateUnitVarianceNormalEP(
     def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
                                           ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, IsotropicNormalNP)
-        xp = cp.array_namespace()
+        xp = array_namespace(cp)
         n = -2.0 * cp.negative_half_precision
         mean = cp.mean_times_precision / n[..., xp.newaxis]
         return (cls(mean), n)

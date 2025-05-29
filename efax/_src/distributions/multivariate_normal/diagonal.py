@@ -45,21 +45,21 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         components = (-xp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
                       + 0.5 * xp.log(-np.pi / self.negative_half_precision))
         return xp.sum(components, axis=-1)
 
     @override
     def to_exp(self) -> MultivariateDiagonalNormalEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         mean = -self.mean_times_precision / (2.0 * self.negative_half_precision)
         second_moment = xp.square(mean) - 0.5 / self.negative_half_precision
         return MultivariateDiagonalNormalEP(mean, second_moment)
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape[:-1])
 
     @override
@@ -115,7 +115,7 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
@@ -127,7 +127,7 @@ class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
         return self.mean.shape[-1]
 
     def variance(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return self.second_moment - xp.square(self.mean)
 
     def to_variance_parametrization(self) -> MultivariateDiagonalNormalVP:
@@ -157,7 +157,7 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.mean.shape if shape is None else shape + self.mean.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
         deviation = xp.sqrt(self.variance)
@@ -171,12 +171,12 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
         return self.to_nat().pdf(x)
 
     def to_exp(self) -> MultivariateDiagonalNormalEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         second_moment = self.variance + xp.square(self.mean)
         return MultivariateDiagonalNormalEP(self.mean, second_moment)
 
     def to_nat(self) -> MultivariateDiagonalNormalNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         precision = xp.reciprocal(self.variance)
         mean_times_precision = self.mean * precision
         negative_half_precision = -0.5 * precision

@@ -41,17 +41,17 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return -xp.log(-self.eta) - xp.log(self.concentration)
 
     @override
     def to_exp(self) -> WeibullEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return WeibullEP(self.concentration, -xp.reciprocal(self.eta))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return (self.concentration - 1.0) * xp.log(x)
 
     @override
@@ -100,19 +100,19 @@ class WeibullEP(HasEntropyEP[WeibullNP],
 
     @override
     def to_nat(self) -> WeibullNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return WeibullNP(self.concentration, -xp.reciprocal(self.chi))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         k = self.concentration
         one_minus_one_over_k = 1.0 - xp.reciprocal(k)
         return one_minus_one_over_k * xp.log(self.chi) - np.euler_gamma * one_minus_one_over_k
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         lambda_ = self.chi ** xp.reciprocal(self.concentration)

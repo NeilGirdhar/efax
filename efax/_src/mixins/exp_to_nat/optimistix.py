@@ -1,6 +1,7 @@
 from typing import Any, TypeAlias, TypeVar
 
 import optimistix as optx
+from array_api_compat import array_namespace
 from jax import jit
 from tjax import JaxRealArray
 from tjax.dataclasses import dataclass, field
@@ -25,7 +26,7 @@ class OptimistixRootFinder(ExpToNatMinimizer):
 
     @override
     def solve(self, exp_to_nat: ExpToNat[Any]) -> JaxRealArray:
-        xp = exp_to_nat.array_namespace()
+        xp = array_namespace(exp_to_nat)
 
         @jit
         def f(x: JaxRealArray, args: None, /) -> JaxRealArray:

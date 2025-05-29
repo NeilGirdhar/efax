@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -74,14 +75,14 @@ class GeometricEP(HasEntropyEP[GeometricNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.mean.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         p = xp.reciprocal(self.mean)
         return jr.geometric(key, p, shape)
 

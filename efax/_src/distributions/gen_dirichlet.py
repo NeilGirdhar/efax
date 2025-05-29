@@ -41,7 +41,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         alpha, beta = self.alpha_beta()
         return xp.sum(jss.betaln(alpha, beta), axis=-1)
 
@@ -52,7 +52,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
         # = jss.digamma(alpha) - jss.digamma(alpha + beta)
         # beta_bar = d y / d beta = jss.betaln'(alpha, beta)
         # = jss.digamma(beta) - jss.digamma(alpha + beta)
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         alpha, beta = self.alpha_beta()
         digamma_sum = jss.digamma(alpha + beta)
         alpha_bar_direct = jss.digamma(alpha) - digamma_sum
@@ -74,7 +74,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape[:len(x.shape) - 1])
 
     @override
@@ -82,7 +82,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
         return self.alpha_minus_one.shape[-1]
 
     def alpha_beta(self) -> tuple[JaxRealArray, JaxRealArray]:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         alpha = self.alpha_minus_one + 1.0
         # cs_alpha[i] = sum_{j>=i} alpha[j]
         # cs_gamma[i] = sum_{j>=i} gamma[j]
@@ -128,7 +128,7 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override

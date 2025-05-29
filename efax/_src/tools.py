@@ -39,7 +39,7 @@ T = TypeVar('T', bound=Distribution)
 
 def parameter_mean(x: T, /, *, axis: Axis | None = None) -> T:
     """Return the mean of the parameters (fixed and variable)."""
-    xp = x.array_namespace()
+    xp = array_namespace(x)
     structure = Structure.create(x)
     p = parameters(x)
     q = {path: xp.mean(value, axis=axis) for path, value in p.items()}

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -50,7 +51,7 @@ class ComplexUnitVarianceNormalNP(
 
     @override
     def to_exp(self) -> ComplexUnitVarianceNormalEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ComplexUnitVarianceNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
 
     @override
@@ -98,7 +99,7 @@ class ComplexUnitVarianceNormalEP(
 
     @override
     def to_nat(self) -> ComplexUnitVarianceNormalNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ComplexUnitVarianceNormalNP(xp.conj(self.mean) * 2.0)
 
     @override
@@ -108,7 +109,7 @@ class ComplexUnitVarianceNormalEP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         key_a, key_b = jr.split(key)

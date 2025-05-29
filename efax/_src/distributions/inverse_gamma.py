@@ -56,12 +56,12 @@ class InverseGammaNP(Samplable,
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -2.0 * xp.log(x)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.reciprocal(self.base_distribution().sample(key, shape))
 
 
@@ -104,5 +104,5 @@ class InverseGammaEP(Samplable,
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.reciprocal(self.base_distribution().sample(key, shape))

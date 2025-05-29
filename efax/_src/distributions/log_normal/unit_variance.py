@@ -62,7 +62,7 @@ class UnitVarianceLogNormalNP(
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return -0.5 * xp.square(xp.log(x)) - xp.log(x)
 
     @override
@@ -107,12 +107,12 @@ class UnitVarianceLogNormalEP(
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return -self.mean - 0.5 * (xp.square(self.mean) + 1.0)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.shape))
         return jr.lognormal(key, shape=shape) * xp.exp(self.mean)[grow]

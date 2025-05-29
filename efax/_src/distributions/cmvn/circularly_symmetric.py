@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 import jax.random as jr
+from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, outer_product
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -49,19 +50,19 @@ class ComplexCircularlySymmetricNormalNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         log_det_s = xp.log(xp.real(xp.linalg.det(-self.negative_precision)))
         return -log_det_s + self.dimensions() * math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexCircularlySymmetricNormalEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ComplexCircularlySymmetricNormalEP(
             xp.conj(xp.linalg.inv(-self.negative_precision)))
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape[:-1])
 
     @override
@@ -111,12 +112,12 @@ class ComplexCircularlySymmetricNormalEP(
 
     @override
     def to_nat(self) -> ComplexCircularlySymmetricNormalNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return ComplexCircularlySymmetricNormalNP(xp.conj(-xp.linalg.inv(self.variance)))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
@@ -135,13 +136,13 @@ class ComplexCircularlySymmetricNormalEP(
 
     def _multivariate_normal_mean(self) -> JaxRealArray:
         """Return the mean of a corresponding real distribution with double the size."""
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         n = self.dimensions()
         return xp.zeros((*self.shape, n * 2))
 
     def _multivariate_normal_cov(self) -> JaxRealArray:
         """Return the covariance of a corresponding real distribution with double the size."""
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         gamma_r = 0.5 * xp.real(self.variance)
         gamma_i = 0.5 * xp.imag(self.variance)
         return xp.concat([xp.concat([gamma_r, -gamma_i], axis=-1),

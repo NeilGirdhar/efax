@@ -41,14 +41,14 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         eta = self.mean_times_precision
         return 0.5 * (-0.5 * xp.sum(xp.square(eta), axis=-1) / self.negative_half_precision
                       + self.dimensions() * xp.log(xp.pi / -self.negative_half_precision))
 
     @override
     def to_exp(self) -> IsotropicNormalEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         precision = -2.0 * self.negative_half_precision
         mean = self.mean_times_precision / precision[..., xp.newaxis]
         total_variance = self.dimensions() / precision
@@ -106,7 +106,7 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
 
     @override
     def to_nat(self) -> IsotropicNormalNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         variance = self.variance()
         negative_half_precision = -0.5 / variance
         mean_times_precision = self.mean / variance[..., xp.newaxis]
@@ -114,12 +114,12 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         shape = self.mean.shape if shape is None else shape + self.mean.shape
         grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
         deviation = xp.sqrt(self.variance())
@@ -130,6 +130,6 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
         return self.mean.shape[-1]
 
     def variance(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         dimensions = self.dimensions()
         return (self.total_second_moment - xp.sum(xp.square(self.mean), axis=-1)) / dimensions

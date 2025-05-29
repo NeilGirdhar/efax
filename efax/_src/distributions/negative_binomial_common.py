@@ -4,6 +4,7 @@ from abc import abstractmethod
 from typing import Any, TypeVar
 
 import jax.scipy.special as jss
+from array_api_compat import array_namespace
 from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -33,7 +34,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return -self._failures() * xp.log1p(-xp.exp(self.log_not_p))
 
     @override
@@ -43,7 +44,7 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
         return jss.gammaln(a + 1) - jss.gammaln(x + 1) - jss.gammaln(a - x + 1)
 
     def _mean(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return self._failures() / xp.expm1(-self.log_not_p)
 
     @abstractmethod
@@ -73,7 +74,7 @@ class NBCommonEP(ExpectationParametrization[NP],
     #     return BetaPrimeNP(n * self._failures() * (self.mean, xp.ones_like(self.mean)))
 
     def _log_not_p(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return -xp.log1p(self._failures() / self.mean)
 
     @abstractmethod

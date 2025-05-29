@@ -61,14 +61,14 @@ class RayleighNP(Samplable,
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.log(x) + math.log(2.0)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         sigma = xp.sqrt(-0.5 / self.eta)
         return jr.rayleigh(key, sigma, shape)
 
@@ -110,13 +110,13 @@ class RayleighEP(Samplable,
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return 0.5 * xp.log(self.chi * 0.5) + (1.5 * math.log(2.0) - 0.5 * np.euler_gamma)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         sigma = xp.sqrt(0.5 * self.chi)
         return jr.rayleigh(key, sigma, shape)

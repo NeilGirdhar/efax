@@ -6,6 +6,7 @@ import array_api_extra as xpx
 import jax.random as jr
 import numpy as np
 import scipy.special as sc
+from array_api_compat import array_namespace
 from jax.nn import one_hot
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -44,7 +45,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
@@ -52,7 +53,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
     @override
     def to_exp(self) -> MultinomialEP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
@@ -60,7 +61,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
-        xp = self.array_namespace(x)
+        xp = array_namespace(self, x)
         return xp.zeros(x.shape[:-1])
 
     @override
@@ -81,7 +82,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         return self.log_odds.shape[-1]
 
     def nat_to_probability(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
@@ -90,7 +91,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         return xp.concat((p, final_p), axis=-1)
 
     def nat_to_surprisal(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         total_p = self.nat_to_probability()
         return -xp.log(total_p)
 
@@ -125,18 +126,18 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
 
     @override
     def to_nat(self) -> MultinomialNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         p_k = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
         return MultinomialNP(xp.log(self.probability / p_k))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         return xp.zeros(self.shape)
 
     @override
     def conjugate_prior_distribution(self, n: JaxRealArray) -> DirichletNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         reshaped_n = n[..., np.newaxis]
         final_p = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
         return DirichletNP(reshaped_n * xp.concat((self.probability, final_p), axis=-1))
@@ -150,7 +151,7 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray) -> GeneralizedDirichletNP:
-        xp = self.array_namespace()
+        xp = array_namespace(self)
         final_p = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
         all_p = xp.concat((self.probability, final_p), axis=-1)
         alpha = n * all_p
