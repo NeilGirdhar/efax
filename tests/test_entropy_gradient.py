@@ -1,4 +1,4 @@
-"""These tests are related to entropy."""
+"""These tests verify entropy gradients."""
 from __future__ import annotations
 
 from functools import partial
@@ -20,21 +20,21 @@ from .distribution_info import DistributionInfo
 
 
 @jit
-def sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any]) -> JaxRealArray:
+def _sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any]) -> JaxRealArray:
     x = flattener.unflatten(flattened)
     return jnp.sum(x.entropy())
 
 
 @jit
-def all_finite(some_tree: Any, /) -> JaxBooleanArray:
+def _all_finite(some_tree: Any, /) -> JaxBooleanArray:
     return dynamic_tree_all(tree.map(lambda x: jnp.all(jnp.isfinite(x)), some_tree))
 
 
-def check_entropy_gradient(distribution: HasEntropy, /) -> None:
+def _check_entropy_gradient(distribution: HasEntropy, /) -> None:
     flattener, flattened = Flattener.flatten(distribution, map_to_plane=False)
-    p_sum_entropy = partial(sum_entropy, flattener=flattener)
+    p_sum_entropy = partial(_sum_entropy, flattener=flattener)
     calculated_gradient = grad(p_sum_entropy)(flattened)
-    if not all_finite(calculated_gradient):
+    if not _all_finite(calculated_gradient):
         indices = jnp.argwhere(jnp.isnan(calculated_gradient))
         bad_distributions = [distribution[tuple(index)[:-1]] for index in indices]
         console = Console()
@@ -50,7 +50,7 @@ def test_nat_entropy_gradient(generator: Generator,
                               ) -> None:
     shape = (7, 13)
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
-    check_entropy_gradient(nat_parameters)
+    _check_entropy_gradient(nat_parameters)
 
 
 def test_exp_entropy_gradient(generator: Generator,
@@ -58,7 +58,7 @@ def test_exp_entropy_gradient(generator: Generator,
                               ) -> None:
     shape = (7, 13)
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
-    check_entropy_gradient(exp_parameters)
+    _check_entropy_gradient(exp_parameters)
 
 
 def test_gamma_vp_entropy_gradient(distribution_name: str | None) -> None:

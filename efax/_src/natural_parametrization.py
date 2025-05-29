@@ -24,9 +24,9 @@ EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
 Domain = TypeVar('Domain', bound=JaxComplexArray | dict[str, Any])
 
 
-def log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
-                       tangents: tuple[NaturalParametrization[Any, Any]],
-                       ) -> tuple[JaxRealArray, JaxRealArray]:
+def _log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
+                        tangents: tuple[NaturalParametrization[Any, Any]],
+                        ) -> tuple[JaxRealArray, JaxRealArray]:
     """The log-normalizer's special JVP vastly improves numerical stability."""
     q, = primals
     q_dot, = tangents
@@ -45,7 +45,7 @@ class NaturalParametrization(Distribution,
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
-    @abstract_custom_jvp(log_normalizer_jvp)
+    @abstract_custom_jvp(_log_normalizer_jvp)
     @abstract_jit
     @abstractmethod
     def log_normalizer(self) -> JaxRealArray:

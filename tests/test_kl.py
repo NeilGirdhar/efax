@@ -16,10 +16,10 @@ from .create_info import GammaInfo, MultivariateNormalInfo, NormalInfo
 from .distribution_info import DistributionInfo
 
 
-def prelude(generator: Generator,
-            distribution_info_kl: DistributionInfo[Any, Any, Any],
-            distribution_name: str | None
-            ) -> tuple[ExpectationParametrization[Any], NaturalParametrization[Any, Any],
+def _prelude(generator: Generator,
+             distribution_info_kl: DistributionInfo[Any, Any, Any],
+             distribution_name: str | None
+             ) -> tuple[ExpectationParametrization[Any], NaturalParametrization[Any, Any],
                        JaxRealArray]:
     shape = (3, 2)
     distribution_info_kl.skip_if_deselected(distribution_name)
@@ -31,7 +31,7 @@ def prelude(generator: Generator,
 
 def test_normal_kl(generator: Generator, distribution_name: str | None) -> None:
     """Test the KL divergence."""
-    x, y, my_kl = prelude(generator, NormalInfo(), distribution_name)
+    x, y, my_kl = _prelude(generator, NormalInfo(), distribution_name)
     assert isinstance(x, NormalEP)
     assert isinstance(y, NormalNP)
     xm = x.mean
@@ -45,7 +45,7 @@ def test_normal_kl(generator: Generator, distribution_name: str | None) -> None:
 
 def test_mvn_kl(generator: Generator, distribution_name: str | None) -> None:
     """Test the KL divergence."""
-    x, y, my_kl = prelude(generator, MultivariateNormalInfo(dimensions=4), distribution_name)
+    x, y, my_kl = _prelude(generator, MultivariateNormalInfo(dimensions=4), distribution_name)
     assert isinstance(x, MultivariateNormalEP)
     assert isinstance(y, MultivariateNormalNP)
     xm = x.mean
@@ -63,7 +63,7 @@ def test_mvn_kl(generator: Generator, distribution_name: str | None) -> None:
 
 def test_gamma_kl(generator: Generator, distribution_name: str | None) -> None:
     """Test the KL divergence."""
-    x, y, my_kl = prelude(generator, GammaInfo(), distribution_name)
+    x, y, my_kl = _prelude(generator, GammaInfo(), distribution_name)
     assert isinstance(x, GammaEP)
     assert isinstance(y, GammaNP)
     xsh = x.to_nat().shape_minus_one + 1.0

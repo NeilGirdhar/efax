@@ -16,19 +16,19 @@ from .create_info import (ComplexCircularlySymmetricNormalInfo,
                           MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
 
-Path: TypeAlias = tuple[str, ...]
+_Path: TypeAlias = tuple[str, ...]
 
 
-def produce_samples(generator: Generator,
-                    key: KeyArray,
-                    sampling_distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
-                                                                 ExpectationParametrization[Any],
-                                                                 Any],
-                    distribution_shape: Shape,
-                    sample_shape: Shape,
-                    *,
-                    natural: bool) -> tuple[ExpectationParametrization[Any],
-                                            dict[str, Any] | JaxComplexArray]:
+def _produce_samples(generator: Generator,
+                     key: KeyArray,
+                     sampling_distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
+                                                                  ExpectationParametrization[Any],
+                                                                  Any],
+                     distribution_shape: Shape,
+                     sample_shape: Shape,
+                     *,
+                     natural: bool) -> tuple[ExpectationParametrization[Any],
+                                             dict[str, Any] | JaxComplexArray]:
     sampling_object: Distribution
     if natural:
         sampling_object = nat_parameters = sampling_distribution_info.nat_parameter_generator(
@@ -48,11 +48,11 @@ def produce_samples(generator: Generator,
     return exp_parameters, samples
 
 
-def verify_sample_shape(distribution_shape: Shape,
-                        sample_shape: Shape,
-                        structure: Structure[ExpectationParametrization[Any]],
-                        flat_map_of_samples: dict[Path, Any]
-                        ) -> None:
+def _verify_sample_shape(distribution_shape: Shape,
+                         sample_shape: Shape,
+                         structure: Structure[ExpectationParametrization[Any]],
+                         flat_map_of_samples: dict[_Path, Any]
+                         ) -> None:
     ideal_samples_shape = {info.path: (*sample_shape, *distribution_shape,
                                        *info.type_.domain_support().shape(info.dimensions))
                            for info in structure.infos
@@ -61,7 +61,7 @@ def verify_sample_shape(distribution_shape: Shape,
     assert samples_shape == ideal_samples_shape
 
 
-def verify_maximum_likelihood_estimate(
+def _verify_maximum_likelihood_estimate(
         sampling_distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
                                                      ExpectationParametrization[Any],
                                                      Any],
@@ -102,11 +102,11 @@ def test_sampling_and_estimation(generator: Generator,
     sampling_distribution_info.skip_if_deselected(distribution_name)
     distribution_shape = (4,)  # The number of distributions that are being estimated.
     sample_shape = (1024, 64)  # The number of samples that are taken to do the estimation.
-    exp_parameters, samples = produce_samples(generator, key, sampling_distribution_info,
-                                              distribution_shape, sample_shape, natural=natural)
+    exp_parameters, samples = _produce_samples(generator, key, sampling_distribution_info,
+                                               distribution_shape, sample_shape, natural=natural)
     flat_map_of_samples = flat_dict_of_observations(samples)
     structure = Structure.create(exp_parameters)
     flat_map_of_samples = flatten_mapping(samples) if isinstance(samples, dict) else {(): samples}
-    verify_sample_shape(distribution_shape, sample_shape, structure, flat_map_of_samples)
-    verify_maximum_likelihood_estimate(sampling_distribution_info, sample_shape, structure,
-                                       exp_parameters, samples)
+    _verify_sample_shape(distribution_shape, sample_shape, structure, flat_map_of_samples)
+    _verify_maximum_likelihood_estimate(sampling_distribution_info, sample_shape, structure,
+                                        exp_parameters, samples)

@@ -10,12 +10,12 @@ from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
 
 
 # Tools --------------------------------------------------------------------------------------------
-def random_complex_array(generator: Generator, shape: Shape = ()) -> NumpyComplexArray:
+def _random_complex_array(generator: Generator, shape: Shape = ()) -> NumpyComplexArray:
     return np.asarray(sum(x * generator.normal(size=shape) for x in (0.5, 0.5j)))
 
 
-def build_uvcn(generator: Generator, shape: Shape) -> ScipyComplexNormal:
-    mean = random_complex_array(generator, shape)
+def _build_uvcn(generator: Generator, shape: Shape) -> ScipyComplexNormal:
+    mean = _random_complex_array(generator, shape)
     variance = generator.exponential(size=shape)
     pseudo_variance = (variance
                        * generator.beta(2, 2, size=shape)
@@ -23,15 +23,15 @@ def build_uvcn(generator: Generator, shape: Shape) -> ScipyComplexNormal:
     return ScipyComplexNormal(mean, variance, pseudo_variance)
 
 
-def build_mvcn(generator: Generator,
-               shape: Shape,
-               dimensions: int,
-               polarization: float = 0.98
-               ) -> ScipyComplexMultivariateNormal:
+def _build_mvcn(generator: Generator,
+                shape: Shape,
+                dimensions: int,
+                polarization: float = 0.98
+                ) -> ScipyComplexMultivariateNormal:
     directions = 3
     weights = np.asarray(range(directions)) + 1.5
-    mean = random_complex_array(generator, (*shape, dimensions))
-    z = random_complex_array(generator, (*shape, dimensions, directions))
+    mean = _random_complex_array(generator, (*shape, dimensions))
+    z = _random_complex_array(generator, (*shape, dimensions, directions))
     regularizer = np.tile(np.eye(dimensions), (*shape, 1, 1))
     variance = (
         np.average(
@@ -51,7 +51,7 @@ def test_univariate_rvs(generator: Generator) -> None:
     shape = (3, 2)
     rvs_shape = (50, 100)
     rvs_axes = tuple(range(-len(rvs_shape), 0))
-    dist = build_uvcn(generator, shape)
+    dist = _build_uvcn(generator, shape)
     rvs = dist.rvs(random_state=generator, size=rvs_shape)
     assert rvs.shape == shape + rvs_shape
 
@@ -73,7 +73,7 @@ def test_multivariate_rvs(generator: Generator) -> None:
     dimensions = 2
     rvs_axes = tuple(range(-len(rvs_shape) - 1, -1))
     rvs_axes2 = tuple(range(-len(rvs_shape) - 2, -2))
-    dist = build_mvcn(generator, shape, dimensions)
+    dist = _build_mvcn(generator, shape, dimensions)
     rvs = dist.rvs(random_state=generator, size=rvs_shape)
     assert rvs.shape == shape + rvs_shape + (dimensions,)
 
@@ -92,11 +92,11 @@ def test_multivariate_rvs(generator: Generator) -> None:
 
 @pytest.mark.nondistribution
 def test_univariate_multivariate_consistency(generator: Generator) -> None:
-    mv = build_mvcn(generator, (), 1, polarization=0.5)
+    mv = _build_mvcn(generator, (), 1, polarization=0.5)
     component = mv.access_object(())
     mean: NumpyComplexArray = np.asarray(component.mean[0])
     variance: NumpyRealArray = np.real(np.asarray(component.variance[0, 0]))
     pseudo_variance: NumpyComplexArray = np.asarray(component.pseudo_variance[0, 0])
     uv = ScipyComplexNormal(mean, variance, pseudo_variance)
-    x = random_complex_array(generator)
+    x = _random_complex_array(generator)
     assert_allclose(mv.pdf(x[np.newaxis]), uv.pdf(x))
