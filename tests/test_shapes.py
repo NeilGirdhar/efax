@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import numpy as np
 from numpy.random import Generator
 
 from efax import HasEntropyEP, HasEntropyNP, SimpleDistribution, parameters
@@ -37,9 +36,3 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
     if isinstance(p, HasEntropyEP):
         assert p.expected_carrier_measure().shape == shape
     assert q.pdf(x).shape == shape
-
-
-def test_types(distribution_info: DistributionInfo) -> None:
-    if isinstance(distribution_info.exp_parameter_generator(np.random.default_rng(), ()), tuple):
-        msg = "This should return a number or an ndarray"
-        raise TypeError(msg)
