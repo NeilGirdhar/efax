@@ -13,6 +13,7 @@ from .structure import Structure, SubDistributionInfo
 
 if TYPE_CHECKING:
     from ..natural_parametrization import NaturalParametrization
+    NP = TypeVar('NP', bound=NaturalParametrization)
 
 T = TypeVar('T')
 P = TypeVar('P', bound=Distribution)
@@ -52,12 +53,11 @@ class MaximumLikelihoodEstimator(Structure[P]):
         return cls(infos, fixed_parameters)
 
     @classmethod
-    def create_estimator_from_natural(cls, p: 'NaturalParametrization'
-                                      ) -> 'MaximumLikelihoodEstimator[Any]':
+    def create_estimator_from_natural(cls, p: 'NP') -> 'MaximumLikelihoodEstimator[NP]':
         """Create an estimator for a natural parametrization."""
         infos = MaximumLikelihoodEstimator.create(p).to_exp().infos
         fixed_parameters = parameters(p, fixed=True)
-        return cls(infos, fixed_parameters)
+        return MaximumLikelihoodEstimator(infos, fixed_parameters)
 
     def sufficient_statistics(self, x: dict[str, Any] | JaxComplexArray) -> P:
         from ..expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
