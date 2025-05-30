@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 import jax.numpy as jnp
 import numpy as np
 import pytest
@@ -15,7 +13,7 @@ from .distribution_info import DistributionInfo
 
 @pytest.mark.parametrize('natural', [False, True])
 def test_flatten(generator: Generator,
-                 distribution_info: DistributionInfo[Any, Any, Any],
+                 distribution_info: DistributionInfo,
                  *,
                  natural: bool,
                  ) -> None:

@@ -21,13 +21,13 @@ _Path: TypeAlias = tuple[str, ...]
 
 def _produce_samples(generator: Generator,
                      key: KeyArray,
-                     sampling_distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
-                                                                  ExpectationParametrization[Any],
+                     sampling_distribution_info: DistributionInfo[NaturalParametrization,
+                                                                  ExpectationParametrization,
                                                                   Any],
                      distribution_shape: Shape,
                      sample_shape: Shape,
                      *,
-                     natural: bool) -> tuple[ExpectationParametrization[Any],
+                     natural: bool) -> tuple[ExpectationParametrization,
                                              dict[str, Any] | JaxComplexArray]:
     sampling_object: Distribution
     if natural:
@@ -50,7 +50,7 @@ def _produce_samples(generator: Generator,
 
 def _verify_sample_shape(distribution_shape: Shape,
                          sample_shape: Shape,
-                         structure: Structure[ExpectationParametrization[Any]],
+                         structure: Structure[ExpectationParametrization],
                          flat_map_of_samples: dict[_Path, Any]
                          ) -> None:
     ideal_samples_shape = {info.path: (*sample_shape, *distribution_shape,
@@ -62,12 +62,12 @@ def _verify_sample_shape(distribution_shape: Shape,
 
 
 def _verify_maximum_likelihood_estimate(
-        sampling_distribution_info: DistributionInfo[NaturalParametrization[Any, Any],
-                                                     ExpectationParametrization[Any],
+        sampling_distribution_info: DistributionInfo[NaturalParametrization,
+                                                     ExpectationParametrization,
                                                      Any],
         sample_shape: Shape,
-        structure: Structure[ExpectationParametrization[Any]],
-        exp_parameters: ExpectationParametrization[Any],
+        structure: Structure[ExpectationParametrization],
+        exp_parameters: ExpectationParametrization,
         samples: dict[str, Any] | JaxComplexArray
         ) -> None:
     atol = (1e-2
@@ -90,7 +90,7 @@ def _verify_maximum_likelihood_estimate(
 
 def test_sampling_and_estimation(generator: Generator,
                                  key: KeyArray,
-                                 sampling_distribution_info: DistributionInfo[Any, Any, Any],
+                                 sampling_distribution_info: DistributionInfo,
                                  *,
                                  distribution_name: str | None,
                                  natural: bool) -> None:

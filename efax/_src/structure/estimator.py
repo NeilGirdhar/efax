@@ -29,9 +29,9 @@ class MaximumLikelihoodEstimator(Structure[P]):
 
     @classmethod
     def create_simple_estimator(cls,
-                                type_p: type[SimpleDistribution],
+                                type_p: type[SP],
                                 **fixed_parameters: JaxArray
-                                ) -> 'MaximumLikelihoodEstimator[Any]':
+                                ) -> 'MaximumLikelihoodEstimator[SP]':
         """Create an estimator for a simple expectation parametrization class.
 
         This doesn't work with things like JointDistributionE.
@@ -52,7 +52,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
         return cls(infos, fixed_parameters)
 
     @classmethod
-    def create_estimator_from_natural(cls, p: 'NaturalParametrization[Any, Any]'
+    def create_estimator_from_natural(cls, p: 'NaturalParametrization'
                                       ) -> 'MaximumLikelihoodEstimator[Any]':
         """Create an estimator for a natural parametrization."""
         infos = MaximumLikelihoodEstimator.create(p).to_exp().infos
@@ -63,7 +63,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
         from ..expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
         from ..natural_parametrization import NaturalParametrization  # noqa: PLC0415
         from ..transform.joint import JointDistributionE  # noqa: PLC0415
-        constructed: dict[Path, ExpectationParametrization[Any]] = {}
+        constructed: dict[Path, ExpectationParametrization] = {}
 
         def g(info: SubDistributionInfo, x: JaxComplexArray) -> None:
             assert not info.sub_distribution_names
@@ -99,7 +99,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
         return cast('P', constructed[()])
 
     def from_conjugate_prior_distribution(self,
-                                          cp: 'NaturalParametrization[Any, Any]'
+                                          cp: 'NaturalParametrization'
                                           ) -> tuple[P, JaxRealArray]:
         from ..interfaces.conjugate_prior import HasConjugatePrior  # noqa: PLC0415
         from ..transform.joint import JointDistributionN  # noqa: PLC0415

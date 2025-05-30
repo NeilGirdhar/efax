@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 import pytest
 from numpy.random import Generator
 from tjax import assert_tree_allclose, print_generic, tree_allclose
@@ -13,7 +11,7 @@ from .distribution_info import DistributionInfo
 
 
 def test_conversion(generator: Generator,
-                    distribution_info: DistributionInfo[Any, Any, Any]
+                    distribution_info: DistributionInfo
                     ) -> None:
     """Test that the conversion between the different parametrizations are consistent."""
     if isinstance(distribution_info, GeneralizedDirichletInfo):

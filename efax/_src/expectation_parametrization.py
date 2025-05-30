@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, TypeVar, final
+from typing import Any, Generic, final
 
 from array_api_compat import array_namespace
 from tjax import JaxRealArray, jit
+from typing_extensions import TypeVar
 
 from .natural_parametrization import NaturalParametrization
 from .parametrization import Distribution
 from .tools import parameter_dot_product, parameter_map
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
 
 
 class ExpectationParametrization(Distribution, Generic[NP]):

@@ -306,7 +306,7 @@ class IsotropicNormalInfo(DistributionInfo[IsotropicNormalNP, IsotropicNormalEP,
 
 
 class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[str, Any]]):
-    def __init__(self, infos: Mapping[str, DistributionInfo[Any, Any, Any]]) -> None:
+    def __init__(self, infos: Mapping[str, DistributionInfo]) -> None:
         super().__init__()
         self.infos = dict(infos)
 
@@ -638,7 +638,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
         return WeibullNP
 
 
-def create_infos() -> list[DistributionInfo[Any, Any, Any]]:
+def create_infos() -> list[DistributionInfo]:
     return [
             BernoulliInfo(),
             BetaInfo(),

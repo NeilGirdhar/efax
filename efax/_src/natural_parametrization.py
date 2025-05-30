@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, final, get_type_hints
+from typing import TYPE_CHECKING, Any, Generic, Self, final, get_type_hints
 
 from array_api_compat import array_namespace
 from jax import grad, jacfwd, vjp, vmap
 from tjax import (JaxAbstractClass, JaxArray, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
                   abstract_jit, jit)
 from tjax.dataclasses import dataclass
+from typing_extensions import TypeVar
 
 from .iteration import parameters
 from .parametrization import Distribution
@@ -20,12 +21,12 @@ if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
 
 
-EP = TypeVar('EP', bound='ExpectationParametrization[Any]')
-Domain = TypeVar('Domain', bound=JaxComplexArray | dict[str, Any])
+EP = TypeVar('EP', bound='ExpectationParametrization', default=Any)
+Domain = TypeVar('Domain', bound=JaxComplexArray | dict[str, Any], default=Any)
 
 
-def _log_normalizer_jvp(primals: tuple[NaturalParametrization[Any, Any]],
-                        tangents: tuple[NaturalParametrization[Any, Any]],
+def _log_normalizer_jvp(primals: tuple[NaturalParametrization],
+                        tangents: tuple[NaturalParametrization],
                         ) -> tuple[JaxRealArray, JaxRealArray]:
     """The log-normalizer's special JVP vastly improves numerical stability."""
     q, = primals

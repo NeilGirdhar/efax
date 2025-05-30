@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Self
+from typing import Self
 
 import array_api_extra as xpx
 import jax.random as jr
@@ -144,7 +144,7 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any],
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization,
                                           ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, GeneralizedDirichletNP)
         raise NotImplementedError

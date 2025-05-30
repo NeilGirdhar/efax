@@ -25,7 +25,7 @@ class OptimistixRootFinder(ExpToNatMinimizer):
     send_lower_and_upper: bool = field(static=True, default=False)
 
     @override
-    def solve(self, exp_to_nat: ExpToNat[Any]) -> JaxRealArray:
+    def solve(self, exp_to_nat: ExpToNat) -> JaxRealArray:
         xp = array_namespace(exp_to_nat)
 
         @jit

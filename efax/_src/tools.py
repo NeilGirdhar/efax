@@ -18,7 +18,7 @@ from .types import Axis
 
 
 @jit
-def parameter_dot_product(x: NaturalParametrization[Any, Any], y: Any, /) -> JaxRealArray:
+def parameter_dot_product(x: NaturalParametrization, y: Any, /) -> JaxRealArray:
     """Return the vectorized dot product over all of the variable parameters."""
     def dotted_fields() -> Iterable[JaxRealArray]:
         xs = parameters(x, fixed=False, support=True).values()

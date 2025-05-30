@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, TypeAlias
+from typing import TypeAlias
 
 from array_api_compat import array_namespace
 from jax import grad, jvp, vjp
@@ -14,11 +14,11 @@ from efax import NaturalParametrization, Structure, parameters
 
 from .distribution_info import DistributionInfo
 
-_LogNormalizer: TypeAlias = Callable[[NaturalParametrization[Any, Any]], JaxRealArray]
+_LogNormalizer: TypeAlias = Callable[[NaturalParametrization], JaxRealArray]
 
 
 def _prelude(generator: Generator,
-             distribution_info: DistributionInfo[Any, Any, Any]
+             distribution_info: DistributionInfo
              ) -> tuple[_LogNormalizer, _LogNormalizer]:
     cls = distribution_info.nat_class()
     original_ln = cls._original_log_normalizer
@@ -26,7 +26,7 @@ def _prelude(generator: Generator,
     return original_ln, optimized_ln
 
 
-def test_primals(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+def test_primals(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
     original_ln, optimized_ln = _prelude(generator, distribution_info)
     original_gln = jit(grad(original_ln, allow_int=True))
@@ -53,8 +53,8 @@ def test_primals(generator: Generator, distribution_info: DistributionInfo[Any, 
         assert_tree_allclose(generated_parameters, optimized_gln_parameters, rtol=1e-5)
 
 
-def _unit_tangent(nat_parameters: NaturalParametrization[Any, Any]
-                 ) -> NaturalParametrization[Any, Any]:
+def _unit_tangent(nat_parameters: NaturalParametrization
+                 ) -> NaturalParametrization:
     xp = array_namespace(nat_parameters)
     new_variable_parameters = {path: xp.ones_like(value)
                                for path, value in parameters(nat_parameters, fixed=False).items()}
@@ -64,7 +64,7 @@ def _unit_tangent(nat_parameters: NaturalParametrization[Any, Any]
     return structure.assemble({**new_variable_parameters, **new_fixed_parameters})
 
 
-def test_jvp(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+def test_jvp(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
     original_ln, optimized_ln = _prelude(generator, distribution_info)
     for _ in range(20):
@@ -78,7 +78,7 @@ def test_jvp(generator: Generator, distribution_info: DistributionInfo[Any, Any,
         assert_allclose(original_jvp, optimized_jvp, rtol=1.5e-5)
 
 
-def test_vjp(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+def test_vjp(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
     original_ln, optimized_ln = _prelude(generator, distribution_info)
     for _ in range(20):

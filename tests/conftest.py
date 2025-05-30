@@ -62,12 +62,12 @@ def distribution_name(request: pytest.FixtureRequest) -> str | None:
     return request.config.getoption("--distribution")  # pyright: ignore
 
 
-def supports(s: Structure[Any], abc: type[Any]) -> bool:
+def supports(s: Structure, abc: type[Any]) -> bool:
     return all(issubclass(info.type_, abc) or issubclass(info.type_, JointDistribution)
                for info in s.infos)
 
 
-def any_integral_supports(structure: Structure[Any]) -> bool:
+def any_integral_supports(structure: Structure) -> bool:
     return any(isinstance(s.ring, BooleanRing | IntegralRing)
                for s in structure.domain_support().values())
 

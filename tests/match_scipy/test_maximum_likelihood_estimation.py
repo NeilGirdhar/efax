@@ -19,7 +19,7 @@ from ..distribution_info import DistributionInfo
 
 def test_maximum_likelihood_estimation(
         generator: Generator,
-        distribution_info: DistributionInfo[NaturalParametrization[Any, Any], Any, Any]
+        distribution_info: DistributionInfo[NaturalParametrization]
         ) -> None:
     """Test maximum likelihood estimation using SciPy.
 

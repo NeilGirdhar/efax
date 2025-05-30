@@ -1,9 +1,10 @@
 from collections.abc import Callable, Iterable, Mapping
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, cast
 
 from numpy.random import Generator
 from tjax import JaxComplexArray, Shape
 from tjax.dataclasses import dataclass, field
+from typing_extensions import TypeVar
 
 from ..iteration import parameters
 from ..parameter import Support
@@ -23,8 +24,7 @@ class SubDistributionInfo:
 
 
 T = TypeVar('T')
-P = TypeVar('P', bound=Distribution)
-SP = TypeVar('SP', bound=SimpleDistribution)
+P = TypeVar('P', bound=Distribution, default=Any)
 
 
 @dataclass
@@ -47,7 +47,7 @@ class Structure(Generic[P]):
     def create(cls, p: P) -> 'Structure[P]':
         return Structure(cls._extract_distributions(p))
 
-    def to_nat(self) -> 'Structure[Any]':
+    def to_nat(self) -> 'Structure':
         from ..expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
         infos = []
         for info in self.infos:
@@ -56,7 +56,7 @@ class Structure(Generic[P]):
                                              info.dimensions, info.sub_distribution_names))
         return Structure(infos)
 
-    def to_exp(self) -> 'Structure[Any]':
+    def to_exp(self) -> 'Structure':
         from ..natural_parametrization import NaturalParametrization  # noqa: PLC0415
         infos = []
         for info in self.infos:

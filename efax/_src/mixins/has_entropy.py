@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, TypeVar, final, override
+from typing import Any, Generic, final, override
 
 from jax.lax import stop_gradient
 from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit
+from typing_extensions import TypeVar
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization
 from ..parametrization import Distribution
 from ..tools import parameter_dot_product
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
 
 
 class HasEntropy(Distribution):
@@ -56,10 +57,10 @@ class HasEntropyEP(ExpectationParametrization[NP],
         return self.cross_entropy(stop_gradient(self.to_nat()))
 
 
-EP = TypeVar('EP', bound=HasEntropyEP[Any])
+EP = TypeVar('EP', bound=HasEntropyEP, default=Any)
 
 
-class HasEntropyNP(NaturalParametrization[EP, Any],
+class HasEntropyNP(NaturalParametrization[EP],
                    HasEntropy,
                    Generic[EP]):
     @jit

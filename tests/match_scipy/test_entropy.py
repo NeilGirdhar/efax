@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 
@@ -12,7 +10,7 @@ from ..distribution_info import DistributionInfo
 
 
 def test_nat_entropy(generator: Generator,
-                     entropy_distribution_info: DistributionInfo[Any, Any, Any]
+                     entropy_distribution_info: DistributionInfo
                      ) -> None:
     """Test that the entropy calculation matches scipy's."""
     shape = (7, 13)
@@ -26,7 +24,7 @@ def test_nat_entropy(generator: Generator,
 
 
 def test_exp_entropy(generator: Generator,
-                     entropy_distribution_info: DistributionInfo[Any, Any, Any]
+                     entropy_distribution_info: DistributionInfo
                      ) -> None:
     """Test that the entropy calculation matches scipy's."""
     shape = (7, 13)

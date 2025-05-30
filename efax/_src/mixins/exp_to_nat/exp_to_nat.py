@@ -1,25 +1,25 @@
 from __future__ import annotations
 
 from dataclasses import KW_ONLY, field
-from typing import Any, Generic, Self, TypeAlias, TypeVar
+from typing import Any, Generic, Self, TypeAlias
 
 from array_api_compat import array_namespace
 from jax import vmap
 from tjax import JaxRealArray, jit
 from tjax.dataclasses import dataclass
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 from ...expectation_parametrization import ExpectationParametrization
 from ...natural_parametrization import NaturalParametrization
 from ...parametrization import SimpleDistribution
 from ...structure.flattener import Flattener
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
+NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
 SP: TypeAlias = JaxRealArray
 
 
 class ExpToNatMinimizer:
-    def solve(self, exp_to_nat: ExpToNat[Any]) -> SP:
+    def solve(self, exp_to_nat: ExpToNat) -> SP:
         raise NotImplementedError
 
 

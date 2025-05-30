@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 import jax.numpy as jnp
 import numpy as np
 from numpy.random import Generator
@@ -54,7 +52,7 @@ def test_mvn_fisher_information_b(distribution_name: str | None) -> None:
 
 
 def test_fisher_information_is_convex(generator: Generator,
-                                      distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+                                      distribution_info: DistributionInfo) -> None:
     shape = (3, 2)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     fisher_information = nat_parameters._fisher_information_matrix()  # noqa: SLF001

@@ -56,10 +56,10 @@ class JointDistribution(Distribution):
 @dataclass
 class JointDistributionE(JointDistribution,
                          HasEntropyEP['JointDistributionN']):
-    _sub_distributions: Mapping[str, ExpectationParametrization[Any]]
+    _sub_distributions: Mapping[str, ExpectationParametrization]
 
     @override
-    def sub_distributions(self) -> Mapping[str, ExpectationParametrization[Any]]:
+    def sub_distributions(self) -> Mapping[str, ExpectationParametrization]:
         return self._sub_distributions
 
     @override
@@ -76,7 +76,7 @@ class JointDistributionE(JointDistribution,
     def expected_carrier_measure(self) -> JaxRealArray:
         xp = array_namespace(self)
 
-        def f(x: ExpectationParametrization[Any]) -> JaxRealArray:
+        def f(x: ExpectationParametrization) -> JaxRealArray:
             assert isinstance(x, HasEntropyEP)
             return x.expected_carrier_measure()
 
@@ -87,10 +87,10 @@ class JointDistributionE(JointDistribution,
 class JointDistributionN(JointDistribution,
                          HasEntropyNP[JointDistributionE],
                          NaturalParametrization[JointDistributionE, dict[str, Any]]):
-    _sub_distributions: Mapping[str, NaturalParametrization[Any, Any]]
+    _sub_distributions: Mapping[str, NaturalParametrization]
 
     @override
-    def sub_distributions(self) -> Mapping[str, NaturalParametrization[Any, Any]]:
+    def sub_distributions(self) -> Mapping[str, NaturalParametrization]:
         return self._sub_distributions
 
     @override

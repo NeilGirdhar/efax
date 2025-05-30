@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 from numpy.linalg import det, inv
 from numpy.random import Generator
@@ -17,9 +15,9 @@ from .distribution_info import DistributionInfo
 
 
 def _prelude(generator: Generator,
-             distribution_info_kl: DistributionInfo[Any, Any, Any],
+             distribution_info_kl: DistributionInfo,
              distribution_name: str | None
-             ) -> tuple[ExpectationParametrization[Any], NaturalParametrization[Any, Any],
+             ) -> tuple[ExpectationParametrization, NaturalParametrization,
                        JaxRealArray]:
     shape = (3, 2)
     distribution_info_kl.skip_if_deselected(distribution_name)

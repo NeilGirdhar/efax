@@ -14,7 +14,7 @@ from ..create_info import MultivariateDiagonalNormalInfo
 from ..distribution_info import DistributionInfo
 
 
-def _check_observation_shape(nat_parameters: NaturalParametrization[Any, Any],
+def _check_observation_shape(nat_parameters: NaturalParametrization,
                             efax_x: JaxComplexArray | dict[str, Any],
                             distribution_shape: tuple[int, ...],
                             ) -> None:
@@ -33,7 +33,7 @@ def _check_observation_shape(nat_parameters: NaturalParametrization[Any, Any],
     assert efax_x.shape == ideal_shape
 
 
-def test_pdf(generator: Generator, distribution_info: DistributionInfo[Any, Any, Any]) -> None:
+def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Test that the density/mass function calculation matches scipy's."""
     distribution_shape = (10,)
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=distribution_shape)

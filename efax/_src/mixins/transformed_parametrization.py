@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from functools import partial
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, cast
 
 from array_api_compat import array_namespace
 from jax import jacobian, vmap
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..iteration import parameters
 from ..natural_parametrization import EP, NaturalParametrization
 
-TEP = TypeVar('TEP', bound=ExpectationParametrization[Any])
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
-Domain = TypeVar('Domain', bound=JaxComplexArray)
+TEP = TypeVar('TEP', bound=ExpectationParametrization, default=Any)
+NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
+Domain = TypeVar('Domain', bound=JaxComplexArray, default=JaxComplexArray)
 
 
 class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
@@ -90,7 +90,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
                 base_cls.sufficient_statistics(y, **fixed_parameters))
 
 
-TNP = TypeVar('TNP', bound=TransformedNaturalParametrization[Any, Any, Any, Any])
+TNP = TypeVar('TNP', bound=TransformedNaturalParametrization, default=Any)
 
 
 class TransformedExpectationParametrization(ExpectationParametrization[TNP],

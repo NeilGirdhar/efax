@@ -1,8 +1,6 @@
 """These tests apply to only samplable distributions."""
 from __future__ import annotations
 
-from typing import Any
-
 import jax.numpy as jnp
 import jax.random as jr
 from jax import jacobian, jit, vmap
@@ -15,7 +13,7 @@ from .distribution_info import DistributionInfo
 
 
 def _sample_using_flattened(flattened_parameters: JaxRealArray,
-                            flattener: Flattener[Any],
+                            flattener: Flattener,
                             key: KeyArray,
                             ) -> JaxArray:
     p = flattener.unflatten(flattened_parameters)
@@ -73,7 +71,7 @@ def _calculate_jacobian_and_curvature(p: SimpleDistribution,
 
 def test_sampling_cotangents(generator: Generator,
                              key: KeyArray,
-                             sampling_wc_distribution_info: DistributionInfo[Any, Any, Any],
+                             sampling_wc_distribution_info: DistributionInfo,
                              *,
                              distribution_name: str | None,
                              natural: bool

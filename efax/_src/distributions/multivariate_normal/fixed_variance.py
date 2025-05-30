@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Self
+from typing import Self
 
 import jax.random as jr
 from array_api_compat import array_namespace
@@ -143,7 +143,7 @@ class MultivariateFixedVarianceNormalEP(
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any],
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization,
                                           variance: JaxRealArray | None = None
                                           ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, IsotropicNormalNP)

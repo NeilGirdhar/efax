@@ -20,7 +20,7 @@ from .distribution_info import DistributionInfo
 
 
 @jit
-def _sum_entropy(flattened: JaxRealArray, flattener: Flattener[Any]) -> JaxRealArray:
+def _sum_entropy(flattened: JaxRealArray, flattener: Flattener) -> JaxRealArray:
     x = flattener.unflatten(flattened)
     return jnp.sum(x.entropy())
 
@@ -46,7 +46,7 @@ def _check_entropy_gradient(distribution: HasEntropy, /) -> None:
 
 
 def test_nat_entropy_gradient(generator: Generator,
-                              entropy_distribution_info: DistributionInfo[Any, Any, Any],
+                              entropy_distribution_info: DistributionInfo,
                               ) -> None:
     shape = (7, 13)
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
@@ -54,7 +54,7 @@ def test_nat_entropy_gradient(generator: Generator,
 
 
 def test_exp_entropy_gradient(generator: Generator,
-                              entropy_distribution_info: DistributionInfo[Any, Any, Any],
+                              entropy_distribution_info: DistributionInfo,
                               ) -> None:
     shape = (7, 13)
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)

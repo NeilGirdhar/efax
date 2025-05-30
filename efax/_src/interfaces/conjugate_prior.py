@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Self
+from typing import Self
 
 from tjax import JaxComplexArray, JaxRealArray
 
@@ -10,10 +10,10 @@ from ..interfaces.multidimensional import Multidimensional
 from ..natural_parametrization import NaturalParametrization
 
 
-class HasConjugatePrior(ExpectationParametrization[Any]):
+class HasConjugatePrior(ExpectationParametrization):
     @abstractmethod
     def conjugate_prior_distribution(self, n: JaxRealArray
-                                     ) -> NaturalParametrization[Any, Any]:
+                                     ) -> NaturalParametrization:
         """The conjugate prior distribution.
 
         Args:
@@ -23,7 +23,7 @@ class HasConjugatePrior(ExpectationParametrization[Any]):
 
     @classmethod
     @abstractmethod
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization[Any, Any]
+    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
                                           ) -> tuple[Self, JaxRealArray]:
         """Given a conjugate prior distribution, find the distribution and observation count.
 
@@ -44,7 +44,7 @@ class HasConjugatePrior(ExpectationParametrization[Any]):
 class HasGeneralizedConjugatePrior(HasConjugatePrior, Multidimensional):
     @abstractmethod
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray
-                                                 ) -> NaturalParametrization[Any, Any]:
+                                                 ) -> NaturalParametrization:
         """A generalization of the conjugate prior distribution.
 
         Args:

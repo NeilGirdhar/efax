@@ -1,10 +1,11 @@
 from dataclasses import replace
 from functools import partial
-from typing import Any, Self, TypeVar, cast, overload
+from typing import Any, Self, cast, overload
 
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray
 from tjax.dataclasses import dataclass, field
+from typing_extensions import TypeVar
 
 from ..iteration import parameters
 from ..parametrization import Distribution, SimpleDistribution
@@ -13,8 +14,8 @@ from .estimator import MaximumLikelihoodEstimator
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
 
-P = TypeVar('P', bound=Distribution)
-SP = TypeVar('SP', bound=SimpleDistribution)
+P = TypeVar('P', bound=Distribution, default=Any)
+SP = TypeVar('SP', bound=SimpleDistribution, default=Any)
 
 
 @dataclass

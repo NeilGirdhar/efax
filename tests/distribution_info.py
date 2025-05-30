@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, TypeVar, final
+from typing import Any, Generic, final
 
 import jax.numpy as jnp
 import pytest
 from numpy.random import Generator
 from tjax import JaxComplexArray, NumpyComplexArray, Shape
-from typing_extensions import override
+from typing_extensions import TypeVar, override
 
 from efax import ExpectationParametrization, NaturalParametrization, Structure, SubDistributionInfo
 
-NP = TypeVar('NP', bound=NaturalParametrization[Any, Any])
-EP = TypeVar('EP', bound=ExpectationParametrization[Any])
-Domain = TypeVar('Domain', bound=NumpyComplexArray | dict[str, Any])
+NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
+EP = TypeVar('EP', bound=ExpectationParametrization, default=Any)
+Domain = TypeVar('Domain', bound=NumpyComplexArray | dict[str, Any], default=Any)
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):
