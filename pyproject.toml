@@ -27,7 +27,7 @@ classifiers = [
 ]
 dependencies = [
   "array_api_compat>=1.10",
-  "array_api_extra>=0.7",
+  "array_api_extra>=0.8",
   "jax>=0.6.1",
   "numpy>=1.25",
   "optimistix>=0.0.9",
@@ -46,10 +46,10 @@ dev = [
   "mypy>=1.12",
   "pre-commit>=4",
   "pylint>=3.3",
-  "pyright>=0.0.13",
+  "pyright>=1.1.401",
   "pytest-ordering",
   "pytest-xdist[psutil]>=3",
-  "pytest>=8",
+  "pytest>=8.4",
   "ruff>=0.9.10",
 ]
 

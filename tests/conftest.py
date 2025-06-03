@@ -59,7 +59,7 @@ _all_infos = create_infos()
 
 @pytest.fixture
 def distribution_name(request: pytest.FixtureRequest) -> str | None:
-    return request.config.getoption("--distribution")  # pyright: ignore
+    return request.config.getoption("--distribution")
 
 
 def supports(s: Structure, abc: type[Any]) -> bool:

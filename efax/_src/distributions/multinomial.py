@@ -7,7 +7,6 @@ import jax.random as jr
 import numpy as np
 import scipy.special as sc
 from array_api_compat import array_namespace
-from jax.nn import one_hot
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 from typing_extensions import override
@@ -74,8 +73,9 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         if shape is not None:
             shape += self.shape
-        return one_hot(jr.categorical(key, self.log_odds, shape=shape),
-                       self.dimensions())
+        retval = xpx.one_hot(jr.categorical(key, self.log_odds, shape=shape), self.dimensions())
+        assert isinstance(retval, JaxRealArray)
+        return retval
 
     @override
     def dimensions(self) -> int:
