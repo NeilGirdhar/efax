@@ -2,7 +2,7 @@ from collections.abc import Callable, Iterable, Mapping
 from typing import Any, Generic, cast
 
 from numpy.random import Generator
-from tjax import JaxComplexArray, Shape
+from tjax import JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
 from typing_extensions import TypeVar
 
@@ -58,7 +58,7 @@ class Structure(Generic[P]):
 
     def to_exp(self) -> 'Structure':
         from ..natural_parametrization import NaturalParametrization  # noqa: PLC0415
-        infos = []
+        infos: list[SubDistributionInfo] = []
         for info in self.infos:
             assert issubclass(info.type_, NaturalParametrization)
             infos.append(SubDistributionInfo(info.path,
@@ -99,7 +99,7 @@ class Structure(Generic[P]):
 
     def generate_random(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> P:
         """Generate a random distribution."""
-        path_and_values = {}
+        path_and_values: dict[tuple[str, ...], JaxRealArray] = {}
         for info in self.infos:
             for name, support, value_receptacle in parameter_supports(info.type_):
                 value = support.generate(xp, rng, shape, safety, info.dimensions)

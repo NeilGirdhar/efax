@@ -3,22 +3,31 @@ from dataclasses import fields
 from typing import Any, Literal, overload
 
 from tjax import JaxComplexArray
+from typing_extensions import TypeIs
 
 from .parameter import Support
 from .parametrization import Distribution, SimpleDistribution
 from .types import Path
 
 
+def is_string_mapping(x: object) -> TypeIs[Mapping[str, object]]:
+    if not isinstance(x, Mapping):
+        return False
+    return all(isinstance(xi, str) for xi in x)
+
+
 def flatten_mapping(m: Mapping[str, Any], /) -> dict[Path, Any]:
     """Flatten a nested mapping."""
     result: dict[Path, Any] = {}
 
-    def _flatten(m: Mapping[str, Mapping[str, Any] | Any], prefix: Path) -> None:
+    def _flatten(m: Mapping[str, Any], prefix: Path) -> None:
         for key, value in m.items():
             path = (*prefix, key)
-            if isinstance(value, Mapping):
+            if is_string_mapping(value):
                 _flatten(value, path)
                 continue
+            if isinstance(value, Mapping):
+                raise TypeError
             result[path] = value
     _flatten(m, ())
 
