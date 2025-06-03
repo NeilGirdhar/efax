@@ -4,6 +4,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from types import ModuleType
 
+import array_api_extra as xpx
 import jax.scipy.special as jss
 import numpy as np
 from array_api_compat import array_namespace
@@ -56,8 +57,8 @@ def _general_array_namespace(x: RealNumeric) -> ModuleType:
 
 
 def _canonical_float_epsilon(xp: ModuleType) -> float:
-    dtype = xp.empty((), dtype=float).dtype  # For Jax, this is canonicalize_dtype(float).
-    return float(xp.finfo(dtype).eps)
+    dtype = xpx.default_dtype(xp)
+    return xp.finfo(dtype).eps
 
 
 @dataclass
