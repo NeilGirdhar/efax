@@ -30,6 +30,7 @@ dependencies = [
   "array_api_extra>=0.8",
   "jax>=0.6.1",
   "numpy>=1.25",
+  "opt-einsum>=3.4",
   "optimistix>=0.0.9",
   "optype>=0.8.0",
   "scipy-stubs>=1.15",

@@ -9,6 +9,7 @@ import jax.scipy.special as jss
 import numpy as np
 from array_api_compat import array_namespace
 from numpy.random import Generator
+from opt_einsum import contract
 from tjax import JaxArray, JaxRealArray, Shape
 from typing_extensions import override
 
@@ -230,14 +231,14 @@ class SymmetricMatrixSupport(Support):
         m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions), safety)
         if self.negative_semidefinite or self.positive_semidefinite:
             # Perform QR decomposition to obtain an orthogonal matrix Q
-            q, _ = np.linalg.qr(m)
+            q, _ = xp.linalg.qr(m)
             # Generate Eigenvalues.
             assert isinstance(self.ring, RealField | ComplexField)
             eig_field = (RealField(minimum=0.0)
                          if self.positive_semidefinite else RealField(maximum=0.0))
             eig = eig_field.generate(xp, rng, (*shape, dimensions), safety)
             # Return Q.T @ diag(eig) @ Q.
-            return xp.einsum('...ji,...j,...jk->...ik', xp.conj(q) if self.hermitian else q, eig, q)
+            return contract('...ji,...j,...jk->...ik', xp.conj(q) if self.hermitian else q, eig, q)
         mt = xp.matrix_transpose(m)
         if self.hermitian:
             mt = xp.conj(mt)
