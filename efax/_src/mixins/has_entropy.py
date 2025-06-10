@@ -3,8 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Generic, final, override
 
-from jax.lax import stop_gradient
-from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit
+from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit, stop_gradient
 from typing_extensions import TypeVar
 
 from ..expectation_parametrization import ExpectationParametrization
