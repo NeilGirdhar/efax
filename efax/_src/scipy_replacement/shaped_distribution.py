@@ -37,13 +37,13 @@ class ShapedDistribution(Generic[T]):
         retval = np.empty(self.shape + size + self.rvs_shape,
                           dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
-            retval[i] = self.objects[i].rvs(size=size, random_state=random_state)
+            retval[i] = self.objects[i].rvs(size=size, random_state=random_state)  # pyright: ignore
         return retval
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
-            value = self.objects[i].pdf(x[i])
+            value = self.objects[i].pdf(x[i])  # pyright: ignore
             if i == ():
                 return value
             retval[i] = value
@@ -52,7 +52,7 @@ class ShapedDistribution(Generic[T]):
     def entropy(self) -> NumpyRealArray:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
-            retval[i] = self.objects[i].entropy()
+            retval[i] = self.objects[i].entropy()  # pyright: ignore
         return retval
 
     def access_object(self, index: tuple[int, ...]) -> T:

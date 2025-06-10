@@ -117,7 +117,7 @@ class ScipyComplexMultivariateNormal(
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
         objects = np.empty(self.shape, dtype=ScipyMultivariateNormalUnvectorized)
         for i in np.ndindex(*self.shape):
-            objects[i] = self.objects[i].as_multivariate_normal()
+            objects[i] = self.objects[i].as_multivariate_normal()  # pyright: ignore
         return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects)
 
     @property
@@ -131,12 +131,12 @@ class ScipyComplexMultivariateNormal(
     def variance(self) -> NumpyComplexArray:
         retval = np.empty(self.shape + self.rvs_shape + self.rvs_shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
-            retval[i] = self.objects[i].variance
+            retval[i] = self.objects[i].variance  # pyright: ignore
         return retval
 
     @property
     def pseudo_variance(self) -> NumpyComplexArray:
         retval = np.empty(self.shape + self.rvs_shape + self.rvs_shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
-            retval[i] = self.objects[i].pseudo_variance
+            retval[i] = self.objects[i].pseudo_variance  # pyright: ignore
         return retval
