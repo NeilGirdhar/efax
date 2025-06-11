@@ -40,7 +40,7 @@ dependencies = [
   "typing_extensions>=4.8",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
   "isort>=5.13",
   "jupyter>=1",
