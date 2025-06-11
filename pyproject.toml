@@ -45,7 +45,7 @@ dev = [
   "isort>=5.13",
   "jupyter>=1",
   "mypy>=1.12",
-  "pre-commit>=4",
+  "lefthook>=1.11.13",
   "pylint>=3.3",
   "pyright>=1.1.401",
   "pytest-ordering",
