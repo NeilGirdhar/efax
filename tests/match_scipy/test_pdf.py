@@ -8,7 +8,8 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxComplexArray
 
-from efax import JointDistributionN, Multidimensional, NaturalParametrization, SimpleDistribution
+from efax import (JointDistributionN, Multidimensional, NaturalParametrization,
+                  ScipyDiscreteDistribution, ScipyDistribution, SimpleDistribution)
 
 from ..create_info import MultivariateDiagonalNormalInfo
 from ..distribution_info import DistributionInfo
@@ -44,10 +45,11 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
 
     # Verify that the density matches scipy.
     efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
-    try:
-        scipy_density = scipy_distribution.pdf(scipy_x)
-    except AttributeError:
-        scipy_density = scipy_distribution.pmf(scipy_x)
+    if isinstance(scipy_distribution, ScipyDistribution):
+        scipy_density = scipy_distribution.pdf(scipy_x)  # pyright: ignore
+    else:
+        assert isinstance(scipy_distribution, ScipyDiscreteDistribution)
+        scipy_density = scipy_distribution.pmf(scipy_x)  # pyright: ignore
 
     if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
         atol = 1e-5

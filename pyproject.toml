@@ -194,7 +194,6 @@ line-length = 100
 preview = true
 select = ["ALL"]
 ignore = [
-  "ANN401", # Dynamically typed expressions (Any).
   "ARG001", # Unused function argument.
   "ARG002", # Unused method argument.
   "ARG003", # Unused class method argument.

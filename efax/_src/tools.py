@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable, Mapping
 from functools import reduce
 from itertools import starmap
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from array_api_compat import array_namespace
 from jax import jit
@@ -18,7 +18,7 @@ from .types import Axis
 
 
 @jit
-def parameter_dot_product(x: NaturalParametrization, y: Any, /) -> JaxRealArray:
+def parameter_dot_product(x: NaturalParametrization, y: Distribution, /) -> JaxRealArray:
     """Return the vectorized dot product over all of the variable parameters."""
     def dotted_fields() -> Iterable[JaxRealArray]:
         xs = parameters(x, fixed=False, support=True).values()

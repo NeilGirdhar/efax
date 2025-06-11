@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Self
+from typing import Self
 
 import numpy as np
 import optype.numpy as onp
@@ -23,15 +23,11 @@ class ScipyMultivariateNormalUnvectorized:
         return np.asarray(self.distribution.pdf(x))
 
     def rvs(self,
-            size: Any = None,
-            random_state: Any = None) -> onp.ArrayND[np.float64]:
+            size: int | tuple[int, ...] = (),
+            random_state: np.random.Generator | None = None
+            ) -> onp.ArrayND[np.float64]:
         retval = self.distribution.rvs(size=size, random_state=random_state)
-        if size is None:
-            size = ()
-        elif isinstance(size, int):
-            size = (size,)
-        else:
-            size = tuple(size)
+        size = (size,) if isinstance(size, int) else tuple(size)
         return np.reshape(retval, size + self.distribution.mean.shape)
 
     def entropy(self) -> NumpyRealArray:

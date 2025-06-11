@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 import optype.numpy as onp
 import scipy.stats as ss
@@ -29,13 +27,13 @@ class ScipyDirichletFixRVsAndPDF:
         return np.float64(self.distribution.pdf(x))
 
     def rvs(self,
-            size: Any = None,
-            random_state: Any = None
+            size: tuple[int, ...] | None = None,
+            random_state: np.random.Generator | None = None
             ) -> onp.ArrayND[np.float64]:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
-        return self.distribution.rvs(size=size, random_state=random_state)
+        return self.distribution.rvs(size=size, random_state=random_state)  # pyright: ignore
 
     def entropy(self) -> NumpyRealArray:
         return np.asarray(self.distribution.entropy())

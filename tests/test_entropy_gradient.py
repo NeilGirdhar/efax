@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Any
 
 import jax.numpy as jnp
 import pytest
@@ -26,7 +25,7 @@ def _sum_entropy(flattened: JaxRealArray, flattener: Flattener) -> JaxRealArray:
 
 
 @jit
-def _all_finite(some_tree: Any, /) -> JaxBooleanArray:
+def _all_finite(some_tree: object, /) -> JaxBooleanArray:
     return dynamic_tree_all(tree.map(lambda x: jnp.all(jnp.isfinite(x)), some_tree))
 
 

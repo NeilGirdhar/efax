@@ -9,7 +9,8 @@ from numpy.random import Generator
 from tjax import JaxComplexArray, NumpyComplexArray, Shape
 from typing_extensions import TypeVar, override
 
-from efax import ExpectationParametrization, NaturalParametrization, Structure, SubDistributionInfo
+from efax import (ExpectationParametrization, NaturalParametrization, ScipyDiscreteDistribution,
+                  ScipyDistribution, Structure, SubDistributionInfo)
 
 NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
 EP = TypeVar('EP', bound=ExpectationParametrization, default=Any)
@@ -22,7 +23,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         self.dimensions = dimensions
         self.safety = safety
 
-    def exp_to_scipy_distribution(self, p: EP) -> Any:
+    def exp_to_scipy_distribution(self, p: EP) -> ScipyDistribution | ScipyDiscreteDistribution:
         """Produce a corresponding scipy distribution from expectation parameters.
 
         Args:
@@ -30,7 +31,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return self.nat_to_scipy_distribution(p.to_nat())
 
-    def nat_to_scipy_distribution(self, q: NP) -> Any:
+    def nat_to_scipy_distribution(self, q: NP) -> ScipyDistribution | ScipyDiscreteDistribution:
         """Produce a corresponding scipy distribution from natural parameters.
 
         Args:
@@ -96,9 +97,9 @@ class DistributionInfo(Generic[NP, EP, Domain]):
                        'scipy_to_exp_family_observation'):
             old_method = getattr(cls, method)
 
-            def new_method(*args: Any,
+            def new_method(*args: object,
                            old_method: Callable[..., Any] = old_method,
-                           **kwargs: Any) -> Any:
+                           **kwargs: object) -> object:
                 return old_method(*args, **kwargs)
 
             setattr(cls, method, new_method)

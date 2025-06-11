@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Mapping
-from types import ModuleType
-from typing import Any, Self, override
+from types import EllipsisType, ModuleType
+from typing import Self, override
 
 from array_api_compat import array_namespace
 from tjax import JaxAbstractClass, JaxArray, Shape
@@ -15,7 +15,7 @@ from .parameter import Support
 @dataclass
 class Distribution(JaxAbstractClass):
     """The Distribution is the base class of all distributions."""
-    def __getitem__(self, key: Any) -> Self:
+    def __getitem__(self, key: tuple[int | slice | EllipsisType | None, ...]) -> Self:
         from .iteration import parameters  # noqa: PLC0415
         from .structure.structure import Structure  # noqa: PLC0415
         parameters_ = {path: value[key] for path, value in parameters(self).items()}

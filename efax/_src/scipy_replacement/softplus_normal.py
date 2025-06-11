@@ -30,3 +30,6 @@ class ScipySoftplusNormal:
         distribution = ss.norm(loc=self.mu, scale=self.sigma)
         samples = np.asarray(distribution.rvs(size=size, random_state=random_state))
         return softplus(samples)
+
+    def entropy(self) -> NumpyRealArray:
+        raise NotImplementedError

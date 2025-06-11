@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 import pytest
 from numpy.random import Generator as NumpyGenerator
 from tjax import Shape
 
-from efax import ScipyDirichlet, ScipyMultivariateNormal
+from efax import ScipyDirichlet, ScipyDistribution, ScipyMultivariateNormal
 
 
 @pytest.mark.nondistribution
@@ -18,7 +16,8 @@ from efax import ScipyDirichlet, ScipyMultivariateNormal
                           (ScipyDirichlet(alpha=np.ones((2, 5))), (2,), 5),
                           (ScipyDirichlet(alpha=np.ones((2, 3, 5))), (2, 3), 5),
                           ])
-def test_shaped(generator: NumpyGenerator, distribution: Any, m: Shape, n: int) -> None:
+def test_shaped(generator: NumpyGenerator, distribution: ScipyDistribution, m: Shape, n: int
+                ) -> None:
     assert distribution.rvs().shape == (*m, n)
     assert distribution.rvs(1).shape == (*m, 1, n)
     assert distribution.rvs((1,)).shape == (*m, 1, n)
