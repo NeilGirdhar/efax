@@ -198,8 +198,6 @@ ignore = [
   "ARG002", # Unused method argument.
   "ARG003", # Unused class method argument.
   "ARG004", # Unused static method argument.
-  "B011", # Do not assert false.
-  "C901", # Complex structure.
   "COM812", # Trailing comma missing.
   "CPY001", # Missing copyright.
   "D100", # Missing docstring in public module.
@@ -213,17 +211,13 @@ ignore = [
   "DOC402", # DOC402 `yield` is not documented in docstring.
   "DOC501", # Raised exception `ValueError` missing from docstring.
   "ERA001", # Commented-out code.
-  "F722", # Syntax error in forward annotation.
-  "FBT003", # Boolean positional value in function call.
   "FIX002", # Line contains TODO, consider resolving the issue.
   "G004", # Logging statement uses f-string.
   "I001", # Import block is un-sorted or un-formatted.
   "PD008", # Use .loc instead of .at. If speed is important, use NumPy.
-  "PD013", # `.melt` is preferred to `.stack`; provides same functionality
   "PGH003", # Use specific rule codes when ignoring type issues.
   "PLR0913", # Too many arguments in function definition.
   "PLR6301", # Method doesn"t use self.
-  "PT013", # Found incorrect import of pytest, use simple import pytest instead.
   "Q000", # Single quotes found but double quotes preferred.
   "RUF021", # Parenthesize `a and b` expressions when chaining `and` and `or` together...
   "S101", # Assert used.
@@ -233,7 +227,6 @@ ignore = [
   "TD002", # Missing author in TODO; try: # TODO(<author_name>): ....
   "TD003", # Missing issue link on the line following this TODO.
   "TID252", # Relative imports from parent modules are banned.
-  "UP037", # Remove quotes from type annotation.
 ]
 
 [tool.ruff.lint.flake8-import-conventions.extend-aliases]
