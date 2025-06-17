@@ -184,6 +184,7 @@ warn_unused_ignores = true
 module = [
   "tensorflow_probability.substrates",
   "array_api_compat",
+  "opt_einsum",
 ]
 ignore_missing_imports = true
 

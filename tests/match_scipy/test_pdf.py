@@ -46,10 +46,10 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
     # Verify that the density matches scipy.
     efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
     if isinstance(scipy_distribution, ScipyDistribution):
-        scipy_density = scipy_distribution.pdf(scipy_x)  # pyright: ignore
+        scipy_density = scipy_distribution.pdf(scipy_x)
     else:
         assert isinstance(scipy_distribution, ScipyDiscreteDistribution)
-        scipy_density = scipy_distribution.pmf(scipy_x)  # pyright: ignore
+        scipy_density = scipy_distribution.pmf(scipy_x)  # type: ignore # pyright: ignore
 
     if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
         atol = 1e-5

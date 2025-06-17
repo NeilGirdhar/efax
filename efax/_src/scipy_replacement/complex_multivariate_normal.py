@@ -79,7 +79,8 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
 
 class ScipyComplexMultivariateNormal(
-        ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]):
+        ShapedDistribution[
+            ScipyComplexMultivariateNormalUnvectorized]):  # type: ignore # pyright: ignore
     """This class allows distributions having a non-empty shape."""
     @override
     def __init__(self,
@@ -117,7 +118,9 @@ class ScipyComplexMultivariateNormal(
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
         objects = np.empty(self.shape, dtype=ScipyMultivariateNormalUnvectorized)
         for i in np.ndindex(*self.shape):
-            objects[i] = self.objects[i].as_multivariate_normal()  # pyright: ignore
+            this_object = self.objects[i]
+            assert isinstance(this_object, ScipyComplexMultivariateNormalUnvectorized)
+            objects[i] = this_object.as_multivariate_normal()
         return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects)
 
     @property
@@ -131,12 +134,16 @@ class ScipyComplexMultivariateNormal(
     def variance(self) -> NumpyComplexArray:
         retval = np.empty(self.shape + self.rvs_shape + self.rvs_shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
-            retval[i] = self.objects[i].variance  # pyright: ignore
+            this_object = self.objects[i]
+            assert isinstance(this_object, ScipyComplexMultivariateNormalUnvectorized)
+            retval[i] = this_object.variance
         return retval
 
     @property
     def pseudo_variance(self) -> NumpyComplexArray:
         retval = np.empty(self.shape + self.rvs_shape + self.rvs_shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
-            retval[i] = self.objects[i].pseudo_variance  # pyright: ignore
+            this_object = self.objects[i]
+            assert isinstance(this_object, ScipyComplexMultivariateNormalUnvectorized)
+            retval[i] = this_object.pseudo_variance
         return retval

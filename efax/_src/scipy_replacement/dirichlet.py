@@ -33,13 +33,15 @@ class ScipyDirichletFixRVsAndPDF:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
-        return self.distribution.rvs(size=size, random_state=random_state)  # pyright: ignore
+        return self.distribution.rvs(size=size,  # type: ignore # pyright: ignore
+                                     random_state=random_state)
 
     def entropy(self) -> NumpyRealArray:
         return np.asarray(self.distribution.entropy())
 
 
-class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
+class ScipyDirichlet(
+        ShapedDistribution[ScipyDirichletFixRVsAndPDF]):  # type: ignore  # pyright: ignore
     """This class allows distributions having a non-empty shape."""
     @override
     def __init__(self, alpha: NumpyRealArray) -> None:

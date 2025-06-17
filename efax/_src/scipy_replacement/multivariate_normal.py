@@ -34,7 +34,8 @@ class ScipyMultivariateNormalUnvectorized:
         return np.asarray(self.distribution.entropy())
 
 
-class ScipyMultivariateNormal(ShapedDistribution[ScipyMultivariateNormalUnvectorized]):
+class ScipyMultivariateNormal(
+        ShapedDistribution[ScipyMultivariateNormalUnvectorized]):  # type: ignore # pyright: ignore
     """This class allows distributions having a non-empty shape."""
     @classmethod
     def from_mc(cls,
