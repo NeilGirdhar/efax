@@ -357,7 +357,7 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
         return JointDistributionN
 
 
-class LogNormal(DistributionInfo[LogNormalNP, LogNormalEP, NumpyRealArray]):
+class LogNormalInfo(DistributionInfo[LogNormalNP, LogNormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: LogNormalEP) -> Any:
         normal_dp = p.base_distribution().to_deviation_parametrization()
@@ -657,7 +657,7 @@ def create_infos() -> list[DistributionInfo]:
             InverseGaussianInfo(),
             IsotropicNormalInfo(dimensions=5),
             JointInfo(infos={'gamma': GammaInfo(), 'normal': NormalInfo()}),
-            LogNormal(),
+            LogNormalInfo(),
             LogarithmicInfo(),
             MultivariateDiagonalNormalInfo(dimensions=4),
             MultivariateFixedVarianceNormalInfo(dimensions=2),
