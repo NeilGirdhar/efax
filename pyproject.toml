@@ -2,6 +2,21 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[dependency-groups]
+dev = [
+  "isort>=5.13",
+  "jupyter>=1",
+  "lefthook>=1.11.13",
+  "mypy>=1.12",
+  "pylint>=3.3",
+  "pyright>=1.1.401",
+  "pytest-ordering",
+  "pytest-xdist[psutil]>=3",
+  "pytest>=8.4",
+  "ruff>=0.9.10",
+  "toml-sort>=0.24"
+]
+
 [project]
 name = "efax"
 version = "1.22.1"
@@ -23,7 +38,7 @@ classifiers = [
   "Programming Language :: Python",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Software Development :: Libraries :: Python Modules",
-  "Typing :: Typed",
+  "Typing :: Typed"
 ]
 dependencies = [
   "array_api_compat>=1.10",
@@ -37,21 +52,7 @@ dependencies = [
   "scipy>=1.15",
   "tensorflow_probability>=0.15",
   "tjax>=1.3.10",
-  "typing_extensions>=4.8",
-]
-
-[dependency-groups]
-dev = [
-  "isort>=5.13",
-  "jupyter>=1",
-  "mypy>=1.12",
-  "lefthook>=1.11.13",
-  "pylint>=3.3",
-  "pyright>=1.1.401",
-  "pytest-ordering",
-  "pytest-xdist[psutil]>=3",
-  "pytest>=8.4",
-  "ruff>=0.9.10",
+  "typing_extensions>=4.8"
 ]
 
 [project.urls]
@@ -61,6 +62,35 @@ source = "https://github.com/NeilGirdhar/efax"
 line_length = 100
 multi_line_output = 0
 skip_glob = [".pytype/*.py"]
+
+[tool.mypy]
+files = ["efax", "tests", "examples"]
+disable_error_code = ["type-abstract"]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+# disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+pretty = true
+show_error_codes = true
+show_error_context = false
+strict_equality = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_return_any = false
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+  "tensorflow_probability.substrates",
+  "array_api_compat",
+  "opt_einsum"
+]
+ignore_missing_imports = true
 
 [tool.pylint.master]
 jobs = 0
@@ -73,38 +103,272 @@ load-plugins = [
   "pylint.extensions.dict_init_mutate",
   "pylint.extensions.docparams",
   "pylint.extensions.overlapping_exceptions",
-  "pylint.extensions.typing",
+  "pylint.extensions.typing"
 ]
 
 [tool.pylint.messages_control]
 disable = [
   # Ruff
-  "C0103", "C0105", "C0112", "C0113", "C0114", "C0115", "C0116", "C0121", "C0123", "C0131", "C0132", "C0198", "C0199", "C0201", "C0202", "C0205",
-  "C0206", "C0208", "C0301", "C0303", "C0304", "C0305", "C0321", "C0410", "C0411", "C0412", "C0413", "C0414", "C0415", "C0501", "C1802", "C1901",
-  "C2201", "C2401", "C2403", "C2701", "C2801", "C3001", "C3002", "E0001", "E0013", "E0014", "E0100", "E0101", "E0102", "E0103", "E0104", "E0105",
-  "E0106", "E0107", "E0108", "E0112", "E0115", "E0116", "E0117", "E0118", "E0213", "E0237", "E0241", "E0302", "E0303", "E0304", "E0305", "E0308",
-  "E0309", "E0402", "E0602", "E0603", "E0604", "E0605", "E0643", "E0704", "E0711", "E1132", "E1142", "E1205", "E1206", "E1300", "E1301", "E1302",
-  "E1303", "E1304", "E1305", "E1306", "E1307", "E1310", "E1519", "E1520", "E1700", "E2502", "E2510", "E2512", "E2513", "E2514", "E2515", "E4703",
-  "E6004", "E6005", "R0022", "R0123", "R0124", "R0133", "R0202", "R0203", "R0205", "R0206", "R0402", "R0904", "R0911", "R0912", "R0913", "R0914",
-  "R0915", "R0916", "R1260", "R1701", "R1702", "R1703", "R1704", "R1705", "R1706", "R1707", "R1710", "R1711", "R1714", "R1715", "R1717", "R1718",
-  "R1719", "R1720", "R1721", "R1722", "R1723", "R1724", "R1725", "R1728", "R1729", "R1730", "R1731", "R1732", "R1733", "R1734", "R1735", "R1736",
-  "R2004", "R2044", "R5501", "R6002", "R6003", "R6104", "R6201", "R6301", "W0012", "W0102", "W0104", "W0106", "W0107", "W0108", "W0109", "W0120",
-  "W0122", "W0123", "W0127", "W0129", "W0130", "W0131", "W0133", "W0150", "W0160", "W0177", "W0199", "W0211", "W0212", "W0245", "W0301", "W0401",
-  "W0404", "W0406", "W0410", "W0511", "W0602", "W0603", "W0604", "W0611", "W0612", "W0613", "W0622", "W0640", "W0702", "W0705", "W0706", "W0707",
-  "W0711", "W0718", "W0719", "W1113", "W1201", "W1202", "W1203", "W1301", "W1302", "W1303", "W1304", "W1305", "W1309", "W1310", "W1401", "W1404",
-  "W1405", "W1406", "W1501", "W1502", "W1508", "W1509", "W1510", "W1514", "W1515", "W1518", "W1641", "W2101", "W2402", "W2601", "W2901", "W3201",
+  "C0103",
+  "C0105",
+  "C0112",
+  "C0113",
+  "C0114",
+  "C0115",
+  "C0116",
+  "C0121",
+  "C0123",
+  "C0131",
+  "C0132",
+  "C0198",
+  "C0199",
+  "C0201",
+  "C0202",
+  "C0205",
+  "C0206",
+  "C0208",
+  "C0301",
+  "C0303",
+  "C0304",
+  "C0305",
+  "C0321",
+  "C0410",
+  "C0411",
+  "C0412",
+  "C0413",
+  "C0414",
+  "C0415",
+  "C0501",
+  "C1802",
+  "C1901",
+  "C2201",
+  "C2401",
+  "C2403",
+  "C2701",
+  "C2801",
+  "C3001",
+  "C3002",
+  "E0001",
+  "E0013",
+  "E0014",
+  "E0100",
+  "E0101",
+  "E0102",
+  "E0103",
+  "E0104",
+  "E0105",
+  "E0106",
+  "E0107",
+  "E0108",
+  "E0112",
+  "E0115",
+  "E0116",
+  "E0117",
+  "E0118",
+  "E0213",
+  "E0237",
+  "E0241",
+  "E0302",
+  "E0303",
+  "E0304",
+  "E0305",
+  "E0308",
+  "E0309",
+  "E0402",
+  "E0602",
+  "E0603",
+  "E0604",
+  "E0605",
+  "E0643",
+  "E0704",
+  "E0711",
+  "E1132",
+  "E1142",
+  "E1205",
+  "E1206",
+  "E1300",
+  "E1301",
+  "E1302",
+  "E1303",
+  "E1304",
+  "E1305",
+  "E1306",
+  "E1307",
+  "E1310",
+  "E1519",
+  "E1520",
+  "E1700",
+  "E2502",
+  "E2510",
+  "E2512",
+  "E2513",
+  "E2514",
+  "E2515",
+  "E4703",
+  "E6004",
+  "E6005",
+  "R0022",
+  "R0123",
+  "R0124",
+  "R0133",
+  "R0202",
+  "R0203",
+  "R0205",
+  "R0206",
+  "R0402",
+  "R0904",
+  "R0911",
+  "R0912",
+  "R0913",
+  "R0914",
+  "R0915",
+  "R0916",
+  "R1260",
+  "R1701",
+  "R1702",
+  "R1703",
+  "R1704",
+  "R1705",
+  "R1706",
+  "R1707",
+  "R1710",
+  "R1711",
+  "R1714",
+  "R1715",
+  "R1717",
+  "R1718",
+  "R1719",
+  "R1720",
+  "R1721",
+  "R1722",
+  "R1723",
+  "R1724",
+  "R1725",
+  "R1728",
+  "R1729",
+  "R1730",
+  "R1731",
+  "R1732",
+  "R1733",
+  "R1734",
+  "R1735",
+  "R1736",
+  "R2004",
+  "R2044",
+  "R5501",
+  "R6002",
+  "R6003",
+  "R6104",
+  "R6201",
+  "R6301",
+  "W0012",
+  "W0102",
+  "W0104",
+  "W0106",
+  "W0107",
+  "W0108",
+  "W0109",
+  "W0120",
+  "W0122",
+  "W0123",
+  "W0127",
+  "W0129",
+  "W0130",
+  "W0131",
+  "W0133",
+  "W0150",
+  "W0160",
+  "W0177",
+  "W0199",
+  "W0211",
+  "W0212",
+  "W0245",
+  "W0301",
+  "W0401",
+  "W0404",
+  "W0406",
+  "W0410",
+  "W0511",
+  "W0602",
+  "W0603",
+  "W0604",
+  "W0611",
+  "W0612",
+  "W0613",
+  "W0622",
+  "W0640",
+  "W0702",
+  "W0705",
+  "W0706",
+  "W0707",
+  "W0711",
+  "W0718",
+  "W0719",
+  "W1113",
+  "W1201",
+  "W1202",
+  "W1203",
+  "W1301",
+  "W1302",
+  "W1303",
+  "W1304",
+  "W1305",
+  "W1309",
+  "W1310",
+  "W1401",
+  "W1404",
+  "W1405",
+  "W1406",
+  "W1501",
+  "W1502",
+  "W1508",
+  "W1509",
+  "W1510",
+  "W1514",
+  "W1515",
+  "W1518",
+  "W1641",
+  "W2101",
+  "W2402",
+  "W2601",
+  "W2901",
+  "W3201",
   "W3301",
-
   # Missing
-  "E0601", "R1737", "W0311", "W2301",
-
+  "E0601",
+  "R1737",
+  "W0311",
+  "W2301",
   # Mine
-  "C0111", "E1101", "E1102", "E1120", "E1123", "E1130", "E1135", "E1136", "E3701", "R0204", "R0401", "R0801", "R0901", "R0902", "R0903", "R0917",
-  "R5601", "R6102", "R6103", "W0149", "W0221", "W0222", "W0223", "W0621", "W0717",
+  "C0111",
+  "E1101",
+  "E1102",
+  "E1120",
+  "E1123",
+  "E1130",
+  "E1135",
+  "E1136",
+  "E3701",
+  "R0204",
+  "R0401",
+  "R0801",
+  "R0901",
+  "R0902",
+  "R0903",
+  "R0917",
+  "R5601",
+  "R6102",
+  "R6103",
+  "W0149",
+  "W0221",
+  "W0222",
+  "W0223",
+  "W0621",
+  "W0717"
 ]
 enable = [
   "useless-suppression",
-  "use-symbolic-message-instead",
+  "use-symbolic-message-instead"
 ]
 
 [tool.pylint.reports]
@@ -159,35 +423,6 @@ reportUnusedExpression = true
 reportUnusedFunction = true
 reportUnusedVariable = true
 
-[tool.mypy]
-files = ["efax", "tests", "examples"]
-disable_error_code = ["type-abstract"]
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_incomplete_defs = true
-# disallow_untyped_calls = true
-disallow_untyped_decorators = true
-disallow_untyped_defs = true
-no_implicit_optional = true
-pretty = true
-show_error_codes = true
-show_error_context = false
-strict_equality = true
-warn_no_return = true
-warn_redundant_casts = true
-warn_return_any = false
-warn_unreachable = true
-warn_unused_configs = true
-warn_unused_ignores = true
-
-[[tool.mypy.overrides]]
-module = [
-  "tensorflow_probability.substrates",
-  "array_api_compat",
-  "opt_einsum",
-]
-ignore_missing_imports = true
-
 [tool.ruff]
 line-length = 100
 
@@ -227,8 +462,11 @@ ignore = [
   "TC003", # Move standard library import into a type-checking block.
   "TD002", # Missing author in TODO; try: # TODO(<author_name>): ....
   "TD003", # Missing issue link on the line following this TODO.
-  "TID252", # Relative imports from parent modules are banned.
+  "TID252" # Relative imports from parent modules are banned.
 ]
+
+[tool.ruff.lint.flake8-errmsg]
+max-string-length = 40
 
 [tool.ruff.lint.flake8-import-conventions.extend-aliases]
 "array_api_extra" = "xpx"
@@ -244,9 +482,6 @@ ignore = [
 "pyqtgraph" = "pg"
 "scipy.special" = "sc"
 "seaborn" = "sns"
-
-[tool.ruff.lint.flake8-errmsg]
-max-string-length = 40
 
 [tool.ruff.lint.isort]
 combine-as-imports = true

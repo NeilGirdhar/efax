@@ -8,3 +8,7 @@ pre-commit:
     - name: pyright
       glob: "*.py"
       run: uv run pyright {staged_files}
+    - name: toml-sort
+      glob: "*.toml"
+      run: toml-sort -i {staged_files}
+      stage_fixed: true
