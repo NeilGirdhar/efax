@@ -29,6 +29,10 @@ class ShapedDistribution(Generic[T]):
         self.real_dtype: np.dtype[Any] = np.real(np.zeros(0, dtype=rvs_dtype)).dtype
         self.objects = objects
 
+    @property
+    def ndim(self) -> int:
+        return len(self.shape)
+
     def rvs(self,
             size: int | Shape | None = None,
             random_state: Generator | None = None) -> NumpyRealArray:
@@ -44,23 +48,27 @@ class ShapedDistribution(Generic[T]):
         return retval
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
-        retval = np.empty(self.shape, dtype=self.real_dtype)
+        assert x.shape[:self.ndim] == self.shape
+        retval = np.empty(x.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast('T', self.objects[i])
             if not isinstance(this_object, ScipyDistribution):
                 raise NotImplementedError
-            value = this_object.pdf(x[i])
-            retval[i] = value
+            for j in np.ndindex(*x.shape[self.ndim:]):
+                value = this_object.pdf(x[*i, *j])
+                retval[*i, *j] = value
         return retval
 
     def pmf(self, x: NumpyIntegralArray) -> NumpyRealArray:
-        retval = np.empty(self.shape, dtype=self.real_dtype)
+        assert x.shape[:self.ndim] == self.shape
+        retval = np.empty(x.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast('T', self.objects[i])
             if not isinstance(this_object, ScipyDiscreteDistribution):
                 raise NotImplementedError
-            value = this_object.pmf(x[i])
-            retval[i] = value
+            for j in np.ndindex(*x.shape[self.ndim:]):
+                value = this_object.pmf(x[*i, *j])
+                retval[*i, *j] = value
         return retval
 
     def entropy(self) -> NumpyRealArray:
