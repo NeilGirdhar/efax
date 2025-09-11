@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import override
+
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization

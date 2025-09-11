@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+from typing import override
+
 import numpy as np
 import optype.numpy as onp
 import scipy.stats as ss
 from numpy.random import Generator
 from scipy.special import beta as scipy_beta
 from tjax import NumpyComplexArray, NumpyRealArray, ShapeLike
-from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 

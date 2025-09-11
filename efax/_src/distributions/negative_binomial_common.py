@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, TypeVar
+from typing import Any, TypeVar, override
 
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..natural_parametrization import NaturalParametrization

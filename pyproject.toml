@@ -22,7 +22,7 @@ name = "efax"
 version = "1.22.3"
 description = "Exponential families for JAX"
 readme = "README.rst"
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.12,<3.15"
 license = "Apache-2.0"
 authors = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
 maintainers = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
@@ -32,9 +32,9 @@ classifiers = [
   "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Software Development :: Libraries :: Python Modules",

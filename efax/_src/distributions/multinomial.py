@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import Self, override
 
 import array_api_extra as xpx
 import jax.random as jr
@@ -9,7 +9,6 @@ import scipy.special as sc
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..interfaces.conjugate_prior import HasGeneralizedConjugatePrior
 from ..interfaces.multidimensional import Multidimensional
@@ -74,7 +73,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
         if shape is not None:
             shape += self.shape
         retval = xpx.one_hot(jr.categorical(key, self.log_odds, shape=shape), self.dimensions())
-        assert isinstance(retval, JaxRealArray)
+        assert isinstance(retval, JaxArray)
         return retval
 
     @override

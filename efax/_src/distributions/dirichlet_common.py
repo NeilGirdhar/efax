@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar, override
 
 import jax.random as jr
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..interfaces.multidimensional import Multidimensional
 from ..interfaces.samplable import Samplable
@@ -20,11 +19,10 @@ EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
 
 
 @dataclass
-class DirichletCommonNP(HasEntropyNP[EP],
+class DirichletCommonNP[EP: 'DirichletCommonEP[Any]'](HasEntropyNP[EP],
                         Samplable,
                         Multidimensional,
-                        NaturalParametrization[EP, JaxRealArray],
-                        Generic[EP]):
+                        NaturalParametrization[EP, JaxRealArray]):
     alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport(
         ring=RealField(minimum=-1.0, generation_scale=3.0)))
 
@@ -60,10 +58,10 @@ NP = TypeVar('NP', bound=DirichletCommonNP[Any])
 
 
 @dataclass
-class DirichletCommonEP(HasEntropyEP[NP],
+class DirichletCommonEP[NP: DirichletCommonNP[Any]](HasEntropyEP[NP],
                         Samplable,
                         ExpToNat[NP],
-                        Multidimensional, Generic[NP]):
+                        Multidimensional):
     mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport(
         ring=negative_support))
 

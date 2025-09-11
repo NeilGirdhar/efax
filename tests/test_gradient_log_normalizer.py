@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TypeAlias
 
 from array_api_compat import array_namespace
 from jax import grad, jvp, vjp
@@ -14,7 +13,7 @@ from efax import NaturalParametrization, Structure, parameters
 
 from .distribution_info import DistributionInfo
 
-_LogNormalizer: TypeAlias = Callable[[NaturalParametrization], JaxRealArray]
+type _LogNormalizer = Callable[[NaturalParametrization], JaxRealArray]
 
 
 def _prelude(generator: Generator,

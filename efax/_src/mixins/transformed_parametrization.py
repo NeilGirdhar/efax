@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from functools import partial
-from typing import Any, Generic, cast
+from typing import Any, Generic, cast, override
 
 from array_api_compat import array_namespace
 from jax import jacobian, vmap
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..iteration import parameters
@@ -19,7 +19,7 @@ Domain = TypeVar('Domain', bound=JaxComplexArray, default=JaxComplexArray)
 
 
 class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
-                                        Generic[NP, EP, TEP, Domain]):
+                                        Generic[NP, EP, TEP, Domain]):  # noqa: UP046
     """Produce a NaturalParametrization by relating it to some base distrubtion NP."""
     @classmethod
     @abstractmethod
@@ -94,7 +94,7 @@ TNP = TypeVar('TNP', bound=TransformedNaturalParametrization, default=Any)
 
 
 class TransformedExpectationParametrization(ExpectationParametrization[TNP],
-                                            Generic[EP, NP, TNP]):
+                                            Generic[EP, NP, TNP]):  # noqa: UP046
     """Produce an ExpectationParametrization by relating it to some base distrubtion EP."""
     @classmethod
     @abstractmethod

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from math import comb, isqrt
-from typing import Any, cast
+from typing import Any, cast, override
 
 import array_api_extra as xpx
 import jax.scipy.special as jss
@@ -11,7 +11,6 @@ from array_api_compat import array_namespace
 from numpy.random import Generator
 from opt_einsum import contract
 from tjax import JaxArray, JaxRealArray, Shape
-from typing_extensions import override
 
 from ..types import Namespace
 from .ring import ComplexField, RealField, Ring, complex_field, real_field

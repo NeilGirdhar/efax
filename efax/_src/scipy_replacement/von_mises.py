@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import override
+
 import numpy as np
 import scipy.stats as ss
 from tjax import NumpyRealArray
-from typing_extensions import override
 
 from .shaped_distribution import ShapedDistribution
 

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import math
+from typing import override
 
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import Array, JaxArray, JaxRealArray
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,

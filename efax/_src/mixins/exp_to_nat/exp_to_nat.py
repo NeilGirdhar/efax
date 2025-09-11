@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import KW_ONLY, field
-from typing import Any, Generic, Self, TypeAlias
+from typing import Any, Generic, Self, override
 
 from array_api_compat import array_namespace
 from jax import vmap
 from tjax import JaxRealArray, jit
 from tjax.dataclasses import dataclass
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar
 
 from ...expectation_parametrization import ExpectationParametrization
 from ...natural_parametrization import NaturalParametrization
@@ -15,7 +15,7 @@ from ...parametrization import SimpleDistribution
 from ...structure.flattener import Flattener
 
 NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
-SP: TypeAlias = JaxRealArray
+type SP = JaxRealArray
 
 
 class ExpToNatMinimizer:

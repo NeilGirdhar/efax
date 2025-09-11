@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import cast, override
 
 import jax.random as jr
 from array_api_compat import array_namespace
 from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ...interfaces.samplable import Samplable
 from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, cast
+from typing import Any, cast, override
 
 import array_api_extra as xpx
 import jax.numpy as jnp
 import numpy as np
 import scipy.stats as ss
 from tjax import JaxRealArray, NumpyComplexArray, NumpyRealArray, abs_square
-from typing_extensions import override
 
 from efax import (BernoulliEP, BernoulliNP, BetaEP, BetaNP, ChiEP, ChiNP, ChiSquareEP, ChiSquareNP,
                   ComplexCircularlySymmetricNormalEP, ComplexCircularlySymmetricNormalNP,

@@ -7,11 +7,12 @@ and Computation, volume 97, pp165-181
 """
 from __future__ import annotations
 
+from typing import override
+
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape, softplus
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat

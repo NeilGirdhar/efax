@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, final
+from typing import Any, Generic, final, override
 
 import jax.numpy as jnp
 import pytest
 from numpy.random import Generator
 from tjax import JaxComplexArray, NumpyComplexArray, Shape
-from typing_extensions import TypeVar, override
+from typing_extensions import TypeVar
 
 from efax import (ExpectationParametrization, NaturalParametrization, ScipyDiscreteDistribution,
                   ScipyDistribution, Structure, SubDistributionInfo)

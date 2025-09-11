@@ -37,7 +37,7 @@ def parameter_dot_product(x: NaturalParametrization, y: Distribution, /) -> JaxR
 T = TypeVar('T', bound=Distribution)
 
 
-def parameter_mean(x: T, /, *, axis: Axis | None = None) -> T:
+def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
     """Return the mean of the parameters (fixed and variable)."""
     xp = array_namespace(x)
     structure = Structure.create(x)
@@ -46,7 +46,7 @@ def parameter_mean(x: T, /, *, axis: Axis | None = None) -> T:
     return structure.assemble(q)
 
 
-def parameter_map(operation: Callable[..., JaxComplexArray],
+def parameter_map[T: Distribution](operation: Callable[..., JaxComplexArray],
                   x: T,
                   /,
                   *ys: Distribution
@@ -62,11 +62,7 @@ def parameter_map(operation: Callable[..., JaxComplexArray],
     return Structure.create(x).assemble({**fixed_parameters, **operated_fields})
 
 
-_T = TypeVar('_T')
-_V = TypeVar('_V')
-
-
-def join_mappings(**field_to_map: Mapping[_T, _V]) -> dict[_T, dict[str, _V]]:
+def join_mappings[T, V](**field_to_map: Mapping[T, V]) -> dict[T, dict[str, V]]:
     """Joins multiple mappings together using their common keys.
 
     >>> user_scores = {'elliot': 50, 'claris': 60}
@@ -74,7 +70,7 @@ def join_mappings(**field_to_map: Mapping[_T, _V]) -> dict[_T, dict[str, _V]]:
     >>> join_mappings(score=user_scores, time=user_times)
     {'elliot': {'score': 50, 'time': 30}, 'claris': {'score': 60, 'time': 40}}
     """
-    retval = defaultdict[_T, dict[str, _V]](dict)
+    retval = defaultdict[T, dict[str, V]](dict)
     for field_name, mapping in field_to_map.items():
         for key, value in mapping.items():
             retval[key][field_name] = value

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, TypeAlias
+from typing import Any
 
-Axis: TypeAlias = int | tuple[int, ...]
-Path: TypeAlias = tuple[str, ...]
-Namespace: TypeAlias = Any
+type Axis = int | tuple[int, ...]
+type Path = tuple[str, ...]
+type Namespace = Any

@@ -1,7 +1,7 @@
 """These tests apply to only samplable distributions."""
 from __future__ import annotations
 
-from typing import Any, TypeAlias
+from typing import Any
 
 import jax.numpy as jnp
 from numpy.random import Generator
@@ -16,7 +16,7 @@ from .create_info import (ComplexCircularlySymmetricNormalInfo,
                           MultivariateNormalInfo)
 from .distribution_info import DistributionInfo
 
-_Path: TypeAlias = tuple[str, ...]
+type _Path = tuple[str, ...]
 
 
 def _produce_samples(generator: Generator,

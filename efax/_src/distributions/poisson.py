@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import Self, override
 
 import jax.random as jr
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.conjugate_prior import HasConjugatePrior

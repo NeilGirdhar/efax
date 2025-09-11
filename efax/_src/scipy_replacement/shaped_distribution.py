@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, TypeVar, cast, override
 
 import numpy as np
 import numpy.typing as npt
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyIntegralArray, NumpyRealArray, Shape
-from typing_extensions import override
 
 from .base import ScipyDiscreteDistribution, ScipyDistribution
 
 T = TypeVar('T', bound=ScipyDiscreteDistribution | ScipyDistribution)
 
 
-class ShapedDistribution(Generic[T]):
+class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
     """Allow a distributions with shape."""
     @override
     def __init__(self,

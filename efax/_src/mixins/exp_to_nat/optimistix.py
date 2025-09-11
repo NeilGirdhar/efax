@@ -1,18 +1,17 @@
-from typing import Any, TypeAlias, TypeVar
+from typing import Any, TypeVar, override
 
 import optimistix as optx
 from array_api_compat import array_namespace
 from jax import jit
 from tjax import JaxRealArray
 from tjax.dataclasses import dataclass, field
-from typing_extensions import override
 
 from .exp_to_nat import ExpToNat, ExpToNatMinimizer
 
 Y = TypeVar('Y')
 Out = TypeVar('Out')
 Aux = TypeVar('Aux')
-RootFinder: TypeAlias = (
+type RootFinder[Y, Out, Aux] = (
         optx.AbstractRootFinder[Y, Out, Aux, Any]
         | optx.AbstractLeastSquaresSolver[Y, Out, Aux, Any]
         | optx.AbstractMinimiser[Y, Aux, Any])

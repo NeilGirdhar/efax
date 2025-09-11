@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import math
-from typing import Self
+from typing import Self, override
 
 import jax.random as jr
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ...interfaces.conjugate_prior import HasConjugatePrior
 from ...interfaces.samplable import Samplable

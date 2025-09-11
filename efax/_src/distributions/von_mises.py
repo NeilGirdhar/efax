@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import math
-from typing import cast
+from typing import cast, override
 
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
-from typing_extensions import override
 
 from ..interfaces.multidimensional import Multidimensional
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat

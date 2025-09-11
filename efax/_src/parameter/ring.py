@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from dataclasses import dataclass
 from types import ModuleType
+from typing import override
 
 import array_api_extra as xpx
 import jax.scipy.special as jss
@@ -11,7 +12,6 @@ from array_api_compat import array_namespace
 from numpy.random import Generator
 from tjax import (JaxArray, JaxComplexArray, JaxRealArray, RealNumeric, Shape, inverse_softplus,
                   softplus)
-from typing_extensions import override
 
 from ..types import Namespace
 
