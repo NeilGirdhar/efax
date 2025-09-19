@@ -187,6 +187,8 @@ class ComplexField(Ring):
         minimum = _fix_bound(self.minimum_modulus, corrected_x)
         maximum = _fix_bound(self.maximum_modulus, corrected_x)
 
+        if minimum is None:
+            minimum = 0.0
         if maximum is None:
             # x is outside the disk of the given minimum.  Map it to the plane.
             corrected_magnitude = xp.abs(corrected_x)
