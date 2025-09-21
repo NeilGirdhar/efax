@@ -55,4 +55,4 @@ class ScipyMultivariateNormal(
         objects = np.empty(shape, dtype=ScipyMultivariateNormalUnvectorized)
         for i in np.ndindex(*shape):
             objects[i] = ScipyMultivariateNormalUnvectorized(mean[i], cov[i])
-        return cls(shape, rvs_shape, dtype, objects)
+        return cls(shape, rvs_shape, dtype, objects, multivariate=True)

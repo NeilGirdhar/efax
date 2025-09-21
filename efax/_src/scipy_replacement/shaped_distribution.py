@@ -19,7 +19,9 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
                  shape: Shape,
                  rvs_shape: Shape,
                  rvs_dtype: np.dtype[Any],
-                 objects: npt.NDArray[np.object_]
+                 objects: npt.NDArray[np.object_],
+                 *,
+                 multivariate: bool,
                  ) -> None:
         super().__init__()
         self.shape = shape
@@ -27,6 +29,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         self.rvs_dtype = rvs_dtype
         self.real_dtype: np.dtype[Any] = np.real(np.zeros(0, dtype=rvs_dtype)).dtype
         self.objects = objects
+        self.multivariate = multivariate
 
     @property
     def ndim(self) -> int:
@@ -48,13 +51,21 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
         assert x.shape[:self.ndim] == self.shape
-        retval = np.empty(x.shape, dtype=self.real_dtype)
+        final_shape = x.shape[:-1] if self.multivariate else x.shape
+        retval = np.empty(final_shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast('T', self.objects[i])
             if not isinstance(this_object, ScipyDistribution):
                 raise NotImplementedError
-            for j in np.ndindex(*x.shape[self.ndim:]):
-                value = this_object.pdf(x[*i, *j])
+            j_range = x.shape[self.ndim: -1] if self.multivariate else x.shape[self.ndim:]
+            for j in np.ndindex(*j_range):
+                if self.multivariate:
+                    x_ij = x[*i, *j, :]
+                    assert x_ij.ndim == 1
+                else:
+                    x_ij = x[*i, *j]
+                    assert x_ij.ndim == 0
+                value = this_object.pdf(x_ij)
                 retval[*i, *j] = value
         return retval
 

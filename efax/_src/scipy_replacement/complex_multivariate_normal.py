@@ -43,6 +43,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
             raise ValueError(msg)
 
     def pdf(self, z: NumpyComplexArray, out: None = None) -> float:
+        assert z.ndim == 1
         zr = np.concat([np.real(z), np.imag(z)], axis=-1)
         return self.as_multivariate_normal().pdf(zr).item()
 
@@ -114,7 +115,7 @@ class ScipyComplexMultivariateNormal(
         for i in np.ndindex(*shape):
             objects[i] = ScipyComplexMultivariateNormalUnvectorized(
                     mean[i], variance[i], pseudo_variance[i])
-        super().__init__(shape, rvs_shape, dtype, objects)
+        super().__init__(shape, rvs_shape, dtype, objects, multivariate=True)
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
         objects = np.empty(self.shape, dtype=ScipyMultivariateNormalUnvectorized)
@@ -122,7 +123,8 @@ class ScipyComplexMultivariateNormal(
             this_object = self.objects[i]
             assert isinstance(this_object, ScipyComplexMultivariateNormalUnvectorized)
             objects[i] = this_object.as_multivariate_normal()
-        return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects)
+        return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects,
+                                       multivariate=True)
 
     @property
     def mean(self) -> NumpyComplexArray:

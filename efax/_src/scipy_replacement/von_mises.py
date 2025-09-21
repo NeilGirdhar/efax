@@ -23,7 +23,7 @@ class ScipyVonMises(ShapedDistribution[object]):  # type: ignore  # pyright: ign
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
             objects[i] = ss.vonmises(kappa[i], loc[i])
-        super().__init__(shape, rvs_shape, dtype, objects)
+        super().__init__(shape, rvs_shape, dtype, objects, multivariate=False)
 
 
 class ScipyVonMisesFisher(ShapedDistribution[object]):  # type: ignore  # pyright: ignore
@@ -39,4 +39,4 @@ class ScipyVonMisesFisher(ShapedDistribution[object]):  # type: ignore  # pyrigh
         objects = np.empty(shape, dtype=np.object_)
         for i in np.ndindex(*shape):
             objects[i] = ss.vonmises_fisher(mu[i], kappa[i])  # type: ignore  # pyright: ignore
-        super().__init__(shape, rvs_shape, dtype, objects)
+        super().__init__(shape, rvs_shape, dtype, objects, multivariate=True)

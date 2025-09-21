@@ -96,7 +96,7 @@ class ScipyComplexNormal(
         objects = np.empty(shape, dtype=ScipyComplexNormalUnvectorized)
         for i in np.ndindex(*shape):
             objects[i] = ScipyComplexNormalUnvectorized(mean[i], variance[i], pseudo_variance[i])
-        super().__init__(shape, rvs_shape, dtype, objects)
+        super().__init__(shape, rvs_shape, dtype, objects, multivariate=False)
 
     @classmethod
     def init_using_angle(cls,
@@ -117,7 +117,8 @@ class ScipyComplexNormal(
             this_object = self.objects[i]
             assert isinstance(this_object, ScipyComplexNormalUnvectorized)
             objects[i] = this_object.as_multivariate_normal()
-        return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects)
+        return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects,
+                                       multivariate=True)
 
     @property
     def mean(self) -> NumpyComplexArray:
