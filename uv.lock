@@ -418,7 +418,7 @@ wheels = [
 
 [[package]]
 name = "efax"
-version = "1.22.3"
+version = "1.23.0"
 source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },
@@ -2122,7 +2122,7 @@ wheels = [
 
 [[package]]
 name = "tfp-nightly"
-version = "0.26.0.dev20250920"
+version = "0.26.0.dev20250921"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "absl-py" },
@@ -2134,7 +2134,7 @@ dependencies = [
     { name = "six" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/88/ff293f55e68145b531568699a674874bb97efda91bcba0c3578891673d93/tfp_nightly-0.26.0.dev20250920-py2.py3-none-any.whl", hash = "sha256:04f9df4915a3239b354f8d0480fa3f77930eda7a3d141b061488c3d4cb654abd", size = 6975546, upload-time = "2025-09-20T08:43:49.764Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/e1/3f93d6a668851aa19f94390e861156cd3ed596e2a4616fa7768a400df182/tfp_nightly-0.26.0.dev20250921-py2.py3-none-any.whl", hash = "sha256:c2ad90ee807c6130ccd15828a5b764a26e2b1b1268a1778a27299c8a2c4ac087", size = 6975549, upload-time = "2025-09-21T08:43:47.768Z" },
 ]
 
 [[package]]

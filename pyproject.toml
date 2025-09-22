@@ -19,7 +19,7 @@ dev = [
 
 [project]
 name = "efax"
-version = "1.22.3"
+version = "1.23.0"
 description = "Exponential families for JAX"
 readme = "README.rst"
 requires-python = ">=3.12,<3.15"
