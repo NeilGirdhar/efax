@@ -8,7 +8,7 @@ dev = [
   "jupyter>=1",
   "lefthook>=1.11.13",
   "mypy>=1.12",
-  "pylint>=3.3",
+  "pylint>=4.0",
   "pyright>=1.1.401",
   "pytest-ordering",
   "pytest-xdist[psutil]>=3",
@@ -44,7 +44,7 @@ dependencies = [
   "array_api_compat>=1.10",
   "array_api_extra>=0.8",
   "jax>=0.6.1",
-  "numpy>=1.25",
+  "numpy>=2.0",
   "opt-einsum>=3.4",
   "optimistix>=0.0.9",
   "optype[numpy]>=0.8.0",
@@ -94,7 +94,7 @@ ignore_missing_imports = true
 
 [tool.pylint.master]
 jobs = 0
-py-version = "3.11"
+py-version = "3.12"
 load-plugins = [
   "pylint.extensions.bad_builtin",
   "pylint.extensions.broad_try_clause",
@@ -262,6 +262,7 @@ disable = [
   "R6201",
   "R6301",
   "W0012",
+  "W0101",
   "W0102",
   "W0104",
   "W0106",
