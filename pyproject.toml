@@ -402,7 +402,6 @@ reportMissingTypeArgument = true
 reportOverlappingOverload = true
 reportPrivateImportUsage = true
 reportPropertyTypeMismatch = true
-reportShadowedImports = true
 reportUninitializedInstanceVariable = true
 reportUnknownArgumentType = false
 reportUnknownLambdaType = false
