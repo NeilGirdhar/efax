@@ -29,7 +29,7 @@ class JointDistribution(Distribution):
         return {name: (value.general_method(f, t)
                        if isinstance(value, JointDistribution) else f(value))
                 for name, value in self._sub_distributions.items()
-                if isinstance(value, JointDistribution | t)}
+                if isinstance(value, (JointDistribution, t))}
 
     def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
         stream = RngStream(key)

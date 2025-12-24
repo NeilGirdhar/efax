@@ -2,7 +2,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import fields
 from typing import Any, Literal, overload
 
-from tjax import JaxComplexArray
+from tjax import JaxArray, JaxComplexArray
 from typing_extensions import TypeIs
 
 from .parameter import Support
@@ -167,4 +167,4 @@ def flat_dict_of_parameters(d: Distribution) -> dict[Path, SimpleDistribution]:
 
 def flat_dict_of_observations(x: Mapping[str, Any] | JaxComplexArray
                               ) -> dict[Path, JaxComplexArray]:
-    return flatten_mapping(x) if isinstance(x, Mapping) else {(): x}
+    return {(): x} if isinstance(x, JaxArray) else flatten_mapping(x)

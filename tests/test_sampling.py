@@ -5,7 +5,7 @@ from typing import Any
 
 import jax.numpy as jnp
 from numpy.random import Generator
-from tjax import JaxComplexArray, KeyArray, Shape, assert_tree_allclose
+from tjax import JaxArray, JaxComplexArray, KeyArray, Shape, assert_tree_allclose
 
 from efax import (Distribution, ExpectationParametrization, JointDistribution,
                   MaximumLikelihoodEstimator, NaturalParametrization, Samplable, SimpleDistribution,
@@ -106,7 +106,8 @@ def test_sampling_and_estimation(generator: Generator,
                                                distribution_shape, sample_shape, natural=natural)
     flat_map_of_samples = flat_dict_of_observations(samples)
     structure = Structure.create(exp_parameters)
-    flat_map_of_samples = flatten_mapping(samples) if isinstance(samples, dict) else {(): samples}
+    flat_map_of_samples = ({(): samples} if isinstance(samples, JaxArray)
+                           else flatten_mapping(samples))
     _verify_sample_shape(distribution_shape, sample_shape, structure, flat_map_of_samples)
     _verify_maximum_likelihood_estimate(sampling_distribution_info, sample_shape, structure,
                                         exp_parameters, samples)

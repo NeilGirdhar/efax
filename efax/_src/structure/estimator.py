@@ -86,16 +86,16 @@ class MaximumLikelihoodEstimator(Structure[P]):
                                  for name in info.sub_distribution_names}
             constructed[info.path] = exp_cls(sub_distributions)
 
-        if isinstance(x, dict):
+        if isinstance(x, JaxArray):
+            info, = self.infos
+            g(info, x)
+        else:
             flat_x = flatten_mapping(x)
             for info in self.infos:
                 if info.path in flat_x:
                     g(info, flat_x[info.path])
                 else:
                     h(info)
-        else:
-            info, = self.infos
-            g(info, x)
         return cast('P', constructed[()])
 
     def from_conjugate_prior_distribution(self,
