@@ -7,7 +7,7 @@ import jax
 import jax.random as jr
 import numpy as np
 import pytest
-from jax.experimental import enable_x64
+from jax import enable_x64
 from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
 
