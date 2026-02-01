@@ -29,7 +29,7 @@ differential programming library `JAX <https://github.com/google/jax/>`_.
 The *exponential families* are an important class of probability distributions that include the
 normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
 For an explanation of the fundamental ideas behind this library, see our `overview on exponential
-families <https://github.com/NeilGirdhar/efax/blob/master/expfam.pdf>`_.
+families <https://github.com/NeilGirdhar/efax/blob/master/exponential_families.pdf>`_.
 
 The main motivation for using EFAX over a library like tensorflow-probability or the basic functions
 in JAX is that EFAX provides the two most important parametrizations for each exponential family—the
@@ -227,7 +227,7 @@ A basic use of the two parametrizations:
 
     """Cross-entropy.
 
-    This example is based on section 1.4.1 from expfam.pdf, entitled Information
+    This example is based on section 1.4.1 from exponential_families.pdf, entitled Information
     theoretic statistics.
     """
     import jax.numpy as jnp
@@ -264,7 +264,7 @@ Evidence combination:
 
     """Bayesian evidence combination.
 
-    This example is based on section 1.2.1 from expfam.pdf, entitled Bayesian
+    This example is based on section 1.2.1 from exponential_families.pdf, entitled Bayesian
     evidence combination.
 
     Suppose you have a prior, and a set of likelihoods, and you want to combine all
@@ -400,7 +400,7 @@ instead.
 
     """Maximum likelihood estimation.
 
-    This example is based on section 1.3.2 from expfam.pdf, entitled Maximum
+    This example is based on section 1.3.2 from exponential_families.pdf, entitled Maximum
     likelihood estimation.
 
     Suppose you have some samples from a distribution family with unknown

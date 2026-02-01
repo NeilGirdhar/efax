@@ -1,7 +1,7 @@
 """Bayesian evidence combination.
 
-This example is based on section 1.2.1 from expfam.pdf, entitled Bayesian
-evidence combination.
+This example is based on section 1.2.1 from exponential_families.pdf, entitled
+Bayesian evidence combination.
 
 Suppose you have a prior, and a set of likelihoods, and you want to combine all
 of the evidence into one distribution.

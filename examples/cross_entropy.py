@@ -1,7 +1,7 @@
 """Cross-entropy.
 
-This example is based on section 1.4.1 from expfam.pdf, entitled Information
-theoretic statistics.
+This example is based on section 1.4.1 from exponential_families.pdf, entitled
+Information theoretic statistics.
 """
 import jax.numpy as jnp
 from tjax import print_generic

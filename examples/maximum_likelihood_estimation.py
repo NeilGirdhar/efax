@@ -1,7 +1,7 @@
 """Maximum likelihood estimation.
 
-This example is based on section 1.3.2 from expfam.pdf, entitled Maximum
-likelihood estimation.
+This example is based on section 1.3.2 from exponential_families.pdf, entitled
+Maximum likelihood estimation.
 
 Suppose you have some samples from a distribution family with unknown
 parameters, and you want to estimate the maximum likelihood parmaters of the
