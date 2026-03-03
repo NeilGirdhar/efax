@@ -456,6 +456,7 @@ ignore = [
   "PLR6301", # Method doesn"t use self.
   "Q000", # Single quotes found but double quotes preferred.
   "RUF021", # Parenthesize `a and b` expressions when chaining `and` and `or` together...
+  "RUF069", # Equality comparison with floats.
   "S101", # Assert used.
   "TC001", # Move application import into a type-checking block.
   "TC002", # Move third-party import into a type-checking block.
