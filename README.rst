@@ -478,4 +478,3 @@ There are a few tools to clean and check the source:
 - :bash:`pyright`
 - :bash:`mypy`
 - :bash:`isort .`
-- :bash:`pylint efax tests`
