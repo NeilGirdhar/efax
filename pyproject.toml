@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-  "isort>=5.13",
   "jupyter>=1",
   "lefthook>=2",
   "mypy>=1.12",
@@ -56,11 +55,6 @@ dependencies = [
 
 [project.urls]
 source = "https://github.com/NeilGirdhar/efax"
-
-[tool.isort]
-line_length = 100
-multi_line_output = 0
-skip_glob = [".pytype/*.py"]
 
 [tool.mypy]
 files = ["efax", "tests", "examples"]
