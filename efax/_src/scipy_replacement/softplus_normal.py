@@ -3,8 +3,14 @@ from __future__ import annotations
 import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
-from tjax import (NumpyComplexArray, NumpyRealArray, NumpyRealNumeric, ShapeLike, inverse_softplus,
-                  softplus)
+from tjax import (
+    NumpyComplexArray,
+    NumpyRealArray,
+    NumpyRealNumeric,
+    ShapeLike,
+    inverse_softplus,
+    softplus,
+)
 
 
 class ScipySoftplusNormal:
@@ -23,10 +29,9 @@ class ScipySoftplusNormal:
         # Compute the final PDF
         return normal_pdf * jacobian
 
-    def rvs(self,
-            size: ShapeLike | None = None,
-            random_state: Generator | None = None
-            ) -> NumpyComplexArray:
+    def rvs(
+        self, size: ShapeLike | None = None, random_state: Generator | None = None
+    ) -> NumpyComplexArray:
         distribution = ss.norm(loc=self.mu, scale=self.sigma)
         samples = np.asarray(distribution.rvs(size=size, random_state=random_state))
         return softplus(samples)

@@ -8,17 +8,24 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxComplexArray
 
-from efax import (JointDistributionN, Multidimensional, NaturalParametrization,
-                  ScipyDiscreteDistribution, ScipyDistribution, SimpleDistribution)
+from efax import (
+    JointDistributionN,
+    Multidimensional,
+    NaturalParametrization,
+    ScipyDiscreteDistribution,
+    ScipyDistribution,
+    SimpleDistribution,
+)
 
 from ..create_info import MultivariateDiagonalNormalInfo
 from ..distribution_info import DistributionInfo
 
 
-def _check_observation_shape(nat_parameters: NaturalParametrization,
-                            efax_x: JaxComplexArray | dict[str, Any],
-                            distribution_shape: tuple[int, ...],
-                            ) -> None:
+def _check_observation_shape(
+    nat_parameters: NaturalParametrization,
+    efax_x: JaxComplexArray | dict[str, Any],
+    distribution_shape: tuple[int, ...],
+) -> None:
     """Verify that the sufficient statistics have the right shape."""
     if isinstance(nat_parameters, JointDistributionN):
         assert isinstance(efax_x, dict)
@@ -27,9 +34,7 @@ def _check_observation_shape(nat_parameters: NaturalParametrization,
         return
     assert isinstance(nat_parameters, SimpleDistribution)  # type: ignore[unreachable]
     assert isinstance(efax_x, Array)  # type: ignore[unreachable]
-    dimensions = (nat_parameters.dimensions()
-                  if isinstance(nat_parameters, Multidimensional)
-                  else 0)
+    dimensions = nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional) else 0
     ideal_shape = distribution_shape + nat_parameters.domain_support().shape(dimensions)
     assert efax_x.shape == ideal_shape
 

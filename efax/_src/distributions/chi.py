@@ -9,24 +9,30 @@ from tjax import Array, JaxArray, JaxRealArray
 from tjax.dataclasses import dataclass
 
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,
-                                                  TransformedNaturalParametrization)
+from ..mixins.transformed_parametrization import (
+    TransformedExpectationParametrization,
+    TransformedNaturalParametrization,
+)
 from ..parameter import RealField, ScalarSupport, distribution_parameter
 from ..parametrization import SimpleDistribution
 from .chi_square import ChiSquareEP, ChiSquareNP
 
 
 @dataclass
-class ChiNP(HasEntropyNP['ChiEP'],
-            TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, 'ChiEP', JaxRealArray],
-            SimpleDistribution):
+class ChiNP(
+    HasEntropyNP["ChiEP"],
+    TransformedNaturalParametrization[ChiSquareNP, ChiSquareEP, "ChiEP", JaxRealArray],
+    SimpleDistribution,
+):
     """The natural parametrization of the chi distribution.
 
     Args:
         k_over_two_minus_one: k/2 - 1 where k is the shape parameter.
     """
-    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=RealField(minimum=-1.0)))
+
+    k_over_two_minus_one: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=RealField(minimum=-1.0))
+    )
 
     @override
     @classmethod
@@ -65,14 +71,17 @@ class ChiNP(HasEntropyNP['ChiEP'],
 
 
 @dataclass
-class ChiEP(HasEntropyEP[ChiNP],
-            TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP],
-            SimpleDistribution):
+class ChiEP(
+    HasEntropyEP[ChiNP],
+    TransformedExpectationParametrization[ChiSquareEP, ChiSquareNP, ChiNP],
+    SimpleDistribution,
+):
     """The expectation parametrization of the chi distribution.
 
     Args:
         mean_log: E(log(x)).
     """
+
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @override

@@ -5,6 +5,7 @@ It is based off:
 T.-T. Wong 1998. Generalized Dirichlet distribution in Bayesian analysis. Applied Mathematics
 and Computation, volume 97, pp165-181
 """
+
 from __future__ import annotations
 
 from typing import override
@@ -22,13 +23,17 @@ from ..parameter import RealField, VectorSupport, distribution_parameter, negati
 
 
 @dataclass
-class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
-                             NaturalParametrization['GeneralizedDirichletEP', JaxRealArray],
-                             Multidimensional):
-    alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=RealField(minimum=-1.0, generation_scale=3.0)))
-    gamma: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=RealField(minimum=0.0, generation_scale=3.0)))
+class GeneralizedDirichletNP(
+    HasEntropyNP["GeneralizedDirichletEP"],
+    NaturalParametrization["GeneralizedDirichletEP", JaxRealArray],
+    Multidimensional,
+):
+    alpha_minus_one: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=RealField(minimum=-1.0, generation_scale=3.0))
+    )
+    gamma: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=RealField(minimum=0.0, generation_scale=3.0))
+    )
 
     @property
     @override
@@ -66,8 +71,9 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> GeneralizedDirichletEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> GeneralizedDirichletEP:
         xp = array_namespace(x)
         cs_x = xp.cumulative_sum(x, axis=-1)
         # cs_x[i] = sum_{j<=i} x[j]
@@ -76,7 +82,7 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         xp = array_namespace(self, x)
-        return xp.zeros(x.shape[:len(x.shape) - 1])
+        return xp.zeros(x.shape[: len(x.shape) - 1])
 
     @override
     def dimensions(self) -> int:
@@ -94,15 +100,17 @@ class GeneralizedDirichletNP(HasEntropyNP['GeneralizedDirichletEP'],
 
 
 @dataclass
-class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
-                             ExpToNat[GeneralizedDirichletNP],
-                             Multidimensional):
+class GeneralizedDirichletEP(
+    HasEntropyEP[GeneralizedDirichletNP], ExpToNat[GeneralizedDirichletNP], Multidimensional
+):
     # E({log(x_i)}_i)
-    mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=negative_support))
+    mean_log_probability: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=negative_support)
+    )
     # E({log(1-∑_{j≤i} x_j)}_i)
-    mean_log_cumulative_probability: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=negative_support))
+    mean_log_cumulative_probability: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=negative_support)
+    )
 
     @property
     @override
@@ -124,8 +132,9 @@ class GeneralizedDirichletEP(HasEntropyEP[GeneralizedDirichletNP],
         # Run Newton's method on the whole real hyperspace.
         n = self.dimensions()
         positive_search_parameters = softplus(search_parameters)
-        return GeneralizedDirichletNP(positive_search_parameters[..., :n] - 1.0,
-                                      positive_search_parameters[..., n:])
+        return GeneralizedDirichletNP(
+            positive_search_parameters[..., :n] - 1.0, positive_search_parameters[..., n:]
+        )
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

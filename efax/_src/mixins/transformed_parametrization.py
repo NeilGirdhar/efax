@@ -13,14 +13,17 @@ from ..expectation_parametrization import ExpectationParametrization
 from ..iteration import parameters
 from ..natural_parametrization import EP, NaturalParametrization
 
-TEP = TypeVar('TEP', bound=ExpectationParametrization, default=Any)
-NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
-Domain = TypeVar('Domain', bound=JaxComplexArray, default=JaxComplexArray)
+TEP = TypeVar("TEP", bound=ExpectationParametrization, default=Any)
+NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
+Domain = TypeVar("Domain", bound=JaxComplexArray, default=JaxComplexArray)
 
 
-class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
-                                        Generic[NP, EP, TEP, Domain]):  # noqa: UP046
+class TransformedNaturalParametrization(
+    NaturalParametrization[TEP, Domain],
+    Generic[NP, EP, TEP, Domain],  # noqa: UP046
+):
     """Produce a NaturalParametrization by relating it to some base distrubtion NP."""
+
     @classmethod
     @abstractmethod
     def base_distribution_cls(cls) -> type[NP]:
@@ -58,7 +61,7 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         xp = array_namespace(self, x)
-        casted_x = cast('Domain', x)
+        casted_x = cast("Domain", x)
         fixed_parameters = parameters(self, fixed=True, recurse=False)
         bound_fy = partial(self.sample_to_base_sample, **fixed_parameters)
         y = bound_fy(casted_x)
@@ -87,15 +90,16 @@ class TransformedNaturalParametrization(NaturalParametrization[TEP, Domain],
         y = cls.sample_to_base_sample(x, **fixed_parameters)
         base_cls = cls.base_distribution_cls()
         return cls.create_expectation_from_base(
-                base_cls.sufficient_statistics(y, **fixed_parameters))
+            base_cls.sufficient_statistics(y, **fixed_parameters)
+        )
 
 
-TNP = TypeVar('TNP', bound=TransformedNaturalParametrization, default=Any)
+TNP = TypeVar("TNP", bound=TransformedNaturalParametrization, default=Any)
 
 
-class TransformedExpectationParametrization(ExpectationParametrization[TNP],
-                                            Generic[EP, NP, TNP]):  # noqa: UP046
+class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):  # noqa: UP046
     """Produce an ExpectationParametrization by relating it to some base distrubtion EP."""
+
     @classmethod
     @abstractmethod
     def base_distribution_cls(cls) -> type[EP]:

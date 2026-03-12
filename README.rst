@@ -474,7 +474,6 @@ The tests can be run using :bash:`pytest -n auto`.  Specific distributions can b
 
 There are a few tools to clean and check the source:
 
-- :bash:`ruff check`
-- :bash:`pyright`
-- :bash:`mypy`
-- :bash:`isort .`
+- :bash:`uv run ruff check`
+- :bash:`uv run ruff format`
+- :bash:`uv run ty check`

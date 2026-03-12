@@ -16,12 +16,12 @@ class ScipyLogNormal:
         exp_mu = np.exp(self.mu)
         return np.asarray(self.distribution.pdf(z / exp_mu)) / exp_mu
 
-    def rvs(self,
-            size: ShapeLike | None = None,
-            random_state: Generator | None = None
-            ) -> NumpyComplexArray:
-        return np.asarray(self.distribution.rvs(size=size, random_state=random_state)
-                          * np.exp(self.mu))
+    def rvs(
+        self, size: ShapeLike | None = None, random_state: Generator | None = None
+    ) -> NumpyComplexArray:
+        return np.asarray(
+            self.distribution.rvs(size=size, random_state=random_state) * np.exp(self.mu)
+        )
 
     def entropy(self) -> NumpyRealArray:
         return np.asarray(self.distribution.entropy()) + self.mu

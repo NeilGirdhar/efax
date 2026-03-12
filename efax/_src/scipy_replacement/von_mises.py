@@ -11,6 +11,7 @@ from .shaped_distribution import ShapedDistribution
 
 class ScipyVonMises(ShapedDistribution[object]):  # type: ignore  # pyright: ignore
     """This class allows distributions having a non-empty shape."""
+
     @override
     def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None) -> None:
         if loc is None:
@@ -28,6 +29,7 @@ class ScipyVonMises(ShapedDistribution[object]):  # type: ignore  # pyright: ign
 
 class ScipyVonMisesFisher(ShapedDistribution[object]):  # type: ignore  # pyright: ignore
     """This class allows distributions having a non-empty shape."""
+
     @override
     def __init__(self, mu: NumpyRealArray, kappa: NumpyRealArray) -> None:
         assert mu.shape[:-1] == kappa.shape

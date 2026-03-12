@@ -11,16 +11,24 @@ from tjax.dataclasses import dataclass
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import (ComplexField, RealField, ScalarSupport, Support, complex_field,
-                          distribution_parameter)
+from ...parameter import (
+    ComplexField,
+    RealField,
+    ScalarSupport,
+    Support,
+    complex_field,
+    distribution_parameter,
+)
 from ...parametrization import SimpleDistribution
 
 
 @dataclass
-class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
-                      Samplable,
-                      NaturalParametrization['ComplexNormalEP', JaxComplexArray],
-                      SimpleDistribution):
+class ComplexNormalNP(
+    HasEntropyNP["ComplexNormalEP"],
+    Samplable,
+    NaturalParametrization["ComplexNormalEP", JaxComplexArray],
+    SimpleDistribution,
+):
     """The natural parametrization of the complex normal distribution.
 
     Args:
@@ -33,10 +41,13 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
     We know that |PVar(x)| < Var(x) where |x| is the modulus.
     """
+
     mean_times_precision: JaxComplexArray = distribution_parameter(
-        ScalarSupport(ring=complex_field))
+        ScalarSupport(ring=complex_field)
+    )
     negative_precision: JaxRealArray = distribution_parameter(
-            ScalarSupport(ring=RealField(maximum=0.0)))
+        ScalarSupport(ring=RealField(maximum=0.0))
+    )
     pseudo_precision: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
 
     @property
@@ -55,11 +66,13 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
         _, s, mu = self._r_s_mu()
         det_s = s
         det_h = -self.negative_precision
-        return (-abs_square(mu) * self.negative_precision
-                - xp.real(xp.square(mu) * self.pseudo_precision)
-                + 0.5 * xp.log(det_s)
-                - 0.5 * xp.log(det_h)
-                + math.log(math.pi))
+        return (
+            -abs_square(mu) * self.negative_precision
+            - xp.real(xp.square(mu) * self.pseudo_precision)
+            + 0.5 * xp.log(det_s)
+            - 0.5 * xp.log(det_h)
+            + math.log(math.pi)
+        )
 
     @override
     def to_exp(self) -> ComplexNormalEP:
@@ -75,8 +88,9 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
-                              ) -> ComplexNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxComplexArray, **fixed_parameters: JaxArray
+    ) -> ComplexNormalEP:
         xp = array_namespace(x)
         return ComplexNormalEP(x, abs_square(x), xp.square(x))
 
@@ -92,9 +106,9 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
     @override
     @classmethod
     def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
-        if name != 'pseudo_precision':
+        if name != "pseudo_precision":
             return super().adjust_support(support, name, **kwargs)
-        precision = -kwargs['negative_precision']
+        precision = -kwargs["negative_precision"]
         xp = array_namespace(precision)
         return ScalarSupport(ring=ComplexField(maximum_modulus=xp.abs(precision)))
 
@@ -104,9 +118,7 @@ class ComplexNormalNP(HasEntropyNP['ComplexNormalEP'],
 
 
 @dataclass
-class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
-                      Samplable,
-                      SimpleDistribution):
+class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], Samplable, SimpleDistribution):
     """The expectation parametrization of the complex normal distribution.
 
     Args:
@@ -114,10 +126,12 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         second_moment: E(x * conjugate(x)).
         pseudo_second_moment: E(x^2).
     """
+
     mean: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=0.0)))
     pseudo_second_moment: JaxComplexArray = distribution_parameter(
-        ScalarSupport(ring=complex_field))
+        ScalarSupport(ring=complex_field)
+    )
 
     @property
     @override
@@ -145,8 +159,9 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
         p_inv_c = xp.reciprocal(p_c)
         precision = xp.real(-p_inv_c)
         pseudo_precision = r * p_inv_c
-        mean_times_precision = -2.0 * (precision * xp.conj(self.mean)
-                                       + pseudo_precision * self.mean)
+        mean_times_precision = -2.0 * (
+            precision * xp.conj(self.mean) + pseudo_precision * self.mean
+        )
         return ComplexNormalNP(mean_times_precision, precision, pseudo_precision)
 
     @override
@@ -157,9 +172,9 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP],
     @override
     @classmethod
     def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
-        if name != 'pseudo_precision':
+        if name != "pseudo_precision":
             return super().adjust_support(support, name, **kwargs)
-        precision = -kwargs['negative_precision']
+        precision = -kwargs["negative_precision"]
         xp = array_namespace(precision)
         return ScalarSupport(ring=ComplexField(maximum_modulus=xp.abs(precision)))
 

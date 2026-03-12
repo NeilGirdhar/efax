@@ -21,14 +21,18 @@ from .gen_dirichlet import GeneralizedDirichletNP
 
 
 @dataclass
-class MultinomialNP(HasEntropyNP['MultinomialEP'],
-                    Samplable,
-                    NaturalParametrization['MultinomialEP', JaxRealArray], Multidimensional):
+class MultinomialNP(
+    HasEntropyNP["MultinomialEP"],
+    Samplable,
+    NaturalParametrization["MultinomialEP", JaxRealArray],
+    Multidimensional,
+):
     """The natural parametrization of the multinomial distribution.
 
     Args:
         log_odds: [log(p_i / p_n)]_{i in 1...n-1}.
     """
+
     log_odds: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property
@@ -64,8 +68,7 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> MultinomialEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> MultinomialEP:
         return MultinomialEP(x)
 
     @override
@@ -96,17 +99,18 @@ class MultinomialNP(HasEntropyNP['MultinomialEP'],
 
 
 @dataclass
-class MultinomialEP(HasEntropyEP[MultinomialNP],
-                    Samplable,
-                    HasGeneralizedConjugatePrior,
-                    Multidimensional):
+class MultinomialEP(
+    HasEntropyEP[MultinomialNP], Samplable, HasGeneralizedConjugatePrior, Multidimensional
+):
     """The expectation parametrization of the multinomial distribution.
 
     Args:
         log_odds: The probability vector with the final element omitted, i.e., [p_i]_{i in 1...n-1}.
     """
-    probability: JaxRealArray = distribution_parameter(VectorSupport(ring=RealField(
-        minimum=0.0, maximum=1.0)))
+
+    probability: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=RealField(minimum=0.0, maximum=1.0))
+    )
 
     @property
     @override
@@ -143,8 +147,10 @@ class MultinomialEP(HasEntropyEP[MultinomialNP],
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization,
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls,
+        cp: NaturalParametrization,
+    ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, GeneralizedDirichletNP)
         raise NotImplementedError
 

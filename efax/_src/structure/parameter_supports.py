@@ -17,12 +17,9 @@ class ValueReceptacle:
         self.parameter_values[self.name] = value
 
 
-def parameter_supports(p: type[Distribution] | Distribution,
-                       /,
-                       *,
-                       fixed: bool | None = None,
-                       adjust: bool = True
-                       ) -> Generator[tuple[str, Support, ValueReceptacle]]:
+def parameter_supports(
+    p: type[Distribution] | Distribution, /, *, fixed: bool | None = None, adjust: bool = True
+) -> Generator[tuple[str, Support, ValueReceptacle]]:
     """The parameter supports in a distribution.
 
     Args:
@@ -34,17 +31,18 @@ def parameter_supports(p: type[Distribution] | Distribution,
     Returns:
         The name, support, and a receptacle for each parameter.
     """
-    def _parameters(q: type[Distribution],
-                    base_path: Path
-                    ) -> Generator[tuple[str, Support, ValueReceptacle]]:
+
+    def _parameters(
+        q: type[Distribution], base_path: Path
+    ) -> Generator[tuple[str, Support, ValueReceptacle]]:
         parameter_values: dict[str, JaxComplexArray] = {}
         for this_field in fields(q):
             name = this_field.name
             metadata = this_field.metadata
-            if not metadata.get('parameter', False):
+            if not metadata.get("parameter", False):
                 continue
-            support = metadata['support']
-            is_fixed = metadata['fixed']
+            support = metadata["support"]
+            is_fixed = metadata["fixed"]
             if not isinstance(is_fixed, bool):
                 raise TypeError
             if fixed is not None and is_fixed != fixed:
@@ -54,5 +52,6 @@ def parameter_supports(p: type[Distribution] | Distribution,
             if adjust:
                 support = q.adjust_support(support, name, **parameter_values)
             yield name, support, ValueReceptacle(name, parameter_values)
+
     cls_p: type[Distribution] = type(p) if isinstance(p, Distribution) else p
     yield from _parameters(cls_p, ())

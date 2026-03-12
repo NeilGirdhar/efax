@@ -11,22 +11,34 @@ from jax import enable_x64
 from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
 
-from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
-                  HasGeneralizedConjugatePrior, IntegralRing, JointDistribution, Samplable,
-                  Structure)
+from efax import (
+    BooleanRing,
+    HasConjugatePrior,
+    HasEntropyEP,
+    HasEntropyNP,
+    HasGeneralizedConjugatePrior,
+    IntegralRing,
+    JointDistribution,
+    Samplable,
+    Structure,
+)
 
 from .create_info import GeneralizedDirichletInfo, create_infos
 
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True, scope="session")
 def _jax_fixture(request: pytest.FixtureRequest) -> Generator[None]:  # pyright: ignore
-    with jax.debug_key_reuse(new_val=True), jax.numpy_rank_promotion('raise'), enable_x64():
+    with jax.debug_key_reuse(new_val=True), jax.numpy_rank_promotion("raise"), enable_x64():
         yield
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption('--distribution', action='store', default=None,
-                     help="Only check the distribution given; matches class names in create_info.")
+    parser.addoption(
+        "--distribution",
+        action="store",
+        default=None,
+        help="Only check the distribution given; matches class names in create_info.",
+    )
 
 
 @pytest.fixture
@@ -42,7 +54,8 @@ def key() -> KeyArray:
 
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
-        "markers", "nondistribution: mark a test as not related to a particular distribution")
+        "markers", "nondistribution: mark a test as not related to a particular distribution"
+    )
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
@@ -63,62 +76,77 @@ def distribution_name(request: pytest.FixtureRequest) -> str | None:
 
 
 def supports(s: Structure, abc: type[Any]) -> bool:
-    return all(issubclass(info.type_, abc) or issubclass(info.type_, JointDistribution)
-               for info in s.infos)
+    return all(
+        issubclass(info.type_, abc) or issubclass(info.type_, JointDistribution) for info in s.infos
+    )
 
 
 def any_integral_supports(structure: Structure) -> bool:
-    return any(isinstance(s.ring, BooleanRing | IntegralRing)
-               for s in structure.domain_support().values())
+    return any(
+        isinstance(s.ring, BooleanRing | IntegralRing) for s in structure.domain_support().values()
+    )
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
-    distribution_name_option = metafunc.config.getoption('--distribution')
+    distribution_name_option = metafunc.config.getoption("--distribution")
     assert isinstance(distribution_name_option, str | type(None))
-    if 'distribution_info' in metafunc.fixturenames:
-        q = [info
-             for info in _all_infos
-             if info.tests_selected(distribution_name_option)]
+    if "distribution_info" in metafunc.fixturenames:
+        q = [info for info in _all_infos if info.tests_selected(distribution_name_option)]
         ids = [info.name() for info in q]
         metafunc.parametrize("distribution_info", q, ids=ids)
-    if 'sampling_distribution_info' in metafunc.fixturenames and 'natural' in metafunc.fixturenames:
-        p = [(info, natural)
-             for info in _all_infos
-             for natural in (False, True)
-             if supports(info.nat_structure() if natural else info.exp_structure(), Samplable)
-             if info.tests_selected(distribution_name_option)]
+    if "sampling_distribution_info" in metafunc.fixturenames and "natural" in metafunc.fixturenames:
+        p = [
+            (info, natural)
+            for info in _all_infos
+            for natural in (False, True)
+            if supports(info.nat_structure() if natural else info.exp_structure(), Samplable)
+            if info.tests_selected(distribution_name_option)
+        ]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
-        metafunc.parametrize(("sampling_distribution_info", "natural"), p,
-                             ids=ids)
-    if ('sampling_wc_distribution_info' in metafunc.fixturenames
-            and 'natural' in metafunc.fixturenames):
-        p = [(info, natural)
-             for info in _all_infos
-             for natural in (False, True)
-             if supports(structure := (info.nat_structure() if natural else info.exp_structure()),
-                         Samplable)
-             if not any_integral_supports(structure)
-             if info.tests_selected(distribution_name_option)]
+        metafunc.parametrize(("sampling_distribution_info", "natural"), p, ids=ids)
+    if (
+        "sampling_wc_distribution_info" in metafunc.fixturenames
+        and "natural" in metafunc.fixturenames
+    ):
+        p = [
+            (info, natural)
+            for info in _all_infos
+            for natural in (False, True)
+            if supports(
+                structure := (info.nat_structure() if natural else info.exp_structure()), Samplable
+            )
+            if not any_integral_supports(structure)
+            if info.tests_selected(distribution_name_option)
+        ]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
-        metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
-                             ids=ids)
-    if 'cp_distribution_info' in metafunc.fixturenames:
-        q = [info
-             for info in _all_infos
-             if supports(info.exp_structure(), HasConjugatePrior)
-             if info.tests_selected(distribution_name_option)]
+        metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p, ids=ids)
+    if "cp_distribution_info" in metafunc.fixturenames:
+        q = [
+            info
+            for info in _all_infos
+            if supports(info.exp_structure(), HasConjugatePrior)
+            if info.tests_selected(distribution_name_option)
+        ]
         metafunc.parametrize("cp_distribution_info", q, ids=[info.name() for info in q])
-    if 'gcp_distribution_info' in metafunc.fixturenames:
-        q = [info
-             for info in _all_infos
-             if supports(info.exp_structure(), HasGeneralizedConjugatePrior)
-             if info.tests_selected(distribution_name_option)]
+    if "gcp_distribution_info" in metafunc.fixturenames:
+        q = [
+            info
+            for info in _all_infos
+            if supports(info.exp_structure(), HasGeneralizedConjugatePrior)
+            if info.tests_selected(distribution_name_option)
+        ]
         metafunc.parametrize("gcp_distribution_info", q, ids=[info.name() for info in q])
-    if 'entropy_distribution_info' in metafunc.fixturenames:
-        q = [info
-             for info in _all_infos
-             if ((supports(info.exp_structure(), HasEntropyEP)
-                  or supports(info.nat_structure(), HasEntropyNP))
-                 and not isinstance(info, GeneralizedDirichletInfo))
-             if info.tests_selected(distribution_name_option)]
+    if "entropy_distribution_info" in metafunc.fixturenames:
+        q = [
+            info
+            for info in _all_infos
+            if (
+                (
+                    supports(info.exp_structure(), HasEntropyEP)
+                    or supports(info.nat_structure(), HasEntropyNP)
+                )
+                and not isinstance(info, GeneralizedDirichletInfo)
+            )
+            if info.tests_selected(distribution_name_option)
+        ]
         metafunc.parametrize("entropy_distribution_info", q, ids=[info.name() for info in q])

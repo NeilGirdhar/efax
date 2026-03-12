@@ -11,24 +11,33 @@ from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import (ScalarSupport, VectorSupport, distribution_parameter, negative_support,
-                          positive_support)
+from ...parameter import (
+    ScalarSupport,
+    VectorSupport,
+    distribution_parameter,
+    negative_support,
+    positive_support,
+)
 
 
 @dataclass
-class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
-                        Samplable,
-                        NaturalParametrization['IsotropicNormalEP', JaxRealArray],
-                        Multidimensional):
+class IsotropicNormalNP(
+    HasEntropyNP["IsotropicNormalEP"],
+    Samplable,
+    NaturalParametrization["IsotropicNormalEP", JaxRealArray],
+    Multidimensional,
+):
     """The natural parametrization of the multivariate normal distribution with Var(x) = kI.
 
     Args:
         mean_times_precision: E(x) / Var(x).
         negative_half_precision: -0.5 / Var(x).
     """
+
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=negative_support))
+    negative_half_precision: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=negative_support)
+    )
 
     @property
     @override
@@ -44,8 +53,10 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         eta = self.mean_times_precision
-        return 0.5 * (-0.5 * xp.sum(xp.square(eta), axis=-1) / self.negative_half_precision
-                      + self.dimensions() * xp.log(xp.pi / -self.negative_half_precision))
+        return 0.5 * (
+            -0.5 * xp.sum(xp.square(eta), axis=-1) / self.negative_half_precision
+            + self.dimensions() * xp.log(xp.pi / -self.negative_half_precision)
+        )
 
     @override
     def to_exp(self) -> IsotropicNormalEP:
@@ -63,8 +74,9 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> IsotropicNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> IsotropicNormalEP:
         xp = array_namespace(x)
         return IsotropicNormalEP(x, xp.sum(xp.square(x), axis=-1))
 
@@ -78,15 +90,14 @@ class IsotropicNormalNP(HasEntropyNP['IsotropicNormalEP'],
 
 
 @dataclass
-class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP],
-                        Samplable,
-                        Multidimensional):
+class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP], Samplable, Multidimensional):
     """The expectation parametrization of the multivariate normal distribution with Var(x) = kI.
 
     Args:
         mean: E(x).
         variance: Var(x).
     """
+
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     total_second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 

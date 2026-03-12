@@ -10,8 +10,10 @@ from tjax.dataclasses import dataclass
 from ...interfaces.conjugate_prior import HasConjugatePrior
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
-                                                   TransformedNaturalParametrization)
+from ...mixins.transformed_parametrization import (
+    TransformedExpectationParametrization,
+    TransformedNaturalParametrization,
+)
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, distribution_parameter
 from ..normal.normal import NormalNP
@@ -20,12 +22,14 @@ from ..normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 
 @dataclass
 class UnitVarianceLogNormalNP(
-        Samplable,
-        HasEntropyNP['UnitVarianceLogNormalEP'],
-        TransformedNaturalParametrization[UnitVarianceNormalNP, UnitVarianceNormalEP,
-                                          'UnitVarianceLogNormalEP',
-                                          JaxRealArray]):
+    Samplable,
+    HasEntropyNP["UnitVarianceLogNormalEP"],
+    TransformedNaturalParametrization[
+        UnitVarianceNormalNP, UnitVarianceNormalEP, "UnitVarianceLogNormalEP", JaxRealArray
+    ],
+):
     """The natural parametrization of the log-normal distribution with unit variance."""
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @override
@@ -49,8 +53,9 @@ class UnitVarianceLogNormalNP(
 
     @override
     @classmethod
-    def create_expectation_from_base(cls, expectation_parametrization: UnitVarianceNormalEP
-                                     ) -> UnitVarianceLogNormalEP:
+    def create_expectation_from_base(
+        cls, expectation_parametrization: UnitVarianceNormalEP
+    ) -> UnitVarianceLogNormalEP:
         return UnitVarianceLogNormalEP(expectation_parametrization.mean)
 
     @override
@@ -71,12 +76,15 @@ class UnitVarianceLogNormalNP(
 
 @dataclass
 class UnitVarianceLogNormalEP(
-        HasConjugatePrior,
-        Samplable,
-        HasEntropyEP[UnitVarianceLogNormalNP],
-        TransformedExpectationParametrization[UnitVarianceNormalEP, UnitVarianceNormalNP,
-                                              UnitVarianceLogNormalNP]):
+    HasConjugatePrior,
+    Samplable,
+    HasEntropyEP[UnitVarianceLogNormalNP],
+    TransformedExpectationParametrization[
+        UnitVarianceNormalEP, UnitVarianceNormalNP, UnitVarianceLogNormalNP
+    ],
+):
     """The expectation parametrization of the log-normal distribution with unit variance."""
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @override
@@ -100,8 +108,9 @@ class UnitVarianceLogNormalEP(
 
     @override
     @classmethod
-    def create_natural_from_base(cls, natural_parametrization: UnitVarianceNormalNP
-                                 ) -> UnitVarianceLogNormalNP:
+    def create_natural_from_base(
+        cls, natural_parametrization: UnitVarianceNormalNP
+    ) -> UnitVarianceLogNormalNP:
         return UnitVarianceLogNormalNP(natural_parametrization.mean)
 
     @override
@@ -123,8 +132,9 @@ class UnitVarianceLogNormalEP(
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         uvn, n = UnitVarianceNormalEP.from_conjugate_prior_distribution(cp)
         return (cls(uvn.mean), n)
 

@@ -14,8 +14,8 @@ from .estimator import MaximumLikelihoodEstimator
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
 
-P = TypeVar('P', bound=Distribution, default=Any)
-SP = TypeVar('SP', bound=SimpleDistribution, default=Any)
+P = TypeVar("P", bound=Distribution, default=Any)
+SP = TypeVar("SP", bound=SimpleDistribution, default=Any)
 
 
 @dataclass
@@ -33,12 +33,15 @@ class Flattener(MaximumLikelihoodEstimator[P]):
     * The Fisher information matrix and the Jacobian matrix are calculated wrt to flattened
       parameters, and flattened outputs.
     """
+
     mapped_to_plane: bool = field(static=True)
 
     def final_dimension_size(self) -> int:
-        return sum(support.num_elements(info.dimensions)
-                   for info in self.infos
-                   for _, support, _ in parameter_supports(info.type_, fixed=False))
+        return sum(
+            support.num_elements(info.dimensions)
+            for info in self.infos
+            for _, support, _ in parameter_supports(info.type_, fixed=False)
+        )
 
     def unflatten(self, flattened: JaxRealArray, *, return_vector: bool = False) -> P:
         """Unflatten an array into a Distribution.
@@ -58,32 +61,31 @@ class Flattener(MaximumLikelihoodEstimator[P]):
             for name, support, value_receptacle in parameter_supports(info.type_, fixed=False):
                 k = support.num_elements(info.dimensions)
                 if consumed + k > available:
-                    raise ValueError('Incompatible array')  # noqa: TRY003
+                    raise ValueError("Incompatible array")  # noqa: TRY003
                 value = regular_kwargs[name] = support.unflattened(
-                        flattened[..., consumed: consumed + k],
-                        info.dimensions,
-                        map_from_plane=self.mapped_to_plane)
+                    flattened[..., consumed : consumed + k],
+                    info.dimensions,
+                    map_from_plane=self.mapped_to_plane,
+                )
                 value_receptacle.set_value(value)
                 consumed += k
             kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = dict(
-                    regular_kwargs)
+                regular_kwargs
+            )
             for name in parameter_names(info.type_, fixed=True):
                 kwargs[name] = self.fixed_parameters[*info.path, name]
-            sub_distributions = {name: constructed[*info.path, name]
-                                 for name in info.sub_distribution_names}
+            sub_distributions = {
+                name: constructed[*info.path, name] for name in info.sub_distribution_names
+            }
             if sub_distributions:
-                kwargs['_sub_distributions'] = sub_distributions
+                kwargs["_sub_distributions"] = sub_distributions
             constructed[info.path] = info.type_(**kwargs)
         if consumed != available:
-            raise ValueError('Incompatible array')  # noqa: TRY003
-        return cast('P', constructed[()])
+            raise ValueError("Incompatible array")  # noqa: TRY003
+        return cast("P", constructed[()])
 
     @classmethod
-    def flatten(cls,
-                p: P,
-                *,
-                map_to_plane: bool = True
-                ) -> tuple[Self, JaxRealArray]:
+    def flatten(cls, p: P, *, map_to_plane: bool = True) -> tuple[Self, JaxRealArray]:
         """Flatten a Distribution.
 
         Args:
@@ -94,39 +96,38 @@ class Flattener(MaximumLikelihoodEstimator[P]):
                 when passing to a neural network.
         """
         xp = array_namespace(p)
-        arrays = [x
-                  for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p)
-                  for x in xs]
+        arrays = [
+            x for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p) for x in xs
+        ]
 
         flattened_array = xp.concat(arrays, axis=-1)
-        return (cls(cls._extract_distributions(p),
-                    parameters(p, fixed=True),
-                    map_to_plane),
-                flattened_array)
+        return (
+            cls(cls._extract_distributions(p), parameters(p, fixed=True), map_to_plane),
+            flattened_array,
+        )
 
     @overload
     @classmethod
-    def create_flattener(cls,
-                         p: SP,
-                         *,
-                         override_unflattened_type: None = None,
-                         mapped_to_plane: bool = True
-                         ) -> 'Flattener[SP]': ...
+    def create_flattener(
+        cls, p: SP, *, override_unflattened_type: None = None, mapped_to_plane: bool = True
+    ) -> "Flattener[SP]": ...
     @overload
     @classmethod
-    def create_flattener(cls,
-                         p: SimpleDistribution,
-                         *,
-                         override_unflattened_type: type[SP],
-                         mapped_to_plane: bool = True
-                         ) -> 'Flattener[SP]': ...
+    def create_flattener(
+        cls,
+        p: SimpleDistribution,
+        *,
+        override_unflattened_type: type[SP],
+        mapped_to_plane: bool = True,
+    ) -> "Flattener[SP]": ...
     @classmethod
-    def create_flattener(cls,
-                         p: SimpleDistribution,
-                         *,
-                         override_unflattened_type: type[SP] | None = None,
-                         mapped_to_plane: bool = True
-                         ) -> 'Flattener[SP]':
+    def create_flattener(
+        cls,
+        p: SimpleDistribution,
+        *,
+        override_unflattened_type: type[SP] | None = None,
+        mapped_to_plane: bool = True,
+    ) -> "Flattener[SP]":
         """Create a Flattener.
 
         Args:
@@ -144,13 +145,15 @@ class Flattener(MaximumLikelihoodEstimator[P]):
         return Flattener(infos, fixed_parameters, mapped_to_plane)
 
     @classmethod
-    def _make_flat(cls, q: Distribution, path: Path, /, *, map_to_plane: bool
-                   ) -> list[JaxRealArray]:
+    def _make_flat(
+        cls, q: Distribution, path: Path, /, *, map_to_plane: bool
+    ) -> list[JaxRealArray]:
         retval: list[JaxRealArray] = []
         for value, (_, support, value_receptacle) in zip(
-                parameters(q, fixed=False, recurse=False).values(),
-                parameter_supports(q, fixed=False),
-                strict=True):
+            parameters(q, fixed=False, recurse=False).values(),
+            parameter_supports(q, fixed=False),
+            strict=True,
+        ):
             value_receptacle.set_value(value)
             retval.append(support.flattened(value, map_to_plane=map_to_plane))
         return retval

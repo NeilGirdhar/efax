@@ -14,7 +14,7 @@ from ...natural_parametrization import NaturalParametrization
 from ...parametrization import SimpleDistribution
 from ...structure.flattener import Flattener
 
-NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
+NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 type SP = JaxRealArray
 
 
@@ -29,20 +29,24 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
 
     It uses Newton's method with a Jacobian to invert the gradient log-normalizer.
     """
+
     _: KW_ONLY
     minimizer: ExpToNatMinimizer | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
-        if hasattr(super(), '__post_init__'):
+        if hasattr(super(), "__post_init__"):
             super().__post_init__()  # type: ignore # pyright: ignore
         if self.minimizer is None:
             from .optimistix import default_bisection_minimizer, default_minimizer  # noqa: PLC0415
+
             initial_search_parameters = self.initial_search_parameters()
-            object.__setattr__(self,
-                               'minimizer',
-                               default_minimizer
-                               if initial_search_parameters.shape[-1] > 1
-                               else default_bisection_minimizer)
+            object.__setattr__(
+                self,
+                "minimizer",
+                default_minimizer
+                if initial_search_parameters.shape[-1] > 1
+                else default_bisection_minimizer,
+            )
 
     @jit
     @override
@@ -78,9 +82,11 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         """
         np_cls = self.natural_parametrization_cls()
         assert issubclass(np_cls, SimpleDistribution)
-        flattener = Flattener.create_flattener(self,  # type: ignore[unreachable]
-                                               override_unflattened_type=np_cls,
-                                               mapped_to_plane=True)
+        flattener = Flattener.create_flattener(
+            self,  # type: ignore[unreachable]
+            override_unflattened_type=np_cls,
+            mapped_to_plane=True,
+        )
         return flattener.unflatten(search_parameters)
 
     def search_gradient(self, search_parameters: SP) -> SP:

@@ -14,9 +14,7 @@ from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 
 @dataclass
-class BetaNP(DirichletCommonNP['BetaEP'],
-             NaturalParametrization['BetaEP', JaxRealArray]
-             ):
+class BetaNP(DirichletCommonNP["BetaEP"], NaturalParametrization["BetaEP", JaxRealArray]):
     """The natural parametrization of the beta distribution.
 
     The best way to interpret the parameters of the beta distribution are that an observation x in
@@ -26,6 +24,7 @@ class BetaNP(DirichletCommonNP['BetaEP'],
     Args:
         alpha_minus_one: The shape parameters alpha, beta in an array with final dimension 2.
     """
+
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
@@ -37,8 +36,7 @@ class BetaNP(DirichletCommonNP['BetaEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> BetaEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> BetaEP:
         xp = array_namespace(x)
         return BetaEP(xp.stack([xp.log(x), xp.log1p(-x)], axis=-1))
 
@@ -56,8 +54,7 @@ class BetaNP(DirichletCommonNP['BetaEP'],
 
 
 @dataclass
-class BetaEP(DirichletCommonEP[BetaNP],
-             ExpectationParametrization[BetaNP]):
+class BetaEP(DirichletCommonEP[BetaNP], ExpectationParametrization[BetaNP]):
     """The expectation parametrization of the beta distribution.
 
     The best way to interpret the parameters of the beta distribution are that an observation x in
@@ -67,6 +64,7 @@ class BetaEP(DirichletCommonEP[BetaNP],
     Args:
         mean_log_probability: An array with final dimension [E(log(x)), E(log(1-x))].
     """
+
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:

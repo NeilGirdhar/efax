@@ -19,15 +19,18 @@ from .beta import BetaNP
 
 
 @dataclass
-class BernoulliNP(HasEntropyNP['BernoulliEP'],
-                  NaturalParametrization['BernoulliEP', JaxRealArray],
-                  Samplable,
-                  SimpleDistribution):
+class BernoulliNP(
+    HasEntropyNP["BernoulliEP"],
+    NaturalParametrization["BernoulliEP", JaxRealArray],
+    Samplable,
+    SimpleDistribution,
+):
     """The natural parametrization of the Bernoulli distribution.
 
     Args:
         log_odds: log(p / (1-p)).
     """
+
     log_odds: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -56,8 +59,7 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> BernoulliEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> BernoulliEP:
         return BernoulliEP(x)
 
     def nat_to_probability(self) -> JaxRealArray:
@@ -77,16 +79,16 @@ class BernoulliNP(HasEntropyNP['BernoulliEP'],
 
 
 @dataclass
-class BernoulliEP(HasEntropyEP[BernoulliNP],
-                  HasConjugatePrior,
-                  Samplable):
+class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior, Samplable):
     """The expectation parametrization of the Bernoulli distribution.
 
     Args:
         probability: p.
     """
-    probability: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(
-        minimum=0.0, maximum=1.0)))
+
+    probability: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=RealField(minimum=0.0, maximum=1.0))
+    )
 
     @property
     @override
@@ -127,13 +129,14 @@ class BernoulliEP(HasEntropyEP[BernoulliNP],
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, BetaNP)
         a = cp.alpha_minus_one
         xp = array_namespace(a)
         n = xp.sum(a, axis=-1)
-        probability = (a[..., 0] / n)
+        probability = a[..., 0] / n
         return (cls(probability), n)
 
     @override

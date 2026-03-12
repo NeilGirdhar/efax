@@ -17,17 +17,17 @@ def _random_complex_array(generator: Generator, shape: Shape = ()) -> NumpyCompl
 def _build_uvcn(generator: Generator, shape: Shape) -> ScipyComplexNormal:
     mean = _random_complex_array(generator, shape)
     variance = generator.exponential(size=shape)
-    pseudo_variance = (variance
-                       * generator.beta(2, 2, size=shape)
-                       * np.exp(1j * generator.uniform(0, 2 * np.pi, size=shape)))
+    pseudo_variance = (
+        variance
+        * generator.beta(2, 2, size=shape)
+        * np.exp(1j * generator.uniform(0, 2 * np.pi, size=shape))
+    )
     return ScipyComplexNormal(mean, variance, pseudo_variance)
 
 
-def _build_mvcn(generator: Generator,
-                shape: Shape,
-                dimensions: int,
-                polarization: float = 0.98
-                ) -> ScipyComplexMultivariateNormal:
+def _build_mvcn(
+    generator: Generator, shape: Shape, dimensions: int, polarization: float = 0.98
+) -> ScipyComplexMultivariateNormal:
     directions = 3
     weights = np.asarray(range(directions)) + 1.5
     mean = _random_complex_array(generator, (*shape, dimensions))
@@ -35,13 +35,14 @@ def _build_mvcn(generator: Generator,
     regularizer = np.tile(np.eye(dimensions), (*shape, 1, 1))
     variance = (
         np.average(
-            np.conj(z)[..., np.newaxis, :, :] * z[..., np.newaxis, :],
-            weights=weights,
-            axis=-1)
-        + regularizer)
-    pseudo_variance = np.average(z[..., np.newaxis, :, :] * z[..., np.newaxis, :],
-                                 weights=weights,
-                                 axis=-1) * polarization
+            np.conj(z)[..., np.newaxis, :, :] * z[..., np.newaxis, :], weights=weights, axis=-1
+        )
+        + regularizer
+    )
+    pseudo_variance = (
+        np.average(z[..., np.newaxis, :, :] * z[..., np.newaxis, :], weights=weights, axis=-1)
+        * polarization
+    )
     return ScipyComplexMultivariateNormal(mean, variance, pseudo_variance)
 
 
@@ -57,13 +58,11 @@ def test_univariate_rvs(generator: Generator) -> None:
 
     estimated_mean = np.average(rvs, axis=rvs_axes)
     centered_rvs = rvs - dist.mean[(...,) + (np.newaxis,) * len(rvs_shape)]
-    estimated_variance = np.real(np.average(
-        np.conj(centered_rvs) * centered_rvs, axis=rvs_axes))
+    estimated_variance = np.real(np.average(np.conj(centered_rvs) * centered_rvs, axis=rvs_axes))
     estimated_pseudo_variance = np.average(np.square(centered_rvs), axis=rvs_axes)
     assert_allclose(estimated_mean, dist.mean, rtol=0.0, atol=2e-2)
     assert_allclose(estimated_variance, dist.variance, rtol=3e-2, atol=2e-2)
-    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=3e-2,
-                    atol=2e-2)
+    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=3e-2, atol=2e-2)
 
 
 @pytest.mark.nondistribution
@@ -79,15 +78,18 @@ def test_multivariate_rvs(generator: Generator) -> None:
 
     estimated_mean = np.average(rvs, axis=rvs_axes)
     centered_rvs = rvs - dist.mean[(...,) + (np.newaxis,) * len(rvs_shape) + (slice(None),)]
-    estimated_variance = np.real(np.average(
-        centered_rvs[..., np.newaxis] * np.conj(centered_rvs)[..., np.newaxis, :],
-        axis=rvs_axes2))
+    estimated_variance = np.real(
+        np.average(
+            centered_rvs[..., np.newaxis] * np.conj(centered_rvs)[..., np.newaxis, :],
+            axis=rvs_axes2,
+        )
+    )
     estimated_pseudo_variance = np.average(
-        centered_rvs[..., np.newaxis] * centered_rvs[..., np.newaxis, :], axis=rvs_axes2)
+        centered_rvs[..., np.newaxis] * centered_rvs[..., np.newaxis, :], axis=rvs_axes2
+    )
     assert_allclose(estimated_mean, dist.mean, rtol=1e-2, atol=1e-2)
     assert_allclose(estimated_variance, dist.variance, rtol=2e-1, atol=5e-1)
-    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=2e-1,
-                    atol=5e-1)
+    assert_allclose(estimated_pseudo_variance, dist.pseudo_variance, rtol=2e-1, atol=5e-1)
 
 
 @pytest.mark.nondistribution

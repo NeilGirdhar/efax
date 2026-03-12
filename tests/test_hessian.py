@@ -1,4 +1,5 @@
 """These tests apply to only samplable distributions."""
+
 from __future__ import annotations
 
 import jax.numpy as jnp
@@ -12,10 +13,11 @@ from efax import Flattener, Samplable, SimpleDistribution, flatten_mapping
 from .distribution_info import DistributionInfo
 
 
-def _sample_using_flattened(flattened_parameters: JaxRealArray,
-                            flattener: Flattener,
-                            key: KeyArray,
-                            ) -> JaxArray:
+def _sample_using_flattened(
+    flattened_parameters: JaxRealArray,
+    flattener: Flattener,
+    key: KeyArray,
+) -> JaxArray:
     p = flattener.unflatten(flattened_parameters)
     stream = RngStream(key)
 
@@ -32,27 +34,29 @@ def _sample_using_flattened(flattened_parameters: JaxRealArray,
     return jnp.concat(tuple(sample_flat.values()), axis=-1)
 
 
-def _calculate_jacobian(p: SimpleDistribution,
-                        keys: KeyArray,
-                        ) -> JaxRealArray:
+def _calculate_jacobian(
+    p: SimpleDistribution,
+    keys: KeyArray,
+) -> JaxRealArray:
     flattener, flattened = Flattener.flatten(p)
     jacobian_sample = vmap(jacobian(_sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
-    parameters_jacobian, = jacobian_sample(flattened, flattener, keys)
-    assert parameters_jacobian.shape[0: 1] == p.shape
+    (parameters_jacobian,) = jacobian_sample(flattened, flattener, keys)
+    assert parameters_jacobian.shape[0:1] == p.shape
     parameters_jacobian = jnp.sum(parameters_jacobian, axis=0)
     return jnp.sum(parameters_jacobian, axis=0)
 
 
-def _calculate_curvature(p: SimpleDistribution,
-                         keys: KeyArray,
-                         ) -> JaxRealArray:
+def _calculate_curvature(
+    p: SimpleDistribution,
+    keys: KeyArray,
+) -> JaxRealArray:
     # Calculate curvature.
     flattener, flattened = Flattener.flatten(p)
     hessian_sample = vmap(hessian(_sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
-    parameters_hessian_x, = hessian_sample(flattened, flattener, keys)
-    parameters_hessian, = parameters_hessian_x
+    (parameters_hessian_x,) = hessian_sample(flattened, flattener, keys)
+    (parameters_hessian,) = parameters_hessian_x
 
-    assert parameters_hessian.shape[0: 1] == p.shape
+    assert parameters_hessian.shape[0:1] == p.shape
     parameters_hessian = jnp.sum(parameters_hessian, axis=0)
 
     assert parameters_hessian.shape[-2] == parameters_hessian.shape[-1]
@@ -62,28 +66,32 @@ def _calculate_curvature(p: SimpleDistribution,
 
 
 @jit
-def _calculate_jacobian_and_curvature(p: SimpleDistribution,
-                                      jacobian_keys: KeyArray,
-                                      curvature_keys: KeyArray,
-                                      ) -> tuple[JaxRealArray, JaxRealArray]:
+def _calculate_jacobian_and_curvature(
+    p: SimpleDistribution,
+    jacobian_keys: KeyArray,
+    curvature_keys: KeyArray,
+) -> tuple[JaxRealArray, JaxRealArray]:
     return _calculate_jacobian(p, jacobian_keys), _calculate_curvature(p, curvature_keys)
 
 
-def test_sampling_cotangents(generator: Generator,
-                             key: KeyArray,
-                             sampling_wc_distribution_info: DistributionInfo,
-                             *,
-                             distribution_name: str | None,
-                             natural: bool
-                             ) -> None:
+def test_sampling_cotangents(
+    generator: Generator,
+    key: KeyArray,
+    sampling_wc_distribution_info: DistributionInfo,
+    *,
+    distribution_name: str | None,
+    natural: bool,
+) -> None:
     """Test that the curvature is nonzero."""
     info = sampling_wc_distribution_info
     info.skip_if_deselected(distribution_name)
     distribution_shape = (23,)
     jacobian_keys, curvature_keys = jr.split(key, (2, *distribution_shape))
-    p: SimpleDistribution = (info.nat_parameter_generator(generator, distribution_shape)
-                             if natural
-                             else info.exp_parameter_generator(generator, distribution_shape))
+    p: SimpleDistribution = (
+        info.nat_parameter_generator(generator, distribution_shape)
+        if natural
+        else info.exp_parameter_generator(generator, distribution_shape)
+    )
     jacobian, curvature = _calculate_jacobian_and_curvature(p, jacobian_keys, curvature_keys)
     assert jacobian.shape == curvature.shape
     assert jnp.all((jacobian != 0) | (curvature != 0))

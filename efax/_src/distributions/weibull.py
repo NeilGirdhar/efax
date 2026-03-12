@@ -16,18 +16,22 @@ from ..parametrization import SimpleDistribution
 
 
 @dataclass
-class WeibullNP(HasEntropyNP['WeibullEP'],
-                Samplable,
-                NaturalParametrization['WeibullEP', JaxRealArray],
-                SimpleDistribution):
+class WeibullNP(
+    HasEntropyNP["WeibullEP"],
+    Samplable,
+    NaturalParametrization["WeibullEP", JaxRealArray],
+    SimpleDistribution,
+):
     """The natural parametrization of the Weibull distribution.
 
     Args:
         concentration: The fixed shape parameter k.
         eta: -scale ^ -concentration.
     """
-    concentration: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support),
-                                                         fixed=True)
+
+    concentration: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=positive_support), fixed=True
+    )
     eta: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @property
@@ -57,13 +61,10 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls,
-                              x: JaxRealArray,
-                              **fixed_parameters: JaxArray
-                              ) -> WeibullEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> WeibullEP:
         xp = array_namespace(x)
-        concentration = fixed_parameters['concentration']
-        return WeibullEP(xp.broadcast_to(concentration, x.shape), x ** concentration)
+        concentration = fixed_parameters["concentration"]
+        return WeibullEP(xp.broadcast_to(concentration, x.shape), x**concentration)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -71,17 +72,17 @@ class WeibullNP(HasEntropyNP['WeibullEP'],
 
 
 @dataclass
-class WeibullEP(HasEntropyEP[WeibullNP],
-                Samplable,
-                SimpleDistribution):
+class WeibullEP(HasEntropyEP[WeibullNP], Samplable, SimpleDistribution):
     """The expectation parametrization of the Weibull distribution.
 
     Args:
         concentration: The fixed shape parameter k.
         chi: scale ^ concentration.
     """
-    concentration: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support),
-                                                         fixed=True)
+
+    concentration: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=positive_support), fixed=True
+    )
     chi: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property

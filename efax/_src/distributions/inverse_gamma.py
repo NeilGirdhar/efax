@@ -8,21 +8,26 @@ from tjax.dataclasses import dataclass
 
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,
-                                                  TransformedNaturalParametrization)
+from ..mixins.transformed_parametrization import (
+    TransformedExpectationParametrization,
+    TransformedNaturalParametrization,
+)
 from ..parameter import RealField, ScalarSupport, distribution_parameter, negative_support
 from .gamma import GammaEP, GammaNP
 
 
 @dataclass
-class InverseGammaNP(Samplable,
-                     HasEntropyNP['InverseGammaEP'],
-                     TransformedNaturalParametrization[GammaNP, GammaEP, 'InverseGammaEP',
-                                                       JaxRealArray]):
+class InverseGammaNP(
+    Samplable,
+    HasEntropyNP["InverseGammaEP"],
+    TransformedNaturalParametrization[GammaNP, GammaEP, "InverseGammaEP", JaxRealArray],
+):
     """The natural parametrization of the InverseGamma distribution."""
+
     negative_scale: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
-    shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=RealField(minimum=-1.0)))
+    shape_minus_one: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=RealField(minimum=-1.0))
+    )
 
     @override
     @classmethod
@@ -46,8 +51,9 @@ class InverseGammaNP(Samplable,
     @override
     @classmethod
     def create_expectation_from_base(cls, expectation_parametrization: GammaEP) -> InverseGammaEP:
-        return InverseGammaEP(expectation_parametrization.mean,
-                              expectation_parametrization.mean_log)
+        return InverseGammaEP(
+            expectation_parametrization.mean, expectation_parametrization.mean_log
+        )
 
     @override
     @classmethod
@@ -67,10 +73,13 @@ class InverseGammaNP(Samplable,
 
 
 @dataclass
-class InverseGammaEP(Samplable,
-                     HasEntropyEP[InverseGammaNP],
-                     TransformedExpectationParametrization[GammaEP, GammaNP, InverseGammaNP]):
+class InverseGammaEP(
+    Samplable,
+    HasEntropyEP[InverseGammaNP],
+    TransformedExpectationParametrization[GammaEP, GammaNP, InverseGammaNP],
+):
     """The expectation parametrization of the InverseGamma distribution."""
+
     base_mean: JaxRealArray = distribution_parameter(ScalarSupport())
     base_mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -96,8 +105,9 @@ class InverseGammaEP(Samplable,
     @override
     @classmethod
     def create_natural_from_base(cls, natural_parametrization: GammaNP) -> InverseGammaNP:
-        return InverseGammaNP(natural_parametrization.negative_rate,
-                              natural_parametrization.shape_minus_one)
+        return InverseGammaNP(
+            natural_parametrization.negative_rate, natural_parametrization.shape_minus_one
+        )
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

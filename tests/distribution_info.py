@@ -9,12 +9,18 @@ from numpy.random import Generator
 from tjax import JaxComplexArray, NumpyComplexArray, Shape
 from typing_extensions import TypeVar
 
-from efax import (ExpectationParametrization, NaturalParametrization, ScipyDiscreteDistribution,
-                  ScipyDistribution, Structure, SubDistributionInfo)
+from efax import (
+    ExpectationParametrization,
+    NaturalParametrization,
+    ScipyDiscreteDistribution,
+    ScipyDistribution,
+    Structure,
+    SubDistributionInfo,
+)
 
-NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
-EP = TypeVar('EP', bound=ExpectationParametrization, default=Any)
-Domain = TypeVar('Domain', bound=NumpyComplexArray | dict[str, Any], default=Any)
+NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
+EP = TypeVar("EP", bound=ExpectationParametrization, default=Any)
+Domain = TypeVar("Domain", bound=NumpyComplexArray | dict[str, Any], default=Any)
 
 
 class DistributionInfo(Generic[NP, EP, Domain]):
@@ -74,7 +80,7 @@ class DistributionInfo(Generic[NP, EP, Domain]):
 
     @classmethod
     def name(cls) -> str:
-        return cls.__name__.removesuffix('Info')
+        return cls.__name__.removesuffix("Info")
 
     @classmethod
     def tests_selected(cls, distribution_name: str | None) -> bool:
@@ -89,17 +95,22 @@ class DistributionInfo(Generic[NP, EP, Domain]):
     def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)
 
-        if (cls.exp_to_scipy_distribution is DistributionInfo.exp_to_scipy_distribution
-                and cls.nat_to_scipy_distribution is DistributionInfo.nat_to_scipy_distribution):
+        if (
+            cls.exp_to_scipy_distribution is DistributionInfo.exp_to_scipy_distribution
+            and cls.nat_to_scipy_distribution is DistributionInfo.nat_to_scipy_distribution
+        ):
             raise TypeError
 
-        for method in ('exp_parameter_generator', 'nat_parameter_generator',
-                       'scipy_to_exp_family_observation'):
+        for method in (
+            "exp_parameter_generator",
+            "nat_parameter_generator",
+            "scipy_to_exp_family_observation",
+        ):
             old_method = getattr(cls, method)
 
-            def new_method(*args: object,
-                           old_method: Callable[..., Any] = old_method,
-                           **kwargs: object) -> object:
+            def new_method(
+                *args: object, old_method: Callable[..., Any] = old_method, **kwargs: object
+            ) -> object:
                 return old_method(*args, **kwargs)
 
             setattr(cls, method, new_method)

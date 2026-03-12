@@ -9,25 +9,30 @@ from tjax.dataclasses import dataclass
 
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
-                                                   TransformedNaturalParametrization)
+from ...mixins.transformed_parametrization import (
+    TransformedExpectationParametrization,
+    TransformedNaturalParametrization,
+)
 from ...parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
 from ..normal.normal import NormalEP, NormalNP
 
 
 @dataclass
-class LogNormalNP(Samplable,
-                  HasEntropyNP['LogNormalEP'],
-                  TransformedNaturalParametrization[NormalNP, NormalEP, 'LogNormalEP',
-                                                    JaxRealArray]):
+class LogNormalNP(
+    Samplable,
+    HasEntropyNP["LogNormalEP"],
+    TransformedNaturalParametrization[NormalNP, NormalEP, "LogNormalEP", JaxRealArray],
+):
     """The natural parametrization of the LogNormal distribution.
 
     Args:
         eta: -1 / (2 * sigma^2).
     """
+
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=negative_support))
+    negative_half_precision: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=negative_support)
+    )
 
     @override
     @classmethod
@@ -51,8 +56,9 @@ class LogNormalNP(Samplable,
     @override
     @classmethod
     def create_expectation_from_base(cls, expectation_parametrization: NormalEP) -> LogNormalEP:
-        return LogNormalEP(expectation_parametrization.mean,
-                           expectation_parametrization.second_moment)
+        return LogNormalEP(
+            expectation_parametrization.mean, expectation_parametrization.second_moment
+        )
 
     @override
     @classmethod
@@ -75,14 +81,17 @@ class LogNormalNP(Samplable,
 
 
 @dataclass
-class LogNormalEP(Samplable,
-                  HasEntropyEP[LogNormalNP],
-                  TransformedExpectationParametrization[NormalEP, NormalNP, LogNormalNP]):
+class LogNormalEP(
+    Samplable,
+    HasEntropyEP[LogNormalNP],
+    TransformedExpectationParametrization[NormalEP, NormalNP, LogNormalNP],
+):
     """The expectation parametrization of the LogNormal distribution.
 
     Args:
         chi: 2 * sigma^2.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
@@ -108,8 +117,10 @@ class LogNormalEP(Samplable,
     @override
     @classmethod
     def create_natural_from_base(cls, natural_parametrization: NormalNP) -> LogNormalNP:
-        return LogNormalNP(natural_parametrization.mean_times_precision,
-                           natural_parametrization.negative_half_precision)
+        return LogNormalNP(
+            natural_parametrization.mean_times_precision,
+            natural_parametrization.negative_half_precision,
+        )
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

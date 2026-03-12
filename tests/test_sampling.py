@@ -1,4 +1,5 @@
 """These tests apply to only samplable distributions."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -7,36 +8,52 @@ import jax.numpy as jnp
 from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, KeyArray, Shape, assert_tree_allclose
 
-from efax import (Distribution, ExpectationParametrization, JointDistribution,
-                  MaximumLikelihoodEstimator, NaturalParametrization, Samplable, SimpleDistribution,
-                  Structure, flat_dict_of_observations, flatten_mapping, parameter_mean)
+from efax import (
+    Distribution,
+    ExpectationParametrization,
+    JointDistribution,
+    MaximumLikelihoodEstimator,
+    NaturalParametrization,
+    Samplable,
+    SimpleDistribution,
+    Structure,
+    flat_dict_of_observations,
+    flatten_mapping,
+    parameter_mean,
+)
 
-from .create_info import (ComplexCircularlySymmetricNormalInfo,
-                          ComplexMultivariateUnitVarianceNormalInfo, MultivariateDiagonalNormalInfo,
-                          MultivariateNormalInfo)
+from .create_info import (
+    ComplexCircularlySymmetricNormalInfo,
+    ComplexMultivariateUnitVarianceNormalInfo,
+    MultivariateDiagonalNormalInfo,
+    MultivariateNormalInfo,
+)
 from .distribution_info import DistributionInfo
 
 type _Path = tuple[str, ...]
 
 
-def _produce_samples(generator: Generator,
-                     key: KeyArray,
-                     sampling_distribution_info: DistributionInfo[NaturalParametrization,
-                                                                  ExpectationParametrization,
-                                                                  Any],
-                     distribution_shape: Shape,
-                     sample_shape: Shape,
-                     *,
-                     natural: bool) -> tuple[ExpectationParametrization,
-                                             dict[str, Any] | JaxComplexArray]:
+def _produce_samples(
+    generator: Generator,
+    key: KeyArray,
+    sampling_distribution_info: DistributionInfo[
+        NaturalParametrization, ExpectationParametrization, Any
+    ],
+    distribution_shape: Shape,
+    sample_shape: Shape,
+    *,
+    natural: bool,
+) -> tuple[ExpectationParametrization, dict[str, Any] | JaxComplexArray]:
     sampling_object: Distribution
     if natural:
         sampling_object = nat_parameters = sampling_distribution_info.nat_parameter_generator(
-                generator, distribution_shape)
+            generator, distribution_shape
+        )
         exp_parameters = nat_parameters.to_exp()
     else:
         sampling_object = exp_parameters = sampling_distribution_info.exp_parameter_generator(
-                generator, distribution_shape)
+            generator, distribution_shape
+        )
 
     samples: dict[str, Any] | JaxComplexArray
     if isinstance(sampling_object, Samplable):
@@ -48,52 +65,63 @@ def _produce_samples(generator: Generator,
     return exp_parameters, samples
 
 
-def _verify_sample_shape(distribution_shape: Shape,
-                         sample_shape: Shape,
-                         structure: Structure[ExpectationParametrization],
-                         flat_map_of_samples: dict[_Path, Any]
-                         ) -> None:
-    ideal_samples_shape = {info.path: (*sample_shape, *distribution_shape,
-                                       *info.type_.domain_support().shape(info.dimensions))
-                           for info in structure.infos
-                           if issubclass(info.type_, SimpleDistribution)}
+def _verify_sample_shape(
+    distribution_shape: Shape,
+    sample_shape: Shape,
+    structure: Structure[ExpectationParametrization],
+    flat_map_of_samples: dict[_Path, Any],
+) -> None:
+    ideal_samples_shape = {
+        info.path: (
+            *sample_shape,
+            *distribution_shape,
+            *info.type_.domain_support().shape(info.dimensions),
+        )
+        for info in structure.infos
+        if issubclass(info.type_, SimpleDistribution)
+    }
     samples_shape = {path: s.shape for path, s in flat_map_of_samples.items()}
     assert samples_shape == ideal_samples_shape
 
 
 def _verify_maximum_likelihood_estimate(
-        sampling_distribution_info: DistributionInfo[NaturalParametrization,
-                                                     ExpectationParametrization,
-                                                     Any],
-        sample_shape: Shape,
-        structure: Structure[ExpectationParametrization],
-        exp_parameters: ExpectationParametrization,
-        samples: dict[str, Any] | JaxComplexArray
-        ) -> None:
-    atol = (1e-2
-            if isinstance(sampling_distribution_info,
-                          ComplexCircularlySymmetricNormalInfo
-                          | ComplexMultivariateUnitVarianceNormalInfo | MultivariateNormalInfo)
-            else 1e-3
-            if isinstance(sampling_distribution_info,
-                          MultivariateDiagonalNormalInfo)
-            else 1e-6)
+    sampling_distribution_info: DistributionInfo[
+        NaturalParametrization, ExpectationParametrization, Any
+    ],
+    sample_shape: Shape,
+    structure: Structure[ExpectationParametrization],
+    exp_parameters: ExpectationParametrization,
+    samples: dict[str, Any] | JaxComplexArray,
+) -> None:
+    atol = (
+        1e-2
+        if isinstance(
+            sampling_distribution_info,
+            ComplexCircularlySymmetricNormalInfo
+            | ComplexMultivariateUnitVarianceNormalInfo
+            | MultivariateNormalInfo,
+        )
+        else 1e-3
+        if isinstance(sampling_distribution_info, MultivariateDiagonalNormalInfo)
+        else 1e-6
+    )
     rtol = 4e-2
     sample_axes = tuple(range(len(sample_shape)))
     newaxes = (jnp.newaxis,) * len(sample_shape)
     estimator = MaximumLikelihoodEstimator.create_estimator(exp_parameters[*newaxes, ...])
     sampled_exp_parameters = estimator.sufficient_statistics(samples)
     maximum_likelihood_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
-    assert_tree_allclose(maximum_likelihood_parameters, exp_parameters, rtol=rtol,
-                         atol=atol)
+    assert_tree_allclose(maximum_likelihood_parameters, exp_parameters, rtol=rtol, atol=atol)
 
 
-def test_sampling_and_estimation(generator: Generator,
-                                 key: KeyArray,
-                                 sampling_distribution_info: DistributionInfo,
-                                 *,
-                                 distribution_name: str | None,
-                                 natural: bool) -> None:
+def test_sampling_and_estimation(
+    generator: Generator,
+    key: KeyArray,
+    sampling_distribution_info: DistributionInfo,
+    *,
+    distribution_name: str | None,
+    natural: bool,
+) -> None:
     """Test that sampling is consistent with maximum likelihood estimation.
 
     This tests samples variates from either natural or expectation parametrizations.  Calculates the
@@ -102,12 +130,20 @@ def test_sampling_and_estimation(generator: Generator,
     sampling_distribution_info.skip_if_deselected(distribution_name)
     distribution_shape = (4,)  # The number of distributions that are being estimated.
     sample_shape = (1024, 64)  # The number of samples that are taken to do the estimation.
-    exp_parameters, samples = _produce_samples(generator, key, sampling_distribution_info,
-                                               distribution_shape, sample_shape, natural=natural)
+    exp_parameters, samples = _produce_samples(
+        generator,
+        key,
+        sampling_distribution_info,
+        distribution_shape,
+        sample_shape,
+        natural=natural,
+    )
     flat_map_of_samples = flat_dict_of_observations(samples)
     structure = Structure.create(exp_parameters)
-    flat_map_of_samples = ({(): samples} if isinstance(samples, JaxArray)
-                           else flatten_mapping(samples))
+    flat_map_of_samples = (
+        {(): samples} if isinstance(samples, JaxArray) else flatten_mapping(samples)
+    )
     _verify_sample_shape(distribution_shape, sample_shape, structure, flat_map_of_samples)
-    _verify_maximum_likelihood_estimate(sampling_distribution_info, sample_shape, structure,
-                                        exp_parameters, samples)
+    _verify_maximum_likelihood_estimate(
+        sampling_distribution_info, sample_shape, structure, exp_parameters, samples
+    )

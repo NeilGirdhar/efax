@@ -5,8 +5,15 @@ from typing import TYPE_CHECKING, Any, Generic, Self, final, get_type_hints
 
 from array_api_compat import array_namespace
 from jax import grad, jacfwd, vjp, vmap
-from tjax import (JaxAbstractClass, JaxArray, JaxComplexArray, JaxRealArray, abstract_custom_jvp,
-                  abstract_jit, jit)
+from tjax import (
+    JaxAbstractClass,
+    JaxArray,
+    JaxComplexArray,
+    JaxRealArray,
+    abstract_custom_jvp,
+    abstract_jit,
+    jit,
+)
 from tjax.dataclasses import dataclass
 from typing_extensions import TypeVar
 
@@ -21,16 +28,17 @@ if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
 
 
-EP = TypeVar('EP', bound='ExpectationParametrization', default=Any)
-Domain = TypeVar('Domain', bound=JaxComplexArray | dict[str, Any], default=Any)
+EP = TypeVar("EP", bound="ExpectationParametrization", default=Any)
+Domain = TypeVar("Domain", bound=JaxComplexArray | dict[str, Any], default=Any)
 
 
-def _log_normalizer_jvp(primals: tuple[NaturalParametrization],
-                        tangents: tuple[NaturalParametrization],
-                        ) -> tuple[JaxRealArray, JaxRealArray]:
+def _log_normalizer_jvp(
+    primals: tuple[NaturalParametrization],
+    tangents: tuple[NaturalParametrization],
+) -> tuple[JaxRealArray, JaxRealArray]:
     """The log-normalizer's special JVP vastly improves numerical stability."""
-    q, = primals
-    q_dot, = tangents
+    (q,) = primals
+    (q_dot,) = tangents
     y = q.log_normalizer()
     p = q.to_exp()
     y_dot = parameter_dot_product(q_dot, p)
@@ -38,14 +46,13 @@ def _log_normalizer_jvp(primals: tuple[NaturalParametrization],
 
 
 @dataclass
-class NaturalParametrization(Distribution,
-                             JaxAbstractClass,
-                             Generic[EP, Domain]):
+class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]):
     """The natural parametrization of an exponential family distribution.
 
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
     """
+
     @abstract_custom_jvp(_log_normalizer_jvp)
     @abstract_jit
     @abstractmethod
@@ -86,7 +93,7 @@ class NaturalParametrization(Distribution,
 
     @classmethod
     def expectation_parametrization_cls(cls) -> type[EP]:
-        return get_type_hints(cls.to_exp)['return']
+        return get_type_hints(cls.to_exp)["return"]
 
     @jit
     @final
@@ -179,10 +186,11 @@ class NaturalParametrization(Distribution,
         return self.to_exp().kl_divergence(q, self_nat=self)
 
     @classmethod
-    def _flat_log_normalizer(cls,
-                             flattened_parameters: JaxRealArray,
-                             flattener: Flattener[Self],
-                             ) -> JaxRealArray:
+    def _flat_log_normalizer(
+        cls,
+        flattened_parameters: JaxRealArray,
+        flattener: Flattener[Self],
+    ) -> JaxRealArray:
         distribution = flattener.unflatten(flattened_parameters)
         return distribution.log_normalizer()
 

@@ -10,25 +10,34 @@ from tjax.dataclasses import dataclass
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import (RealField, ScalarSupport, Support, distribution_parameter,
-                         negative_support, positive_support)
+from ..parameter import (
+    RealField,
+    ScalarSupport,
+    Support,
+    distribution_parameter,
+    negative_support,
+    positive_support,
+)
 from ..parametrization import SimpleDistribution
 
 
 @dataclass
-class InverseGaussianNP(Samplable,
-                        NaturalParametrization['InverseGaussianEP', JaxRealArray],
-                        SimpleDistribution):
+class InverseGaussianNP(
+    Samplable, NaturalParametrization["InverseGaussianEP", JaxRealArray], SimpleDistribution
+):
     """The natural parametrization of the inverse Gaussian distribution.
 
     Args:
         negative_lambda_over_two_mu_squared: -lambda / (2 mu ** 2)
         negative_lambda_over_two: -lambda/2
     """
-    negative_lambda_over_two_mu_squared: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=negative_support))
-    negative_lambda_over_two: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=negative_support))
+
+    negative_lambda_over_two_mu_squared: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=negative_support)
+    )
+    negative_lambda_over_two: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=negative_support)
+    )
 
     @property
     @override
@@ -43,9 +52,9 @@ class InverseGaussianNP(Samplable,
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
-        return (-0.5 * xp.log(-2.0 * self.negative_lambda_over_two)
-                - 2.0 * xp.sqrt(self.negative_lambda_over_two_mu_squared
-                                * self.negative_lambda_over_two))
+        return -0.5 * xp.log(-2.0 * self.negative_lambda_over_two) - 2.0 * xp.sqrt(
+            self.negative_lambda_over_two_mu_squared * self.negative_lambda_over_two
+        )
 
     @override
     def to_exp(self) -> InverseGaussianEP:
@@ -62,17 +71,18 @@ class InverseGaussianNP(Samplable,
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> InverseGaussianEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> InverseGaussianEP:
         xp = array_namespace(x)
         return InverseGaussianEP(x, xp.reciprocal(x))
 
     @override
     @classmethod
     def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
-        if name != 'negative_lambda_over_two':
+        if name != "negative_lambda_over_two":
             return super().adjust_support(support, name, **kwargs)
-        eta1 = kwargs['negative_lambda_over_two_mu_squared']
+        eta1 = kwargs["negative_lambda_over_two_mu_squared"]
         xp = array_namespace(eta1)
         maximum = -xp.pow(-0.25 * eta1, 1.0 / 3.0)
         return ScalarSupport(ring=RealField(maximum=maximum))
@@ -93,23 +103,26 @@ class InverseGaussianNP(Samplable,
 
         # Sample using the algorithm
         y = xp.square(nu)
-        x = mu + 0.5 * mu_squared / lambda_ * y - (
-                mu / (2.0 * lambda_)
-                * xp.sqrt(4.0 * mu * lambda_ * y + mu_squared * xp.square(y)))
+        x = (
+            mu
+            + 0.5 * mu_squared / lambda_ * y
+            - (mu / (2.0 * lambda_) * xp.sqrt(4.0 * mu * lambda_ * y + mu_squared * xp.square(y)))
+        )
 
         return xp.where(z <= mu / (mu + x), x, mu_squared / x)
 
 
 @dataclass
-class InverseGaussianEP(ExpectationParametrization[InverseGaussianNP],
-                        Samplable,
-                        SimpleDistribution):
+class InverseGaussianEP(
+    ExpectationParametrization[InverseGaussianNP], Samplable, SimpleDistribution
+):
     """The expectation parametrization of the normal distribution.
 
     Args:
         mean: The mean.
         mean_reciprocal: The mean of the reciprocal.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
     mean_reciprocal: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
@@ -139,9 +152,9 @@ class InverseGaussianEP(ExpectationParametrization[InverseGaussianNP],
     @override
     @classmethod
     def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
-        if name != 'mean_reciprocal':
+        if name != "mean_reciprocal":
             return super().adjust_support(support, name, **kwargs)
-        mean = kwargs['mean']
+        mean = kwargs["mean"]
         xp = array_namespace(mean)
         return ScalarSupport(ring=RealField(minimum=xp.reciprocal(mean)))
 
