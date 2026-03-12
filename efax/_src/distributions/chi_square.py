@@ -18,9 +18,9 @@ from ..parametrization import SimpleDistribution
 
 
 @dataclass
-class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
-                  Samplable,
-                  NaturalParametrization['ChiSquareEP', JaxRealArray]):
+class ChiSquareNP(
+    HasEntropyNP["ChiSquareEP"], Samplable, NaturalParametrization["ChiSquareEP", JaxRealArray]
+):
     """The natural parameters of the chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.
@@ -28,8 +28,10 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
     Args:
         k_over_two_minus_one: k/2 - 1.
     """
-    k_over_two_minus_one: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=RealField(minimum=-1.0)))
+
+    k_over_two_minus_one: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=RealField(minimum=-1.0))
+    )
 
     @property
     @override
@@ -57,8 +59,7 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> ChiSquareEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> ChiSquareEP:
         xp = array_namespace(x)
         return ChiSquareEP(xp.log(x))
 
@@ -72,10 +73,7 @@ class ChiSquareNP(HasEntropyNP['ChiSquareEP'],
 
 # The ExpToNat mixin can be circumvented if the inverse of the digamma function were added to JAX.
 @dataclass
-class ChiSquareEP(HasEntropyEP[ChiSquareNP],
-                  Samplable,
-                  ExpToNat[ChiSquareNP],
-                  SimpleDistribution):
+class ChiSquareEP(HasEntropyEP[ChiSquareNP], Samplable, ExpToNat[ChiSquareNP], SimpleDistribution):
     """The expectation parameters of the chi-square distribution with k degrees of freedom.
 
     This is the gamma distribution with shape k/2 and rate 1/2.
@@ -83,6 +81,7 @@ class ChiSquareEP(HasEntropyEP[ChiSquareNP],
     Args:
         mean_log: E(log(x)).
     """
+
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @classmethod

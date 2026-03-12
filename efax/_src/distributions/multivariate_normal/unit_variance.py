@@ -20,10 +20,11 @@ from .isotropic import IsotropicNormalNP
 
 @dataclass
 class MultivariateUnitVarianceNormalNP(
-        HasEntropyNP['MultivariateUnitVarianceNormalEP'],
-        NaturalParametrization['MultivariateUnitVarianceNormalEP', JaxRealArray],
-        Multidimensional,
-        Samplable):
+    HasEntropyNP["MultivariateUnitVarianceNormalEP"],
+    NaturalParametrization["MultivariateUnitVarianceNormalEP", JaxRealArray],
+    Multidimensional,
+    Samplable,
+):
     """The natural parametrization of the multivariate normal distribution with unit variance.
 
     This is a curved exponential family.
@@ -31,6 +32,7 @@ class MultivariateUnitVarianceNormalNP(
     Args:
         mean: E(x).
     """
+
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property
@@ -46,8 +48,9 @@ class MultivariateUnitVarianceNormalNP(
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
-        return 0.5 * (xp.sum(xp.square(self.mean), axis=-1)
-                      + self.dimensions() * math.log(math.pi * 2.0))
+        return 0.5 * (
+            xp.sum(xp.square(self.mean), axis=-1) + self.dimensions() * math.log(math.pi * 2.0)
+        )
 
     @override
     def to_exp(self) -> MultivariateUnitVarianceNormalEP:
@@ -61,8 +64,9 @@ class MultivariateUnitVarianceNormalNP(
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> MultivariateUnitVarianceNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> MultivariateUnitVarianceNormalEP:
         return MultivariateUnitVarianceNormalEP(x)
 
     @override
@@ -79,10 +83,11 @@ class MultivariateUnitVarianceNormalNP(
 
 @dataclass
 class MultivariateUnitVarianceNormalEP(
-        HasEntropyEP[MultivariateUnitVarianceNormalNP],
-        HasGeneralizedConjugatePrior,
-        Samplable,
-        Multidimensional):
+    HasEntropyEP[MultivariateUnitVarianceNormalNP],
+    HasGeneralizedConjugatePrior,
+    Samplable,
+    Multidimensional,
+):
     """The expectation parametrization of the multivariate normal distribution with unit variance.
 
     This is a curved exponential family.
@@ -90,6 +95,7 @@ class MultivariateUnitVarianceNormalEP(
     Args:
         mean: E(x).
     """
+
     mean: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property
@@ -129,8 +135,9 @@ class MultivariateUnitVarianceNormalEP(
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, IsotropicNormalNP)
         xp = array_namespace(cp)
         n = -2.0 * cp.negative_half_precision
@@ -138,8 +145,9 @@ class MultivariateUnitVarianceNormalEP(
         return (cls(mean), n)
 
     @override
-    def generalized_conjugate_prior_distribution(self, n: JaxRealArray
-                                                 ) -> MultivariateDiagonalNormalNP:
+    def generalized_conjugate_prior_distribution(
+        self, n: JaxRealArray
+    ) -> MultivariateDiagonalNormalNP:
         negative_half_precision = -0.5 * n
         return MultivariateDiagonalNormalNP(n * self.mean, negative_half_precision)
 

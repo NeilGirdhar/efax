@@ -10,9 +10,7 @@ from .create_info import GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
 
 
-def test_conversion(generator: Generator,
-                    distribution_info: DistributionInfo
-                    ) -> None:
+def test_conversion(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Test that the conversion between the different parametrizations are consistent."""
     if isinstance(distribution_info, GeneralizedDirichletInfo):
         pytest.skip()
@@ -27,9 +25,13 @@ def test_conversion(generator: Generator,
     if not tree_allclose(final_np, original_np):
         for i in range(n):
             if not tree_allclose(final_np[i], original_np[i]):
-                print_generic({"original": original_np[i],
-                               "intermediate": intermediate_ep[i],
-                               "final": final_np[i]})
+                print_generic(
+                    {
+                        "original": original_np[i],
+                        "intermediate": intermediate_ep[i],
+                        "final": final_np[i],
+                    }
+                )
                 pytest.fail("Conversion failure")
 
     # Check fixed parameters.

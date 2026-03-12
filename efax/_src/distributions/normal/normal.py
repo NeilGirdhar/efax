@@ -16,19 +16,23 @@ from ...parametrization import SimpleDistribution
 
 
 @dataclass
-class NormalNP(HasEntropyNP['NormalEP'],
-               Samplable,
-               NaturalParametrization['NormalEP', JaxRealArray],
-               SimpleDistribution):
+class NormalNP(
+    HasEntropyNP["NormalEP"],
+    Samplable,
+    NaturalParametrization["NormalEP", JaxRealArray],
+    SimpleDistribution,
+):
     """The natural parametrization of the normal distribution.
 
     Args:
         mean_times_precision: The mean times the precision.
         negative_half_precision: -0.5 times the precision.
     """
+
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=negative_support))
+    negative_half_precision: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=negative_support)
+    )
 
     @property
     @override
@@ -43,8 +47,9 @@ class NormalNP(HasEntropyNP['NormalEP'],
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
-        return (-xp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
-                + 0.5 * xp.log(-np.pi / self.negative_half_precision))
+        return -xp.square(self.mean_times_precision) / (
+            4.0 * self.negative_half_precision
+        ) + 0.5 * xp.log(-np.pi / self.negative_half_precision)
 
     @override
     def to_exp(self) -> NormalEP:
@@ -60,8 +65,7 @@ class NormalNP(HasEntropyNP['NormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> NormalEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> NormalEP:
         xp = array_namespace(x)
         return NormalEP(x, xp.square(x))
 
@@ -77,15 +81,14 @@ class NormalNP(HasEntropyNP['NormalEP'],
 
 
 @dataclass
-class NormalEP(HasEntropyEP[NormalNP],
-               Samplable,
-               SimpleDistribution):
+class NormalEP(HasEntropyEP[NormalNP], Samplable, SimpleDistribution):
     """The expectation parametrization of the normal distribution.
 
     Args:
         mean: The mean.
         second_moment: The second moment.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
@@ -136,6 +139,7 @@ class NormalVP(Samplable, SimpleDistribution):
         mean: The mean.
         variance: The variance.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
@@ -184,6 +188,7 @@ class NormalDP(Samplable, SimpleDistribution):
         mean: The mean.
         deviation: The standard deviation.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     deviation: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 

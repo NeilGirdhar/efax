@@ -17,10 +17,11 @@ from ...parameter import VectorSupport, complex_field, distribution_parameter
 
 @dataclass
 class ComplexMultivariateUnitVarianceNormalNP(
-        HasEntropyNP['ComplexMultivariateUnitVarianceNormalEP'],
-        NaturalParametrization['ComplexMultivariateUnitVarianceNormalEP', JaxComplexArray],
-        Multidimensional,
-        Samplable):
+    HasEntropyNP["ComplexMultivariateUnitVarianceNormalEP"],
+    NaturalParametrization["ComplexMultivariateUnitVarianceNormalEP", JaxComplexArray],
+    Multidimensional,
+    Samplable,
+):
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.
 
     This is a curved exponential family.
@@ -28,6 +29,7 @@ class ComplexMultivariateUnitVarianceNormalNP(
     Args:
         two_mean_conjugate: 2 * E(conjugate(x)).
     """
+
     two_mean_conjugate: JaxComplexArray = distribution_parameter(VectorSupport(ring=complex_field))
     # S = I, U = 0
     # P = I, R = 0
@@ -64,8 +66,9 @@ class ComplexMultivariateUnitVarianceNormalNP(
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
-                              ) -> ComplexMultivariateUnitVarianceNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxComplexArray, **fixed_parameters: JaxArray
+    ) -> ComplexMultivariateUnitVarianceNormalEP:
         return ComplexMultivariateUnitVarianceNormalEP(x)
 
     @override
@@ -79,9 +82,8 @@ class ComplexMultivariateUnitVarianceNormalNP(
 
 @dataclass
 class ComplexMultivariateUnitVarianceNormalEP(
-        HasEntropyEP[ComplexMultivariateUnitVarianceNormalNP],
-        Multidimensional,
-        Samplable):
+    HasEntropyEP[ComplexMultivariateUnitVarianceNormalNP], Multidimensional, Samplable
+):
     """The complex multivariate normal distribution with unit variance, and zero pseudo-variance.
 
     This is a curved exponential family.
@@ -89,6 +91,7 @@ class ComplexMultivariateUnitVarianceNormalEP(
     Args:
         mean: E(x).
     """
+
     mean: JaxComplexArray = distribution_parameter(VectorSupport(ring=complex_field))
 
     @property

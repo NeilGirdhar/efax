@@ -13,12 +13,11 @@ from ..natural_parametrization import NaturalParametrization
 from ..parameter import ScalarSupport, integral_ring
 from ..parametrization import SimpleDistribution
 
-EP = TypeVar('EP', bound='NBCommonEP[Any]')
+EP = TypeVar("EP", bound="NBCommonEP[Any]")
 
 
 @dataclass
-class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
-                 SimpleDistribution):
+class NBCommonNP(NaturalParametrization[EP, JaxRealArray], SimpleDistribution):
     log_not_p: JaxRealArray
 
     @property
@@ -51,12 +50,11 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray],
         raise NotImplementedError
 
 
-NP = TypeVar('NP', bound=NBCommonNP[Any])
+NP = TypeVar("NP", bound=NBCommonNP[Any])
 
 
 @dataclass
-class NBCommonEP(ExpectationParametrization[NP],
-                 SimpleDistribution):
+class NBCommonEP(ExpectationParametrization[NP], SimpleDistribution):
     mean: JaxRealArray
 
     @property

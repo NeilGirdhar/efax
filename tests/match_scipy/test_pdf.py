@@ -8,28 +8,33 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxComplexArray
 
-from efax import (JointDistributionN, Multidimensional, NaturalParametrization,
-                  ScipyDiscreteDistribution, ScipyDistribution, SimpleDistribution)
+from efax import (
+    JointDistributionN,
+    Multidimensional,
+    NaturalParametrization,
+    ScipyDiscreteDistribution,
+    ScipyDistribution,
+    SimpleDistribution,
+)
 
 from ..create_info import MultivariateDiagonalNormalInfo
 from ..distribution_info import DistributionInfo
 
 
-def _check_observation_shape(nat_parameters: NaturalParametrization,
-                            efax_x: JaxComplexArray | dict[str, Any],
-                            distribution_shape: tuple[int, ...],
-                            ) -> None:
+def _check_observation_shape(
+    nat_parameters: NaturalParametrization,
+    efax_x: JaxComplexArray | dict[str, Any],
+    distribution_shape: tuple[int, ...],
+) -> None:
     """Verify that the sufficient statistics have the right shape."""
     if isinstance(nat_parameters, JointDistributionN):
         assert isinstance(efax_x, dict)
         for name, value in nat_parameters.sub_distributions().items():
             _check_observation_shape(value, efax_x[name], distribution_shape)
         return
-    assert isinstance(nat_parameters, SimpleDistribution)  # type: ignore[unreachable]
-    assert isinstance(efax_x, Array)  # type: ignore[unreachable]
-    dimensions = (nat_parameters.dimensions()
-                  if isinstance(nat_parameters, Multidimensional)
-                  else 0)
+    assert isinstance(nat_parameters, SimpleDistribution)
+    assert isinstance(efax_x, Array)
+    dimensions = nat_parameters.dimensions() if isinstance(nat_parameters, Multidimensional) else 0
     ideal_shape = distribution_shape + nat_parameters.domain_support().shape(dimensions)
     assert efax_x.shape == ideal_shape
 
@@ -49,7 +54,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
         scipy_density = scipy_distribution.pdf(scipy_x)
     else:
         assert isinstance(scipy_distribution, ScipyDiscreteDistribution)
-        scipy_density = scipy_distribution.pmf(scipy_x)  # type: ignore # pyright: ignore
+        scipy_density = scipy_distribution.pmf(scipy_x)  # pyright: ignore
 
     if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
         atol = 1e-5

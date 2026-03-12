@@ -16,9 +16,10 @@ from ...parameter import ScalarSupport, complex_field, distribution_parameter
 
 @dataclass
 class ComplexUnitVarianceNormalNP(
-        HasEntropyNP['ComplexUnitVarianceNormalEP'],
-        NaturalParametrization['ComplexUnitVarianceNormalEP', JaxComplexArray],
-        Samplable):
+    HasEntropyNP["ComplexUnitVarianceNormalEP"],
+    NaturalParametrization["ComplexUnitVarianceNormalEP", JaxComplexArray],
+    Samplable,
+):
     """The natural parametrization of the complex unit normal distribution.
 
     It has unit variance, and zero pseudo-variance. This is a curved exponential family.
@@ -26,6 +27,7 @@ class ComplexUnitVarianceNormalNP(
     Args:
         two_mean_conjugate: 2 * E(conjugate(x)).
     """
+
     two_mean_conjugate: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
     # S = I, U = 0
     # P = I, R = 0
@@ -60,8 +62,9 @@ class ComplexUnitVarianceNormalNP(
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
-                              ) -> ComplexUnitVarianceNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxComplexArray, **fixed_parameters: JaxArray
+    ) -> ComplexUnitVarianceNormalEP:
         return ComplexUnitVarianceNormalEP(x)
 
     @override
@@ -70,9 +73,7 @@ class ComplexUnitVarianceNormalNP(
 
 
 @dataclass
-class ComplexUnitVarianceNormalEP(
-        HasEntropyEP[ComplexUnitVarianceNormalNP],
-        Samplable):
+class ComplexUnitVarianceNormalEP(HasEntropyEP[ComplexUnitVarianceNormalNP], Samplable):
     """The expectation parametrization of the complex unit normal distribution.
 
     It has unit variance, and zero pseudo-variance. This is a curved exponential family.
@@ -80,6 +81,7 @@ class ComplexUnitVarianceNormalEP(
     Args:
         mean: E(x).
     """
+
     mean: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
 
     @property

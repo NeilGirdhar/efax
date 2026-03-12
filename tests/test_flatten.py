@@ -11,17 +11,20 @@ from efax import Flattener, MultivariateUnitVarianceNormalNP
 from .distribution_info import DistributionInfo
 
 
-@pytest.mark.parametrize('natural', [False, True])
-def test_flatten(generator: Generator,
-                 distribution_info: DistributionInfo,
-                 *,
-                 natural: bool,
-                 ) -> None:
+@pytest.mark.parametrize("natural", [False, True])
+def test_flatten(
+    generator: Generator,
+    distribution_info: DistributionInfo,
+    *,
+    natural: bool,
+) -> None:
     """Test that unflattening restores the source of flattening."""
     shape = (3, 4)
-    p = (distribution_info.exp_parameter_generator(generator, shape=shape)
-         if natural
-         else distribution_info.nat_parameter_generator(generator, shape=shape))
+    p = (
+        distribution_info.exp_parameter_generator(generator, shape=shape)
+        if natural
+        else distribution_info.nat_parameter_generator(generator, shape=shape)
+    )
     flattener, flattened = Flattener.flatten(p)
     assert issubclass(flattened.dtype.type, np.floating)
     assert_tree_allclose(flattener.unflatten(flattened), p)

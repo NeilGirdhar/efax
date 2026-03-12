@@ -19,11 +19,12 @@ from .isotropic import IsotropicNormalNP
 
 
 @dataclass
-class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceNormalEP'],
-                                        NaturalParametrization['MultivariateFixedVarianceNormalEP',
-                                                               JaxRealArray],
-                                        Multidimensional,
-                                        Samplable):
+class MultivariateFixedVarianceNormalNP(
+    HasEntropyNP["MultivariateFixedVarianceNormalEP"],
+    NaturalParametrization["MultivariateFixedVarianceNormalEP", JaxRealArray],
+    Multidimensional,
+    Samplable,
+):
     """The natural parametrization of the multivariate normal distribution with fixed variance.
 
     This is a curved exponential family.
@@ -32,9 +33,11 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
         mean_times_precision: E(x) / Var(x).
         variance: The fixed variance, Var(x).
     """
+
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=0.0)),
-                                                    fixed=True)
+    variance: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=RealField(minimum=0.0)), fixed=True
+    )
 
     @property
     @override
@@ -50,15 +53,17 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         eta = self.mean_times_precision
-        return 0.5 * (xp.sum(xp.square(eta), axis=-1) * self.variance
-                      + self.dimensions() * xp.log(math.pi * 2.0 * self.variance))
+        return 0.5 * (
+            xp.sum(xp.square(eta), axis=-1) * self.variance
+            + self.dimensions() * xp.log(math.pi * 2.0 * self.variance)
+        )
 
     @override
     def to_exp(self) -> MultivariateFixedVarianceNormalEP:
         xp = array_namespace(self)
         return MultivariateFixedVarianceNormalEP(
-            self.mean_times_precision * self.variance[..., xp.newaxis],
-            variance=self.variance)
+            self.mean_times_precision * self.variance[..., xp.newaxis], variance=self.variance
+        )
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -67,9 +72,10 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> MultivariateFixedVarianceNormalEP:
-        return MultivariateFixedVarianceNormalEP(x, variance=fixed_parameters['variance'])
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> MultivariateFixedVarianceNormalEP:
+        return MultivariateFixedVarianceNormalEP(x, variance=fixed_parameters["variance"])
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -82,10 +88,11 @@ class MultivariateFixedVarianceNormalNP(HasEntropyNP['MultivariateFixedVarianceN
 
 @dataclass
 class MultivariateFixedVarianceNormalEP(
-        HasEntropyEP[MultivariateFixedVarianceNormalNP],
-        HasGeneralizedConjugatePrior,
-        Samplable,
-        Multidimensional):
+    HasEntropyEP[MultivariateFixedVarianceNormalNP],
+    HasGeneralizedConjugatePrior,
+    Samplable,
+    Multidimensional,
+):
     """The expectation parametrization of the multivariate normal distribution with fixed variance.
 
     This is a curved exponential family.
@@ -94,9 +101,11 @@ class MultivariateFixedVarianceNormalEP(
         mean: E(x).
         variance: The fixed variance, Var(x).
     """
+
     mean: JaxRealArray = distribution_parameter(VectorSupport())
-    variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=0.0)),
-                                                    fixed=True)
+    variance: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=RealField(minimum=0.0)), fixed=True
+    )
 
     @property
     @override
@@ -116,8 +125,9 @@ class MultivariateFixedVarianceNormalEP(
     @override
     def to_nat(self) -> MultivariateFixedVarianceNormalNP:
         xp = array_namespace(self)
-        return MultivariateFixedVarianceNormalNP(self.mean / self.variance[..., xp.newaxis],
-                                                 variance=self.variance)
+        return MultivariateFixedVarianceNormalNP(
+            self.mean / self.variance[..., xp.newaxis], variance=self.variance
+        )
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
@@ -137,14 +147,15 @@ class MultivariateFixedVarianceNormalEP(
         xp = array_namespace(self)
         n_over_variance = n / self.variance
         negative_half_precision = -0.5 * n_over_variance
-        return IsotropicNormalNP(n_over_variance[..., xp.newaxis] * self.mean,
-                                 negative_half_precision)
+        return IsotropicNormalNP(
+            n_over_variance[..., xp.newaxis] * self.mean, negative_half_precision
+        )
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization,
-                                          variance: JaxRealArray | None = None
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization, variance: JaxRealArray | None = None
+    ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, IsotropicNormalNP)
         assert variance is not None
         xp = array_namespace(cp)
@@ -154,8 +165,9 @@ class MultivariateFixedVarianceNormalEP(
         return cls(mean, variance), n
 
     @override
-    def generalized_conjugate_prior_distribution(self, n: JaxRealArray
-                                                 ) -> MultivariateDiagonalNormalNP:
+    def generalized_conjugate_prior_distribution(
+        self, n: JaxRealArray
+    ) -> MultivariateDiagonalNormalNP:
         xp = array_namespace(self)
         n_over_variance = n / self.variance[..., xp.newaxis]
         negative_half_precision = -0.5 * n_over_variance

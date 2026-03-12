@@ -11,7 +11,7 @@ from ..natural_parametrization import NaturalParametrization
 from ..parametrization import Distribution
 from ..tools import parameter_dot_product
 
-NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
+NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 
 
 class HasEntropy(Distribution):
@@ -19,10 +19,7 @@ class HasEntropy(Distribution):
         raise NotImplementedError
 
 
-class HasEntropyEP(ExpectationParametrization[NP],
-                   HasEntropy,
-                   JaxAbstractClass,
-                   Generic[NP]):
+class HasEntropyEP(ExpectationParametrization[NP], HasEntropy, JaxAbstractClass, Generic[NP]):
     @abstract_jit
     @abstractmethod
     def expected_carrier_measure(self) -> JaxRealArray:
@@ -41,9 +38,9 @@ class HasEntropyEP(ExpectationParametrization[NP],
         Args:
             q: The natural parameters of the prediction.
         """
-        return (-parameter_dot_product(q, self)
-                + q.log_normalizer()
-                - self.expected_carrier_measure())
+        return (
+            -parameter_dot_product(q, self) + q.log_normalizer() - self.expected_carrier_measure()
+        )
 
     @jit
     @final
@@ -56,12 +53,10 @@ class HasEntropyEP(ExpectationParametrization[NP],
         return self.cross_entropy(stop_gradient(self.to_nat()))
 
 
-EP = TypeVar('EP', bound=HasEntropyEP, default=Any)
+EP = TypeVar("EP", bound=HasEntropyEP, default=Any)
 
 
-class HasEntropyNP(NaturalParametrization[EP],
-                   HasEntropy,
-                   Generic[EP]):
+class HasEntropyNP(NaturalParametrization[EP], HasEntropy, Generic[EP]):
     @jit
     @final
     @override

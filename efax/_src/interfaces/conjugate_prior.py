@@ -12,8 +12,7 @@ from ..natural_parametrization import NaturalParametrization
 
 class HasConjugatePrior(ExpectationParametrization):
     @abstractmethod
-    def conjugate_prior_distribution(self, n: JaxRealArray
-                                     ) -> NaturalParametrization:
+    def conjugate_prior_distribution(self, n: JaxRealArray) -> NaturalParametrization:
         """The conjugate prior distribution.
 
         Args:
@@ -23,8 +22,9 @@ class HasConjugatePrior(ExpectationParametrization):
 
     @classmethod
     @abstractmethod
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         """Given a conjugate prior distribution, find the distribution and observation count.
 
         Args:
@@ -43,8 +43,7 @@ class HasConjugatePrior(ExpectationParametrization):
 
 class HasGeneralizedConjugatePrior(HasConjugatePrior, Multidimensional):
     @abstractmethod
-    def generalized_conjugate_prior_distribution(self, n: JaxRealArray
-                                                 ) -> NaturalParametrization:
+    def generalized_conjugate_prior_distribution(self, n: JaxRealArray) -> NaturalParametrization:
         """A generalization of the conjugate prior distribution.
 
         Args:

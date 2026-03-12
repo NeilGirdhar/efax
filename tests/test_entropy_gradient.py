@@ -1,4 +1,5 @@
 """These tests verify entropy gradients."""
+
 from __future__ import annotations
 
 from functools import partial
@@ -9,8 +10,13 @@ from jax import grad, jit, tree, value_and_grad
 from jax.test_util import check_grads
 from numpy.random import Generator
 from rich.console import Console
-from tjax import (JaxBooleanArray, JaxRealArray, assert_tree_allclose, dynamic_tree_all,
-                  print_generic)
+from tjax import (
+    JaxBooleanArray,
+    JaxRealArray,
+    assert_tree_allclose,
+    dynamic_tree_all,
+    print_generic,
+)
 
 from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
@@ -44,17 +50,19 @@ def _check_entropy_gradient(distribution: HasEntropy, /) -> None:
     check_grads(p_sum_entropy, (flattened,), order=1, atol=1e-4, rtol=1e-2)
 
 
-def test_nat_entropy_gradient(generator: Generator,
-                              entropy_distribution_info: DistributionInfo,
-                              ) -> None:
+def test_nat_entropy_gradient(
+    generator: Generator,
+    entropy_distribution_info: DistributionInfo,
+) -> None:
     shape = (7, 13)
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
     _check_entropy_gradient(nat_parameters)
 
 
-def test_exp_entropy_gradient(generator: Generator,
-                              entropy_distribution_info: DistributionInfo,
-                              ) -> None:
+def test_exp_entropy_gradient(
+    generator: Generator,
+    entropy_distribution_info: DistributionInfo,
+) -> None:
     shape = (7, 13)
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
     _check_entropy_gradient(exp_parameters)

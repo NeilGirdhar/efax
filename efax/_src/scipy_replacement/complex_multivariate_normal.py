@@ -12,11 +12,14 @@ from .shaped_distribution import ShapedDistribution
 
 class ScipyComplexMultivariateNormalUnvectorized:
     """Represents a multivariate complex normal distribution."""
+
     @override
-    def __init__(self,
-                 mean: NumpyComplexArray,
-                 variance: NumpyComplexArray,
-                 pseudo_variance: NumpyComplexArray) -> None:
+    def __init__(
+        self,
+        mean: NumpyComplexArray,
+        variance: NumpyComplexArray,
+        pseudo_variance: NumpyComplexArray,
+    ) -> None:
         super().__init__()
         self.size = mean.shape[0]
         self.mean = mean
@@ -29,8 +32,10 @@ class ScipyComplexMultivariateNormalUnvectorized:
             msg = "The variance has shape {variance.shape} instead of {(self.size, self.size)}."
             raise ValueError(msg)
         if pseudo_variance.shape != (self.size, self.size):
-            msg = ("The pseudo-variance has shape {pseudo_variance.shape} "
-                   f"instead of {(self.size, self.size)}.")
+            msg = (
+                "The pseudo-variance has shape {pseudo_variance.shape} "
+                f"instead of {(self.size, self.size)}."
+            )
             raise ValueError(msg)
         if not np.all(np.linalg.eigvals(variance) >= 0):
             msg = "The variance is not positive semidefinite."
@@ -52,10 +57,10 @@ class ScipyComplexMultivariateNormalUnvectorized:
             size = (size,)
         if random_state is None:
             random_state = np.random.default_rng()
-        xy_rvs = random_state.multivariate_normal(mean=self._multivariate_normal_mean(),
-                                                  cov=self._multivariate_normal_cov(),
-                                                  size=size)
-        return xy_rvs[..., :self.size] + 1j * xy_rvs[..., self.size:]
+        xy_rvs = random_state.multivariate_normal(
+            mean=self._multivariate_normal_mean(), cov=self._multivariate_normal_cov(), size=size
+        )
+        return xy_rvs[..., : self.size] + 1j * xy_rvs[..., self.size :]
 
     def entropy(self) -> float:
         return self.as_multivariate_normal().entropy().item()
@@ -81,14 +86,17 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
 
 class ScipyComplexMultivariateNormal(
-        ShapedDistribution[
-            ScipyComplexMultivariateNormalUnvectorized]):  # type: ignore # pyright: ignore
+    ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]  # type: ignore # pyright: ignore
+):
     """This class allows distributions having a non-empty shape."""
+
     @override
-    def __init__(self,
-                 mean: NumpyComplexArray | None = None,
-                 variance: NumpyComplexArray | None = None,
-                 pseudo_variance: NumpyComplexArray | None = None) -> None:
+    def __init__(
+        self,
+        mean: NumpyComplexArray | None = None,
+        variance: NumpyComplexArray | None = None,
+        pseudo_variance: NumpyComplexArray | None = None,
+    ) -> None:
         if mean is not None:
             shape = mean.shape[:-1]
             dimensions = mean.shape[-1]
@@ -100,9 +108,9 @@ class ScipyComplexMultivariateNormal(
             dimensions = pseudo_variance.shape[-1]
         else:
             raise ValueError
-        dtype = np.result_type(*[x.dtype
-                                 for x in (mean, variance, pseudo_variance)
-                                 if x is not None])
+        dtype = np.result_type(
+            *[x.dtype for x in (mean, variance, pseudo_variance) if x is not None]
+        )
         rvs_shape = (dimensions,)
         if mean is None:
             mean = np.zeros((*shape, dimensions), dtype=dtype)
@@ -114,7 +122,8 @@ class ScipyComplexMultivariateNormal(
         objects = np.empty(shape, dtype=ScipyComplexMultivariateNormalUnvectorized)
         for i in np.ndindex(*shape):
             objects[i] = ScipyComplexMultivariateNormalUnvectorized(
-                    mean[i], variance[i], pseudo_variance[i])
+                mean[i], variance[i], pseudo_variance[i]
+            )
         super().__init__(shape, rvs_shape, dtype, objects, multivariate=True)
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormal:
@@ -123,8 +132,9 @@ class ScipyComplexMultivariateNormal(
             this_object = self.objects[i]
             assert isinstance(this_object, ScipyComplexMultivariateNormalUnvectorized)
             objects[i] = this_object.as_multivariate_normal()
-        return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects,
-                                       multivariate=True)
+        return ScipyMultivariateNormal(
+            self.shape, self.rvs_shape, self.real_dtype, objects, multivariate=True
+        )
 
     @property
     def mean(self) -> NumpyComplexArray:

@@ -17,6 +17,7 @@ class ScipyDirichletFixRVsAndPDF:
 
     See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.
     """
+
     def __init__(self, alpha: NumpyRealArray) -> None:
         super().__init__()
         self.distribution = ss.dirichlet(alpha=alpha)
@@ -27,23 +28,24 @@ class ScipyDirichletFixRVsAndPDF:
             return np.float64(self.distribution.pdf(x.T))
         return np.float64(self.distribution.pdf(x))
 
-    def rvs(self,
-            size: tuple[int, ...] | None = None,
-            random_state: np.random.Generator | None = None
-            ) -> onp.ArrayND[np.float64]:
+    def rvs(
+        self, size: tuple[int, ...] | None = None, random_state: np.random.Generator | None = None
+    ) -> onp.ArrayND[np.float64]:
         if size is None:
             size = ()
         # This somehow fixes the behaviour of rvs.
-        return self.distribution.rvs(size=size,  # type: ignore # pyright: ignore
-                                     random_state=random_state)
+        return self.distribution.rvs(  # type: ignore
+            size=size,  # pyright: ignore
+            random_state=random_state,
+        )
 
     def entropy(self) -> NumpyRealArray:
         return np.asarray(self.distribution.entropy())
 
 
-class ScipyDirichlet(
-        ShapedDistribution[ScipyDirichletFixRVsAndPDF]):  # type: ignore  # pyright: ignore
+class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):  # type: ignore  # pyright: ignore
     """This class allows distributions having a non-empty shape."""
+
     @override
     def __init__(self, alpha: NumpyRealArray) -> None:
         shape = alpha[..., -1].shape
@@ -79,8 +81,9 @@ class ScipyGeneralizedDirichlet:
         return np.prod(terms, axis=-1)
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
-        sample_size: tuple[int, ...] = (((size,) if isinstance(size, int) else tuple(size))
-                                        + self.alpha.shape)
+        sample_size: tuple[int, ...] = (
+            (size,) if isinstance(size, int) else tuple(size)
+        ) + self.alpha.shape
         if random_state is None:
             random_state = np.random.default_rng()
         dimensions = self.alpha.shape[-1]

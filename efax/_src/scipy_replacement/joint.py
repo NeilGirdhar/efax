@@ -17,16 +17,17 @@ class ScipyJointDistribution:
 
     def pdf(self, z: dict[str, Any], out: None = None) -> NumpyRealNumeric:
         joined = join_mappings(sub=self.sub_distributions, z=z)
-        return prod(value['sub'].pdf(value['z']) for value in joined.values())
+        return prod(value["sub"].pdf(value["z"]) for value in joined.values())
 
-    def rvs(self,
-            size: ShapeLike | None = None,
-            random_state: Generator | None = None
-            ) -> dict[str, Any]:
-        return {name: distribution.rvs(size, random_state)
-                for name, distribution in self.sub_distributions.items()}
+    def rvs(
+        self, size: ShapeLike | None = None, random_state: Generator | None = None
+    ) -> dict[str, Any]:
+        return {
+            name: distribution.rvs(size, random_state)
+            for name, distribution in self.sub_distributions.items()
+        }
 
     def entropy(self) -> NumpyRealArray:
-        return np.sum([distribution.entropy()
-                       for distribution in self.sub_distributions.values()],
-                      axis=0)
+        return np.sum(
+            [distribution.entropy() for distribution in self.sub_distributions.values()], axis=0
+        )

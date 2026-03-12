@@ -16,11 +16,12 @@ from ...parameter import VectorSupport, distribution_parameter, negative_support
 
 
 @dataclass
-class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
-                                   NaturalParametrization['MultivariateDiagonalNormalEP',
-                                                          JaxRealArray],
-                                   Multidimensional,
-                                   Samplable):
+class MultivariateDiagonalNormalNP(
+    HasEntropyNP["MultivariateDiagonalNormalEP"],
+    NaturalParametrization["MultivariateDiagonalNormalEP", JaxRealArray],
+    Multidimensional,
+    Samplable,
+):
     """The natural parametrization of the normal distribution with diagonal variance.
 
     This distribution exists because it's the generalized conjugate prior of
@@ -30,9 +31,11 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
         mean_times_precision: E(x) / Var(x).
         negative_half_precision: The diagonal elements of -0.5 / Var(x).
     """
+
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=negative_support))
+    negative_half_precision: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=negative_support)
+    )
 
     @property
     @override
@@ -47,8 +50,9 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
-        components = (-xp.square(self.mean_times_precision) / (4.0 * self.negative_half_precision)
-                      + 0.5 * xp.log(-np.pi / self.negative_half_precision))
+        components = -xp.square(self.mean_times_precision) / (
+            4.0 * self.negative_half_precision
+        ) + 0.5 * xp.log(-np.pi / self.negative_half_precision)
         return xp.sum(components, axis=-1)
 
     @override
@@ -65,8 +69,9 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> MultivariateDiagonalNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> MultivariateDiagonalNormalEP:
         xp = array_namespace(x)
         return MultivariateDiagonalNormalEP(x, xp.square(x))
 
@@ -83,15 +88,16 @@ class MultivariateDiagonalNormalNP(HasEntropyNP['MultivariateDiagonalNormalEP'],
 
 
 @dataclass
-class MultivariateDiagonalNormalEP(HasEntropyEP[MultivariateDiagonalNormalNP],
-                                   Multidimensional,
-                                   Samplable):
+class MultivariateDiagonalNormalEP(
+    HasEntropyEP[MultivariateDiagonalNormalNP], Multidimensional, Samplable
+):
     """The expectation parametrization of the normal distribution with diagonal variance.
 
     Args:
         mean: E(x).
         second moment: The diagonal elements of E(x^2).
     """
+
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     second_moment: JaxRealArray = distribution_parameter(VectorSupport(ring=positive_support))
 
@@ -143,6 +149,7 @@ class MultivariateDiagonalNormalVP(Samplable, Multidimensional):
         mean: E(x).
         variance: The diagonal elements of Var(x).
     """
+
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(VectorSupport())
 

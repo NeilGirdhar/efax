@@ -5,6 +5,7 @@ context.  Suppose we have an unknown target value, and a loss function based on
 the cross-entropy between the target value and a predictive distribution.  We
 will optimize the predictive distribution by a small fraction of its cotangent.
 """
+
 import jax.numpy as jnp
 from jax import grad, lax
 from tjax import JaxBooleanArray, JaxRealArray, jit, print_generic
@@ -44,13 +45,16 @@ target_distribution = BernoulliEP(jnp.asarray([0.3, 0.4, 0.7]))
 initial_predictive_distribution = BernoulliNP(jnp.zeros(3))
 
 # Optimize the predictive distribution iteratively.
-predictive_distribution = lax.while_loop(cond_fun, body_fun,
-                                         initial_predictive_distribution)
+predictive_distribution = lax.while_loop(cond_fun, body_fun, initial_predictive_distribution)
 
 # Compare the optimized predictive distribution with the target value in the
 # same natural parametrization.
-print_generic({"predictive_distribution": predictive_distribution,
-               "target_distribution": target_distribution.to_nat()})
+print_generic(
+    {
+        "predictive_distribution": predictive_distribution,
+        "target_distribution": target_distribution.to_nat(),
+    }
+)
 # dict
 # ├── predictive_distribution=BernoulliNP[dataclass]
 # │   └── log_odds=Jax Array (3,) float32
@@ -60,8 +64,12 @@ print_generic({"predictive_distribution": predictive_distribution,
 #         └──  -0.8473 │ -0.4055 │ 0.8473
 
 # Do the same in the expectation parametrization.
-print_generic({"predictive_distribution": predictive_distribution.to_exp(),
-               "target_distribution": target_distribution})
+print_generic(
+    {
+        "predictive_distribution": predictive_distribution.to_exp(),
+        "target_distribution": target_distribution,
+    }
+)
 # dict
 # ├── predictive_distribution=BernoulliEP[dataclass]
 # │   └── probability=Jax Array (3,) float32

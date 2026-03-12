@@ -22,14 +22,14 @@ class JointDistribution(Distribution):
     def sub_distributions(self) -> Mapping[str, Distribution]:
         return self._sub_distributions
 
-    def general_method(self,
-                       f: Callable[[Distribution], Any],
-                       t: type[Distribution] = Distribution
-                       ) -> dict[str, Any]:
-        return {name: (value.general_method(f, t)
-                       if isinstance(value, JointDistribution) else f(value))
-                for name, value in self._sub_distributions.items()
-                if isinstance(value, (JointDistribution, t))}
+    def general_method(
+        self, f: Callable[[Distribution], Any], t: type[Distribution] = Distribution
+    ) -> dict[str, Any]:
+        return {
+            name: (value.general_method(f, t) if isinstance(value, JointDistribution) else f(value))
+            for name, value in self._sub_distributions.items()
+            if isinstance(value, (JointDistribution, t))
+        }
 
     def general_sample(self, key: KeyArray, shape: Shape | None = None) -> dict[str, Any]:
         stream = RngStream(key)
@@ -37,12 +37,14 @@ class JointDistribution(Distribution):
         def f(x: Distribution, /) -> JaxComplexArray:
             assert isinstance(x, Samplable)
             return x.sample(stream.key(), shape)
+
         return self.general_method(f, Samplable)
 
     def as_dict(self) -> dict[str, Any]:
         def f(x: Distribution, /) -> SimpleDistribution:
             assert isinstance(x, SimpleDistribution)
             return x
+
         return self.general_method(f)
 
     @property
@@ -54,8 +56,7 @@ class JointDistribution(Distribution):
 
 
 @dataclass
-class JointDistributionE(JointDistribution,
-                         HasEntropyEP['JointDistributionN']):
+class JointDistributionE(JointDistribution, HasEntropyEP["JointDistributionN"]):
     _sub_distributions: Mapping[str, ExpectationParametrization]
 
     @override
@@ -64,13 +65,14 @@ class JointDistributionE(JointDistribution,
 
     @override
     @classmethod
-    def natural_parametrization_cls(cls) -> type['JointDistributionN']:
+    def natural_parametrization_cls(cls) -> type["JointDistributionN"]:
         return JointDistributionN
 
     @override
-    def to_nat(self) -> 'JointDistributionN':
-        return JointDistributionN({name: value.to_nat()
-                                   for name, value in self._sub_distributions.items()})
+    def to_nat(self) -> "JointDistributionN":
+        return JointDistributionN(
+            {name: value.to_nat() for name, value in self._sub_distributions.items()}
+        )
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
@@ -84,9 +86,11 @@ class JointDistributionE(JointDistribution,
 
 
 @dataclass
-class JointDistributionN(JointDistribution,
-                         HasEntropyNP[JointDistributionE],
-                         NaturalParametrization[JointDistributionE, dict[str, Any]]):
+class JointDistributionN(
+    JointDistribution,
+    HasEntropyNP[JointDistributionE],
+    NaturalParametrization[JointDistributionE, dict[str, Any]],
+):
     _sub_distributions: Mapping[str, NaturalParametrization]
 
     @override
@@ -97,25 +101,26 @@ class JointDistributionN(JointDistribution,
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
 
-        return reduce(xp.add,
-                      (x.log_normalizer() for x in self._sub_distributions.values()))
+        return reduce(xp.add, (x.log_normalizer() for x in self._sub_distributions.values()))
 
     @override
     def to_exp(self) -> JointDistributionE:
-        return JointDistributionE({name: value.to_exp()
-                                   for name, value in self._sub_distributions.items()})
+        return JointDistributionE(
+            {name: value.to_exp() for name, value in self._sub_distributions.items()}
+        )
 
     @override
     def carrier_measure(self, x: dict[str, Any]) -> JaxRealArray:
         xp = array_namespace(self)
 
         joined = join_mappings(sub=self._sub_distributions, x=x)
-        return reduce(xp.add,
-                      (value['sub'].carrier_measure(value['x'])
-                       for value in joined.values()))
+        return reduce(
+            xp.add, (value["sub"].carrier_measure(value["x"]) for value in joined.values())
+        )
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: dict[str, Any], **fixed_parameters: JaxArray
-                              ) -> JointDistributionE:
+    def sufficient_statistics(
+        cls, x: dict[str, Any], **fixed_parameters: JaxArray
+    ) -> JointDistributionE:
         raise NotImplementedError

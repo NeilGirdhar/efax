@@ -16,9 +16,9 @@ from .distribution_info import DistributionInfo
 type _LogNormalizer = Callable[[NaturalParametrization], JaxRealArray]
 
 
-def _prelude(generator: Generator,
-             distribution_info: DistributionInfo
-             ) -> tuple[_LogNormalizer, _LogNormalizer]:
+def _prelude(
+    generator: Generator, distribution_info: DistributionInfo
+) -> tuple[_LogNormalizer, _LogNormalizer]:
     cls = distribution_info.nat_class()
     original_ln = cls._original_log_normalizer
     optimized_ln = cls.log_normalizer
@@ -52,13 +52,15 @@ def test_primals(generator: Generator, distribution_info: DistributionInfo) -> N
         assert_tree_allclose(generated_parameters, optimized_gln_parameters, rtol=1e-5)
 
 
-def _unit_tangent(nat_parameters: NaturalParametrization
-                 ) -> NaturalParametrization:
+def _unit_tangent(nat_parameters: NaturalParametrization) -> NaturalParametrization:
     xp = array_namespace(nat_parameters)
-    new_variable_parameters = {path: xp.ones_like(value)
-                               for path, value in parameters(nat_parameters, fixed=False).items()}
-    new_fixed_parameters = {path: zero_from_primal(value, symbolic_zeros=False)
-                            for path, value in parameters(nat_parameters, fixed=True).items()}
+    new_variable_parameters = {
+        path: xp.ones_like(value) for path, value in parameters(nat_parameters, fixed=False).items()
+    }
+    new_fixed_parameters = {
+        path: zero_from_primal(value, symbolic_zeros=False)
+        for path, value in parameters(nat_parameters, fixed=True).items()
+    }
     structure = Structure.create(nat_parameters)
     return structure.assemble({**new_variable_parameters, **new_fixed_parameters})
 
@@ -85,12 +87,14 @@ def test_vjp(generator: Generator, distribution_info: DistributionInfo) -> None:
         nat_tangent = _unit_tangent(nat_parameters)
         original_ln_of_nat, _ = jvp(original_ln, (nat_parameters,), (nat_tangent,))
         original_ln_of_nat_b, original_vjp = vjp(original_ln, nat_parameters)
-        original_gln_of_nat, = original_vjp(1.0)
+        (original_gln_of_nat,) = original_vjp(1.0)
         optimized_ln_of_nat_b, optimized_vjp = vjp(optimized_ln, nat_parameters)
-        optimized_gln_of_nat, = optimized_vjp(1.0)
+        (optimized_gln_of_nat,) = optimized_vjp(1.0)
 
         assert_allclose(original_ln_of_nat_b, optimized_ln_of_nat_b, rtol=1e-5)
         assert_allclose(original_ln_of_nat, original_ln_of_nat_b, rtol=1e-5)
-        assert_tree_allclose(parameters(original_gln_of_nat, fixed=False),
-                             parameters(optimized_gln_of_nat, fixed=False),
-                             rtol=1e-5)
+        assert_tree_allclose(
+            parameters(original_gln_of_nat, fixed=False),
+            parameters(optimized_gln_of_nat, fixed=False),
+            rtol=1e-5,
+        )

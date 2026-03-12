@@ -11,22 +11,26 @@ from tjax.dataclasses import dataclass
 
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..mixins.transformed_parametrization import (TransformedExpectationParametrization,
-                                                  TransformedNaturalParametrization)
+from ..mixins.transformed_parametrization import (
+    TransformedExpectationParametrization,
+    TransformedNaturalParametrization,
+)
 from ..parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
 from .exponential import ExponentialEP, ExponentialNP
 
 
 @dataclass
-class RayleighNP(Samplable,
-                 HasEntropyNP['RayleighEP'],
-                 TransformedNaturalParametrization[ExponentialNP, ExponentialEP, 'RayleighEP',
-                                                   JaxRealArray]):
+class RayleighNP(
+    Samplable,
+    HasEntropyNP["RayleighEP"],
+    TransformedNaturalParametrization[ExponentialNP, ExponentialEP, "RayleighEP", JaxRealArray],
+):
     """The natural parametrization of the Rayleigh distribution.
 
     Args:
         eta: -1 / (2 * sigma^2).
     """
+
     eta: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @override
@@ -74,14 +78,17 @@ class RayleighNP(Samplable,
 
 
 @dataclass
-class RayleighEP(Samplable,
-                 HasEntropyEP[RayleighNP],
-                 TransformedExpectationParametrization[ExponentialEP, ExponentialNP, RayleighNP]):
+class RayleighEP(
+    Samplable,
+    HasEntropyEP[RayleighNP],
+    TransformedExpectationParametrization[ExponentialEP, ExponentialNP, RayleighNP],
+):
     """The expectation parametrization of the Rayleigh distribution.
 
     Args:
         chi: 2 * sigma^2.
     """
+
     chi: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @override

@@ -15,16 +15,16 @@ from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
 from ..parameter import RealField, VectorSupport, distribution_parameter, negative_support
 
-EP = TypeVar('EP', bound='DirichletCommonEP[Any]')
+EP = TypeVar("EP", bound="DirichletCommonEP[Any]")
 
 
 @dataclass
-class DirichletCommonNP[EP: 'DirichletCommonEP[Any]'](HasEntropyNP[EP],
-                        Samplable,
-                        Multidimensional,
-                        NaturalParametrization[EP, JaxRealArray]):
-    alpha_minus_one: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=RealField(minimum=-1.0, generation_scale=3.0)))
+class DirichletCommonNP[EP: "DirichletCommonEP[Any]"](
+    HasEntropyNP[EP], Samplable, Multidimensional, NaturalParametrization[EP, JaxRealArray]
+):
+    alpha_minus_one: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=RealField(minimum=-1.0, generation_scale=3.0))
+    )
 
     @property
     @override
@@ -35,8 +35,9 @@ class DirichletCommonNP[EP: 'DirichletCommonEP[Any]'](HasEntropyNP[EP],
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         q = self.alpha_minus_one
-        return (xp.sum(jss.gammaln(q + 1.0), axis=-1)
-                - jss.gammaln(xp.sum(q, axis=-1) + self.dimensions()))
+        return xp.sum(jss.gammaln(q + 1.0), axis=-1) - jss.gammaln(
+            xp.sum(q, axis=-1) + self.dimensions()
+        )
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -54,16 +55,16 @@ class DirichletCommonNP[EP: 'DirichletCommonEP[Any]'](HasEntropyNP[EP],
         return jss.digamma(q + 1.0) - jss.digamma(xp.sum(q, axis=-1, keepdims=True) + q.shape[-1])
 
 
-NP = TypeVar('NP', bound=DirichletCommonNP[Any])
+NP = TypeVar("NP", bound=DirichletCommonNP[Any])
 
 
 @dataclass
-class DirichletCommonEP[NP: DirichletCommonNP[Any]](HasEntropyEP[NP],
-                        Samplable,
-                        ExpToNat[NP],
-                        Multidimensional):
-    mean_log_probability: JaxRealArray = distribution_parameter(VectorSupport(
-        ring=negative_support))
+class DirichletCommonEP[NP: DirichletCommonNP[Any]](
+    HasEntropyEP[NP], Samplable, ExpToNat[NP], Multidimensional
+):
+    mean_log_probability: JaxRealArray = distribution_parameter(
+        VectorSupport(ring=negative_support)
+    )
 
     @property
     @override

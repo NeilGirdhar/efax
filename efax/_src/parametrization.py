@@ -15,9 +15,11 @@ from .parameter import Support
 @dataclass
 class Distribution(JaxAbstractClass):
     """The Distribution is the base class of all distributions."""
+
     def __getitem__(self, key: tuple[int | slice | EllipsisType | None, ...]) -> Self:
         from .iteration import parameters  # noqa: PLC0415
         from .structure.structure import Structure  # noqa: PLC0415
+
         parameters_ = {path: value[key] for path, value in parameters(self).items()}
         return Structure.create(self).assemble(parameters_)
 
@@ -40,6 +42,7 @@ class Distribution(JaxAbstractClass):
 
     def __array_namespace__(self, api_version: str | None = None) -> ModuleType:  # noqa: PLW3201
         from .iteration import parameters  # noqa: PLC0415
+
         values = parameters(self).values()
         return array_namespace(*values)
 
@@ -50,6 +53,7 @@ class SimpleDistribution(Distribution):
 
     As a consequence, its domain is a simple support (rather than a dict).
     """
+
     @override
     def sub_distributions(self) -> Mapping[str, Distribution]:
         return {}

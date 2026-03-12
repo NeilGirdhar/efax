@@ -16,14 +16,17 @@ from ..tools import iv_ratio, log_ive
 
 
 @dataclass
-class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
-                       NaturalParametrization['VonMisesFisherEP', JaxRealArray],
-                       Multidimensional):
+class VonMisesFisherNP(
+    HasEntropyNP["VonMisesFisherEP"],
+    NaturalParametrization["VonMisesFisherEP", JaxRealArray],
+    Multidimensional,
+):
     """The natural parametrization of the von Mises-Fisher distribution.
 
     Args:
         mean_times_concentration: E(x) times the concentration kappa.
     """
+
     mean_times_concentration: JaxRealArray = distribution_parameter(VectorSupport())
 
     @property
@@ -41,10 +44,12 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
         xp = array_namespace(self)
         half_k = self.dimensions() * 0.5
         kappa = xp.linalg.vector_norm(self.mean_times_concentration, axis=-1)
-        return (kappa
-                - (half_k - 1.0) * xp.log(kappa)
-                + half_k * math.log(2.0 * math.pi)
-                + log_ive(half_k - 1.0, kappa))
+        return (
+            kappa
+            - (half_k - 1.0) * xp.log(kappa)
+            + half_k * math.log(2.0 * math.pi)
+            + log_ive(half_k - 1.0, kappa)
+        )
 
     @override
     def to_exp(self) -> VonMisesFisherEP:
@@ -52,9 +57,8 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
         q = self.mean_times_concentration
         kappa: JaxRealArray = xp.linalg.vector_norm(q, axis=-1, keepdims=True)
         return VonMisesFisherEP(
-                xp.where(kappa == 0.0,
-                         q,
-                         q * (_a_k(self.dimensions(), kappa) / kappa)))
+            xp.where(kappa == 0.0, q, q * (_a_k(self.dimensions(), kappa) / kappa))
+        )
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -63,8 +67,9 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> VonMisesFisherEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> VonMisesFisherEP:
         return VonMisesFisherEP(x)
 
     @override
@@ -80,22 +85,24 @@ class VonMisesFisherNP(HasEntropyNP['VonMisesFisherEP'],
             raise ValueError
         xp = array_namespace(self)
         kappa = self.kappa()
-        angle = xp.where(kappa == 0.0,
-                         xp.asarray(0.0),
-                         xp.atan2(self.mean_times_concentration[..., 1],
-                                  self.mean_times_concentration[..., 0]))
+        angle = xp.where(
+            kappa == 0.0,
+            xp.asarray(0.0),
+            xp.atan2(self.mean_times_concentration[..., 1], self.mean_times_concentration[..., 0]),
+        )
         return kappa, angle
 
 
 @dataclass
-class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
-                       ExpToNat[VonMisesFisherNP],
-                       Multidimensional):
+class VonMisesFisherEP(
+    HasEntropyEP[VonMisesFisherNP], ExpToNat[VonMisesFisherNP], Multidimensional
+):
     """The expectation parametrization of the von Mises-Fisher distribution.
 
     Args:
         mean: E(x).
     """
+
     mean: JaxRealArray = distribution_parameter(CircularBoundedSupport(1.0))
 
     @property
@@ -123,10 +130,10 @@ class VonMisesFisherEP(HasEntropyEP[VonMisesFisherNP],
         xp = array_namespace(self)
         mu: JaxRealArray = xp.linalg.vector_norm(self.mean, axis=-1)
         # 0 <= mu <= 1.0
-        initial_kappa = xp.where(mu == 1.0,
-                                 xp.asarray(xp.inf),
-                                 (mu * self.dimensions() - mu ** 3) / (1.0 - mu ** 2))
-        initial_kappa = cast('JaxRealArray', initial_kappa)
+        initial_kappa = xp.where(
+            mu == 1.0, xp.asarray(xp.inf), (mu * self.dimensions() - mu**3) / (1.0 - mu**2)
+        )
+        initial_kappa = cast("JaxRealArray", initial_kappa)
         return inverse_softplus(initial_kappa)[..., xp.newaxis]
 
     @override

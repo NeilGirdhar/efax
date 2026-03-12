@@ -29,6 +29,7 @@ def flatten_mapping(m: Mapping[str, Any], /) -> dict[Path, Any]:
             if isinstance(value, Mapping):
                 raise TypeError
             result[path] = value
+
     _flatten(m, ())
 
     return result
@@ -67,56 +68,57 @@ def unflatten_mapping(m: Mapping[Path, Any], /) -> dict[str, Any]:
 
 
 @overload
-def parameters(p: Distribution,
-               /,
-               *,
-               fixed: bool | None = None,
-               support: Literal[False] = False,
-               recurse: Literal[False],
-               ) -> dict[str, JaxComplexArray]:
-    ...
+def parameters(
+    p: Distribution,
+    /,
+    *,
+    fixed: bool | None = None,
+    support: Literal[False] = False,
+    recurse: Literal[False],
+) -> dict[str, JaxComplexArray]: ...
 
 
 @overload
-def parameters(p: Distribution,
-               /,
-               *,
-               fixed: bool | None = None,
-               support: Literal[True],
-               recurse: Literal[False],
-               ) -> dict[str, tuple[JaxComplexArray, Support]]:
-    ...
+def parameters(
+    p: Distribution,
+    /,
+    *,
+    fixed: bool | None = None,
+    support: Literal[True],
+    recurse: Literal[False],
+) -> dict[str, tuple[JaxComplexArray, Support]]: ...
 
 
 @overload
-def parameters(p: Distribution,
-               /,
-               *,
-               fixed: bool | None = None,
-               support: Literal[False] = False,
-               recurse: Literal[True] = True,
-               ) -> dict[Path, JaxComplexArray]:
-    ...
+def parameters(
+    p: Distribution,
+    /,
+    *,
+    fixed: bool | None = None,
+    support: Literal[False] = False,
+    recurse: Literal[True] = True,
+) -> dict[Path, JaxComplexArray]: ...
 
 
 @overload
-def parameters(p: Distribution,
-               /,
-               *,
-               fixed: bool | None = None,
-               support: Literal[True],
-               recurse: Literal[True] = True,
-               ) -> dict[Path, tuple[JaxComplexArray, Support]]:
-    ...
+def parameters(
+    p: Distribution,
+    /,
+    *,
+    fixed: bool | None = None,
+    support: Literal[True],
+    recurse: Literal[True] = True,
+) -> dict[Path, tuple[JaxComplexArray, Support]]: ...
 
 
-def parameters(p: Distribution,
-               /,
-               *,
-               fixed: bool | None = None,
-               support: bool = False,
-               recurse: bool = True,
-               ) -> Any:
+def parameters(
+    p: Distribution,
+    /,
+    *,
+    fixed: bool | None = None,
+    support: bool = False,
+    recurse: bool = True,
+) -> Any:
     """Return the parameters of a distribution.
 
     Args:
@@ -128,23 +130,22 @@ def parameters(p: Distribution,
     Returns:
         A dict containing the path, value, and optionally the support of each parameter.
     """
-    def _parameters(q: Distribution,
-                    base_path: Path
-                    ) -> Iterable[tuple[Any, ...]]:
+
+    def _parameters(q: Distribution, base_path: Path) -> Iterable[tuple[Any, ...]]:
         for this_field in fields(q):
             name = this_field.name
             value = getattr(q, name)
             metadata = this_field.metadata
-            if not metadata.get('parameter', False):
+            if not metadata.get("parameter", False):
                 continue
-            is_fixed = metadata['fixed']
+            is_fixed = metadata["fixed"]
             if not isinstance(is_fixed, bool):
                 raise TypeError
             if fixed is not None and is_fixed != fixed:
                 continue
             this_path = (*base_path, name) if recurse else name
             if support:
-                yield this_path, value, metadata['support']
+                yield this_path, value, metadata["support"]
             else:
                 yield this_path, value
         if not recurse:
@@ -152,6 +153,7 @@ def parameters(p: Distribution,
         for name, value in q.sub_distributions().items():
             this_path = (*base_path, name)
             yield from _parameters(value, this_path)
+
     if support:
         return {key: (value, support) for key, value, support in _parameters(p, ())}
     return dict(_parameters(p, ()))
@@ -159,12 +161,14 @@ def parameters(p: Distribution,
 
 def flat_dict_of_parameters(d: Distribution) -> dict[Path, SimpleDistribution]:
     from .transform.joint import JointDistribution  # noqa: PLC0415
+
     if isinstance(d, JointDistribution):
         return flatten_mapping(d.as_dict())
     assert isinstance(d, SimpleDistribution)
     return {(): d}
 
 
-def flat_dict_of_observations(x: Mapping[str, Any] | JaxComplexArray
-                              ) -> dict[Path, JaxComplexArray]:
+def flat_dict_of_observations(
+    x: Mapping[str, Any] | JaxComplexArray,
+) -> dict[Path, JaxComplexArray]:
     return {(): x} if isinstance(x, JaxArray) else flatten_mapping(x)

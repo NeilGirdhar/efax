@@ -7,18 +7,24 @@ from numpy.testing import assert_allclose
 from scipy.special import digamma, gammaln
 from tjax import JaxRealArray
 
-from efax import (ExpectationParametrization, GammaEP, GammaNP, MultivariateNormalEP,
-                  MultivariateNormalNP, NaturalParametrization, NormalEP, NormalNP)
+from efax import (
+    ExpectationParametrization,
+    GammaEP,
+    GammaNP,
+    MultivariateNormalEP,
+    MultivariateNormalNP,
+    NaturalParametrization,
+    NormalEP,
+    NormalNP,
+)
 
 from .create_info import GammaInfo, MultivariateNormalInfo, NormalInfo
 from .distribution_info import DistributionInfo
 
 
-def _prelude(generator: Generator,
-             distribution_info_kl: DistributionInfo,
-             distribution_name: str | None
-             ) -> tuple[ExpectationParametrization, NaturalParametrization,
-                       JaxRealArray]:
+def _prelude(
+    generator: Generator, distribution_info_kl: DistributionInfo, distribution_name: str | None
+) -> tuple[ExpectationParametrization, NaturalParametrization, JaxRealArray]:
     shape = (3, 2)
     distribution_info_kl.skip_if_deselected(distribution_name)
     x = distribution_info_kl.exp_parameter_generator(generator, shape=shape)
@@ -53,8 +59,7 @@ def test_mvn_kl(generator: Generator, distribution_name: str | None) -> None:
     md = ym - xm
     tq = np.trace(inv(yv) @ xv, axis1=-2, axis2=-1)
     mvm = np.einsum("...i,...ij,...j->...", md, inv(yv), md)
-    scipy_kl = 0.5 * (tq + mvm - x.dimensions()
-                      + np.log(det(yv) / det(xv)))
+    scipy_kl = 0.5 * (tq + mvm - x.dimensions() + np.log(det(yv) / det(xv)))
     rtol = 1e-5
     assert_allclose(my_kl, scipy_kl, rtol=rtol)
 
@@ -68,8 +73,13 @@ def test_gamma_kl(generator: Generator, distribution_name: str | None) -> None:
     ysh = y.shape_minus_one + 1.0
     xsc = -np.reciprocal(x.to_nat().negative_rate)
     ysc = -np.reciprocal(y.negative_rate)
-    scipy_kl = (((xsc - ysc) / ysc) * xsh + gammaln(ysh) - gammaln(xsh)
-                + ysh * np.log(ysc) - xsh * np.log(xsc)
-                + (xsh - ysh) * (np.log(xsc) + digamma(xsh)))
+    scipy_kl = (
+        ((xsc - ysc) / ysc) * xsh
+        + gammaln(ysh)
+        - gammaln(xsh)
+        + ysh * np.log(ysc)
+        - xsh * np.log(xsc)
+        + (xsh - ysh) * (np.log(xsc) + digamma(xsh))
+    )
     rtol = 1e-5
     assert_allclose(my_kl, scipy_kl, rtol=rtol)

@@ -16,14 +16,15 @@ from .gamma import GammaNP
 
 
 @dataclass
-class ExponentialNP(HasEntropyNP['ExponentialEP'],
-                    Samplable,
-                    NaturalParametrization['ExponentialEP', JaxRealArray]):
+class ExponentialNP(
+    HasEntropyNP["ExponentialEP"], Samplable, NaturalParametrization["ExponentialEP", JaxRealArray]
+):
     """The natural parametrization of the exponential distribution.
 
     Args:
         negative_rate: -lambda where lambda is the rate.
     """
+
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @property
@@ -53,8 +54,7 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> ExponentialEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> ExponentialEP:
         return ExponentialEP(x)
 
     @override
@@ -66,14 +66,13 @@ class ExponentialNP(HasEntropyNP['ExponentialEP'],
 
 
 @dataclass
-class ExponentialEP(HasEntropyEP[ExponentialNP],
-                    HasConjugatePrior,
-                    Samplable):
+class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior, Samplable):
     """The expectation parametrization of the exponential distribution.
 
     Args:
         mean: E(x) = 1/lambda where lambda is the rate.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
@@ -114,8 +113,9 @@ class ExponentialEP(HasEntropyEP[ExponentialNP],
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, GammaNP)
         n = cp.shape_minus_one
         return (cls(-n / cp.negative_rate), n)

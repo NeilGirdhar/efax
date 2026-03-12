@@ -6,6 +6,7 @@ Bayesian evidence combination.
 Suppose you have a prior, and a set of likelihoods, and you want to combine all
 of the evidence into one distribution.
 """
+
 from operator import add
 
 import jax.numpy as jnp
@@ -13,10 +14,10 @@ from tjax import print_generic
 
 from efax import MultivariateDiagonalNormalVP, parameter_map
 
-prior = MultivariateDiagonalNormalVP(mean=jnp.zeros(2),
-                                     variance=10 * jnp.ones(2))
-likelihood = MultivariateDiagonalNormalVP(mean=jnp.asarray([1.1, -2.2]),
-                                          variance=jnp.asarray([3.0, 1.0]))
+prior = MultivariateDiagonalNormalVP(mean=jnp.zeros(2), variance=10 * jnp.ones(2))
+likelihood = MultivariateDiagonalNormalVP(
+    mean=jnp.asarray([1.1, -2.2]), variance=jnp.asarray([3.0, 1.0])
+)
 
 # Convert to the natural parametrization.
 prior_np = prior.to_nat()
@@ -28,9 +29,7 @@ posterior_np = parameter_map(add, prior_np, likelihood_np)
 
 # Convert to the source parametrization.
 posterior = posterior_np.to_variance_parametrization()
-print_generic({"prior": prior,
-               "likelihood": likelihood,
-               "posterior": posterior})
+print_generic({"prior": prior, "likelihood": likelihood, "posterior": posterior})
 # dict
 # ├── likelihood=MultivariateDiagonalNormalVP[dataclass]
 # │   ├── mean=Jax Array (2,) float32

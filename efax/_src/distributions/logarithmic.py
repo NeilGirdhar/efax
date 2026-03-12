@@ -9,8 +9,13 @@ from tjax.dataclasses import dataclass
 from ..expectation_parametrization import ExpectationParametrization
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import (IntegralRing, RealField, ScalarSupport, distribution_parameter,
-                         negative_support)
+from ..parameter import (
+    IntegralRing,
+    RealField,
+    ScalarSupport,
+    distribution_parameter,
+    negative_support,
+)
 from ..parametrization import SimpleDistribution
 
 log_probability_floor = -50.0
@@ -18,13 +23,13 @@ log_probability_ceiling = -1e-7
 
 
 @dataclass
-class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
-                    SimpleDistribution):
+class LogarithmicNP(NaturalParametrization["LogarithmicEP", JaxRealArray], SimpleDistribution):
     """The natural parametrization of the logarithmic distribution.
 
     Args:
         log_probability: log(p).
     """
+
     log_probability: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @property
@@ -46,12 +51,15 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
     def to_exp(self) -> LogarithmicEP:
         xp = array_namespace(self)
         probability = xp.exp(self.log_probability)
-        chi = xp.where(self.log_probability < log_probability_floor,
-                       xp.asarray(1.0),
-                       xp.where(self.log_probability > log_probability_ceiling,
-                                xp.asarray(xp.inf),
-                                probability / (xp.expm1(self.log_probability)
-                                               * xp.log1p(-probability))))
+        chi = xp.where(
+            self.log_probability < log_probability_floor,
+            xp.asarray(1.0),
+            xp.where(
+                self.log_probability > log_probability_ceiling,
+                xp.asarray(xp.inf),
+                probability / (xp.expm1(self.log_probability) * xp.log1p(-probability)),
+            ),
+        )
         return LogarithmicEP(chi)
 
     @override
@@ -61,20 +69,20 @@ class LogarithmicNP(NaturalParametrization['LogarithmicEP', JaxRealArray],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> LogarithmicEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> LogarithmicEP:
         return LogarithmicEP(x)
 
 
 @dataclass
-class LogarithmicEP(ExpToNat[LogarithmicNP],
-                    ExpectationParametrization[LogarithmicNP],
-                    SimpleDistribution):
+class LogarithmicEP(
+    ExpToNat[LogarithmicNP], ExpectationParametrization[LogarithmicNP], SimpleDistribution
+):
     """The expectation parametrization of the logarithmic distribution.
 
     Args:
         chi: -(p / (1-p)) * log(1-p).
     """
+
     chi: JaxRealArray = distribution_parameter(ScalarSupport(ring=RealField(minimum=1.0)))
 
     @property
@@ -98,8 +106,10 @@ class LogarithmicEP(ExpToNat[LogarithmicNP],
     def to_nat(self) -> LogarithmicNP:
         xp = array_namespace(self)
         z: LogarithmicNP = super().to_nat()
-        return LogarithmicNP(xp.where(self.chi < 1.0,
-                                      xp.asarray(xp.nan),
-                                      xp.where(self.chi == 1.0,
-                                               xp.asarray(xp.inf),
-                                               z.log_probability)))
+        return LogarithmicNP(
+            xp.where(
+                self.chi < 1.0,
+                xp.asarray(xp.nan),
+                xp.where(self.chi == 1.0, xp.asarray(xp.inf), z.log_probability),
+            )
+        )

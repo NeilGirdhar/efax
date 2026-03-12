@@ -16,11 +16,13 @@ from .negative_binomial_common import NBCommonEP, NBCommonNP
 
 
 @dataclass
-class GeometricNP(HasEntropyNP['GeometricEP'],
-                  Samplable,
-                  NBCommonNP['GeometricEP'],
-                  NaturalParametrization['GeometricEP', JaxRealArray],
-                  SimpleDistribution):
+class GeometricNP(
+    HasEntropyNP["GeometricEP"],
+    Samplable,
+    NBCommonNP["GeometricEP"],
+    NaturalParametrization["GeometricEP", JaxRealArray],
+    SimpleDistribution,
+):
     """The natural parameters of the geometric distribution.
 
     Models the number of Bernoulli trials having probability p until one failure.  Thus, it has
@@ -29,6 +31,7 @@ class GeometricNP(HasEntropyNP['GeometricEP'],
     Args:
         log_not_p: log(1-p).
     """
+
     log_not_p: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
 
     @override
@@ -37,8 +40,7 @@ class GeometricNP(HasEntropyNP['GeometricEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> GeometricEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> GeometricEP:
         return GeometricEP(x)
 
     @override
@@ -51,10 +53,9 @@ class GeometricNP(HasEntropyNP['GeometricEP'],
 
 
 @dataclass
-class GeometricEP(HasEntropyEP[GeometricNP],
-                  Samplable,
-                  NBCommonEP[GeometricNP],
-                  SimpleDistribution):
+class GeometricEP(
+    HasEntropyEP[GeometricNP], Samplable, NBCommonEP[GeometricNP], SimpleDistribution
+):
     """The expectation parameters of the geometric distribution.
 
     Models the number of Bernoulli trials having probability p until one failure.  Thus, it has
@@ -63,6 +64,7 @@ class GeometricEP(HasEntropyEP[GeometricNP],
     Args:
         mean: E(x).
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @classmethod

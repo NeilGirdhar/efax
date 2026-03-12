@@ -17,9 +17,11 @@ from .normal import NormalNP
 
 
 @dataclass
-class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
-                           NaturalParametrization['UnitVarianceNormalEP', JaxRealArray],
-                           Samplable):
+class UnitVarianceNormalNP(
+    HasEntropyNP["UnitVarianceNormalEP"],
+    NaturalParametrization["UnitVarianceNormalEP", JaxRealArray],
+    Samplable,
+):
     """The natural parametrization of the normal distribution with unit variance.
 
     This is a curved exponential family.
@@ -27,6 +29,7 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
     Args:
         mean: E(x).
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -56,9 +59,9 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray,
-                              **fixed_parameters: JaxArray
-                              ) -> UnitVarianceNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> UnitVarianceNormalEP:
         return UnitVarianceNormalEP(x)
 
     @override
@@ -67,9 +70,7 @@ class UnitVarianceNormalNP(HasEntropyNP['UnitVarianceNormalEP'],
 
 
 @dataclass
-class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP],
-                           HasConjugatePrior,
-                           Samplable):
+class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP], HasConjugatePrior, Samplable):
     """The expectation parametrization of the normal distribution with unit variance.
 
     This is a curved exponential family.
@@ -77,6 +78,7 @@ class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP],
     Args:
         mean: E(x).
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -118,8 +120,9 @@ class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP],
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, NormalNP)
         n = -2.0 * cp.negative_half_precision
         mean = cp.mean_times_precision / n

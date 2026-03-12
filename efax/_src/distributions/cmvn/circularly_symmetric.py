@@ -12,16 +12,21 @@ from ...interfaces.multidimensional import Multidimensional
 from ...interfaces.samplable import Samplable
 from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ...natural_parametrization import NaturalParametrization
-from ...parameter import (SymmetricMatrixSupport, VectorSupport, complex_field,
-                          distribution_parameter)
+from ...parameter import (
+    SymmetricMatrixSupport,
+    VectorSupport,
+    complex_field,
+    distribution_parameter,
+)
 
 
 @dataclass
 class ComplexCircularlySymmetricNormalNP(
-        HasEntropyNP['ComplexCircularlySymmetricNormalEP'],
-        NaturalParametrization['ComplexCircularlySymmetricNormalEP', JaxComplexArray],
-        Multidimensional,
-        Samplable):
+    HasEntropyNP["ComplexCircularlySymmetricNormalEP"],
+    NaturalParametrization["ComplexCircularlySymmetricNormalEP", JaxComplexArray],
+    Multidimensional,
+    Samplable,
+):
     """The natural parameters of the circularly symmetric complex multivariate normal distribution.
 
     This has zero mean and and zero pseudo-variance. This is a curved exponential family.
@@ -29,8 +34,10 @@ class ComplexCircularlySymmetricNormalNP(
     Args:
         negative_precision: -1/Var(x).
     """
+
     negative_precision: JaxComplexArray = distribution_parameter(
-        SymmetricMatrixSupport(hermitian=True, negative_semidefinite=True))
+        SymmetricMatrixSupport(hermitian=True, negative_semidefinite=True)
+    )
     # S = -1/negative_precision, U = 0
     # P = S.conjugate, R = 0
     # H = -1/S, J = 0
@@ -57,8 +64,7 @@ class ComplexCircularlySymmetricNormalNP(
     @override
     def to_exp(self) -> ComplexCircularlySymmetricNormalEP:
         xp = array_namespace(self)
-        return ComplexCircularlySymmetricNormalEP(
-            xp.conj(xp.linalg.inv(-self.negative_precision)))
+        return ComplexCircularlySymmetricNormalEP(xp.conj(xp.linalg.inv(-self.negative_precision)))
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -67,8 +73,9 @@ class ComplexCircularlySymmetricNormalNP(
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxComplexArray, **fixed_parameters: JaxArray
-                              ) -> ComplexCircularlySymmetricNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxComplexArray, **fixed_parameters: JaxArray
+    ) -> ComplexCircularlySymmetricNormalEP:
         return ComplexCircularlySymmetricNormalEP(outer_product(x, x))
 
     @override
@@ -82,9 +89,8 @@ class ComplexCircularlySymmetricNormalNP(
 
 @dataclass
 class ComplexCircularlySymmetricNormalEP(
-        HasEntropyEP[ComplexCircularlySymmetricNormalNP],
-        Multidimensional,
-        Samplable):
+    HasEntropyEP[ComplexCircularlySymmetricNormalNP], Multidimensional, Samplable
+):
     """The expectation parameters of the circularly symmetric complex normal distribution.
 
     This has zero mean and and zero pseudo-variance. This is a curved exponential family.
@@ -92,8 +98,10 @@ class ComplexCircularlySymmetricNormalEP(
     Args:
         variance: Var(x).
     """
+
     variance: JaxComplexArray = distribution_parameter(
-            SymmetricMatrixSupport(hermitian=True, positive_semidefinite=True))
+        SymmetricMatrixSupport(hermitian=True, positive_semidefinite=True)
+    )
 
     @property
     @override
@@ -124,10 +132,9 @@ class ComplexCircularlySymmetricNormalEP(
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         n = self.dimensions()
         shape = self.shape if shape is None else shape + self.shape
-        xy_rvs = jr.multivariate_normal(key,
-                                        self._multivariate_normal_mean(),
-                                        self._multivariate_normal_cov(),
-                                        shape)
+        xy_rvs = jr.multivariate_normal(
+            key, self._multivariate_normal_mean(), self._multivariate_normal_cov(), shape
+        )
         return xy_rvs[..., :n] + 1j * xy_rvs[..., n:]
 
     @override
@@ -145,6 +152,7 @@ class ComplexCircularlySymmetricNormalEP(
         xp = array_namespace(self)
         gamma_r = 0.5 * xp.real(self.variance)
         gamma_i = 0.5 * xp.imag(self.variance)
-        return xp.concat([xp.concat([gamma_r, -gamma_i], axis=-1),
-                          xp.concat([gamma_i, gamma_r], axis=-1)],
-                         axis=-2)
+        return xp.concat(
+            [xp.concat([gamma_r, -gamma_i], axis=-1), xp.concat([gamma_i, gamma_r], axis=-1)],
+            axis=-2,
+        )

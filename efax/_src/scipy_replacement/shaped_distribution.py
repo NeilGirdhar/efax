@@ -9,20 +9,22 @@ from tjax import NumpyComplexArray, NumpyIntegralArray, NumpyRealArray, Shape
 
 from .base import ScipyDiscreteDistribution, ScipyDistribution
 
-T = TypeVar('T', bound=ScipyDiscreteDistribution | ScipyDistribution)
+T = TypeVar("T", bound=ScipyDiscreteDistribution | ScipyDistribution)
 
 
 class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
     """Allow a distributions with shape."""
+
     @override
-    def __init__(self,
-                 shape: Shape,
-                 rvs_shape: Shape,
-                 rvs_dtype: np.dtype[Any],
-                 objects: npt.NDArray[np.object_],
-                 *,
-                 multivariate: bool,
-                 ) -> None:
+    def __init__(
+        self,
+        shape: Shape,
+        rvs_shape: Shape,
+        rvs_dtype: np.dtype[Any],
+        objects: npt.NDArray[np.object_],
+        *,
+        multivariate: bool,
+    ) -> None:
         super().__init__()
         self.shape = shape
         self.rvs_shape = rvs_shape
@@ -35,29 +37,28 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
     def ndim(self) -> int:
         return len(self.shape)
 
-    def rvs(self,
-            size: int | Shape | None = None,
-            random_state: Generator | None = None) -> NumpyRealArray:
+    def rvs(
+        self, size: int | Shape | None = None, random_state: Generator | None = None
+    ) -> NumpyRealArray:
         if size is None:
             size = ()
         elif isinstance(size, int):
             size = (size,)
-        retval = np.empty(self.shape + size + self.rvs_shape,
-                          dtype=self.rvs_dtype)
+        retval = np.empty(self.shape + size + self.rvs_shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
-            this_object = cast('T', self.objects[i])
+            this_object = cast("T", self.objects[i])
             retval[i] = this_object.rvs(size=size, random_state=random_state)
         return retval
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
-        assert x.shape[:self.ndim] == self.shape
+        assert x.shape[: self.ndim] == self.shape
         final_shape = x.shape[:-1] if self.multivariate else x.shape
         retval = np.empty(final_shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
-            this_object = cast('T', self.objects[i])
+            this_object = cast("T", self.objects[i])
             if not isinstance(this_object, ScipyDistribution):
                 raise NotImplementedError
-            j_range = x.shape[self.ndim: -1] if self.multivariate else x.shape[self.ndim:]
+            j_range = x.shape[self.ndim : -1] if self.multivariate else x.shape[self.ndim :]
             for j in np.ndindex(*j_range):
                 if self.multivariate:
                     x_ij = x[*i, *j, :]
@@ -70,13 +71,13 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         return retval
 
     def pmf(self, x: NumpyIntegralArray) -> NumpyRealArray:
-        assert x.shape[:self.ndim] == self.shape
+        assert x.shape[: self.ndim] == self.shape
         retval = np.empty(x.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
-            this_object = cast('T', self.objects[i])
+            this_object = cast("T", self.objects[i])
             if not isinstance(this_object, ScipyDiscreteDistribution):
                 raise NotImplementedError
-            for j in np.ndindex(*x.shape[self.ndim:]):
+            for j in np.ndindex(*x.shape[self.ndim :]):
                 value = this_object.pmf(x[*i, *j])
                 retval[*i, *j] = value
         return retval
@@ -84,7 +85,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
     def entropy(self) -> NumpyRealArray:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
-            this_object = cast('T', self.objects[i])
+            this_object = cast("T", self.objects[i])
             retval[i] = this_object.entropy()
         return retval
 

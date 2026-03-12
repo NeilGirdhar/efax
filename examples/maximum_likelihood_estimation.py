@@ -7,6 +7,7 @@ Suppose you have some samples from a distribution family with unknown
 parameters, and you want to estimate the maximum likelihood parmaters of the
 distribution.
 """
+
 import jax.numpy as jnp
 import jax.random as jr
 from tjax import print_generic
@@ -34,8 +35,9 @@ ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
 # Convert this back to the natural parametrization.
 estimated_distribution = ss_mean.to_nat()
-print_generic({"estimated_distribution": estimated_distribution,
-               "source_distribution": source_distribution})
+print_generic(
+    {"estimated_distribution": estimated_distribution, "source_distribution": source_distribution}
+)
 # dict
 # ├── estimated_distribution=DirichletNP[dataclass]
 # │   └── alpha_minus_one=Jax Array (3,) float32

@@ -10,8 +10,15 @@ import jax.scipy.special as jss
 import numpy as np
 from array_api_compat import array_namespace
 from numpy.random import Generator
-from tjax import (JaxArray, JaxComplexArray, JaxRealArray, RealNumeric, Shape, inverse_softplus,
-                  softplus)
+from tjax import (
+    JaxArray,
+    JaxComplexArray,
+    JaxRealArray,
+    RealNumeric,
+    Shape,
+    inverse_softplus,
+    softplus,
+)
 
 from ..types import Namespace
 
@@ -21,7 +28,7 @@ def _fix_bound(bound: RealNumeric | None, x: JaxArray) -> JaxArray | None:
     if bound is None:
         return bound
     bound_x = xp.asarray(bound)
-    assert bound_x.shape == x.shape[:bound_x.ndim]
+    assert bound_x.shape == x.shape[: bound_x.ndim]
     delta_ndim = x.ndim - bound_x.ndim
     if delta_ndim == 0:
         return bound_x
@@ -73,15 +80,19 @@ class RealField(Ring):
         if self.min_open and self.minimum is not None:
             xp = _general_array_namespace(self.minimum)
             eps = _canonical_float_epsilon(xp)
-            self.minimum = xp.asarray(xp.maximum(
-                self.minimum + eps,
-                self.minimum * (1.0 + xp.copysign(eps, self.minimum))))
+            self.minimum = xp.asarray(
+                xp.maximum(
+                    self.minimum + eps, self.minimum * (1.0 + xp.copysign(eps, self.minimum))
+                )
+            )
         if self.max_open and self.maximum is not None:
             xp = _general_array_namespace(self.maximum)
             eps = _canonical_float_epsilon(xp)
-            self.maximum = xp.asarray(xp.minimum(
-                self.maximum - eps,
-                self.maximum * (1.0 + xp.copysign(eps, -self.maximum))))
+            self.maximum = xp.asarray(
+                xp.minimum(
+                    self.maximum - eps, self.maximum * (1.0 + xp.copysign(eps, -self.maximum))
+                )
+            )
 
     @override
     def num_elements(self, support_num_element: int) -> int:
@@ -119,12 +130,14 @@ class RealField(Ring):
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
         if self.minimum is None and self.maximum is not None:
             maximum = xp.asarray(self.maximum)
-            return xp.asarray(maximum - rng.exponential(size=shape) * self.generation_scale
-                              - safety)
+            return xp.asarray(
+                maximum - rng.exponential(size=shape) * self.generation_scale - safety
+            )
         if self.minimum is not None and self.maximum is None:
             minimum = xp.asarray(self.minimum)
-            return xp.asarray(rng.exponential(size=shape) * self.generation_scale + minimum
-                              + safety)
+            return xp.asarray(
+                rng.exponential(size=shape) * self.generation_scale + minimum + safety
+            )
         if self.minimum is not None and self.maximum is not None:
             minimum = xp.asarray(self.minimum)
             maximum = xp.asarray(self.maximum)
@@ -245,8 +258,10 @@ class IntegralRing(Ring):
 
     @override
     def generate(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> JaxRealArray:
-        field = RealField(minimum=None if self.minimum is None else float(self.minimum),
-                      maximum=None if self.maximum is None else float(self.maximum))
+        field = RealField(
+            minimum=None if self.minimum is None else float(self.minimum),
+            maximum=None if self.maximum is None else float(self.maximum),
+        )
         real_values = field.generate(xp, rng, shape, safety) * 10
         return xp.astype(real_values, int)
 

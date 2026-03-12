@@ -18,14 +18,13 @@ from .gamma import GammaNP
 
 
 @dataclass
-class PoissonNP(Samplable,
-                NaturalParametrization['PoissonEP', JaxRealArray],
-                SimpleDistribution):
+class PoissonNP(Samplable, NaturalParametrization["PoissonEP", JaxRealArray], SimpleDistribution):
     """The natural parametrization of the Poisson distribution.
 
     Args:
         log_mean: log(E(x)).
     """
+
     log_mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @property
@@ -54,8 +53,7 @@ class PoissonNP(Samplable,
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> PoissonEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> PoissonEP:
         return PoissonEP(x)
 
     @override
@@ -64,15 +62,15 @@ class PoissonNP(Samplable,
 
 
 @dataclass
-class PoissonEP(HasConjugatePrior,
-                Samplable,
-                ExpectationParametrization[PoissonNP],
-                SimpleDistribution):
+class PoissonEP(
+    HasConjugatePrior, Samplable, ExpectationParametrization[PoissonNP], SimpleDistribution
+):
     """The expectation parametrization of the Poisson distribution.
 
     Args:
         mean: E(x).
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
     @property
@@ -109,8 +107,9 @@ class PoissonEP(HasConjugatePrior,
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         assert isinstance(cp, GammaNP)
         n = -cp.negative_rate
         mean = cp.shape_minus_one / n

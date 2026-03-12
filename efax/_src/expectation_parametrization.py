@@ -11,7 +11,7 @@ from .natural_parametrization import NaturalParametrization
 from .parametrization import Distribution
 from .tools import parameter_dot_product, parameter_map
 
-NP = TypeVar('NP', bound=NaturalParametrization, default=Any)
+NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 
 
 class ExpectationParametrization(Distribution, Generic[NP]):
@@ -23,6 +23,7 @@ class ExpectationParametrization(Distribution, Generic[NP]):
     distributed observations into the maximum likelihood distribution.  In the expectation
     parametrization, this is an expected value.
     """
+
     @classmethod
     @abstractmethod
     def natural_parametrization_cls(cls) -> type[NP]:
@@ -49,6 +50,6 @@ class ExpectationParametrization(Distribution, Generic[NP]):
             self_nat = self.to_nat()
         xp = array_namespace(self)
         difference = parameter_map(xp.subtract, self_nat, q)
-        return (parameter_dot_product(difference, self)
-                + q.log_normalizer()
-                - self_nat.log_normalizer())
+        return (
+            parameter_dot_product(difference, self) + q.log_normalizer() - self_nat.log_normalizer()
+        )

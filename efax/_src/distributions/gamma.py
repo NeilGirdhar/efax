@@ -12,27 +12,36 @@ from ..interfaces.samplable import Samplable
 from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import (RealField, ScalarSupport, distribution_parameter, negative_support,
-                         positive_support)
+from ..parameter import (
+    RealField,
+    ScalarSupport,
+    distribution_parameter,
+    negative_support,
+    positive_support,
+)
 from ..parametrization import SimpleDistribution
 from .log_normal.log_normal import LogNormalEP, LogNormalNP
 from .normal.normal import NormalVP
 
 
 @dataclass
-class GammaNP(HasEntropyNP['GammaEP'],
-              Samplable,
-              NaturalParametrization['GammaEP', JaxRealArray],
-              SimpleDistribution):
+class GammaNP(
+    HasEntropyNP["GammaEP"],
+    Samplable,
+    NaturalParametrization["GammaEP", JaxRealArray],
+    SimpleDistribution,
+):
     """The natural parametrization of the Gamma distribution.
 
     Args:
         negative_rate: The negative rate.
         shape_minus_one: The shape minus one.
     """
+
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
-    shape_minus_one: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=RealField(minimum=-1.0)))
+    shape_minus_one: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=RealField(minimum=-1.0))
+    )
 
     @property
     @override
@@ -54,8 +63,9 @@ class GammaNP(HasEntropyNP['GammaEP'],
     def to_exp(self) -> GammaEP:
         xp = array_namespace(self)
         shape = self.shape_minus_one + 1.0
-        return GammaEP(-shape / self.negative_rate,
-                       jss.digamma(shape) - xp.log(-self.negative_rate))
+        return GammaEP(
+            -shape / self.negative_rate, jss.digamma(shape) - xp.log(-self.negative_rate)
+        )
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -64,8 +74,7 @@ class GammaNP(HasEntropyNP['GammaEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> GammaEP:
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> GammaEP:
         xp = array_namespace(x)
         return GammaEP(x, xp.log(x))
 
@@ -88,24 +97,22 @@ class GammaNP(HasEntropyNP['GammaEP'],
         shape = self.shape_minus_one + 1.0
         rate = -self.negative_rate
         mean = shape / rate
-        variance = shape / (rate ** 2)
-        normal_variance = xp.log(1 + variance / (mean ** 2))
+        variance = shape / (rate**2)
+        normal_variance = xp.log(1 + variance / (mean**2))
         normal_mean = xp.log(mean) - 0.5 * normal_variance
         normal_vp = NormalVP(normal_mean, normal_variance)
         return LogNormalEP.create_natural_from_base(normal_vp.to_nat())
 
 
 @dataclass
-class GammaEP(HasEntropyEP[GammaNP],
-              Samplable,
-              ExpToNat[GammaNP],
-              SimpleDistribution):
+class GammaEP(HasEntropyEP[GammaNP], Samplable, ExpToNat[GammaNP], SimpleDistribution):
     """The expectation parametrization of the Gamma distribution.
 
     Args:
         mean: The mean: E(x).
         mean_log: The mean of the log: E(log(x)).
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
     mean_log: JaxRealArray = distribution_parameter(ScalarSupport())
 
@@ -153,9 +160,10 @@ class GammaEP(HasEntropyEP[GammaNP],
         xp = array_namespace(self)
         log_mean_minus_mean_log = xp.log(self.mean) - self.mean_log
         initial_shape: JaxRealArray = (
-            (3.0 - log_mean_minus_mean_log
-             + xp.sqrt((log_mean_minus_mean_log - 3.0) ** 2 + 24.0 * log_mean_minus_mean_log))
-            / (12.0 * log_mean_minus_mean_log))
+            3.0
+            - log_mean_minus_mean_log
+            + xp.sqrt((log_mean_minus_mean_log - 3.0) ** 2 + 24.0 * log_mean_minus_mean_log)
+        ) / (12.0 * log_mean_minus_mean_log)
         return inverse_softplus(initial_shape)[..., xp.newaxis]
 
 
@@ -167,6 +175,7 @@ class GammaVP(Samplable, SimpleDistribution):
         mean: The mean.
         variance: The variance.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
     variance: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 

@@ -15,6 +15,7 @@ class ScipyMultivariateNormalUnvectorized:
 
     See https://github.com/scipy/scipy/issues/7689.
     """
+
     def __init__(self, mean: NumpyRealArray, cov: NumpyRealArray) -> None:
         super().__init__()
         self.distribution = ss.multivariate_normal(mean=mean, cov=cov)
@@ -22,10 +23,9 @@ class ScipyMultivariateNormalUnvectorized:
     def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
         return np.asarray(self.distribution.pdf(x))
 
-    def rvs(self,
-            size: int | tuple[int, ...] = (),
-            random_state: np.random.Generator | None = None
-            ) -> onp.ArrayND[np.float64]:
+    def rvs(
+        self, size: int | tuple[int, ...] = (), random_state: np.random.Generator | None = None
+    ) -> onp.ArrayND[np.float64]:
         retval = self.distribution.rvs(size=size, random_state=random_state)
         size = (size,) if isinstance(size, int) else tuple(size)
         return np.reshape(retval, size + self.distribution.mean.shape)
@@ -34,13 +34,11 @@ class ScipyMultivariateNormalUnvectorized:
         return np.asarray(self.distribution.entropy())
 
 
-class ScipyMultivariateNormal(
-        ShapedDistribution[ScipyMultivariateNormalUnvectorized]):  # type: ignore # pyright: ignore
+class ScipyMultivariateNormal(ShapedDistribution[ScipyMultivariateNormalUnvectorized]):  # type: ignore # pyright: ignore
     """This class allows distributions having a non-empty shape."""
+
     @classmethod
-    def from_mc(cls,
-                mean: NumpyRealArray | None = None,
-                cov: NumpyRealArray | None = None) -> Self:
+    def from_mc(cls, mean: NumpyRealArray | None = None, cov: NumpyRealArray | None = None) -> Self:
         if mean is None and cov is None:
             mean = np.zeros(1)
         if mean is None:

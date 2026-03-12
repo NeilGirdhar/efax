@@ -1,14 +1,18 @@
 pre-commit:
   parallel: true
   jobs:
-    - name: ruff-fix
+    - name: ruff-check
       glob: "*.py"
       run: uv run ruff check --fix {staged_files}
+      stage_fixed: true
+    - name: ruff-format
+      glob: "*.py"
+      run: uv run ruff format {staged_files}
       stage_fixed: true
     - name: pyright
       glob: "*.py"
       run: uv run pyright {staged_files}
     - name: toml-sort
       glob: "*.toml"
-      run: toml-sort -i {staged_files}
+      run: uv run toml-sort -i {staged_files}
       stage_fixed: true

@@ -20,6 +20,7 @@ from .types import Axis
 @jit
 def parameter_dot_product(x: NaturalParametrization, y: Distribution, /) -> JaxRealArray:
     """Return the vectorized dot product over all of the variable parameters."""
+
     def dotted_fields() -> Iterable[JaxRealArray]:
         xs = parameters(x, fixed=False, support=True).values()
         ys = parameters(y, fixed=False, support=True).values()
@@ -34,7 +35,7 @@ def parameter_dot_product(x: NaturalParametrization, y: Distribution, /) -> JaxR
     return reduce(xp.add, dotted_fields_list)
 
 
-T = TypeVar('T', bound=Distribution)
+T = TypeVar("T", bound=Distribution)
 
 
 def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
@@ -46,15 +47,12 @@ def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
     return structure.assemble(q)
 
 
-def parameter_map[T: Distribution](operation: Callable[..., JaxComplexArray],
-                  x: T,
-                  /,
-                  *ys: Distribution
-                  ) -> T:
+def parameter_map[T: Distribution](
+    operation: Callable[..., JaxComplexArray], x: T, /, *ys: Distribution
+) -> T:
     """Return a new distribution created by operating on the variable fields of the inputs."""
     paths = parameters(x, fixed=False).keys()
-    iterators = [parameters(y, fixed=False).values()  # type: ignore[call-overload]
-                 for y in (x, *ys)]
+    iterators = [parameters(y, fixed=False).values() for y in (x, *ys)]
     final_values = list(starmap(operation, zip(*iterators, strict=True)))
     operated_fields = dict(zip(paths, final_values, strict=True))
 

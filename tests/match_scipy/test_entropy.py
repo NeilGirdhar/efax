@@ -9,9 +9,7 @@ from ..create_info import ChiInfo, ChiSquareInfo
 from ..distribution_info import DistributionInfo
 
 
-def test_nat_entropy(generator: Generator,
-                     entropy_distribution_info: DistributionInfo
-                     ) -> None:
+def test_nat_entropy(generator: Generator, entropy_distribution_info: DistributionInfo) -> None:
     """Test that the entropy calculation matches scipy's."""
     shape = (7, 13)
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
@@ -23,17 +21,13 @@ def test_nat_entropy(generator: Generator,
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)
 
 
-def test_exp_entropy(generator: Generator,
-                     entropy_distribution_info: DistributionInfo
-                     ) -> None:
+def test_exp_entropy(generator: Generator, entropy_distribution_info: DistributionInfo) -> None:
     """Test that the entropy calculation matches scipy's."""
     shape = (7, 13)
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
     assert isinstance(exp_parameters, HasEntropyEP)
     scipy_distribution = entropy_distribution_info.exp_to_scipy_distribution(exp_parameters)
-    rtol = (1e-5
-            if isinstance(entropy_distribution_info, ChiInfo | ChiSquareInfo)
-            else 1e-6)
+    rtol = 1e-5 if isinstance(entropy_distribution_info, ChiInfo | ChiSquareInfo) else 1e-6
     my_entropy = exp_parameters.entropy()
     scipy_entropy = scipy_distribution.entropy()
     assert_allclose(my_entropy, scipy_entropy, rtol=rtol)

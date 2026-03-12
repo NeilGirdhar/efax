@@ -8,20 +8,25 @@ from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplu
 from tjax.dataclasses import dataclass
 
 from ...interfaces.samplable import Samplable
-from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
-                                                   TransformedNaturalParametrization)
+from ...mixins.transformed_parametrization import (
+    TransformedExpectationParametrization,
+    TransformedNaturalParametrization,
+)
 from ...parameter import ScalarSupport, distribution_parameter, negative_support, positive_support
 from ..normal.normal import NormalEP, NormalNP
 
 
 @dataclass
 class SoftplusNormalNP(
-        Samplable,
-        TransformedNaturalParametrization[NormalNP, NormalEP, 'SoftplusNormalEP', JaxRealArray]):
+    Samplable,
+    TransformedNaturalParametrization[NormalNP, NormalEP, "SoftplusNormalEP", JaxRealArray],
+):
     """The natural parametrization of the softplus-normal distribution."""
+
     mean_times_precision: JaxRealArray = distribution_parameter(ScalarSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(ScalarSupport(
-        ring=negative_support))
+    negative_half_precision: JaxRealArray = distribution_parameter(
+        ScalarSupport(ring=negative_support)
+    )
 
     @override
     @classmethod
@@ -44,15 +49,17 @@ class SoftplusNormalNP(
 
     @override
     @classmethod
-    def create_expectation_from_base(cls, expectation_parametrization: NormalEP
-                                     ) -> SoftplusNormalEP:
-        return SoftplusNormalEP(expectation_parametrization.mean,
-                                expectation_parametrization.second_moment)
+    def create_expectation_from_base(
+        cls, expectation_parametrization: NormalEP
+    ) -> SoftplusNormalEP:
+        return SoftplusNormalEP(
+            expectation_parametrization.mean, expectation_parametrization.second_moment
+        )
 
     @override
     @classmethod
     def sample_to_base_sample(cls, x: Array, **fixed_parameters: JaxArray) -> JaxRealArray:
-        return cast('JaxRealArray', inverse_softplus(x))
+        return cast("JaxRealArray", inverse_softplus(x))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -69,9 +76,11 @@ class SoftplusNormalNP(
 
 
 @dataclass
-class SoftplusNormalEP(Samplable,
-                       TransformedExpectationParametrization[NormalEP, NormalNP, SoftplusNormalNP]):
+class SoftplusNormalEP(
+    Samplable, TransformedExpectationParametrization[NormalEP, NormalNP, SoftplusNormalNP]
+):
     """The expectation parametrization of the softplus-normal distribution."""
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
     second_moment: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
 
@@ -97,8 +106,10 @@ class SoftplusNormalEP(Samplable,
     @override
     @classmethod
     def create_natural_from_base(cls, natural_parametrization: NormalNP) -> SoftplusNormalNP:
-        return SoftplusNormalNP(natural_parametrization.mean_times_precision,
-                                natural_parametrization.negative_half_precision)
+        return SoftplusNormalNP(
+            natural_parametrization.mean_times_precision,
+            natural_parametrization.negative_half_precision,
+        )
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

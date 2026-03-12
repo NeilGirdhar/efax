@@ -11,9 +11,9 @@ from efax import HasConjugatePrior, HasGeneralizedConjugatePrior, MaximumLikelih
 from .distribution_info import DistributionInfo
 
 
-def test_conjugate_prior(generator: Generator,
-                         cp_distribution_info: DistributionInfo,
-                         distribution_name: str | None) -> None:
+def test_conjugate_prior(
+    generator: Generator, cp_distribution_info: DistributionInfo, distribution_name: str | None
+) -> None:
     """Test that the conjugate prior actually matches the distribution."""
     cp_distribution_info.skip_if_deselected(distribution_name)
     shape = (4, 3)
@@ -43,9 +43,9 @@ def test_conjugate_prior(generator: Generator,
     assert_tree_allclose(derivative, zero_derivative, atol=1.5)
 
 
-def test_from_conjugate_prior(generator: Generator,
-                              cp_distribution_info: DistributionInfo,
-                              distribution_name: str | None) -> None:
+def test_from_conjugate_prior(
+    generator: Generator, cp_distribution_info: DistributionInfo, distribution_name: str | None
+) -> None:
     """Test that the conjugate prior is reversible."""
     cp_distribution_info.skip_if_deselected(distribution_name)
     shape = (4, 3)
@@ -63,10 +63,9 @@ def test_from_conjugate_prior(generator: Generator,
     assert_allclose(n, n_prime, atol=1.5)
 
 
-def test_generalized_conjugate_prior(generator: Generator,
-                                     gcp_distribution_info: DistributionInfo,
-                                     distribution_name: str | None
-                                     ) -> None:
+def test_generalized_conjugate_prior(
+    generator: Generator, gcp_distribution_info: DistributionInfo, distribution_name: str | None
+) -> None:
     """Same as test_conjugate_prior, but with generalized_conjugate_prior_distribution."""
     gcp_distribution_info.skip_if_deselected(distribution_name)
     shape = (4, 3)

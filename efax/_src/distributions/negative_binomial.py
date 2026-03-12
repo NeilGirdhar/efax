@@ -10,17 +10,24 @@ from tjax.dataclasses import dataclass
 from ..expectation_parametrization import ExpectationParametrization
 from ..interfaces.samplable import Samplable
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import (IntegralRing, ScalarSupport, distribution_parameter, negative_support,
-                         positive_support)
+from ..parameter import (
+    IntegralRing,
+    ScalarSupport,
+    distribution_parameter,
+    negative_support,
+    positive_support,
+)
 from .gamma import GammaNP
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 from .poisson import PoissonEP
 
 
 @dataclass
-class NegativeBinomialNP(Samplable,
-                         NBCommonNP['NegativeBinomialEP'],
-                         NaturalParametrization['NegativeBinomialEP', JaxRealArray]):
+class NegativeBinomialNP(
+    Samplable,
+    NBCommonNP["NegativeBinomialEP"],
+    NaturalParametrization["NegativeBinomialEP", JaxRealArray],
+):
     """The natural parametrization of the negative binomial distribution.
 
     Models the number of Bernoulli trials having probability p until r failures.
@@ -29,9 +36,11 @@ class NegativeBinomialNP(Samplable,
         log_not_p: log(1-p).
         failures: r.
     """
+
     log_not_p: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
-    failures: JaxIntegralArray = distribution_parameter(ScalarSupport(ring=IntegralRing(minimum=1)),
-                                                        fixed=True)
+    failures: JaxIntegralArray = distribution_parameter(
+        ScalarSupport(ring=IntegralRing(minimum=1)), fixed=True
+    )
 
     @override
     def to_exp(self) -> NegativeBinomialEP:
@@ -39,10 +48,11 @@ class NegativeBinomialNP(Samplable,
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> NegativeBinomialEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> NegativeBinomialEP:
         xp = array_namespace(x)
-        return NegativeBinomialEP(x, xp.broadcast_to(fixed_parameters['failures'], x.shape))
+        return NegativeBinomialEP(x, xp.broadcast_to(fixed_parameters["failures"], x.shape))
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -54,9 +64,9 @@ class NegativeBinomialNP(Samplable,
 
 
 @dataclass
-class NegativeBinomialEP(Samplable,
-                         NBCommonEP[NegativeBinomialNP],
-                         ExpectationParametrization[NegativeBinomialNP]):
+class NegativeBinomialEP(
+    Samplable, NBCommonEP[NegativeBinomialNP], ExpectationParametrization[NegativeBinomialNP]
+):
     """The expectation parametrization of the negative binomial distribution.
 
     Models the number of Bernoulli trials x having probability p until r failures.
@@ -65,9 +75,11 @@ class NegativeBinomialEP(Samplable,
         mean: E(x).
         failures: r.
     """
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
-    failures: JaxIntegralArray = distribution_parameter(ScalarSupport(ring=IntegralRing(minimum=1)),
-                                                        fixed=True)
+    failures: JaxIntegralArray = distribution_parameter(
+        ScalarSupport(ring=IntegralRing(minimum=1)), fixed=True
+    )
 
     @classmethod
     @override

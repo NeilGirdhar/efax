@@ -9,8 +9,10 @@ from tjax.dataclasses import dataclass
 
 from ...interfaces.conjugate_prior import HasConjugatePrior
 from ...interfaces.samplable import Samplable
-from ...mixins.transformed_parametrization import (TransformedExpectationParametrization,
-                                                   TransformedNaturalParametrization)
+from ...mixins.transformed_parametrization import (
+    TransformedExpectationParametrization,
+    TransformedNaturalParametrization,
+)
 from ...natural_parametrization import NaturalParametrization
 from ...parameter import ScalarSupport, distribution_parameter
 from ..normal.normal import NormalNP
@@ -19,11 +21,13 @@ from ..normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 
 @dataclass
 class UnitVarianceSoftplusNormalNP(
-        Samplable,
-        TransformedNaturalParametrization[UnitVarianceNormalNP, UnitVarianceNormalEP,
-                                          'UnitVarianceSoftplusNormalEP',
-                                          JaxRealArray]):
+    Samplable,
+    TransformedNaturalParametrization[
+        UnitVarianceNormalNP, UnitVarianceNormalEP, "UnitVarianceSoftplusNormalEP", JaxRealArray
+    ],
+):
     """natural parametrization of the softplus-normal distribution with unit variance."""
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @override
@@ -47,14 +51,15 @@ class UnitVarianceSoftplusNormalNP(
 
     @override
     @classmethod
-    def create_expectation_from_base(cls, expectation_parametrization: UnitVarianceNormalEP
-                                     ) -> UnitVarianceSoftplusNormalEP:
+    def create_expectation_from_base(
+        cls, expectation_parametrization: UnitVarianceNormalEP
+    ) -> UnitVarianceSoftplusNormalEP:
         return UnitVarianceSoftplusNormalEP(expectation_parametrization.mean)
 
     @override
     @classmethod
     def sample_to_base_sample(cls, x: Array, **fixed_parameters: JaxArray) -> JaxRealArray:
-        return cast('JaxRealArray', inverse_softplus(x))
+        return cast("JaxRealArray", inverse_softplus(x))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -68,11 +73,14 @@ class UnitVarianceSoftplusNormalNP(
 
 @dataclass
 class UnitVarianceSoftplusNormalEP(
-        HasConjugatePrior,
-        Samplable,
-        TransformedExpectationParametrization[UnitVarianceNormalEP, UnitVarianceNormalNP,
-                                              UnitVarianceSoftplusNormalNP]):
+    HasConjugatePrior,
+    Samplable,
+    TransformedExpectationParametrization[
+        UnitVarianceNormalEP, UnitVarianceNormalNP, UnitVarianceSoftplusNormalNP
+    ],
+):
     """The expectation parametrization of the softplus-normal distribution with unit variance."""
+
     mean: JaxRealArray = distribution_parameter(ScalarSupport())
 
     @override
@@ -96,8 +104,9 @@ class UnitVarianceSoftplusNormalEP(
 
     @override
     @classmethod
-    def create_natural_from_base(cls, natural_parametrization: UnitVarianceNormalNP
-                                 ) -> UnitVarianceSoftplusNormalNP:
+    def create_natural_from_base(
+        cls, natural_parametrization: UnitVarianceNormalNP
+    ) -> UnitVarianceSoftplusNormalNP:
         return UnitVarianceSoftplusNormalNP(natural_parametrization.mean)
 
     @override
@@ -114,8 +123,9 @@ class UnitVarianceSoftplusNormalEP(
 
     @classmethod
     @override
-    def from_conjugate_prior_distribution(cls, cp: NaturalParametrization
-                                          ) -> tuple[Self, JaxRealArray]:
+    def from_conjugate_prior_distribution(
+        cls, cp: NaturalParametrization
+    ) -> tuple[Self, JaxRealArray]:
         uvn, n = UnitVarianceNormalEP.from_conjugate_prior_distribution(cp)
         return (cls(uvn.mean), n)
 

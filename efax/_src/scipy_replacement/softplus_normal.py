@@ -3,8 +3,14 @@ from __future__ import annotations
 import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
-from tjax import (NumpyComplexArray, NumpyRealArray, NumpyRealNumeric, ShapeLike, inverse_softplus,
-                  softplus)
+from tjax import (
+    NumpyComplexArray,
+    NumpyRealArray,
+    NumpyRealNumeric,
+    ShapeLike,
+    inverse_softplus,
+    softplus,
+)
 
 
 class ScipySoftplusNormal:
@@ -15,7 +21,7 @@ class ScipySoftplusNormal:
 
     def pdf(self, x: NumpyRealNumeric, out: None = None) -> NumpyRealArray:
         # Compute the inverse Softplus transformation: z = inverse_softplus(x)
-        z = inverse_softplus(np.asarray(x))
+        z = inverse_softplus(np.asarray(x))  # type: ignore
         # Compute the normal PDF of z ~ N(mu, sigma^2)
         normal_pdf = ss.norm.pdf(z, loc=self.mu, scale=self.sigma)
         # Compute the Jacobian term dx/dz = 1/(1+exp(-x))
@@ -23,13 +29,12 @@ class ScipySoftplusNormal:
         # Compute the final PDF
         return normal_pdf * jacobian
 
-    def rvs(self,
-            size: ShapeLike | None = None,
-            random_state: Generator | None = None
-            ) -> NumpyComplexArray:
+    def rvs(
+        self, size: ShapeLike | None = None, random_state: Generator | None = None
+    ) -> NumpyComplexArray:
         distribution = ss.norm(loc=self.mu, scale=self.sigma)
         samples = np.asarray(distribution.rvs(size=size, random_state=random_state))
-        return softplus(samples)
+        return softplus(samples)  # type: ignore
 
     def entropy(self) -> NumpyRealArray:
         raise NotImplementedError

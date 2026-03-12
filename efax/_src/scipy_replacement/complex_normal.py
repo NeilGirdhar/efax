@@ -12,11 +12,14 @@ from .shaped_distribution import ShapedDistribution
 
 class ScipyComplexNormalUnvectorized:
     """Represents an array of univariate complex normal distributions."""
+
     @override
-    def __init__(self,
-                 mean: NumpyComplexNumeric,
-                 variance: NumpyRealNumeric,
-                 pseudo_variance: NumpyComplexNumeric) -> None:
+    def __init__(
+        self,
+        mean: NumpyComplexNumeric,
+        variance: NumpyRealNumeric,
+        pseudo_variance: NumpyComplexNumeric,
+    ) -> None:
         super().__init__()
         self.mean: NumpyComplexArray = np.asarray(mean)
         self.variance: NumpyRealArray = np.asarray(variance)
@@ -27,13 +30,12 @@ class ScipyComplexNormalUnvectorized:
         if np.any(np.abs(self.pseudo_variance) > self.variance):
             msg = f"The pseudo-variance {pseudo_variance} is bigger than the variance {variance}."
             raise ValueError(msg)
-        if not (self.mean.shape == self.variance.shape
-                == self.pseudo_variance.shape):
+        if not (self.mean.shape == self.variance.shape == self.pseudo_variance.shape):
             msg = "Shape mismatch."
             raise ValueError(msg)
 
     def pdf(self, z: NumpyComplexNumeric, out: None = None) -> NumpyRealNumeric:
-        zr: NumpyRealArray = np.stack([np.real(z), np.imag(z)], axis=-1)  # type: ignore[list-item]
+        zr: NumpyRealArray = np.stack([np.real(z), np.imag(z)], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
     def rvs(self, size: ShapeLike = (), random_state: Generator | None = None) -> NumpyComplexArray:
@@ -41,9 +43,9 @@ class ScipyComplexNormalUnvectorized:
             size = (size,)
         if random_state is None:
             random_state = np.random.default_rng()
-        xy_rvs = random_state.multivariate_normal(mean=self._multivariate_normal_mean(),
-                                                  cov=self._multivariate_normal_cov(),
-                                                  size=size)
+        xy_rvs = random_state.multivariate_normal(
+            mean=self._multivariate_normal_mean(), cov=self._multivariate_normal_cov(), size=size
+        )
         return xy_rvs[..., 0] + 1j * xy_rvs[..., 1]
 
     def entropy(self) -> float:
@@ -66,14 +68,16 @@ class ScipyComplexNormalUnvectorized:
         return 0.5 * np.stack([xx_xy, yx_yy], axis=-2)
 
 
-class ScipyComplexNormal(
-        ShapedDistribution[ScipyComplexNormalUnvectorized]):  # type: ignore  # pyright: ignore
+class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):  # type: ignore  # pyright: ignore
     """This class allows distributions having a non-empty shape."""
+
     @override
-    def __init__(self,
-                 mean: NumpyComplexArray | None = None,
-                 variance: NumpyRealArray | None = None,
-                 pseudo_variance: NumpyComplexArray | None = None) -> None:
+    def __init__(
+        self,
+        mean: NumpyComplexArray | None = None,
+        variance: NumpyRealArray | None = None,
+        pseudo_variance: NumpyComplexArray | None = None,
+    ) -> None:
         if mean is not None:
             shape = mean.shape
         elif variance is not None:
@@ -82,9 +86,9 @@ class ScipyComplexNormal(
             shape = pseudo_variance.shape
         else:
             raise ValueError
-        dtype = np.result_type(*[x.dtype
-                                 for x in (mean, variance, pseudo_variance)
-                                 if x is not None])
+        dtype = np.result_type(
+            *[x.dtype for x in (mean, variance, pseudo_variance) if x is not None]
+        )
         rvs_shape = ()
         if mean is None:
             mean = np.zeros(shape, dtype=dtype)
@@ -99,11 +103,13 @@ class ScipyComplexNormal(
         super().__init__(shape, rvs_shape, dtype, objects, multivariate=False)
 
     @classmethod
-    def init_using_angle(cls,
-                         mean: NumpyComplexNumeric,
-                         variance: NumpyRealNumeric,
-                         angle: NumpyRealNumeric,
-                         polarization: NumpyComplexNumeric) -> Self:
+    def init_using_angle(
+        cls,
+        mean: NumpyComplexNumeric,
+        variance: NumpyRealNumeric,
+        angle: NumpyRealNumeric,
+        polarization: NumpyComplexNumeric,
+    ) -> Self:
         polarization_np: NumpyComplexArray = np.asarray(polarization)
         r: NumpyComplexArray = polarization_np * np.exp(1j * 2 * np.pi * angle * 2)
         mean_array = np.asarray(mean)
@@ -117,8 +123,9 @@ class ScipyComplexNormal(
             this_object = self.objects[i]
             assert isinstance(this_object, ScipyComplexNormalUnvectorized)
             objects[i] = this_object.as_multivariate_normal()
-        return ScipyMultivariateNormal(self.shape, self.rvs_shape, self.real_dtype, objects,
-                                       multivariate=True)
+        return ScipyMultivariateNormal(
+            self.shape, self.rvs_shape, self.real_dtype, objects, multivariate=True
+        )
 
     @property
     def mean(self) -> NumpyComplexArray:

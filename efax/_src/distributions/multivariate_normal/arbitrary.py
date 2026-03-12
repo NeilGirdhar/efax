@@ -5,8 +5,15 @@ from typing import cast, override
 
 import jax.random as jr
 from array_api_compat import array_namespace
-from tjax import (JaxArray, JaxRealArray, KeyArray, Shape, matrix_dot_product, matrix_vector_mul,
-                  outer_product)
+from tjax import (
+    JaxArray,
+    JaxRealArray,
+    KeyArray,
+    Shape,
+    matrix_dot_product,
+    matrix_vector_mul,
+    outer_product,
+)
 from tjax.dataclasses import dataclass
 
 from ...interfaces.multidimensional import Multidimensional
@@ -17,19 +24,23 @@ from ...parameter import SymmetricMatrixSupport, VectorSupport, distribution_par
 
 
 @dataclass
-class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
-                           NaturalParametrization['MultivariateNormalEP', JaxRealArray],
-                           Multidimensional,
-                           Samplable):
+class MultivariateNormalNP(
+    HasEntropyNP["MultivariateNormalEP"],
+    NaturalParametrization["MultivariateNormalEP", JaxRealArray],
+    Multidimensional,
+    Samplable,
+):
     """The natural parametrization of the multivariate normal distribution.
 
     Args:
         mean_times_precision: E(x) / Var(x).
         negative_half_precision: -0.5 / Var(x).
     """
+
     mean_times_precision: JaxRealArray = distribution_parameter(VectorSupport())
-    negative_half_precision: JaxRealArray = distribution_parameter(SymmetricMatrixSupport(
-        negative_semidefinite=True))
+    negative_half_precision: JaxRealArray = distribution_parameter(
+        SymmetricMatrixSupport(negative_semidefinite=True)
+    )
 
     @property
     @override
@@ -72,7 +83,7 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
     def to_exp(self) -> MultivariateNormalEP:
         xp = array_namespace(self)
         h_inv = xp.linalg.inv(self.negative_half_precision)
-        h_inv = cast('JaxRealArray', h_inv)
+        h_inv = cast("JaxRealArray", h_inv)
         h_inv_times_eta = matrix_vector_mul(h_inv, self.mean_times_precision)
         mean = -0.5 * h_inv_times_eta
         second_moment = 0.25 * outer_product(h_inv_times_eta, h_inv_times_eta) - 0.5 * h_inv
@@ -85,8 +96,9 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray
-                              ) -> MultivariateNormalEP:
+    def sufficient_statistics(
+        cls, x: JaxRealArray, **fixed_parameters: JaxArray
+    ) -> MultivariateNormalEP:
         return MultivariateNormalEP(x, outer_product(x, x))
 
     @override
@@ -95,12 +107,11 @@ class MultivariateNormalNP(HasEntropyNP['MultivariateNormalEP'],
 
 
 @dataclass
-class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
-                           Multidimensional,
-                           Samplable):
+class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP], Multidimensional, Samplable):
     mean: JaxRealArray = distribution_parameter(VectorSupport())
-    second_moment: JaxRealArray = distribution_parameter(SymmetricMatrixSupport(
-        positive_semidefinite=True))
+    second_moment: JaxRealArray = distribution_parameter(
+        SymmetricMatrixSupport(positive_semidefinite=True)
+    )
 
     @property
     @override
@@ -121,7 +132,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP],
     def to_nat(self) -> MultivariateNormalNP:
         xp = array_namespace(self)
         precision = xp.linalg.inv(self.variance())
-        precision = cast('JaxRealArray', precision)
+        precision = cast("JaxRealArray", precision)
         mean_times_precision = matrix_vector_mul(precision, self.mean)
         return MultivariateNormalNP(mean_times_precision, -0.5 * precision)
 
@@ -153,6 +164,7 @@ class MultivariateNormalVP(Samplable, Multidimensional):
         mean: E(x).
         variance: Var(x).
     """
+
     mean: JaxRealArray = distribution_parameter(VectorSupport())
     variance: JaxRealArray = distribution_parameter(SymmetricMatrixSupport())
 
