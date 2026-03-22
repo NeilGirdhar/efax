@@ -22,8 +22,8 @@ description = "Exponential families for JAX"
 readme = "README.rst"
 requires-python = ">=3.12, <3.15"
 license = "Apache-2.0"
-authors = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
-maintainers = [{email = "mistersheik@gmail.com"}, {name = "Neil Girdhar"}]
+authors = [{name = "Neil Girdhar", email = "mistersheik@gmail.com"}]
+maintainers = [{name = "Neil Girdhar", email = "mistersheik@gmail.com"}]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",
