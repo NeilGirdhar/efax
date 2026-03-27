@@ -72,7 +72,7 @@ def test_maximum_likelihood_estimation(
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
     calculated_parameters = parameter_map(
-        partial(np.mean, axis=0),  # type: ignore[arg-type]
+        partial(np.mean, axis=0),  # type: ignore
         sufficient_stats,
     )
     assert_tree_allclose(exp_parameters, calculated_parameters, rtol=rtol, atol=atol)
