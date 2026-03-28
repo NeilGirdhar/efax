@@ -8,18 +8,18 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 
-from ..interfaces.samplable import Samplable
-from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import (
+from efax._src.interfaces.samplable import Samplable
+from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import (
     RealField,
     ScalarSupport,
     distribution_parameter,
     negative_support,
     positive_support,
 )
-from ..parametrization import SimpleDistribution
+from efax._src.parametrization import SimpleDistribution
 from .log_normal.log_normal import LogNormalEP, LogNormalNP
 from .normal.normal import NormalVP
 

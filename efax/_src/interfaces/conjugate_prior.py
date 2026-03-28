@@ -5,9 +5,9 @@ from typing import Self
 
 from tjax import JaxComplexArray, JaxRealArray
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..interfaces.multidimensional import Multidimensional
-from ..natural_parametrization import NaturalParametrization
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.interfaces.multidimensional import Multidimensional
+from efax._src.natural_parametrization import NaturalParametrization
 
 
 class HasConjugatePrior(ExpectationParametrization):

@@ -3,9 +3,9 @@ from dataclasses import dataclass, fields
 
 from tjax import JaxComplexArray
 
-from ..parameter import Support
-from ..parametrization import Distribution
-from ..types import Path
+from efax._src.parameter import Support
+from efax._src.parametrization import Distribution
+from efax._src.types import Path
 
 
 @dataclass

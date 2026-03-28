@@ -1,8 +1,8 @@
 from collections.abc import Generator, Iterable
 from dataclasses import fields
 
-from ..parametrization import Distribution
-from ..types import Path
+from efax._src.parametrization import Distribution
+from efax._src.types import Path
 
 
 def parameter_names(

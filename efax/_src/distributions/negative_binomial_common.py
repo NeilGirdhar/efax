@@ -8,10 +8,10 @@ from array_api_compat import array_namespace
 from tjax import JaxIntegralArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, integral_ring
-from ..parametrization import SimpleDistribution
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import ScalarSupport, integral_ring
+from efax._src.parametrization import SimpleDistribution
 
 EP = TypeVar("EP", bound="NBCommonEP[Any]")
 

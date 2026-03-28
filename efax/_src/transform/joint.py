@@ -6,12 +6,12 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, RngStream, Shape
 from tjax.dataclasses import dataclass
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..interfaces.samplable import Samplable
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..natural_parametrization import NaturalParametrization
-from ..parametrization import Distribution, SimpleDistribution
-from ..tools import join_mappings
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.interfaces.samplable import Samplable
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parametrization import Distribution, SimpleDistribution
+from efax._src.tools import join_mappings
 
 
 @dataclass

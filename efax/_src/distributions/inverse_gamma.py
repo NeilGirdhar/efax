@@ -6,13 +6,13 @@ from array_api_compat import array_namespace
 from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..interfaces.samplable import Samplable
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..mixins.transformed_parametrization import (
+from efax._src.interfaces.samplable import Samplable
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.mixins.transformed_parametrization import (
     TransformedExpectationParametrization,
     TransformedNaturalParametrization,
 )
-from ..parameter import RealField, ScalarSupport, distribution_parameter, negative_support
+from efax._src.parameter import RealField, ScalarSupport, distribution_parameter, negative_support
 from .gamma import GammaEP, GammaNP
 
 

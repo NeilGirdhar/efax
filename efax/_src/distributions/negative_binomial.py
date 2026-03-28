@@ -7,10 +7,10 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxIntegralArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..interfaces.samplable import Samplable
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import (
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.interfaces.samplable import Samplable
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import (
     IntegralRing,
     ScalarSupport,
     distribution_parameter,

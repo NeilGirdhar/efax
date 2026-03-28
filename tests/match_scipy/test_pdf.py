@@ -17,8 +17,8 @@ from efax import (
     SimpleDistribution,
 )
 
-from ..create_info import MultivariateDiagonalNormalInfo
-from ..distribution_info import DistributionInfo
+from tests.create_info import MultivariateDiagonalNormalInfo
+from tests.distribution_info import DistributionInfo
 
 
 def _check_observation_shape(

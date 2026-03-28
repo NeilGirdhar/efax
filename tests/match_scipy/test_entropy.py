@@ -5,8 +5,8 @@ from numpy.testing import assert_allclose
 
 from efax import HasEntropyEP, HasEntropyNP
 
-from ..create_info import ChiInfo, ChiSquareInfo
-from ..distribution_info import DistributionInfo
+from tests.create_info import ChiInfo, ChiSquareInfo
+from tests.distribution_info import DistributionInfo
 
 
 def test_nat_entropy(generator: Generator, entropy_distribution_info: DistributionInfo) -> None:

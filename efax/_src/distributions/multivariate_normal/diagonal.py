@@ -8,11 +8,16 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
-from ...interfaces.multidimensional import Multidimensional
-from ...interfaces.samplable import Samplable
-from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ...natural_parametrization import NaturalParametrization
-from ...parameter import VectorSupport, distribution_parameter, negative_support, positive_support
+from efax._src.interfaces.multidimensional import Multidimensional
+from efax._src.interfaces.samplable import Samplable
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import (
+    VectorSupport,
+    distribution_parameter,
+    negative_support,
+    positive_support,
+)
 
 
 @dataclass

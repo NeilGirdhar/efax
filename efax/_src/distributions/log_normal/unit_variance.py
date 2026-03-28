@@ -7,17 +7,17 @@ from array_api_compat import array_namespace
 from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
-from ...interfaces.conjugate_prior import HasConjugatePrior
-from ...interfaces.samplable import Samplable
-from ...mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ...mixins.transformed_parametrization import (
+from efax._src.interfaces.conjugate_prior import HasConjugatePrior
+from efax._src.interfaces.samplable import Samplable
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.mixins.transformed_parametrization import (
     TransformedExpectationParametrization,
     TransformedNaturalParametrization,
 )
-from ...natural_parametrization import NaturalParametrization
-from ...parameter import ScalarSupport, distribution_parameter
-from ..normal.normal import NormalNP
-from ..normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import ScalarSupport, distribution_parameter
+from efax._src.distributions.normal.normal import NormalNP
+from efax._src.distributions.normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 
 
 @dataclass

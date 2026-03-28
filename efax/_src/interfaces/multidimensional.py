@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from ..parametrization import SimpleDistribution
+from efax._src.parametrization import SimpleDistribution
 
 
 class Multidimensional(SimpleDistribution):

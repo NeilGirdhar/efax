@@ -8,12 +8,17 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..interfaces.conjugate_prior import HasConjugatePrior
-from ..interfaces.samplable import Samplable
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import ScalarSupport, distribution_parameter, integral_ring, positive_support
-from ..parametrization import SimpleDistribution
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.interfaces.conjugate_prior import HasConjugatePrior
+from efax._src.interfaces.samplable import Samplable
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import (
+    ScalarSupport,
+    distribution_parameter,
+    integral_ring,
+    positive_support,
+)
+from efax._src.parametrization import SimpleDistribution
 from .gamma import GammaNP
 
 

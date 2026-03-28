@@ -7,9 +7,9 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import RealField, ScalarSupport
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import RealField, ScalarSupport
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 

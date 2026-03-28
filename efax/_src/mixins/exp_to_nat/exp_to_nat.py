@@ -9,10 +9,10 @@ from tjax import JaxRealArray, jit
 from tjax.dataclasses import dataclass
 from typing_extensions import TypeVar
 
-from ...expectation_parametrization import ExpectationParametrization
-from ...natural_parametrization import NaturalParametrization
-from ...parametrization import SimpleDistribution
-from ...structure.flattener import Flattener
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parametrization import SimpleDistribution
+from efax._src.structure.flattener import Flattener
 
 NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 type SP = JaxRealArray

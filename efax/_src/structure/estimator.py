@@ -5,14 +5,14 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray
 from tjax.dataclasses import dataclass
 
-from ..iteration import flatten_mapping, parameters
-from ..parametrization import Distribution, SimpleDistribution
-from ..types import Path
+from efax._src.iteration import flatten_mapping, parameters
+from efax._src.parametrization import Distribution, SimpleDistribution
+from efax._src.types import Path
 from .parameter_names import parameter_names
 from .structure import Structure, SubDistributionInfo
 
 if TYPE_CHECKING:
-    from ..natural_parametrization import NaturalParametrization
+    from efax._src.natural_parametrization import NaturalParametrization
 
     NP = TypeVar("NP", bound=NaturalParametrization)
 
@@ -38,7 +38,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
 
         This doesn't work with things like JointDistributionE.
         """
-        from ..expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
 
         assert issubclass(type_p, ExpectationParametrization)
         return MaximumLikelihoodEstimator(
@@ -49,7 +49,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
     @classmethod
     def create_estimator(cls, p: P) -> Self:
         """Create an estimator for an expectation parametrization."""
-        from ..expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
 
         infos = cls.create(p).infos
         assert isinstance(p, ExpectationParametrization)
@@ -64,9 +64,9 @@ class MaximumLikelihoodEstimator(Structure[P]):
         return MaximumLikelihoodEstimator(infos, fixed_parameters)
 
     def sufficient_statistics(self, x: dict[str, Any] | JaxComplexArray) -> P:
-        from ..expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
-        from ..natural_parametrization import NaturalParametrization  # noqa: PLC0415
-        from ..transform.joint import JointDistributionE  # noqa: PLC0415
+        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.natural_parametrization import NaturalParametrization  # noqa: PLC0415
+        from efax._src.transform.joint import JointDistributionE  # noqa: PLC0415
 
         constructed: dict[Path, ExpectationParametrization] = {}
 
@@ -109,8 +109,8 @@ class MaximumLikelihoodEstimator(Structure[P]):
     def from_conjugate_prior_distribution(
         self, cp: "NaturalParametrization"
     ) -> tuple[P, JaxRealArray]:
-        from ..interfaces.conjugate_prior import HasConjugatePrior  # noqa: PLC0415
-        from ..transform.joint import JointDistributionN  # noqa: PLC0415
+        from efax._src.interfaces.conjugate_prior import HasConjugatePrior  # noqa: PLC0415
+        from efax._src.transform.joint import JointDistributionN  # noqa: PLC0415
 
         constructed: dict[Path, Distribution] = {}
         n = None

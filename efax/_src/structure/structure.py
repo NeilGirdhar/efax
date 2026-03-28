@@ -6,10 +6,10 @@ from tjax import JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
 from typing_extensions import TypeVar
 
-from ..iteration import parameters
-from ..parameter import Support
-from ..parametrization import Distribution, SimpleDistribution
-from ..types import Namespace, Path
+from efax._src.iteration import parameters
+from efax._src.parameter import Support
+from efax._src.parametrization import Distribution, SimpleDistribution
+from efax._src.types import Namespace, Path
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
 
@@ -50,7 +50,7 @@ class Structure(Generic[P]):
         return Structure(cls._extract_distributions(p))
 
     def to_nat(self) -> "Structure":
-        from ..expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
 
         infos = []
         for info in self.infos:
@@ -66,7 +66,7 @@ class Structure(Generic[P]):
         return Structure(infos)
 
     def to_exp(self) -> "Structure":
-        from ..natural_parametrization import NaturalParametrization  # noqa: PLC0415
+        from efax._src.natural_parametrization import NaturalParametrization  # noqa: PLC0415
 
         infos: list[SubDistributionInfo] = []
         for info in self.infos:
@@ -144,7 +144,7 @@ class Structure(Generic[P]):
 
     @classmethod
     def _make_info(cls, q: Distribution, path: Path) -> SubDistributionInfo:
-        from ..interfaces.multidimensional import Multidimensional  # noqa: PLC0415
+        from efax._src.interfaces.multidimensional import Multidimensional  # noqa: PLC0415
 
         dimensions = q.dimensions() if isinstance(q, Multidimensional) else 1
         sub_distribution_names = list(q.sub_distributions())

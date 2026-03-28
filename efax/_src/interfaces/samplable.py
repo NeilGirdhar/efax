@@ -4,7 +4,7 @@ from abc import abstractmethod
 
 from tjax import JaxArray, KeyArray, Shape
 
-from ..parametrization import SimpleDistribution
+from efax._src.parametrization import SimpleDistribution
 
 
 class Samplable(SimpleDistribution):

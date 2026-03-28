@@ -20,7 +20,7 @@ from tjax import (
     softplus,
 )
 
-from ..types import Namespace
+from efax._src.types import Namespace
 
 
 def _fix_bound(bound: RealNumeric | None, x: JaxArray) -> JaxArray | None:

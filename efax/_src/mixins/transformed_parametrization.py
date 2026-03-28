@@ -9,9 +9,9 @@ from jax import jacobian, vmap
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
 from typing_extensions import TypeVar
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..iteration import parameters
-from ..natural_parametrization import EP, NaturalParametrization
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.iteration import parameters
+from efax._src.natural_parametrization import EP, NaturalParametrization
 
 TEP = TypeVar("TEP", bound=ExpectationParametrization, default=Any)
 NP = TypeVar("NP", bound=NaturalParametrization, default=Any)

@@ -8,12 +8,12 @@ from array_api_compat import array_namespace
 from tjax import JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..interfaces.multidimensional import Multidimensional
-from ..interfaces.samplable import Samplable
-from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import RealField, VectorSupport, distribution_parameter, negative_support
+from efax._src.interfaces.multidimensional import Multidimensional
+from efax._src.interfaces.samplable import Samplable
+from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import RealField, VectorSupport, distribution_parameter, negative_support
 
 EP = TypeVar("EP", bound="DirichletCommonEP[Any]")
 

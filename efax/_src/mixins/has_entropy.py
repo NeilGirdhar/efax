@@ -6,10 +6,10 @@ from typing import Any, Generic, final, override
 from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit, stop_gradient
 from typing_extensions import TypeVar
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..natural_parametrization import NaturalParametrization
-from ..parametrization import Distribution
-from ..tools import parameter_dot_product
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parametrization import Distribution
+from efax._src.tools import parameter_dot_product
 
 NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 

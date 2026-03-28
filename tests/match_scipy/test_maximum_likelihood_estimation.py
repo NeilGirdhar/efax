@@ -17,14 +17,14 @@ from efax import (
     unflatten_mapping,
 )
 
-from ..create_info import (
+from tests.create_info import (
     ComplexCircularlySymmetricNormalInfo,
     IsotropicNormalInfo,
     MultivariateFixedVarianceNormalInfo,
     MultivariateNormalInfo,
     VonMisesFisherInfo,
 )
-from ..distribution_info import DistributionInfo
+from tests.distribution_info import DistributionInfo
 
 
 def test_maximum_likelihood_estimation(

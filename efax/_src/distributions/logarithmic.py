@@ -6,17 +6,17 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass
 
-from ..expectation_parametrization import ExpectationParametrization
-from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import (
+from efax._src.expectation_parametrization import ExpectationParametrization
+from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import (
     IntegralRing,
     RealField,
     ScalarSupport,
     distribution_parameter,
     negative_support,
 )
-from ..parametrization import SimpleDistribution
+from efax._src.parametrization import SimpleDistribution
 
 log_probability_floor = -50.0
 log_probability_ceiling = -1e-7

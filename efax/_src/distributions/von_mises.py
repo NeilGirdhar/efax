@@ -7,12 +7,12 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 
-from ..interfaces.multidimensional import Multidimensional
-from ..mixins.exp_to_nat.exp_to_nat import ExpToNat
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..natural_parametrization import NaturalParametrization
-from ..parameter import CircularBoundedSupport, VectorSupport, distribution_parameter
-from ..tools import iv_ratio, log_ive
+from efax._src.interfaces.multidimensional import Multidimensional
+from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.natural_parametrization import NaturalParametrization
+from efax._src.parameter import CircularBoundedSupport, VectorSupport, distribution_parameter
+from efax._src.tools import iv_ratio, log_ive
 
 
 @dataclass

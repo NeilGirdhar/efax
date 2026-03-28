@@ -8,13 +8,13 @@ from array_api_compat import array_namespace
 from tjax import Array, JaxArray, JaxRealArray
 from tjax.dataclasses import dataclass
 
-from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
-from ..mixins.transformed_parametrization import (
+from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
+from efax._src.mixins.transformed_parametrization import (
     TransformedExpectationParametrization,
     TransformedNaturalParametrization,
 )
-from ..parameter import RealField, ScalarSupport, distribution_parameter
-from ..parametrization import SimpleDistribution
+from efax._src.parameter import RealField, ScalarSupport, distribution_parameter
+from efax._src.parametrization import SimpleDistribution
 from .chi_square import ChiSquareEP, ChiSquareNP
 
 

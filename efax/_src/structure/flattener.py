@@ -7,9 +7,9 @@ from tjax import JaxArray, JaxComplexArray, JaxRealArray
 from tjax.dataclasses import dataclass, field
 from typing_extensions import TypeVar
 
-from ..iteration import parameters
-from ..parametrization import Distribution, SimpleDistribution
-from ..types import Path
+from efax._src.iteration import parameters
+from efax._src.parametrization import Distribution, SimpleDistribution
+from efax._src.types import Path
 from .estimator import MaximumLikelihoodEstimator
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
