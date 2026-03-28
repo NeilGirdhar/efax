@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import override
+from typing import override, Self
 
 import jax.random as jr
 import jax.scipy.special as jss
@@ -77,6 +77,16 @@ class GammaNP(
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> GammaEP:
         xp = array_namespace(x)
         return GammaEP(x, xp.log(x))
+
+    @override
+    def _complexify(self, t: Self) -> Self:  # ty: ignore
+        """Only complexify negative_rate; jss.gammaln does not accept complex inputs.
+
+        This means characteristic_function cannot query the log x sufficient
+        statistic (the shape_minus_one component).  Querying it returns 1
+        instead of the true E[exp(i·t·log x)].
+        """
+        return type(self)(self.negative_rate + 1j * t.negative_rate, self.shape_minus_one)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

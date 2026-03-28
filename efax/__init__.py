@@ -62,7 +62,10 @@ from ._src.distributions.softplus_normal.unit_variance import (
 )
 from ._src.distributions.von_mises import VonMisesFisherEP, VonMisesFisherNP
 from ._src.distributions.weibull import WeibullEP, WeibullNP
-from ._src.expectation_parametrization import ExpectationParametrization
+from ._src.expectation_parametrization import (
+    ExpectationParametrization,
+    expectation_parameters_from_characteristic_function,
+)
 from ._src.interfaces.conjugate_prior import HasConjugatePrior, HasGeneralizedConjugatePrior
 from ._src.interfaces.multidimensional import Multidimensional
 from ._src.interfaces.samplable import Samplable
@@ -221,6 +224,7 @@ __all__ = [
     "WeibullEP",
     "WeibullNP",
     "distribution_parameter",
+    "expectation_parameters_from_characteristic_function",
     "flat_dict_of_observations",
     "flat_dict_of_parameters",
     "flatten_mapping",

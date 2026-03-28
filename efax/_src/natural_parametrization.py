@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Self, final, get_type_hints
 
+import jax
+import jax.numpy as jnp
 from array_api_compat import array_namespace
 from jax import grad, jacfwd, vjp, vmap
 from tjax import (
@@ -184,6 +186,58 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
     @final
     def kl_divergence(self, q: Self) -> JaxRealArray:
         return self.to_exp().kl_divergence(q, self_nat=self)
+
+    def _complexify(self, t: Self) -> Self:
+        """Shift natural parameters into the complex plane: η → η + i·t.
+
+        The default shifts every field.  Subclasses must override this when
+        ``log_normalizer`` calls functions that don't accept complex inputs
+        (e.g. ``gammaln``).  Keeping parameter k real means
+        ``characteristic_function`` cannot query the k-th sufficient statistic:
+        it will silently return 1 for that component instead of the true value.
+
+        Args:
+            t: Imaginary displacements, same pytree structure as self.
+
+        Returns: A copy of self with each field replaced by ``η + i·t``.
+        """
+        return jax.tree_util.tree_map(lambda eta, delta: eta + 1j * delta, self, t)
+
+    @jit
+    @final
+    def characteristic_function(self, t: Self) -> JaxComplexArray:
+        """Characteristic function of the sufficient statistics: E[exp(i·⟨t, T(x)⟩)].
+
+        For any exponential family, analytically continuing the log-normalizer
+        gives the characteristic function of T(x):
+
+            E[exp(i·⟨t, T(x)⟩)] = exp(A(η + i·t) − A(η))
+
+        The frequency ``t`` lives in natural-parameter space and has the same
+        pytree structure as ``self``: each field of ``t`` is the imaginary
+        displacement for the corresponding natural parameter / sufficient
+        statistic pair.
+
+        Shapes::
+
+            self : (*s,)           -- distribution with batch shape s
+            t    : (*batch, *s)    -- frequency, broadcasts over self
+            return: (*batch, *s)   -- one complex value per (batch, s) element
+
+        Common usage: evaluate the CF at k frequencies simultaneously by
+        giving ``t`` a leading batch dimension of size k::
+
+            omegas = 2 * jnp.pi * jnp.fft.fftfreq(k, d=dx)
+            t_grid = PoissonNP(omegas)           # shape (k,)
+            phi = p.characteristic_function(t_grid)  # shape (k,)
+
+        Args:
+            t: Frequencies in natural-parameter space, same structure as self.
+
+        Returns: Complex CF values, shape ``(*batch, *s)``.
+        """
+        shifted = self._complexify(t)
+        return jnp.exp(shifted.log_normalizer() - self.log_normalizer())
 
     @classmethod
     def _flat_log_normalizer(
