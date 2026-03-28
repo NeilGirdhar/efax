@@ -14,10 +14,12 @@ from efax import (
     ExpectationParametrization,
     JointDistribution,
     MaximumLikelihoodEstimator,
+    Multidimensional,
     NaturalParametrization,
     Samplable,
     SimpleDistribution,
     Structure,
+    flat_dict_of_parameters,
     flat_dict_of_observations,
     flatten_mapping,
     parameter_mean,
@@ -148,3 +150,44 @@ def test_sampling_and_estimation(
     _verify_maximum_likelihood_estimate(
         sampling_distribution_info, sample_shape, structure, exp_parameters, samples
     )
+
+
+def test_multidimensional_sample_shape_matches_dimensions(
+    generator: Generator,
+    key: KeyArray,
+    sampling_distribution_info: DistributionInfo,
+    *,
+    distribution_name: str | None,
+    natural: bool,
+) -> None:
+    """Test that sampled event shapes agree with support.shape(dimensions())."""
+    sampling_distribution_info.skip_if_deselected(distribution_name)
+    distribution_shape = (4,)
+    sample_shape = (8, 16)
+
+    sampling_object: Distribution
+    if natural:
+        sampling_object = sampling_distribution_info.nat_parameter_generator(
+            generator, distribution_shape
+        )
+    else:
+        sampling_object = sampling_distribution_info.exp_parameter_generator(
+            generator, distribution_shape
+        )
+
+    samples: Mapping[_Path, Any]
+    if isinstance(sampling_object, Samplable):
+        samples = {(): sampling_object.sample(key, sample_shape)}
+        sampled_distributions = {(): sampling_object}
+    else:
+        assert isinstance(sampling_object, JointDistribution)
+        samples = flatten_mapping(sampling_object.general_sample(key, sample_shape))
+        sampled_distributions = flat_dict_of_parameters(sampling_object)
+
+    for path, distribution in sampled_distributions.items():
+        if isinstance(distribution, Multidimensional):
+            support = distribution.domain_support()
+            sample_event_shape = (
+                () if support.axes() == 0 else samples[path].shape[-support.axes() :]
+            )
+            assert sample_event_shape == support.shape(distribution.dimensions())

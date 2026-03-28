@@ -94,6 +94,7 @@ from ._src.scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDi
 from ._src.scipy_replacement.geometric import ScipyGeometric
 from ._src.scipy_replacement.joint import ScipyJointDistribution
 from ._src.scipy_replacement.log_normal import ScipyLogNormal
+from ._src.scipy_replacement.multinomial import ScipyMultinomial
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.softplus_normal import ScipySoftplusNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
@@ -194,6 +195,7 @@ __all__ = [
     "ScipyGeometric",
     "ScipyJointDistribution",
     "ScipyLogNormal",
+    "ScipyMultinomial",
     "ScipyMultivariateNormal",
     "ScipySoftplusNormal",
     "ScipyVonMises",

@@ -5,7 +5,7 @@ from typing import Self, override
 import array_api_extra as xpx
 import jax.random as jr
 import numpy as np
-import scipy.special as sc
+import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -15,7 +15,7 @@ from ..interfaces.multidimensional import Multidimensional
 from ..interfaces.samplable import Samplable
 from ..mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from ..natural_parametrization import NaturalParametrization
-from ..parameter import RealField, VectorSupport, distribution_parameter
+from ..parameter import RealField, VectorSupport, boolean_ring, distribution_parameter
 from .dirichlet import DirichletNP
 from .gen_dirichlet import GeneralizedDirichletNP
 
@@ -43,14 +43,14 @@ class MultinomialNP(
     @override
     @classmethod
     def domain_support(cls) -> VectorSupport:
-        return VectorSupport()
+        return VectorSupport(ring=boolean_ring)
 
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
+        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return max_q + log_scaled_a
 
     @override
@@ -58,7 +58,7 @@ class MultinomialNP(
         xp = array_namespace(self)
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
+        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         return MultinomialEP(xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
 
     @override
@@ -73,11 +73,13 @@ class MultinomialNP(
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        xp = array_namespace(self)
         if shape is not None:
             shape += self.shape
-        retval = xpx.one_hot(jr.categorical(key, self.log_odds, shape=shape), self.dimensions())  # type: ignore
+        logits = xp.concat((self.log_odds, xp.zeros((*self.shape, 1))), axis=-1)
+        retval = xpx.one_hot(jr.categorical(key, logits, shape=shape), self.dimensions() + 1)  # type: ignore
         assert isinstance(retval, JaxArray)
-        return retval
+        return retval[..., :-1]  # pyright: ignore
 
     @override
     def dimensions(self) -> int:
@@ -87,7 +89,7 @@ class MultinomialNP(
         xp = array_namespace(self)
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
-        log_scaled_a = xp.logaddexp(-max_q, sc.logsumexp(q_minus_max_q, axis=-1))
+        log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
         p = xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis])
         final_p = 1.0 - xp.sum(p, axis=-1, keepdims=True)
         return xp.concat((p, final_p), axis=-1)
@@ -120,7 +122,7 @@ class MultinomialEP(
     @override
     @classmethod
     def domain_support(cls) -> VectorSupport:
-        return VectorSupport()
+        return VectorSupport(ring=boolean_ring)
 
     @classmethod
     @override
@@ -151,19 +153,21 @@ class MultinomialEP(
         cls,
         cp: NaturalParametrization,
     ) -> tuple[Self, JaxRealArray]:
-        assert isinstance(cp, GeneralizedDirichletNP)
-        raise NotImplementedError
+        assert isinstance(cp, DirichletNP)
+        a = cp.alpha_minus_one
+        xp = array_namespace(a)
+        n = xp.sum(a, axis=-1)
+        probability = a[..., :-1] / n[..., xp.newaxis]
+        return cls(probability), n
 
     @override
     def generalized_conjugate_prior_distribution(self, n: JaxRealArray) -> GeneralizedDirichletNP:
         xp = array_namespace(self)
-        final_p = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
-        all_p = xp.concat((self.probability, final_p), axis=-1)
-        alpha = n * all_p
-        beta = n * (1.0 - all_p)
-        alpha_roll = xpx.at(xp.roll(alpha, -1, axis=-1))[..., -1].set(0.0)
-        gamma = -xp.diff(beta, append=1.0) - alpha_roll
-        return GeneralizedDirichletNP(alpha - 1.0, gamma)
+        tail_n = xp.cumulative_sum(n[..., ::-1], axis=-1)[..., ::-1]
+        residual_probability = 1.0 - xp.cumulative_sum(self.probability, axis=-1)
+        alpha_minus_one = self.probability * tail_n
+        gamma = n * residual_probability
+        return GeneralizedDirichletNP(alpha_minus_one, gamma)
 
     @override
     def conjugate_prior_observation(self) -> JaxRealArray:

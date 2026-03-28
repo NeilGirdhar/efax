@@ -52,6 +52,8 @@ from efax import (
     MultivariateDiagonalNormalNP,
     MultivariateFixedVarianceNormalEP,
     MultivariateFixedVarianceNormalNP,
+    MultinomialEP,
+    MultinomialNP,
     MultivariateNormalEP,
     MultivariateNormalNP,
     MultivariateUnitVarianceNormalEP,
@@ -71,6 +73,7 @@ from efax import (
     ScipyGeometric,
     ScipyJointDistribution,
     ScipyLogNormal,
+    ScipyMultinomial,
     ScipyMultivariateNormal,
     ScipySoftplusNormal,
     ScipyVonMises,
@@ -512,6 +515,29 @@ class MultivariateFixedVarianceNormalInfo(
         return MultivariateFixedVarianceNormalNP
 
 
+class MultinomialInfo(DistributionInfo[MultinomialNP, MultinomialEP, NumpyRealArray]):
+    def __init__(self, dimensions: int) -> None:
+        super().__init__(dimensions=dimensions, safety=0.1)
+
+    @override
+    def exp_to_scipy_distribution(self, p: MultinomialEP) -> Any:
+        final_p = 1.0 - np.sum(np.asarray(p.probability), axis=-1, keepdims=True)
+        all_p = np.concatenate((np.asarray(p.probability), final_p), axis=-1)
+        return ScipyMultinomial(all_p)
+
+    @override
+    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
+        return jnp.asarray(x[..., :-1], dtype=jnp.float64)
+
+    @override
+    def exp_class(self) -> type[MultinomialEP]:
+        return MultinomialEP
+
+    @override
+    def nat_class(self) -> type[MultinomialNP]:
+        return MultinomialNP
+
+
 class MultivariateNormalInfo(
     DistributionInfo[MultivariateNormalNP, MultivariateNormalEP, NumpyRealArray]
 ):
@@ -754,6 +780,7 @@ def create_infos() -> list[DistributionInfo]:
         LogarithmicInfo(),
         MultivariateDiagonalNormalInfo(dimensions=4),
         MultivariateFixedVarianceNormalInfo(dimensions=2),
+        MultinomialInfo(dimensions=3),
         MultivariateNormalInfo(dimensions=4),
         MultivariateUnitVarianceNormalInfo(dimensions=5),
         NegativeBinomialInfo(),
