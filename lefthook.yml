@@ -9,9 +9,9 @@ pre-commit:
       glob: "*.py"
       run: uv run ruff format {staged_files}
       stage_fixed: true
-    - name: pyright
+    - name: ty
       glob: "*.py"
-      run: uv run pyright {staged_files}
+      run: uv run ty check {staged_files}
     - name: toml-sort
       glob: "*.toml"
       run: uv run toml-sort -i {staged_files}
