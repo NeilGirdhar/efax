@@ -80,6 +80,7 @@ from efax import (
     ScipySoftplusNormal,
     ScipyVonMises,
     ScipyVonMisesFisher,
+    ScipyWishart,
     SoftplusNormalEP,
     SoftplusNormalNP,
     Structure,
@@ -94,6 +95,8 @@ from efax import (
     VonMisesFisherNP,
     WeibullEP,
     WeibullNP,
+    WishartEP,
+    WishartNP,
 )
 
 from .distribution_info import DistributionInfo
@@ -777,6 +780,25 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
         return WeibullNP
 
 
+class WishartInfo(DistributionInfo[WishartNP, WishartEP, NumpyRealArray]):
+    def __init__(self, dimensions: int) -> None:
+        super().__init__(dimensions=dimensions, safety=0.1)
+
+    @override
+    def nat_to_scipy_distribution(self, q: WishartNP) -> Any:
+        degrees_of_freedom = np.asarray(2.0 * q.half_df())
+        scale = np.asarray(q.to_exp().mean / degrees_of_freedom[..., np.newaxis, np.newaxis])
+        return ScipyWishart(df=degrees_of_freedom, scale=scale)
+
+    @override
+    def exp_class(self) -> type[WishartEP]:
+        return WishartEP
+
+    @override
+    def nat_class(self) -> type[WishartNP]:
+        return WishartNP
+
+
 def create_infos() -> list[DistributionInfo]:
     return [
         BernoulliInfo(),
@@ -815,4 +837,5 @@ def create_infos() -> list[DistributionInfo]:
         VonMisesFisherInfo(dimensions=5),
         VonMisesInfo(),
         WeibullInfo(),
+        WishartInfo(dimensions=3),
     ]

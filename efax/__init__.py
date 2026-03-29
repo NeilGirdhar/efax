@@ -63,6 +63,7 @@ from ._src.distributions.softplus_normal.unit_variance import (
 )
 from ._src.distributions.von_mises import VonMisesFisherEP, VonMisesFisherNP
 from ._src.distributions.weibull import WeibullEP, WeibullNP
+from ._src.distributions.wishart import WishartEP, WishartNP
 from ._src.expectation_parametrization import (
     ExpectationParametrization,
     expectation_parameters_from_characteristic_function,
@@ -102,6 +103,7 @@ from ._src.scipy_replacement.multinomial import ScipyMultinomial
 from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from ._src.scipy_replacement.softplus_normal import ScipySoftplusNormal
 from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
+from ._src.scipy_replacement.wishart import ScipyWishart
 from ._src.structure.estimator import MaximumLikelihoodEstimator
 from ._src.structure.flattener import Flattener
 from ._src.structure.structure import Structure, SubDistributionInfo
@@ -206,6 +208,7 @@ __all__ = [
     "ScipySoftplusNormal",
     "ScipyVonMises",
     "ScipyVonMisesFisher",
+    "ScipyWishart",
     "SimpleDistribution",
     "SimplexSupport",
     "SoftplusNormalEP",
@@ -226,6 +229,8 @@ __all__ = [
     "VonMisesFisherNP",
     "WeibullEP",
     "WeibullNP",
+    "WishartEP",
+    "WishartNP",
     "distribution_parameter",
     "expectation_parameters_from_characteristic_function",
     "flat_dict_of_observations",

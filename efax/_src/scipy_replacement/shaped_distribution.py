@@ -52,17 +52,18 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
         assert x.shape[: self.ndim] == self.shape
-        final_shape = x.shape[:-1] if self.multivariate else x.shape
+        event_ndim = len(self.rvs_shape) if self.multivariate else 0
+        final_shape = x.shape[:-event_ndim] if event_ndim else x.shape
         retval = np.empty(final_shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
             if not isinstance(this_object, ScipyDistribution):
                 raise NotImplementedError
-            j_range = x.shape[self.ndim : -1] if self.multivariate else x.shape[self.ndim :]
+            j_range = x.shape[self.ndim : -event_ndim] if event_ndim else x.shape[self.ndim :]
             for j in np.ndindex(*j_range):
-                if self.multivariate:
-                    x_ij = x[*i, *j, :]
-                    assert x_ij.ndim == 1
+                if event_ndim:
+                    x_ij = x[*i, *j, ...]
+                    assert x_ij.ndim == event_ndim
                 else:
                     x_ij = x[*i, *j]
                     assert x_ij.ndim == 0
