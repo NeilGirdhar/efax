@@ -5,6 +5,7 @@ from typing import Any, Generic, final
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 from array_api_compat import array_namespace
 from tjax import JaxComplexArray, JaxRealArray, jit
 from typing_extensions import TypeVar
@@ -57,7 +58,7 @@ class ExpectationParametrization(Distribution, Generic[NP]):
         )
 
 
-def expectation_parameters_from_characteristic_function(
+def expectation_parameters_from_characteristic_function(  # noqa: PLR0914
     t: NaturalParametrization,
     cf_values: JaxComplexArray,
 ) -> ExpectationParametrization:
@@ -75,17 +76,21 @@ def expectation_parameters_from_characteristic_function(
     first-order approximation for other families — accuracy improves as the
     magnitude of the frequencies in ``t`` decreases.
 
+    Works for any NP field shape (scalar, vector, or matrix).  Each leaf of ``t``
+    has shape ``(*s, k, *field_shape)`` where ``*s`` is the distribution batch
+    shape and ``*field_shape`` is the per-element shape of that NP field.  All
+    field dimensions are flattened into a single column dimension for the OLS.
+
     Shapes::
 
-        t         : (*s, k)  -- NP whose fields are the k frequency vectors
+        t         : (*s, k)  -- NP with t.shape=(*s,k); leaves (*s,k,*field_shape)
         cf_values : (*s, k)  -- complex CF values at those frequencies
         return    : (*s,)    -- estimated EP, one per batch element
 
     Args:
-        t: Frequency grid.  Each field has shape ``(*s, k)``.  The k columns
-           are the frequency vectors at which ``characteristic_function`` was
-           evaluated; different columns should span the NP field directions for
-           well-conditioned recovery.
+        t: Frequency grid.  ``t.shape`` must equal ``(*s, k)``.  Each leaf has
+           shape ``(*s, k, *field_shape)`` where the ``k`` columns span the NP
+           field directions for well-conditioned recovery.
         cf_values: Complex CF values ``φ_Y(tⱼ)`` at the frequencies in ``t``,
             shape ``(*s, k)``.
 
@@ -93,22 +98,38 @@ def expectation_parameters_from_characteristic_function(
         the OLS estimates of ``E[T(x)]``.
     """
     leaves = jax.tree_util.tree_leaves(t)
-    n = len(leaves)
 
-    # Design matrix: each column is one NP field evaluated at k frequencies
-    # shape (*s, k, n)
-    design = jnp.stack(leaves, axis=-1)
+    # Each leaf has shape (*s, k, *field_shape).
+    # t.shape = (*s, k), so field_shape = leaf.shape[len(t.shape):].
+    n_t = len(t.shape)
+
+    # Flatten each leaf's field dims: (*s, k, *field_shape) → (*s, k, d_i).
+    d_is = [int(np.prod(leaf.shape[n_t:])) if leaf.shape[n_t:] else 1 for leaf in leaves]
+    leaves_flat = [
+        leaf.reshape(*leaf.shape[:n_t], d_i) for leaf, d_i in zip(leaves, d_is, strict=False)
+    ]
+
+    # Design matrix: (*s, k, total_dim)
+    design = jnp.concatenate(leaves_flat, axis=-1)
 
     # Response: Im(log φ), shape (*s, k)
     b = jnp.imag(jnp.log(cf_values))
 
     # OLS via normal equations: (designᵀ design) chi = designᵀ b
-    gram = jnp.einsum("...ki,...kj->...ij", design, design)  # (*s, n, n)
-    rhs = jnp.einsum("...ki,...k->...i", design, b)  # (*s, n)
-    chi = jnp.linalg.solve(gram, rhs)  # (*s, n)
+    gram = jnp.einsum("...ki,...kj->...ij", design, design)  # (*s, total_dim, total_dim)
+    rhs = jnp.einsum("...ki,...k->...i", design, b)  # (*s, total_dim)
+    chi = jnp.linalg.solve(gram, rhs[..., jnp.newaxis]).squeeze(-1)  # (*s, total_dim)
 
-    # Reconstruct EP: use sufficient_statistics on a dummy to get the treedef,
-    # then inject the OLS solution into the leaves.
-    dummy_ep = type(t).sufficient_statistics(jnp.zeros(1))
+    # Reconstruct EP: use sufficient_statistics on a dummy to get the treedef.
+    # The first leaf's field_shape gives the domain sample shape.
+    first_field_shape = leaves[0].shape[n_t:]
+    dummy_ep = type(t).sufficient_statistics(jnp.zeros(first_field_shape))
     _, ep_treedef = jax.tree_util.tree_flatten(dummy_ep)
-    return ep_treedef.unflatten([chi[..., i] for i in range(n)])
+
+    ep_leaves = []
+    offset = 0
+    for leaf, d_i in zip(leaves, d_is, strict=False):
+        field_shape = leaf.shape[n_t:]
+        ep_leaves.append(chi[..., offset : offset + d_i].reshape(*chi.shape[:-1], *field_shape))
+        offset += d_i
+    return ep_treedef.unflatten(ep_leaves)
