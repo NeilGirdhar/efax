@@ -57,7 +57,7 @@ class VonMisesFisherNP(
         q = self.mean_times_concentration
         kappa: JaxRealArray = xp.linalg.vector_norm(q, axis=-1, keepdims=True)
         return VonMisesFisherEP(
-            xp.where(kappa == 0.0, q, q * (_a_k(self.dimensions(), kappa) / kappa))
+            xp.where(kappa == 0.0, q, q * (_a_k(xp.asarray(self.dimensions()), kappa) / kappa))
         )
 
     @override
@@ -149,7 +149,7 @@ class VonMisesFisherEP(
         xp = array_namespace(self)
         kappa = softplus(search_parameters)
         mu = xp.linalg.vector_norm(self.mean, axis=-1)
-        return _a_k(self.dimensions(), kappa) - mu
+        return _a_k(xp.asarray(self.dimensions()), kappa) - mu
 
     @override
     def dimensions(self) -> int:
@@ -157,5 +157,5 @@ class VonMisesFisherEP(
 
 
 # Private functions --------------------------------------------------------------------------------
-def _a_k(k: float | JaxRealArray, kappa: float | JaxRealArray) -> JaxRealArray:
+def _a_k(k: JaxRealArray, kappa: JaxRealArray) -> JaxRealArray:
     return iv_ratio(k * 0.5, kappa)
