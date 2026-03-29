@@ -52,9 +52,7 @@ class ComplexVonMisesNP(
         xp = array_namespace(self)
         q = self.mean_times_concentration
         kappa = xp.abs(q)
-        return ComplexVonMisesEP(
-            xp.where(kappa == 0.0, xp.conj(q), xp.conj(q) * (_a_k(kappa) / kappa))
-        )
+        return ComplexVonMisesEP(xp.where(kappa == 0.0, q, q * (_a_k(kappa) / kappa)))
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -84,17 +82,17 @@ class ComplexVonMisesEP(
     """The expectation parametrization of the von Mises distribution.
 
     Args:
-        mean_conjugate: E(exp(-i x)).
+        mean: E(exp(i x)).
     """
 
-    mean_conjugate: JaxComplexArray = distribution_parameter(
+    mean: JaxComplexArray = distribution_parameter(
         ScalarSupport(ring=ComplexField(maximum_modulus=1.0))
     )
 
     @property
     @override
     def shape(self) -> Shape:
-        return self.mean_conjugate.shape
+        return self.mean.shape
 
     @override
     @classmethod
@@ -114,7 +112,7 @@ class ComplexVonMisesEP(
     @override
     def initial_search_parameters(self) -> JaxRealArray:
         xp = array_namespace(self)
-        mu = xp.abs(self.mean_conjugate)
+        mu = xp.abs(self.mean)
         initial_kappa = xp.where(mu == 1.0, xp.asarray(xp.inf), (2.0 * mu - mu**3) / (1.0 - mu**2))
         initial_kappa = cast("JaxRealArray", initial_kappa)
         return inverse_softplus(initial_kappa)[..., xp.newaxis]
@@ -123,11 +121,11 @@ class ComplexVonMisesEP(
     def search_to_natural(self, search_parameters: JaxRealArray) -> ComplexVonMisesNP:
         xp = array_namespace(self)
         kappa = softplus(search_parameters[..., 0])
-        mu = xp.abs(self.mean_conjugate)
+        mu = xp.abs(self.mean)
         q = xp.where(
             mu == 0.0,
-            self.mean_conjugate,
-            xp.conj(self.mean_conjugate) * (kappa / mu),
+            self.mean,
+            self.mean * (kappa / mu),
         )
         return ComplexVonMisesNP(q)
 
@@ -135,7 +133,7 @@ class ComplexVonMisesEP(
     def search_gradient(self, search_parameters: JaxRealArray) -> JaxRealArray:
         xp = array_namespace(self)
         kappa = softplus(search_parameters[..., 0])
-        mu = xp.abs(self.mean_conjugate)
+        mu = xp.abs(self.mean)
         return (_a_k(kappa) - mu)[..., xp.newaxis]
 
 

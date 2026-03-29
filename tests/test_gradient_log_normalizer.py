@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from array_api_compat import array_namespace
+import jax
 from jax import grad, jvp, vjp
 from jax.custom_derivatives import zero_from_primal
 from numpy.random import Generator
@@ -25,6 +26,16 @@ def _prelude(
     return original_ln, optimized_ln
 
 
+def _complex_grad_to_parameters(gln: NaturalParametrization) -> dict[tuple[str, ...], JaxRealArray]:
+    """Interpret JAX's complex gradient leaves as expectation-parameter leaves.
+
+    With the Hermitian pairing ``Re(eta * conj(T(x)))``, JAX's gradient for a real-valued function
+    returns the complex-conjugated leaf relative to the sufficient statistic / expectation leaf.
+    Real leaves are unaffected.
+    """
+    return jax.tree_util.tree_map(lambda value: value.conj(), parameters(gln, fixed=False))
+
+
 def test_primals(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Tests that the gradient log-normalizer equals the gradient of the log-normalizer."""
     original_ln, optimized_ln = _prelude(generator, distribution_info)
@@ -39,12 +50,12 @@ def test_primals(generator: Generator, distribution_info: DistributionInfo) -> N
         # Original GLN.
         original_gln_np = original_gln(generated_np)
         original_gln_ep = structure_ep.reinterpret(original_gln_np)
-        original_gln_parameters = parameters(original_gln_ep, fixed=False)
+        original_gln_parameters = _complex_grad_to_parameters(original_gln_ep)
 
         # Optimized GLN.
         optimized_gln_np = optimized_gln(generated_np)
         optimized_gln_ep = structure_ep.reinterpret(optimized_gln_np)
-        optimized_gln_parameters = parameters(optimized_gln_ep, fixed=False)
+        optimized_gln_parameters = _complex_grad_to_parameters(optimized_gln_ep)
 
         # Test primal evaluation.
         # parameters(generated_ep, fixed=False)

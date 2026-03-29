@@ -228,7 +228,7 @@ class ComplexVonMisesInfo(DistributionInfo[ComplexVonMisesNP, ComplexVonMisesEP,
 
     @override
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyComplexArray:
-        return jnp.exp(-1j * jnp.asarray(x))
+        return jnp.exp(1j * jnp.asarray(x))
 
     @override
     def exp_class(self) -> type[ComplexVonMisesEP]:

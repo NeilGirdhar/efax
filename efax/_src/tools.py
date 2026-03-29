@@ -84,7 +84,7 @@ def _parameter_dot_product(x: JaxComplexArray, y: JaxComplexArray, n_axes: int) 
     """Returns the real component of the dot product of the final n_axes axes of two arrays."""
     xp = array_namespace(x, y)
     axes = tuple(range(-n_axes, 0))
-    return xp.sum(xp.real(x * y), axis=axes)
+    return xp.sum(xp.real(x * xp.conj(y)), axis=axes)
 
 
 if TYPE_CHECKING:

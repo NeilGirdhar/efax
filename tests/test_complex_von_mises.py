@@ -18,10 +18,10 @@ def test_complex_von_mises_matches_von_mises_fisher() -> None:
     assert_tree_allclose(q_cvm.kappa(), q_vmf.kappa())
     assert_tree_allclose(q_cvm.angle(), q_vmf.to_kappa_angle()[1])
     assert_tree_allclose(
-        jnp.real(p_cvm.mean_conjugate),
+        jnp.real(p_cvm.mean),
         p_vmf.mean[..., 0],
     )
     assert_tree_allclose(
-        -jnp.imag(p_cvm.mean_conjugate),
+        jnp.imag(p_cvm.mean),
         p_vmf.mean[..., 1],
     )

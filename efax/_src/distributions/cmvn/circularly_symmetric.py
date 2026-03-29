@@ -64,7 +64,7 @@ class ComplexCircularlySymmetricNormalNP(
     @override
     def to_exp(self) -> ComplexCircularlySymmetricNormalEP:
         xp = array_namespace(self)
-        return ComplexCircularlySymmetricNormalEP(xp.conj(xp.linalg.inv(-self.negative_precision)))
+        return ComplexCircularlySymmetricNormalEP(xp.linalg.inv(-self.negative_precision))
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -121,7 +121,7 @@ class ComplexCircularlySymmetricNormalEP(
     @override
     def to_nat(self) -> ComplexCircularlySymmetricNormalNP:
         xp = array_namespace(self)
-        return ComplexCircularlySymmetricNormalNP(xp.conj(-xp.linalg.inv(self.variance)))
+        return ComplexCircularlySymmetricNormalNP(-xp.linalg.inv(self.variance))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

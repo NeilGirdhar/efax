@@ -63,12 +63,13 @@ class ComplexNormalNP(
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
+        pseudo_precision = xp.conj(self.pseudo_precision)
         _, s, mu = self._r_s_mu()
         det_s = s
         det_h = -self.negative_precision
         return (
             -abs_square(mu) * self.negative_precision
-            - xp.real(xp.square(mu) * self.pseudo_precision)
+            - xp.real(xp.square(mu) * pseudo_precision)
             + 0.5 * xp.log(det_s)
             - 0.5 * xp.log(det_h)
             + math.log(math.pi)
@@ -96,11 +97,15 @@ class ComplexNormalNP(
 
     def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
         xp = array_namespace(self)
-        r = -self.pseudo_precision / self.negative_precision
+        r = -xp.conj(self.pseudo_precision) / self.negative_precision
         s = xp.reciprocal((abs_square(r) - 1.0) * self.negative_precision)
-        k = self.pseudo_precision / self.negative_precision
-        l_eta = 0.5 * self.mean_times_precision / ((abs_square(k) - 1.0) * self.negative_precision)
-        mu = xp.conj(l_eta) - xp.conj(self.pseudo_precision / self.negative_precision) * l_eta
+        k = xp.conj(self.pseudo_precision) / self.negative_precision
+        l_eta = (
+            0.5
+            * xp.conj(self.mean_times_precision)
+            / ((abs_square(k) - 1.0) * self.negative_precision)
+        )
+        mu = xp.conj(l_eta) - (self.pseudo_precision / self.negative_precision) * l_eta
         return r, s, mu
 
     @override
@@ -158,9 +163,9 @@ class ComplexNormalEP(HasEntropyEP[ComplexNormalNP], Samplable, SimpleDistributi
         p_c = variance - xp.conj(r * pseudo_variance)
         p_inv_c = xp.reciprocal(p_c)
         precision = xp.real(-p_inv_c)
-        pseudo_precision = r * p_inv_c
+        pseudo_precision = xp.conj(r * p_inv_c)
         mean_times_precision = -2.0 * (
-            precision * xp.conj(self.mean) + pseudo_precision * self.mean
+            precision * self.mean + pseudo_precision * xp.conj(self.mean)
         )
         return ComplexNormalNP(mean_times_precision, precision, pseudo_precision)
 

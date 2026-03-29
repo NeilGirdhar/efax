@@ -25,10 +25,10 @@ class ComplexUnitVarianceNormalNP(
     It has unit variance, and zero pseudo-variance. This is a curved exponential family.
 
     Args:
-        two_mean_conjugate: 2 * E(conjugate(x)).
+        two_mean: 2 * E(x).
     """
 
-    two_mean_conjugate: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
+    two_mean: JaxComplexArray = distribution_parameter(ScalarSupport(ring=complex_field))
     # S = I, U = 0
     # P = I, R = 0
     # H = -I, J = 0
@@ -39,7 +39,7 @@ class ComplexUnitVarianceNormalNP(
     @property
     @override
     def shape(self) -> Shape:
-        return self.two_mean_conjugate.shape
+        return self.two_mean.shape
 
     @override
     @classmethod
@@ -48,13 +48,12 @@ class ComplexUnitVarianceNormalNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        mean_conjugate = self.two_mean_conjugate * 0.5
-        return abs_square(mean_conjugate) + math.log(math.pi)
+        mean = self.two_mean * 0.5
+        return abs_square(mean) + math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexUnitVarianceNormalEP:
-        xp = array_namespace(self)
-        return ComplexUnitVarianceNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
+        return ComplexUnitVarianceNormalEP(self.two_mean * 0.5)
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -101,8 +100,7 @@ class ComplexUnitVarianceNormalEP(HasEntropyEP[ComplexUnitVarianceNormalNP], Sam
 
     @override
     def to_nat(self) -> ComplexUnitVarianceNormalNP:
-        xp = array_namespace(self)
-        return ComplexUnitVarianceNormalNP(xp.conj(self.mean) * 2.0)
+        return ComplexUnitVarianceNormalNP(self.mean * 2.0)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

@@ -27,10 +27,10 @@ class ComplexMultivariateUnitVarianceNormalNP(
     This is a curved exponential family.
 
     Args:
-        two_mean_conjugate: 2 * E(conjugate(x)).
+        two_mean: 2 * E(x).
     """
 
-    two_mean_conjugate: JaxComplexArray = distribution_parameter(VectorSupport(ring=complex_field))
+    two_mean: JaxComplexArray = distribution_parameter(VectorSupport(ring=complex_field))
     # S = I, U = 0
     # P = I, R = 0
     # H = -I, J = 0
@@ -41,7 +41,7 @@ class ComplexMultivariateUnitVarianceNormalNP(
     @property
     @override
     def shape(self) -> Shape:
-        return self.two_mean_conjugate.shape[:-1]
+        return self.two_mean.shape[:-1]
 
     @override
     @classmethod
@@ -51,13 +51,12 @@ class ComplexMultivariateUnitVarianceNormalNP(
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
-        mean_conjugate = self.two_mean_conjugate * 0.5
-        return xp.sum(abs_square(mean_conjugate), axis=-1) + self.dimensions() * math.log(math.pi)
+        mean = self.two_mean * 0.5
+        return xp.sum(abs_square(mean), axis=-1) + self.dimensions() * math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexMultivariateUnitVarianceNormalEP:
-        xp = array_namespace(self)
-        return ComplexMultivariateUnitVarianceNormalEP(xp.conj(self.two_mean_conjugate) * 0.5)
+        return ComplexMultivariateUnitVarianceNormalEP(self.two_mean * 0.5)
 
     @override
     def carrier_measure(self, x: JaxComplexArray) -> JaxRealArray:
@@ -77,7 +76,7 @@ class ComplexMultivariateUnitVarianceNormalNP(
 
     @override
     def dimensions(self) -> int:
-        return self.two_mean_conjugate.shape[-1]
+        return self.two_mean.shape[-1]
 
 
 @dataclass
@@ -111,8 +110,7 @@ class ComplexMultivariateUnitVarianceNormalEP(
 
     @override
     def to_nat(self) -> ComplexMultivariateUnitVarianceNormalNP:
-        xp = array_namespace(self)
-        return ComplexMultivariateUnitVarianceNormalNP(xp.conj(self.mean) * 2.0)
+        return ComplexMultivariateUnitVarianceNormalNP(self.mean * 2.0)
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:
