@@ -17,6 +17,7 @@ from ._src.distributions.complex_normal.unit_variance import (
     ComplexUnitVarianceNormalEP,
     ComplexUnitVarianceNormalNP,
 )
+from ._src.distributions.complex_von_mises import ComplexVonMisesEP, ComplexVonMisesNP
 from ._src.distributions.dirichlet import DirichletEP, DirichletNP
 from ._src.distributions.exponential import ExponentialEP, ExponentialNP
 from ._src.distributions.gamma import GammaEP, GammaNP, GammaVP
@@ -127,6 +128,8 @@ __all__ = [
     "ComplexNormalNP",
     "ComplexUnitVarianceNormalEP",
     "ComplexUnitVarianceNormalNP",
+    "ComplexVonMisesEP",
+    "ComplexVonMisesNP",
     "DirichletEP",
     "DirichletNP",
     "Distribution",

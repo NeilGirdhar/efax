@@ -26,6 +26,8 @@ from efax import (
     ComplexNormalNP,
     ComplexUnitVarianceNormalEP,
     ComplexUnitVarianceNormalNP,
+    ComplexVonMisesEP,
+    ComplexVonMisesNP,
     DirichletEP,
     DirichletNP,
     ExponentialEP,
@@ -214,6 +216,24 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
     @override
     def nat_class(self) -> type[ComplexNormalNP]:
         return ComplexNormalNP
+
+
+class ComplexVonMisesInfo(DistributionInfo[ComplexVonMisesNP, ComplexVonMisesEP, NumpyRealArray]):
+    @override
+    def nat_to_scipy_distribution(self, q: ComplexVonMisesNP) -> Any:
+        return ScipyVonMises(np.asarray(q.kappa()), np.asarray(q.angle()))
+
+    @override
+    def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> NumpyComplexArray:
+        return jnp.exp(-1j * jnp.asarray(x))
+
+    @override
+    def exp_class(self) -> type[ComplexVonMisesEP]:
+        return ComplexVonMisesEP
+
+    @override
+    def nat_class(self) -> type[ComplexVonMisesNP]:
+        return ComplexVonMisesNP
 
 
 class ComplexUnitVarianceNormalInfo(
@@ -767,6 +787,7 @@ def create_infos() -> list[DistributionInfo]:
         ComplexMultivariateUnitVarianceNormalInfo(dimensions=4),
         ComplexNormalInfo(),
         ComplexUnitVarianceNormalInfo(),
+        ComplexVonMisesInfo(),
         DirichletInfo(dimensions=5),
         ExponentialInfo(),
         GammaInfo(),
