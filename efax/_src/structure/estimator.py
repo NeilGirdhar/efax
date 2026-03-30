@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
     NP = TypeVar("NP", bound=NaturalParametrization)
 
-T = TypeVar("T")
 P = TypeVar("P", bound=Distribution)
 SP = TypeVar("SP", bound=SimpleDistribution)
 

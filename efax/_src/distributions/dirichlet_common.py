@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, TypeVar, override
+from typing import Any, override
 
 import jax.random as jr
 import jax.scipy.special as jss
@@ -14,8 +14,6 @@ from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import RealField, VectorSupport, distribution_parameter, negative_support
-
-EP = TypeVar("EP", bound="DirichletCommonEP[Any]")
 
 
 @dataclass
@@ -53,9 +51,6 @@ class DirichletCommonNP[EP: "DirichletCommonEP[Any]"](
         xp = array_namespace(self)
         q = self.alpha_minus_one
         return jss.digamma(q + 1.0) - jss.digamma(xp.sum(q, axis=-1, keepdims=True) + q.shape[-1])
-
-
-NP = TypeVar("NP", bound=DirichletCommonNP[Any])
 
 
 @dataclass
