@@ -7,6 +7,8 @@ from array_api_compat import array_namespace
 from tjax import Array, JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 
+from efax._src.distributions.normal.normal import NormalNP
+from efax._src.distributions.normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 from efax._src.interfaces.conjugate_prior import HasConjugatePrior
 from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.transformed_parametrization import (
@@ -15,8 +17,6 @@ from efax._src.mixins.transformed_parametrization import (
 )
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import ScalarSupport, distribution_parameter
-from efax._src.distributions.normal.normal import NormalNP
-from efax._src.distributions.normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 
 
 @dataclass

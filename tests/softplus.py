@@ -1,6 +1,8 @@
 from array_api_compat import array_namespace
-from scipy.stats._distribution_infrastructure import MonotonicTransformedDistribution  # noqa: PLC2701
-from scipy.stats._distribution_infrastructure import ContinuousDistribution
+from scipy.stats._distribution_infrastructure import (  # noqa: PLC2701
+    ContinuousDistribution,
+    MonotonicTransformedDistribution,
+)
 from tjax import NumpyArray, inverse_softplus, softplus
 
 

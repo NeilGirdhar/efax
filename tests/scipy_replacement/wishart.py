@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyRealArray, Shape
-from typing import Any
 
 from .shaped_distribution import ShapedDistribution
 

@@ -14,6 +14,7 @@ from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import VectorSupport, distribution_parameter
+
 from .diagonal import MultivariateDiagonalNormalNP
 from .isotropic import IsotropicNormalNP
 

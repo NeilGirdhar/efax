@@ -17,6 +17,7 @@ from efax._src.parameter import (
     positive_support,
 )
 from efax._src.parametrization import SimpleDistribution
+
 from .negative_binomial_common import NBCommonEP, NBCommonNP
 
 

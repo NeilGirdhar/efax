@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import override, Self
+from typing import Self, override
 
 import jax.random as jr
 import jax.scipy.special as jss
@@ -20,6 +20,7 @@ from efax._src.parameter import (
     positive_support,
 )
 from efax._src.parametrization import SimpleDistribution
+
 from .log_normal.log_normal import LogNormalEP, LogNormalNP
 from .normal.normal import NormalVP
 

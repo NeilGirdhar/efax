@@ -1,9 +1,9 @@
 from __future__ import annotations
-import jax.numpy as jnp
 
 import math
 from typing import Any, override
 
+import jax.numpy as jnp
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape, softplus

@@ -4,8 +4,8 @@ from typing import Self, override
 
 import array_api_extra as xpx
 import jax.random as jr
-import numpy as np
 import jax.scipy.special as jss
+import numpy as np
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -16,6 +16,7 @@ from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import RealField, VectorSupport, boolean_ring, distribution_parameter
+
 from .dirichlet import DirichletNP
 from .gen_dirichlet import GeneralizedDirichletNP
 

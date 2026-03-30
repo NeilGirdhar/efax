@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from array_api_compat import array_namespace
 import jax
+from array_api_compat import array_namespace
 from jax import grad, jvp, vjp
 from jax.custom_derivatives import zero_from_primal
 from numpy.random import Generator

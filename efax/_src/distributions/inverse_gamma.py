@@ -13,6 +13,7 @@ from efax._src.mixins.transformed_parametrization import (
     TransformedNaturalParametrization,
 )
 from efax._src.parameter import RealField, ScalarSupport, distribution_parameter, negative_support
+
 from .gamma import GammaEP, GammaNP
 
 

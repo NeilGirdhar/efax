@@ -16,9 +16,9 @@ These conditions are checked at runtime; incompatible distributions are skipped.
 from __future__ import annotations
 
 import jax
-import numpy as np
 import jax.numpy as jnp
 import jax.tree_util as jtu
+import numpy as np
 import pytest
 from numpy.random import Generator
 from numpy.testing import assert_allclose

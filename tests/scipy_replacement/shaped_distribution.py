@@ -1,10 +1,10 @@
 from __future__ import annotations
-from numpy.random import Generator
 
 from typing import Any, TypeVar, cast, override
 
 import numpy as np
 import numpy.typing as npt
+from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyIntegralArray, NumpyRealArray, Shape
 
 from .base import ScipyDiscreteDistribution, ScipyDistribution

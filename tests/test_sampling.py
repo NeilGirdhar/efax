@@ -19,8 +19,8 @@ from efax import (
     Samplable,
     SimpleDistribution,
     Structure,
-    flat_dict_of_parameters,
     flat_dict_of_observations,
+    flat_dict_of_parameters,
     flatten_mapping,
     parameter_mean,
 )

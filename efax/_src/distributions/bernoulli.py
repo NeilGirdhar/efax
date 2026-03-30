@@ -15,6 +15,7 @@ from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import RealField, ScalarSupport, boolean_ring, distribution_parameter
 from efax._src.parametrization import SimpleDistribution
+
 from .beta import BetaNP
 
 

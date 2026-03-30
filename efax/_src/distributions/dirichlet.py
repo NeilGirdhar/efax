@@ -9,6 +9,7 @@ from tjax.dataclasses import dataclass
 from efax._src.expectation_parametrization import ExpectationParametrization
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import SimplexSupport
+
 from .dirichlet_common import DirichletCommonEP, DirichletCommonNP
 
 

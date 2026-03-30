@@ -10,6 +10,7 @@ from efax._src.iteration import parameters
 from efax._src.parameter import Support
 from efax._src.parametrization import Distribution, SimpleDistribution
 from efax._src.types import Namespace, Path
+
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
 
@@ -50,7 +51,9 @@ class Structure(Generic[P]):
         return Structure(cls._extract_distributions(p))
 
     def to_nat(self) -> "Structure":
-        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+            ExpectationParametrization,
+        )
 
         infos = []
         for info in self.infos:

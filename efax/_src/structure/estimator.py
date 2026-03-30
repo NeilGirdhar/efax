@@ -8,6 +8,7 @@ from tjax.dataclasses import dataclass
 from efax._src.iteration import flatten_mapping, parameters
 from efax._src.parametrization import Distribution, SimpleDistribution
 from efax._src.types import Path
+
 from .parameter_names import parameter_names
 from .structure import Structure, SubDistributionInfo
 
@@ -37,7 +38,9 @@ class MaximumLikelihoodEstimator(Structure[P]):
 
         This doesn't work with things like JointDistributionE.
         """
-        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+            ExpectationParametrization,
+        )
 
         assert issubclass(type_p, ExpectationParametrization)
         return MaximumLikelihoodEstimator(
@@ -48,7 +51,9 @@ class MaximumLikelihoodEstimator(Structure[P]):
     @classmethod
     def create_estimator(cls, p: P) -> Self:
         """Create an estimator for an expectation parametrization."""
-        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+            ExpectationParametrization,
+        )
 
         infos = cls.create(p).infos
         assert isinstance(p, ExpectationParametrization)
@@ -63,7 +68,9 @@ class MaximumLikelihoodEstimator(Structure[P]):
         return MaximumLikelihoodEstimator(infos, fixed_parameters)
 
     def sufficient_statistics(self, x: dict[str, Any] | JaxComplexArray) -> P:
-        from efax._src.expectation_parametrization import ExpectationParametrization  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+            ExpectationParametrization,
+        )
         from efax._src.natural_parametrization import NaturalParametrization  # noqa: PLC0415
         from efax._src.transform.joint import JointDistributionE  # noqa: PLC0415
 

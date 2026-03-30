@@ -15,6 +15,7 @@ from efax._src.mixins.transformed_parametrization import (
 )
 from efax._src.parameter import RealField, ScalarSupport, distribution_parameter
 from efax._src.parametrization import SimpleDistribution
+
 from .chi_square import ChiSquareEP, ChiSquareNP
 
 

@@ -4,7 +4,6 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 
 from efax import HasEntropyEP, HasEntropyNP
-
 from tests.create_info import ChiInfo, ChiSquareInfo
 from tests.distribution_info import DistributionInfo
 

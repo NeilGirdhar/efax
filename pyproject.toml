@@ -89,7 +89,6 @@ ignore = [
   "ERA001", # Commented-out code.
   "FIX002", # TODO comment.
   "G004", # Logging uses f-string.
-  "I001", # Unsorted imports.
   "PD008", # Prefer .loc over .at.
   "PGH003", # Use specific type-ignore codes.
   "PLR0913", # Too many function arguments.

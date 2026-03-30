@@ -15,7 +15,6 @@ from efax import (
     NaturalParametrization,
     SimpleDistribution,
 )
-
 from tests.create_info import MultivariateDiagonalNormalInfo
 from tests.distribution_info import DistributionInfo
 from tests.scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistribution

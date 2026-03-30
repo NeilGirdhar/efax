@@ -13,6 +13,7 @@ from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import ScalarSupport, distribution_parameter
+
 from .normal import NormalNP
 
 

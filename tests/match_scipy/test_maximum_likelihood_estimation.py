@@ -16,7 +16,6 @@ from efax import (
     parameter_map,
     unflatten_mapping,
 )
-
 from tests.create_info import (
     ComplexCircularlySymmetricNormalInfo,
     IsotropicNormalInfo,
