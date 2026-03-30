@@ -379,7 +379,7 @@ wheels = [
 
 [[package]]
 name = "efax"
-version = "2.1.1"
+version = "2.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },
@@ -2022,21 +2022,19 @@ wheels = [
 
 [[package]]
 name = "tjax"
-version = "1.4.4"
+version = "1.4.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "array-api-compat" },
-    { name = "array-api-extra" },
     { name = "jax" },
     { name = "numpy" },
     { name = "optax" },
     { name = "optype", extra = ["numpy"] },
     { name = "rich" },
-    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b3/82/52e3aac34c2a5115927dae931d7fd8756e31f229f73ff9174e710a64f521/tjax-1.4.4.tar.gz", hash = "sha256:824432c50b9626a001f54f809f0aee07b1a13d59e991bea014a748cf2d2d54de", size = 156244, upload-time = "2026-03-30T12:21:27.207Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/5e/d7cf6b4cc4d27a47487c625f5b7c1b56edde95992b32235c98ed928afeb5/tjax-1.4.5.tar.gz", hash = "sha256:d2d1843ecf2e4f33758aec227fa281a365ba30dad601a67bedff816c6f627548", size = 155737, upload-time = "2026-03-30T15:11:49.676Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/19/04/46a6af06857f5fccfd799c25dc9fcf267f9b1711433eae88713521e9c2b3/tjax-1.4.4-py3-none-any.whl", hash = "sha256:4df95e4cca31b34a8f2e1343189919b73ccf9e882837ddc405c458451f7ff8ea", size = 45732, upload-time = "2026-03-30T12:21:25.575Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/79/e4a79b059d14cf698b3eadd0c701728852f31fe8b7b958a3eef6eab40360/tjax-1.4.5-py3-none-any.whl", hash = "sha256:e6b7a38a69cfe9c1e0c665f0d764493ad7b661db84e58e5329dd447e7dea23e3", size = 45473, upload-time = "2026-03-30T15:11:48.317Z" },
 ]
 
 [[package]]
