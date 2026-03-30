@@ -93,7 +93,6 @@ ignore = [
   "PGH003", # Use specific type-ignore codes.
   "PLR0913", # Too many function arguments.
   "PLR6301", # Method does not use self.
-  "Q000", # Prefer double quotes.
   "RUF002", # Ambiguous Unicode character.
   "RUF021", # Parenthesize mixed and/or.
   "RUF069", # Float equality comparison.
