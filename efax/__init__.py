@@ -92,15 +92,6 @@ from ._src.parameter.support import (
     VectorSupport,
 )
 from ._src.parametrization import Distribution, SimpleDistribution
-from ._src.scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistribution
-from ._src.scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
-from ._src.scipy_replacement.complex_normal import ScipyComplexNormal
-from ._src.scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
-from ._src.scipy_replacement.joint import ScipyJointDistribution
-from ._src.scipy_replacement.multinomial import ScipyMultinomial
-from ._src.scipy_replacement.multivariate_normal import ScipyMultivariateNormal
-from ._src.scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
-from ._src.scipy_replacement.wishart import ScipyWishart
 from ._src.structure.estimator import MaximumLikelihoodEstimator
 from ._src.structure.flattener import Flattener
 from ._src.structure.structure import Structure, SubDistributionInfo
@@ -191,18 +182,6 @@ __all__ = [
     "Ring",
     "Samplable",
     "ScalarSupport",
-    "ScipyComplexMultivariateNormal",
-    "ScipyComplexNormal",
-    "ScipyDirichlet",
-    "ScipyDiscreteDistribution",
-    "ScipyDistribution",
-    "ScipyGeneralizedDirichlet",
-    "ScipyJointDistribution",
-    "ScipyMultinomial",
-    "ScipyMultivariateNormal",
-    "ScipyVonMises",
-    "ScipyVonMisesFisher",
-    "ScipyWishart",
     "SimpleDistribution",
     "SimplexSupport",
     "SoftplusNormalEP",

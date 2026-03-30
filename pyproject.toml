@@ -7,10 +7,11 @@ dev = [
   "jupyter>=1",
   "lefthook>=2",
   "pyright>=1.1.408",
-  "pytest-ordering",
   "pytest-xdist[psutil]>=3",
   "pytest>=9",
   "ruff>=0.15",
+  "scipy-stubs>=1.15",
+  "scipy>=1.15",
   "toml-sort>=0.24",
   "ty>=0.0.22"
 ]
@@ -46,8 +47,6 @@ dependencies = [
   "opt-einsum>=3.4",
   "optimistix>=0.0.9",
   "optype[numpy]>=0.8.0",
-  "scipy-stubs>=1.15",
-  "scipy>=1.15",
   "tjax>=1.4.4",
   "typing_extensions>=4.8"
 ]

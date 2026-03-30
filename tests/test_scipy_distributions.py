@@ -5,7 +5,10 @@ import pytest
 from numpy.random import Generator as NumpyGenerator
 from tjax import Shape
 
-from efax import ScipyDirichlet, ScipyDistribution, ScipyMultivariateNormal, ScipyWishart
+from .scipy_replacement.base import ScipyDistribution
+from .scipy_replacement.dirichlet import ScipyDirichlet
+from .scipy_replacement.multivariate_normal import ScipyMultivariateNormal
+from .scipy_replacement.wishart import ScipyWishart
 
 
 @pytest.mark.nondistribution

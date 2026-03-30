@@ -68,16 +68,6 @@ from efax import (
     PoissonNP,
     RayleighEP,
     RayleighNP,
-    ScipyComplexMultivariateNormal,
-    ScipyComplexNormal,
-    ScipyDirichlet,
-    ScipyGeneralizedDirichlet,
-    ScipyJointDistribution,
-    ScipyMultinomial,
-    ScipyMultivariateNormal,
-    ScipyVonMises,
-    ScipyVonMisesFisher,
-    ScipyWishart,
     SoftplusNormalEP,
     SoftplusNormalNP,
     Structure,
@@ -97,6 +87,14 @@ from efax import (
 )
 
 from .distribution_info import DistributionInfo
+from .scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
+from .scipy_replacement.complex_normal import ScipyComplexNormal
+from .scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
+from .scipy_replacement.joint import ScipyJointDistribution
+from .scipy_replacement.multinomial import ScipyMultinomial
+from .scipy_replacement.multivariate_normal import ScipyMultivariateNormal
+from .scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
+from .scipy_replacement.wishart import ScipyWishart
 from .softplus import softplus_distribution
 
 Bernoulli = ss.make_distribution(ss.bernoulli)  # ty: ignore

@@ -12,11 +12,11 @@ from typing_extensions import TypeVar
 from efax import (
     ExpectationParametrization,
     NaturalParametrization,
-    ScipyDiscreteDistribution,
-    ScipyDistribution,
     Structure,
     SubDistributionInfo,
 )
+
+from .scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistribution
 
 NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 EP = TypeVar("EP", bound=ExpectationParametrization, default=Any)

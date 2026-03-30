@@ -13,13 +13,12 @@ from efax import (
     JointDistributionN,
     Multidimensional,
     NaturalParametrization,
-    ScipyDiscreteDistribution,
-    ScipyDistribution,
     SimpleDistribution,
 )
 
 from tests.create_info import MultivariateDiagonalNormalInfo
 from tests.distribution_info import DistributionInfo
+from tests.scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistribution
 
 
 def _check_observation_shape(

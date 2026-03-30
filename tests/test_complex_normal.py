@@ -6,7 +6,8 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import NumpyComplexArray, NumpyRealArray, Shape
 
-from efax import ScipyComplexMultivariateNormal, ScipyComplexNormal
+from .scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
+from .scipy_replacement.complex_normal import ScipyComplexNormal
 
 
 # Tools --------------------------------------------------------------------------------------------
