@@ -4,7 +4,15 @@ import math
 from typing import cast, override
 
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, softplus
+from tjax import (
+    JaxArray,
+    JaxRealArray,
+    Shape,
+    inverse_softplus,
+    softplus,
+    bessel_iv_ratio,
+    log_bessel_ive,
+)
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.multidimensional import Multidimensional
@@ -12,7 +20,6 @@ from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import CircularBoundedSupport, VectorSupport, distribution_parameter
-from efax._src.tools import iv_ratio, log_ive
 
 
 @dataclass
@@ -48,7 +55,7 @@ class VonMisesFisherNP(
             kappa
             - (half_k - 1.0) * xp.log(kappa)
             + half_k * math.log(2.0 * math.pi)
-            + log_ive(half_k - 1.0, kappa)
+            + log_bessel_ive(half_k - 1.0, kappa)
         )
 
     @override
@@ -158,4 +165,4 @@ class VonMisesFisherEP(
 
 # Private functions --------------------------------------------------------------------------------
 def _a_k(k: JaxRealArray, kappa: JaxRealArray) -> JaxRealArray:
-    return iv_ratio(k * 0.5, kappa)
+    return bessel_iv_ratio(k * 0.5, kappa)

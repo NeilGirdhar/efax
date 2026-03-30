@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, TypeVar
 
 from array_api_compat import array_namespace
 from jax import jit
-from tensorflow_probability.substrates import jax as tfp
 from tjax import JaxComplexArray, JaxRealArray
 
 from .iteration import parameters
@@ -73,10 +72,6 @@ def join_mappings[T, V](**field_to_map: Mapping[T, V]) -> dict[T, dict[str, V]]:
         for key, value in mapping.items():
             retval[key][field_name] = value
     return dict(retval)
-
-
-iv_ratio = tfp.math.bessel_iv_ratio
-log_ive = tfp.math.log_bessel_ive
 
 
 # Private functions --------------------------------------------------------------------------------

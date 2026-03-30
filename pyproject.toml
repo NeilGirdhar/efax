@@ -48,8 +48,7 @@ dependencies = [
   "optype[numpy]>=0.8.0",
   "scipy-stubs>=1.15",
   "scipy>=1.15",
-  "tfp-nightly>=0.25",
-  "tjax>=1.4.1",
+  "tjax>=1.4.4",
   "typing_extensions>=4.8"
 ]
 
