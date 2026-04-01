@@ -21,7 +21,7 @@ class Distribution(JaxAbstractClass):
         from .structure.assembler import Assembler  # noqa: PLC0415
 
         parameters_ = {path: value[key] for path, value in parameters(self).items()}
-        return Assembler.create(self).assemble(parameters_)
+        return Assembler.create_assembler(self).assemble(parameters_)
 
     @abstractmethod
     def sub_distributions(self) -> Mapping[str, Distribution]:

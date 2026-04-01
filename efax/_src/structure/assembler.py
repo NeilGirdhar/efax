@@ -39,7 +39,7 @@ class Assembler(Generic[P]):
     tree, enabling operations that would otherwise require a live instance:
 
     * Reassemble a Distribution from its parameters (assemble).
-    * Reinterpret parameter values from one parametrization as another (reinterpret).
+    * Coerce parameter values from one parametrization into another (coerce_from_distribution).
     * Enumerate domain support constraints (domain_support).
     * Generate a random distribution with valid parameters (generate_random).
 
@@ -51,8 +51,13 @@ class Assembler(Generic[P]):
     infos: list[SubDistributionInfo] = field(static=True)
 
     @classmethod
-    def create(cls, p: P) -> "Assembler[P]":
-        """Create an Assembler by extracting the distribution tree structure from p."""
+    def create_assembler(cls, p: P) -> "Assembler[P]":
+        """Create an Assembler by extracting the distribution tree structure from p.
+
+        Always returns a plain Assembler regardless of which subclass this is called on.
+        Subclasses (Estimator, Flattener) use this to obtain an Assembler's infos before
+        constructing their own richer objects.
+        """
         return Assembler(cls._extract_distributions(p))
 
     def to_nat(self) -> "Assembler":
@@ -91,13 +96,13 @@ class Assembler(Generic[P]):
             )
         return Assembler(infos)
 
-    def assemble(self, p: Mapping[Path, JaxComplexArray]) -> P:
+    def assemble(self, params: Mapping[Path, JaxComplexArray]) -> P:
         """Reassemble a Distribution from a mapping of paths to parameter arrays.
 
         This is the core operation: given the raw parameter values (keyed by their paths in the
         distribution tree), reconstruct the full Distribution object using the stored type metadata.
         """
-        constructed: dict[Path, Distribution | JaxComplexArray] = dict(p)
+        constructed: dict[Path, Distribution | JaxComplexArray] = dict(params)
         for info in self.infos:
             kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = {
                 name: constructed[*info.path, name] for name in parameter_names(info.type_)
@@ -112,12 +117,12 @@ class Assembler(Generic[P]):
         assert isinstance(retval, Distribution)
         return cast("P", retval)
 
-    def reinterpret(self, q: Distribution) -> P:
-        """Reinterpret q's parameter values as belonging to this Assembler's distribution types.
+    def coerce_from_distribution(self, q: Distribution) -> P:
+        """Coerce q's parameter values into this Assembler's distribution types.
 
-        Grafts the raw parameter arrays from q onto the type schema stored in this Assembler,
-        producing a distribution of type P with q's numeric values.  Useful for switching
-        between parametrizations when the parameter layouts are known to match.
+        Takes the raw parameter arrays from q and pours them into the type schema stored in
+        this Assembler, producing a distribution of type P with q's numeric values.  Useful
+        for switching between parametrizations when the parameter layouts are known to match.
         """
         p_paths = [
             (*info.path, name) for info in self.infos for name in parameter_names(info.type_)

@@ -57,8 +57,8 @@ def test_from_conjugate_prior(
 
     # Find its conjugate prior at that point with many observations.
     cp_q = p.conjugate_prior_distribution(n)
-    p_estimator = Estimator.create_estimator(p)
-    p_prime, n_prime = p_estimator.from_conjugate_prior_distribution(cp_q)
+    p_estimator = Estimator.from_expectation(p)
+    p_prime, n_prime = p_estimator.from_conjugate_prior(cp_q)
     assert_tree_allclose(p, p_prime, atol=1.5)
     assert_allclose(n, n_prime, atol=1.5)
 

@@ -40,7 +40,7 @@ T = TypeVar("T", bound=Distribution)
 def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
     """Return the mean of the parameters (fixed and variable)."""
     xp = array_namespace(x)
-    structure = Assembler.create(x)
+    structure = Assembler.create_assembler(x)
     p = parameters(x)
     q = {path: xp.mean(value, axis=axis) for path, value in p.items()}
     return structure.assemble(q)
@@ -56,7 +56,7 @@ def parameter_map[T: Distribution](
     operated_fields = dict(zip(paths, final_values, strict=True))
 
     fixed_parameters = parameters(x, fixed=True)
-    return Assembler.create(x).assemble({**fixed_parameters, **operated_fields})
+    return Assembler.create_assembler(x).assemble({**fixed_parameters, **operated_fields})
 
 
 def join_mappings[T, V](**field_to_map: Mapping[T, V]) -> dict[T, dict[str, V]]:

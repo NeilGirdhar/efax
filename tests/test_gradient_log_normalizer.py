@@ -45,16 +45,16 @@ def test_primals(generator: Generator, distribution_info: DistributionInfo) -> N
         generated_np = distribution_info.nat_parameter_generator(generator, shape=())
         generated_ep = generated_np.to_exp()  # Regular transformation.
         generated_parameters = parameters(generated_ep, fixed=False)
-        structure_ep = Assembler.create(generated_ep)
+        structure_ep = Assembler.create_assembler(generated_ep)
 
         # Original GLN.
         original_gln_np = original_gln(generated_np)
-        original_gln_ep = structure_ep.reinterpret(original_gln_np)
+        original_gln_ep = structure_ep.coerce_from_distribution(original_gln_np)
         original_gln_parameters = _complex_grad_to_parameters(original_gln_ep)
 
         # Optimized GLN.
         optimized_gln_np = optimized_gln(generated_np)
-        optimized_gln_ep = structure_ep.reinterpret(optimized_gln_np)
+        optimized_gln_ep = structure_ep.coerce_from_distribution(optimized_gln_np)
         optimized_gln_parameters = _complex_grad_to_parameters(optimized_gln_ep)
 
         # Test primal evaluation.
@@ -72,7 +72,7 @@ def _unit_tangent(nat_parameters: NaturalParametrization) -> NaturalParametrizat
         path: zero_from_primal(value, symbolic_zeros=False)
         for path, value in parameters(nat_parameters, fixed=True).items()
     }
-    structure = Assembler.create(nat_parameters)
+    structure = Assembler.create_assembler(nat_parameters)
     return structure.assemble({**new_variable_parameters, **new_fixed_parameters})
 
 

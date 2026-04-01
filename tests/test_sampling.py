@@ -111,7 +111,7 @@ def _verify_maximum_likelihood_estimate(
     rtol = 4e-2
     sample_axes = tuple(range(len(sample_shape)))
     newaxes = (jnp.newaxis,) * len(sample_shape)
-    estimator = Estimator.create_estimator(exp_parameters[*newaxes, ...])
+    estimator = Estimator.from_expectation(exp_parameters[*newaxes, ...])
     sampled_exp_parameters = estimator.sufficient_statistics(samples)
     maximum_likelihood_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
     assert_tree_allclose(maximum_likelihood_parameters, exp_parameters, rtol=rtol, atol=atol)
@@ -142,7 +142,7 @@ def test_sampling_and_estimation(
         natural=natural,
     )
     flat_map_of_samples = flat_dict_of_observations(samples)
-    structure = Assembler.create(exp_parameters)
+    structure = Assembler.create_assembler(exp_parameters)
     flat_map_of_samples = (
         {(): samples} if isinstance(samples, JaxArray) else flatten_mapping(samples)
     )

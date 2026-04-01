@@ -35,10 +35,8 @@ class Estimator(Assembler[P]):
     fixed_parameters: dict[Path, JaxComplexArray]
 
     @classmethod
-    def create_simple_estimator(
-        cls, type_p: type[SP], **fixed_parameters: JaxArray
-    ) -> "Estimator[SP]":
-        """Create an Estimator for a simple ExpectationParametrization class.
+    def from_type(cls, type_p: type[SP], **fixed_parameters: JaxArray) -> "Estimator[SP]":
+        """Create an Estimator from a simple ExpectationParametrization class.
 
         Use this when you have a type rather than an instance.  Does not work with composite
         distributions such as JointDistributionE.
@@ -54,7 +52,7 @@ class Estimator(Assembler[P]):
         )
 
     @classmethod
-    def create_estimator(cls, p: P) -> Self:
+    def from_expectation(cls, p: P) -> Self:
         """Create an Estimator from an expectation-parametrized distribution.
 
         Extracts the distribution tree structure from p and records which of its parameters
@@ -64,19 +62,19 @@ class Estimator(Assembler[P]):
             ExpectationParametrization,
         )
 
-        infos = cls.create(p).infos
+        infos = cls.create_assembler(p).infos
         assert isinstance(p, ExpectationParametrization)
         fixed_parameters = parameters(p, fixed=True)
         return cls(infos, fixed_parameters)
 
     @classmethod
-    def create_estimator_from_natural(cls, p: "NP") -> "Estimator[NP]":
+    def from_natural(cls, p: "NP") -> "Estimator[NP]":
         """Create an Estimator from a natural-parametrized distribution.
 
         Converts the distribution tree to expectation parametrization types while preserving
         the fixed parameter values from p.
         """
-        infos = Estimator.create(p).to_exp().infos  # type: ignore
+        infos = Estimator.create_assembler(p).to_exp().infos  # type: ignore
         fixed_parameters = parameters(p, fixed=True)
         return Estimator(infos, fixed_parameters)
 
@@ -131,9 +129,7 @@ class Estimator(Assembler[P]):
                     h(info)
         return cast("P", constructed[()])
 
-    def from_conjugate_prior_distribution(
-        self, cp: "NaturalParametrization"
-    ) -> tuple[P, JaxRealArray]:
+    def from_conjugate_prior(self, cp: "NaturalParametrization") -> tuple[P, JaxRealArray]:
         """Recover distribution parameters and observation count from a conjugate prior.
 
         Given a conjugate prior distribution cp, returns the distribution p whose parameters

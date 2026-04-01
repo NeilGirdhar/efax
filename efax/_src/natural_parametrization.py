@@ -116,7 +116,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
         Args:
             x: The sample.
         """
-        estimator = Estimator.create_estimator_from_natural(self)
+        estimator = Estimator.from_natural(self)
         tx = estimator.sufficient_statistics(x)
         return parameter_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 
@@ -146,7 +146,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
         """
         xp = array_namespace(self)
         fisher_information_diagonal = self.fisher_information_diagonal()
-        structure = Assembler.create(self)
+        structure = Assembler.create_assembler(self)
         final_parameters = parameters(self)
         for path, (value, support) in parameters(fisher_information_diagonal, support=True).items():
             na = support.axes()
@@ -250,7 +250,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
 
     @jit
     def _fisher_information_matrix(self) -> JaxRealArray:
-        flattener, flattened = Flattener.flatten(self, map_to_plane=False)
+        flattener, flattened = Flattener.flatten(self, mapped_to_plane=False)
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
         for _ in range(len(self.shape)):
             fisher_info_f = vmap(fisher_info_f)

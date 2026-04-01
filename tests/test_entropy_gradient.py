@@ -36,7 +36,7 @@ def _all_finite(some_tree: object, /) -> JaxBooleanArray:
 
 
 def _check_entropy_gradient(distribution: HasEntropy, /) -> None:
-    flattener, flattened = Flattener.flatten(distribution, map_to_plane=False)
+    flattener, flattened = Flattener.flatten(distribution, mapped_to_plane=False)
     p_sum_entropy = partial(_sum_entropy, flattener=flattener)
     calculated_gradient = grad(p_sum_entropy)(flattened)
     if not _all_finite(calculated_gradient):
@@ -83,7 +83,7 @@ def test_gamma_vp_entropy_gradient(distribution_name: str | None) -> None:
     o = jnp.ones(())
     x = GammaVP(o, o * 0.25)
     x_e = x.to_exp()
-    flattener, flattened = Flattener.flatten(x_e, map_to_plane=False)
+    flattener, flattened = Flattener.flatten(x_e, mapped_to_plane=False)
     f_value, f_gradient = value_and_grad(f)(flattened, flattener)
     g_value, g_gradient = value_and_grad(g)(flattened, flattener)
     assert_tree_allclose(f_value, g_value)

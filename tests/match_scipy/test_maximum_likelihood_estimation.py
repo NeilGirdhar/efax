@@ -66,7 +66,7 @@ def test_maximum_likelihood_estimation(
         if flat_efax_x_clamped.keys() == {()}
         else unflatten_mapping(flat_efax_x_clamped)
     )
-    estimator = Estimator.create_estimator(exp_parameters)
+    estimator = Estimator.from_expectation(exp_parameters)
     sufficient_stats = estimator.sufficient_statistics(efax_x_clamped)
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.

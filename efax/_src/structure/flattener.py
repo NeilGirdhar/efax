@@ -37,7 +37,7 @@ class Flattener(Estimator[P]):
     mapped_to_plane: bool = field(static=True)
 
     def final_dimension_size(self) -> int:
-        """Return the total length of the flat array produced by flatten."""
+        """Return the size of the last (parameter) dimension of the flat array produced by flatten."""
         return sum(
             support.num_elements(info.dimensions)
             for info in self.infos
@@ -86,7 +86,7 @@ class Flattener(Estimator[P]):
         return cast("P", constructed[()])
 
     @classmethod
-    def flatten(cls, p: P, *, map_to_plane: bool = True) -> tuple[Self, JaxRealArray]:
+    def flatten(cls, p: P, *, mapped_to_plane: bool = True) -> tuple[Self, JaxRealArray]:
         """Encode a Distribution as a (Flattener, flat_array) pair.
 
         Returns both the flat array and the Flattener needed to decode it.  Fixed parameters
@@ -94,26 +94,28 @@ class Flattener(Estimator[P]):
 
         Args:
             p: The distribution to encode.
-            map_to_plane: Whether to bijectively map constrained parameters to all of ℝⁿ.
+            mapped_to_plane: Whether to bijectively map constrained parameters to all of ℝⁿ.
                 Set False when the flat values should reflect true parameter magnitudes, e.g.,
                 when differencing expectation parameters or computing gradients.
                 Set True when passing to a neural network.
         """
         xp = array_namespace(p)
         arrays = [
-            x for xs in cls._walk(partial(cls._make_flat, map_to_plane=map_to_plane), p) for x in xs
+            x
+            for xs in cls._walk(partial(cls._make_flat, map_to_plane=mapped_to_plane), p)
+            for x in xs
         ]
 
         flattened_array = xp.concat(arrays, axis=-1)
         return (
-            cls(cls._extract_distributions(p), parameters(p, fixed=True), map_to_plane),
+            cls(cls._extract_distributions(p), parameters(p, fixed=True), mapped_to_plane),
             flattened_array,
         )
 
     @overload
     @classmethod
     def create_flattener(
-        cls, p: SP, *, override_unflattened_type: None = None, mapped_to_plane: bool = True
+        cls, p: SP, *, unflatten_as_type: None = None, mapped_to_plane: bool = True
     ) -> "Flattener[SP]": ...
     @overload
     @classmethod
@@ -121,7 +123,7 @@ class Flattener(Estimator[P]):
         cls,
         p: SimpleDistribution,
         *,
-        override_unflattened_type: type[SP],
+        unflatten_as_type: type[SP],
         mapped_to_plane: bool = True,
     ) -> "Flattener[SP]": ...
     @classmethod
@@ -129,7 +131,7 @@ class Flattener(Estimator[P]):
         cls,
         p: SimpleDistribution,
         *,
-        override_unflattened_type: type[SP] | None = None,
+        unflatten_as_type: type[SP] | None = None,
         mapped_to_plane: bool = True,
     ) -> "Flattener[SP]":
         """Create a Flattener from a simple distribution instance.
@@ -140,13 +142,13 @@ class Flattener(Estimator[P]):
 
         Args:
             p: The distribution from which to extract dimensions and fixed parameters.
-            override_unflattened_type: If provided, the Flattener will decode to this type
+            unflatten_as_type: If provided, the Flattener will decode to this type
                 instead of type(p).
             mapped_to_plane: Whether unflatten should apply the inverse plane mapping.
         """
         if p.sub_distributions():
             raise ValueError
-        type_ = type(p) if override_unflattened_type is None else override_unflattened_type
+        type_ = type(p) if unflatten_as_type is None else unflatten_as_type
         info = cls._make_info(p, path=())
         info = replace(info, type_=type_)
         infos = [info]
