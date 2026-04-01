@@ -23,9 +23,10 @@ SP = TypeVar("SP", bound=SimpleDistribution, default=Any)
 class Flattener(Estimator[P]):
     """An Estimator that also converts distributions to and from flat arrays.
 
-    Extends Estimator with the ability to encode a Distribution as a dense 1D array and decode
-    it back, making distributions compatible with neural networks and numerical optimizers.
-    Fixed parameters are excluded from the flat array and reinserted automatically on decode.
+    Extends Estimator with the ability to encode a Distribution as an array of shape
+    (*distribution.shape, k) — where k is final_dimension_size — and decode it back,
+    making distributions compatible with neural networks and numerical optimizers.
+    Fixed parameters are excluded from the encoded array and reinserted automatically on decode.
 
     The mapped_to_plane flag controls whether parameters are bijectively mapped from their
     constrained support (e.g., a simplex or positive reals) to all of ℝⁿ.  Set it True when

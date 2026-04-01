@@ -4,6 +4,8 @@
 .. role:: python(code)
     :language: python
 
+.. default-role:: python
+
 .. image:: https://img.shields.io/pypi/v/efax
    :target: https://pypi.org/project/efax/
    :alt: PyPI - Version
@@ -48,7 +50,7 @@ Framework
 =========
 Representation
 --------------
-EFAX has a single base class for its objects: :python:`Distribution` whose type encodes the
+EFAX has a single base class for its objects: `Distribution` whose type encodes the
 distribution family.
 
 Each parametrization object has a shape, and so it can store any number of distributions.
@@ -56,11 +58,11 @@ Operations on these objects are vectorized.
 This is unlike SciPy where each distribution is represented by a single object, and so a thousand
 distributions need a thousand objects, and corresponding calls to functions that operate on them.
 
-All parametrization objects are dataclasses using :python:`tjax.dataclass`.  These dataclasses are
-a modification of Python's dataclasses to support JAX's “PyTree” type registration.
+All parametrization objects are dataclasses using `tjax.dataclass`.  These dataclasses are
+a modification of Python's dataclasses to support JAX's "PyTree" type registration.
 
 Each of the fields of a parametrization object stores a parameter over a specified support.
-Some parameters are marked as “fixed”, which means that they are fixed with respect to the
+Some parameters are marked as "fixed", which means that they are fixed with respect to the
 exponential family.  An example of a fixed parameter is the failure number of the negative binomial
 distribution.
 
@@ -74,17 +76,17 @@ For example:
         negative_half_precision: RealArray = distribution_parameter(SymmetricMatrixSupport())
 
 In this case, we see that there are two natural parameters for the multivariate normal distribution.
-Objects of this type can hold any number of distributions:  if such an object :python:`x` has shape
-:python:`s`, then the shape of
-:python:`x.mean_times_precision` is :python:`(*s, n)` and the shape of
-:python:`x.negative_half_precision` is :python:`(*s, n, n)`.
+Objects of this type can hold any number of distributions:  if such an object `x` has shape
+`s`, then the shape of
+`x.mean_times_precision` is `(*s, n)` and the shape of
+`x.negative_half_precision` is `(*s, n, n)`.
 
 Parametrizations
 ----------------
 Each exponential family distribution has two special parametrizations: the natural and the
 expectation parametrization.  (These are described in the overview pdf.)
 Consequently, every distribution has at least two base classes, one inheriting from
-:python:`NaturalParametrization` and one from :python:`ExpectationParametrization`.
+`NaturalParametrization` and one from `ExpectationParametrization`.
 
 The motivation for the natural parametrization is combining and scaling independent predictive
 evidence.  In the natural parametrization, these operations correspond to scaling and addition.
@@ -94,56 +96,121 @@ maximum likelihood distribution that could have produced them.  In the expectati
 this is an expected value.
 
 EFAX provides conversions between the two parametrizations through the
-:python:`NaturalParametrization.to_exp` and :python:`ExpectationParametrization.to_nat` methods.
+`NaturalParametrization.to_exp` and `ExpectationParametrization.to_nat` methods.
+
+Some distributions also provide additional convenience parametrizations.  For example, the normal
+distribution offers `NormalVP` (variance parametrization) and `NormalDP` (deviation
+parametrization), and the multivariate normal provides `MultivariateNormalVP` and
+`MultivariateDiagonalNormalVP`.  These are not exponential-family parametrizations but are
+useful for constructing and interpreting distributions.
 
 Important methods
 -----------------
 EFAX aims to provide the main methods used in machine learning.
 
-Every :python:`Distribution` has methods:
+Every `Distribution` has:
 
-- :python:`flattened` and :python:`unflattened` to flatten and unflatten the parameters into a
-  single array.  Typically, array-valued signals in a machine learning model would be unflattened
-  into a distribution object, operated on, and then flattened before being sent back to the model.
-  Flattening is careful with distributions with symmetric (or Hermitian) matrix-valued parameters.
-  It only stores the upper triangular elements.  And,
-- :python:`shape`, which supports broadcasting.
+- `shape` and `ndim`, which support broadcasting, and
+- indexing via `[]`, which slices all parameter arrays simultaneously.
 
-Every :python:`NaturalParametrization` has methods:
+Every `NaturalParametrization` has methods:
 
-- :python:`to_exp` to convert itself to expectation parameters.
-- :python:`sufficient_statistics` to produce the sufficient statistics given an observation (used in
+- `to_exp` to convert itself to expectation parameters,
+- `sufficient_statistics` to produce the sufficient statistics given an observation (used in
   maximum likelihood estimation),
-- :python:`pdf` and :python:`log_pdf`, which is the density or mass function and its logarithm,
-- :python:`fisher_information`, which is the Fisher information matrix, and
-- :python:`kl_divergence`, which is the KL divergence.
+- `log_normalizer`, the log partition function,
+- `carrier_measure`, the base measure,
+- `pdf` and `log_pdf`, which are the density or mass function and its logarithm,
+- `fisher_information_diagonal` and `fisher_information_trace`, which return the
+  diagonal and trace of the Fisher information matrix stored as distribution objects,
+- `apply_fisher_information`, which applies the Fisher information matrix to a vector of
+  expectation parameters efficiently in a single VJP pass,
+- `jeffreys_prior_density`, which returns the square root of the Fisher information
+  determinant,
+- `characteristic_function`, which evaluates the characteristic function of the sufficient
+  statistics via analytic continuation of the log-normalizer, and
+- `kl_divergence`, which is the KL divergence.
 
-Every :python:`ExpectationParametrization` has methods:
+Every `ExpectationParametrization` has methods:
 
-- :python:`to_nat` to convert itself to natural parameters, and
-- :python:`kl_divergence`, which is the KL divergence.
+- `to_nat` to convert itself to natural parameters, and
+- `kl_divergence`, which is the KL divergence.
 
 Some parametrizations inherit from these interfaces:
 
-- :python:`HasConjugatePrior` can produce the conjugate prior,
-- :python:`HasGeneralizedConjugatePrior` can produce a generalization of the conjugate prior,
-- :python:`Multidimensional` distributions have a integer number of `dimensions`, and
-- :python:`Samplable` distributions support sampling.
+- `HasConjugatePrior` can produce and recover the conjugate prior,
+- `HasGeneralizedConjugatePrior` extends that with per-dimension pseudo-observation counts,
+- `Multidimensional` distributions have an integer number of `dimensions`, and
+- `Samplable` distributions support sampling.
 
 Some parametrizations inherit from these public mixins:
 
-- :python:`HasEntropyEP` is an expectation parametrization with an entropy and cross entropy, and
-- :python:`HasEntropyNP` is a natural parametrization with an entropy,  (The cross entropy is not
-  efficient.)
+- `HasEntropy` is a distribution with a `entropy` method,
+- `HasEntropyEP` is an expectation parametrization with analytically tractable entropy and
+  `cross_entropy`, and
+- `HasEntropyNP` is a natural parametrization with analytically tractable entropy via the
+  paired expectation parametrization.
 
 Some parametrizations inherit from these private mixins:
 
-- :python:`ExpToNat` implements the conversion from expectation to natural parameters when no
+- `ExpToNat` implements the conversion from expectation to natural parameters when no
   analytical solution is possible.  It uses Newton's method with a Jacobian to invert the gradient
   log-normalizer.
-- :python:`TransformedNaturalParametrization` produces a natural parametrization by relating it to
+- `TransformedNaturalParametrization` produces a natural parametrization by relating it to
   an existing natural parametrization.  And similarly for
-  :python:`TransformedExpectationParametrization`.
+  `TransformedExpectationParametrization`.
+
+Joint distributions
+-------------------
+`JointDistribution`, `JointDistributionE`, and `JointDistributionN` compose
+multiple independent distributions into a single object.  `JointDistributionE` holds
+expectation parametrizations and implements `HasEntropyEP`; `JointDistributionN`
+holds natural parametrizations.  They support the same `to_nat` / `to_exp`
+conversions as simple distributions.
+
+Structure utilities
+-------------------
+EFAX provides three classes that capture the static metadata of a distribution tree—its types,
+parameter names, and dimension information—without requiring a live instance.  They form an
+inheritance hierarchy:
+
+**Assembler**
+  Stores a post-order traversal of a `Distribution` tree (types, paths, dimensions) so
+  that distributions can be reconstructed from raw parameter data without passing type information
+  alongside arrays.  Key methods:
+
+  - `assemble(params)` — rebuild a `Distribution` from a `{path: array}` mapping,
+  - `coerce_from_distribution(q)` — reinterpret q's numeric values under this Assembler's types,
+  - `domain_support()` — enumerate each leaf distribution's parameter constraints,
+  - `generate_random(xp, rng, shape, safety)` — draw a random distribution with valid parameters, and
+  - `to_nat()` / `to_exp()` — return a copy whose types are all in natural or expectation form.
+
+**Estimator** *(extends Assembler)*
+  Adds maximum likelihood estimation by recording which parameters are fixed (held constant across
+  observations) and which are free.  Because the MLE for every exponential family equals the mean
+  of the sufficient statistics, estimation reduces to a single call:
+
+  - `sufficient_statistics(x)` — compute the sufficient statistics of observation x, with
+    fixed parameters supplied automatically.
+
+  Create one with `Estimator.from_type(type_p, **fixed)`,
+  `Estimator.from_expectation(p)`, or `Estimator.from_natural(p)`.
+
+**Flattener** *(extends Estimator)*
+  Adds encoding and decoding between a `Distribution` and an array of shape
+  `(*distribution.shape, k)`, making distributions compatible with neural networks and numerical
+  optimizers.  Fixed parameters are excluded from the encoded array and reinserted automatically
+  on decode.
+
+  - `Flattener.flatten(p, mapped_to_plane=True)` — encode p into a `(Flattener, array)` pair,
+  - `unflatten(array)` — decode the array back into a distribution, and
+  - `final_dimension_size()` — the size k of the last axis of the encoded array.
+
+  The `mapped_to_plane` flag controls whether constrained parameters (e.g., those on a
+  simplex or restricted to the positive reals) are bijectively mapped to all of ℝⁿ.  Set it
+  `True` when passing to a neural network (to prevent invalid outputs), and `False`
+  when the raw magnitudes matter—for example when differencing expectation parameters or computing
+  Jacobians.
 
 Distributions
 =============
@@ -216,6 +283,11 @@ EFAX supports the following distributions:
 - on the n-sphere:
 
   - von Mises-Fisher
+  - complex von Mises
+
+- on positive-definite matrices:
+
+  - Wishart
 
 Usage
 =====
@@ -404,7 +476,7 @@ instead.
     likelihood estimation.
 
     Suppose you have some samples from a distribution family with unknown
-    parameters, and you want to estimate the maximum likelihood parmaters of the
+    parameters, and you want to estimate the maximum likelihood parameters of the
     distribution.
     """
     import jax.numpy as jnp
@@ -424,9 +496,9 @@ instead.
 
     # Now, let's find the maximum likelihood Dirichlet distribution that fits it.
     # First, convert the samples to their sufficient statistics.
-    estimator = Estimator.create_simple_estimator(DirichletEP)
+    estimator = Estimator.from_type(DirichletEP)
     ss = estimator.sufficient_statistics(samples)
-    # ss has type DirichletEP.  This is similar to the conjguate prior of the
+    # ss has type DirichletEP.  This is similar to the conjugate prior of the
     # Dirichlet distribution.
 
     # Take the mean over the first axis.
