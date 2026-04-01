@@ -21,23 +21,23 @@ SP = TypeVar("SP", bound=SimpleDistribution, default=Any)
 
 @dataclass
 class Flattener(Estimator[P]):
-    """This class can flatten and unflatten distributions.
+    """An Estimator that also converts distributions to and from flat arrays.
 
-    The flattener can optionally map the values to and from the full plane.  This is useful when
-    implementing machine learning algorithms since the variables parameters are the inputs and
-    outputs of neural networks.  We don't want catastrophic results when the neural network produces
-    values that are outside the support.
+    Extends Estimator with the ability to encode a Distribution as a dense 1D array and decode
+    it back, making distributions compatible with neural networks and numerical optimizers.
+    Fixed parameters are excluded from the flat array and reinserted automatically on decode.
 
-    Examples where we want to disable mapping to the plane include:
-    * The ExpToNat subtracts flattened expectation parameters to calculate the gradient wrt to
-      the natural parameters.
-    * The Fisher information matrix and the Jacobian matrix are calculated wrt to flattened
-      parameters, and flattened outputs.
+    The mapped_to_plane flag controls whether parameters are bijectively mapped from their
+    constrained support (e.g., a simplex or positive reals) to all of ℝⁿ.  Set it True when
+    interfacing with a neural network (to prevent invalid outputs from causing catastrophic
+    failures), and False when the flat values should reflect true parameter magnitudes — for
+    example when differencing expectation parameters or computing Fisher information and Jacobians.
     """
 
     mapped_to_plane: bool = field(static=True)
 
     def final_dimension_size(self) -> int:
+        """Return the total length of the flat array produced by flatten."""
         return sum(
             support.num_elements(info.dimensions)
             for info in self.infos
@@ -45,11 +45,11 @@ class Flattener(Estimator[P]):
         )
 
     def unflatten(self, flattened: JaxRealArray, *, return_vector: bool = False) -> P:
-        """Unflatten an array into a Distribution.
+        """Decode a flat array back into a Distribution, reinserting fixed parameters.
 
         Args:
-            flattened: The flattened array.
-            return_vector: If true, reshape the array so that a vector is returned.
+            flattened: The flat array produced by flatten.
+            return_vector: If true, reshape the leading dimensions so that a vector is returned.
         """
         xp = array_namespace(flattened)
         if return_vector:
@@ -87,14 +87,17 @@ class Flattener(Estimator[P]):
 
     @classmethod
     def flatten(cls, p: P, *, map_to_plane: bool = True) -> tuple[Self, JaxRealArray]:
-        """Flatten a Distribution.
+        """Encode a Distribution as a (Flattener, flat_array) pair.
+
+        Returns both the flat array and the Flattener needed to decode it.  Fixed parameters
+        are stored in the Flattener rather than the array.
 
         Args:
-            p: The object to flatten.
-            map_to_plane: Whether to map the individual parameters to the plane.  It should be false
-                if flattening when the meaning of the flattened parameters should reflect parameter
-                values (e.g., when taking a different of expectation parameters).  It should be true
-                when passing to a neural network.
+            p: The distribution to encode.
+            map_to_plane: Whether to bijectively map constrained parameters to all of ℝⁿ.
+                Set False when the flat values should reflect true parameter magnitudes, e.g.,
+                when differencing expectation parameters or computing gradients.
+                Set True when passing to a neural network.
         """
         xp = array_namespace(p)
         arrays = [
@@ -129,12 +132,17 @@ class Flattener(Estimator[P]):
         override_unflattened_type: type[SP] | None = None,
         mapped_to_plane: bool = True,
     ) -> "Flattener[SP]":
-        """Create a Flattener.
+        """Create a Flattener from a simple distribution instance.
+
+        Captures p's dimensions and fixed parameters without performing any encoding.
+        Use this when you want to reuse the same Flattener across many unflatten calls
+        (e.g., inside a training loop) rather than calling flatten each time.
 
         Args:
-            p: The object from which to get dimensions and fixed parameters.
-            override_unflattened_type: The type of the returned Flattener.
-            mapped_to_plane: Whether the flattener should map from the plane.
+            p: The distribution from which to extract dimensions and fixed parameters.
+            override_unflattened_type: If provided, the Flattener will decode to this type
+                instead of type(p).
+            mapped_to_plane: Whether unflatten should apply the inverse plane mapping.
         """
         if p.sub_distributions():
             raise ValueError

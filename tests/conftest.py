@@ -12,6 +12,7 @@ from numpy.random import Generator as NumpyGenerator
 from tjax import KeyArray
 
 from efax import (
+    Assembler,
     BooleanRing,
     HasConjugatePrior,
     HasEntropyEP,
@@ -20,7 +21,6 @@ from efax import (
     IntegralRing,
     JointDistribution,
     Samplable,
-    Structure,
 )
 
 from .create_info import GeneralizedDirichletInfo, create_infos
@@ -75,13 +75,13 @@ def distribution_name(request: pytest.FixtureRequest) -> str | None:
     return request.config.getoption("--distribution")
 
 
-def supports(s: Structure, abc: type[Any]) -> bool:
+def supports(s: Assembler, abc: type[Any]) -> bool:
     return all(
         issubclass(info.type_, abc) or issubclass(info.type_, JointDistribution) for info in s.infos
     )
 
 
-def any_integral_supports(structure: Structure) -> bool:
+def any_integral_supports(structure: Assembler) -> bool:
     return any(
         isinstance(s.ring, BooleanRing | IntegralRing) for s in structure.domain_support().values()
     )

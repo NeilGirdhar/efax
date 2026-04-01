@@ -10,6 +10,7 @@ import scipy.stats as ss
 from tjax import JaxRealArray, NumpyComplexArray, NumpyRealArray, abs_square
 
 from efax import (
+    Assembler,
     BernoulliEP,
     BernoulliNP,
     BetaEP,
@@ -70,7 +71,6 @@ from efax import (
     RayleighNP,
     SoftplusNormalEP,
     SoftplusNormalNP,
-    Structure,
     SubDistributionInfo,
     UnitVarianceLogNormalEP,
     UnitVarianceLogNormalNP,
@@ -433,7 +433,7 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
         }
 
     @override
-    def exp_structure(self) -> Structure[JointDistributionE]:
+    def exp_structure(self) -> Assembler[JointDistributionE]:
         infos = []
         for name, info in self.infos.items():
             infos.extend(
@@ -450,10 +450,10 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
         infos.append(
             SubDistributionInfo((), self.exp_class(), self.dimensions, list(self.infos.keys()))
         )
-        return Structure(infos)
+        return Assembler(infos)
 
     @override
-    def nat_structure(self) -> Structure[JointDistributionN]:
+    def nat_structure(self) -> Assembler[JointDistributionN]:
         infos = []
         for name, info in self.infos.items():
             infos.extend(
@@ -470,7 +470,7 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
         infos.append(
             SubDistributionInfo((), self.nat_class(), self.dimensions, list(self.infos.keys()))
         )
-        return Structure(infos)
+        return Assembler(infos)
 
     @override
     def exp_class(self) -> type[JointDistributionE]:

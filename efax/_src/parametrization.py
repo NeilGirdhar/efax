@@ -18,10 +18,10 @@ class Distribution(JaxAbstractClass):
 
     def __getitem__(self, key: tuple[int | slice | EllipsisType | None, ...]) -> Self:
         from .iteration import parameters  # noqa: PLC0415
-        from .structure.structure import Structure  # noqa: PLC0415
+        from .structure.assembler import Assembler  # noqa: PLC0415
 
         parameters_ = {path: value[key] for path, value in parameters(self).items()}
-        return Structure.create(self).assemble(parameters_)
+        return Assembler.create(self).assemble(parameters_)
 
     @abstractmethod
     def sub_distributions(self) -> Mapping[str, Distribution]:

@@ -30,27 +30,33 @@ P = TypeVar("P", bound=Distribution, default=Any)
 
 
 @dataclass
-class Structure(Generic[P]):
-    """This class generalizes the notion of type for Distribution objects.
+class Assembler(Generic[P]):
+    """Holds enough static information about a Distribution tree to reassemble one from raw data.
 
-    Structure implements a variety of functions that would normally be class methods, but can't be
-    because of missing information in a class.  Specifically:
-    * Assemble a Distribution from its parameters using the saved structure.
-    * Reinterpret a distribution in one parametrization using the saved structure.
-    * Get the domain support, which may require the structure for joint distributions.
-    * Generate a random set of parameters for a distribution having the saved structure.
+    Distribution classes alone lack the context needed to reconstruct themselves — for example, a
+    joint distribution must know the concrete types of its sub-distributions at reconstruction time.
+    Assembler captures that metadata (types, paths, dimensions) in a post-order traversal of the
+    tree, enabling operations that would otherwise require a live instance:
 
-    Structure is also the base class for Flattener.
+    * Reassemble a Distribution from its parameters (assemble).
+    * Reinterpret parameter values from one parametrization as another (reinterpret).
+    * Enumerate domain support constraints (domain_support).
+    * Generate a random distribution with valid parameters (generate_random).
+
+    Assembler is the base class for Estimator, which extends it with parameter estimation,
+    and Flattener, which extends Estimator with vectorization.
     """
 
     # A post-order traversal of the tree.
     infos: list[SubDistributionInfo] = field(static=True)
 
     @classmethod
-    def create(cls, p: P) -> "Structure[P]":
-        return Structure(cls._extract_distributions(p))
+    def create(cls, p: P) -> "Assembler[P]":
+        """Create an Assembler by extracting the distribution tree structure from p."""
+        return Assembler(cls._extract_distributions(p))
 
-    def to_nat(self) -> "Structure":
+    def to_nat(self) -> "Assembler":
+        """Return a copy with distribution types converted to their natural parametrization."""
         from efax._src.expectation_parametrization import (  # noqa: PLC0415
             ExpectationParametrization,
         )
@@ -66,9 +72,10 @@ class Structure(Generic[P]):
                     info.sub_distribution_names,
                 )
             )
-        return Structure(infos)
+        return Assembler(infos)
 
-    def to_exp(self) -> "Structure":
+    def to_exp(self) -> "Assembler":
+        """Return a copy with distribution types converted to their expectation parametrization."""
         from efax._src.natural_parametrization import NaturalParametrization  # noqa: PLC0415
 
         infos: list[SubDistributionInfo] = []
@@ -82,10 +89,14 @@ class Structure(Generic[P]):
                     info.sub_distribution_names,
                 )
             )
-        return Structure(infos)
+        return Assembler(infos)
 
     def assemble(self, p: Mapping[Path, JaxComplexArray]) -> P:
-        """Assemble a Distribution from its parameters using the saved structure."""
+        """Reassemble a Distribution from a mapping of paths to parameter arrays.
+
+        This is the core operation: given the raw parameter values (keyed by their paths in the
+        distribution tree), reconstruct the full Distribution object using the stored type metadata.
+        """
         constructed: dict[Path, Distribution | JaxComplexArray] = dict(p)
         for info in self.infos:
             kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = {
@@ -102,7 +113,12 @@ class Structure(Generic[P]):
         return cast("P", retval)
 
     def reinterpret(self, q: Distribution) -> P:
-        """Reinterpret a distribution in one parametrization using the saved structure."""
+        """Reinterpret q's parameter values as belonging to this Assembler's distribution types.
+
+        Grafts the raw parameter arrays from q onto the type schema stored in this Assembler,
+        producing a distribution of type P with q's numeric values.  Useful for switching
+        between parametrizations when the parameter layouts are known to match.
+        """
         p_paths = [
             (*info.path, name) for info in self.infos for name in parameter_names(info.type_)
         ]
@@ -111,7 +127,7 @@ class Structure(Generic[P]):
         return self.assemble(q_params_as_p)
 
     def domain_support(self) -> dict[Path, Support]:
-        """Get the domain support, which may require the structure for joint distributions."""
+        """Return the domain support constraints for each simple sub-distribution in the tree."""
         return {
             info.path: info.type_.domain_support()
             for info in self.infos
@@ -119,7 +135,7 @@ class Structure(Generic[P]):
         }
 
     def generate_random(self, xp: Namespace, rng: Generator, shape: Shape, safety: float) -> P:
-        """Generate a random distribution."""
+        """Generate a random distribution with parameters drawn from each parameter's support."""
         path_and_values: dict[tuple[str, ...], JaxRealArray] = {}
         for info in self.infos:
             for name, support, value_receptacle in parameter_supports(info.type_):

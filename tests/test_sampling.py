@@ -10,6 +10,7 @@ from numpy.random import Generator
 from tjax import JaxArray, JaxComplexArray, KeyArray, Shape, assert_tree_allclose
 
 from efax import (
+    Assembler,
     Distribution,
     Estimator,
     ExpectationParametrization,
@@ -18,7 +19,6 @@ from efax import (
     NaturalParametrization,
     Samplable,
     SimpleDistribution,
-    Structure,
     flat_dict_of_observations,
     flat_dict_of_parameters,
     flatten_mapping,
@@ -71,7 +71,7 @@ def _produce_samples(
 def _verify_sample_shape(
     distribution_shape: Shape,
     sample_shape: Shape,
-    structure: Structure[ExpectationParametrization],
+    structure: Assembler[ExpectationParametrization],
     flat_map_of_samples: Mapping[_Path, Any],
 ) -> None:
     ideal_samples_shape = {
@@ -92,7 +92,7 @@ def _verify_maximum_likelihood_estimate(
         NaturalParametrization, ExpectationParametrization, Any
     ],
     sample_shape: Shape,
-    structure: Structure[ExpectationParametrization],
+    structure: Assembler[ExpectationParametrization],
     exp_parameters: ExpectationParametrization,
     samples: dict[str, Any] | JaxComplexArray,
 ) -> None:
@@ -142,7 +142,7 @@ def test_sampling_and_estimation(
         natural=natural,
     )
     flat_map_of_samples = flat_dict_of_observations(samples)
-    structure = Structure.create(exp_parameters)
+    structure = Assembler.create(exp_parameters)
     flat_map_of_samples = (
         {(): samples} if isinstance(samples, JaxArray) else flatten_mapping(samples)
     )

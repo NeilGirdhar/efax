@@ -10,7 +10,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import JaxRealArray, assert_tree_allclose, jit
 
-from efax import NaturalParametrization, Structure, parameters
+from efax import Assembler, NaturalParametrization, parameters
 
 from .distribution_info import DistributionInfo
 
@@ -45,7 +45,7 @@ def test_primals(generator: Generator, distribution_info: DistributionInfo) -> N
         generated_np = distribution_info.nat_parameter_generator(generator, shape=())
         generated_ep = generated_np.to_exp()  # Regular transformation.
         generated_parameters = parameters(generated_ep, fixed=False)
-        structure_ep = Structure.create(generated_ep)
+        structure_ep = Assembler.create(generated_ep)
 
         # Original GLN.
         original_gln_np = original_gln(generated_np)
@@ -72,7 +72,7 @@ def _unit_tangent(nat_parameters: NaturalParametrization) -> NaturalParametrizat
         path: zero_from_primal(value, symbolic_zeros=False)
         for path, value in parameters(nat_parameters, fixed=True).items()
     }
-    structure = Structure.create(nat_parameters)
+    structure = Assembler.create(nat_parameters)
     return structure.assemble({**new_variable_parameters, **new_fixed_parameters})
 
 

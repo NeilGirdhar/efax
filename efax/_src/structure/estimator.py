@@ -9,8 +9,8 @@ from efax._src.iteration import flatten_mapping, parameters
 from efax._src.parametrization import Distribution, SimpleDistribution
 from efax._src.types import Path
 
+from .assembler import Assembler, SubDistributionInfo
 from .parameter_names import parameter_names
-from .structure import Structure, SubDistributionInfo
 
 if TYPE_CHECKING:
     from efax._src.natural_parametrization import NaturalParametrization
@@ -22,10 +22,14 @@ SP = TypeVar("SP", bound=SimpleDistribution)
 
 
 @dataclass
-class Estimator(Structure[P]):
-    """This class does maximum likelihood estimation.
+class Estimator(Assembler[P]):
+    """An Assembler that also performs maximum likelihood estimation.
 
-    To do this, it needs to store the structure and the fixed parameters.
+    Extends Assembler by tracking which parameters are fixed (held constant during estimation)
+    and providing operations to estimate the free parameters from observed data.
+
+    In exponential family distributions, maximum likelihood estimation reduces to computing
+    sufficient statistics, making sufficient_statistics the core estimation operation.
     """
 
     fixed_parameters: dict[Path, JaxComplexArray]
@@ -34,9 +38,10 @@ class Estimator(Structure[P]):
     def create_simple_estimator(
         cls, type_p: type[SP], **fixed_parameters: JaxArray
     ) -> "Estimator[SP]":
-        """Create an estimator for a simple expectation parametrization class.
+        """Create an Estimator for a simple ExpectationParametrization class.
 
-        This doesn't work with things like JointDistributionE.
+        Use this when you have a type rather than an instance.  Does not work with composite
+        distributions such as JointDistributionE.
         """
         from efax._src.expectation_parametrization import (  # noqa: PLC0415
             ExpectationParametrization,
@@ -50,7 +55,11 @@ class Estimator(Structure[P]):
 
     @classmethod
     def create_estimator(cls, p: P) -> Self:
-        """Create an estimator for an expectation parametrization."""
+        """Create an Estimator from an expectation-parametrized distribution.
+
+        Extracts the distribution tree structure from p and records which of its parameters
+        are marked fixed, so they will be held constant during estimation.
+        """
         from efax._src.expectation_parametrization import (  # noqa: PLC0415
             ExpectationParametrization,
         )
@@ -62,12 +71,22 @@ class Estimator(Structure[P]):
 
     @classmethod
     def create_estimator_from_natural(cls, p: "NP") -> "Estimator[NP]":
-        """Create an estimator for a natural parametrization."""
+        """Create an Estimator from a natural-parametrized distribution.
+
+        Converts the distribution tree to expectation parametrization types while preserving
+        the fixed parameter values from p.
+        """
         infos = Estimator.create(p).to_exp().infos  # type: ignore
         fixed_parameters = parameters(p, fixed=True)
         return Estimator(infos, fixed_parameters)
 
     def sufficient_statistics(self, x: dict[str, Any] | JaxComplexArray) -> P:
+        """Compute the sufficient statistics of observation x.
+
+        In exponential family distributions, sufficient statistics are exactly the MLE parameter
+        estimates, so this is the primary estimation operation.  Fixed parameters are supplied
+        automatically from this Estimator's stored values.
+        """
         from efax._src.expectation_parametrization import (  # noqa: PLC0415
             ExpectationParametrization,
         )
@@ -115,6 +134,12 @@ class Estimator(Structure[P]):
     def from_conjugate_prior_distribution(
         self, cp: "NaturalParametrization"
     ) -> tuple[P, JaxRealArray]:
+        """Recover distribution parameters and observation count from a conjugate prior.
+
+        Given a conjugate prior distribution cp, returns the distribution p whose parameters
+        are encoded in cp together with the pseudo-observation count n.  Fixed parameters are
+        supplied automatically from this Estimator's stored values.
+        """
         from efax._src.interfaces.conjugate_prior import HasConjugatePrior  # noqa: PLC0415
         from efax._src.transform.joint import JointDistributionN  # noqa: PLC0415
 

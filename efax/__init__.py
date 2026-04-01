@@ -92,13 +92,14 @@ from ._src.parameter.support import (
     VectorSupport,
 )
 from ._src.parametrization import Distribution, SimpleDistribution
+from ._src.structure.assembler import Assembler, SubDistributionInfo
 from ._src.structure.estimator import Estimator
 from ._src.structure.flattener import Flattener
-from ._src.structure.structure import Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
 from ._src.transform.joint import JointDistribution, JointDistributionE, JointDistributionN
 
 __all__ = [
+    "Assembler",
     "BernoulliEP",
     "BernoulliNP",
     "BetaEP",
@@ -187,7 +188,6 @@ __all__ = [
     "SoftplusNormalEP",
     "SoftplusNormalNP",
     "SquareMatrixSupport",
-    "Structure",
     "SubDistributionInfo",
     "Support",
     "SymmetricMatrixSupport",

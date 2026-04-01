@@ -10,9 +10,9 @@ from tjax import JaxComplexArray, NumpyComplexArray, Shape
 from typing_extensions import TypeVar
 
 from efax import (
+    Assembler,
     ExpectationParametrization,
     NaturalParametrization,
-    Structure,
     SubDistributionInfo,
 )
 
@@ -66,11 +66,11 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         """
         return jnp.asarray(x)
 
-    def exp_structure(self) -> Structure[EP]:
-        return Structure([SubDistributionInfo((), self.exp_class(), self.dimensions, [])])
+    def exp_structure(self) -> Assembler[EP]:
+        return Assembler([SubDistributionInfo((), self.exp_class(), self.dimensions, [])])
 
-    def nat_structure(self) -> Structure[NP]:
-        return Structure([SubDistributionInfo((), self.nat_class(), self.dimensions, [])])
+    def nat_structure(self) -> Assembler[NP]:
+        return Assembler([SubDistributionInfo((), self.nat_class(), self.dimensions, [])])
 
     def exp_class(self) -> type[EP]:
         raise NotImplementedError

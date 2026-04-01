@@ -21,9 +21,9 @@ from typing_extensions import TypeVar
 
 from .iteration import parameters
 from .parametrization import Distribution
+from .structure.assembler import Assembler
 from .structure.estimator import Estimator
 from .structure.flattener import Flattener
-from .structure.structure import Structure
 from .tools import parameter_dot_product
 
 if TYPE_CHECKING:
@@ -146,7 +146,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
         """
         xp = array_namespace(self)
         fisher_information_diagonal = self.fisher_information_diagonal()
-        structure = Structure.create(self)
+        structure = Assembler.create(self)
         final_parameters = parameters(self)
         for path, (value, support) in parameters(fisher_information_diagonal, support=True).items():
             na = support.axes()
