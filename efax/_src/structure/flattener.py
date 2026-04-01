@@ -11,7 +11,7 @@ from efax._src.iteration import parameters
 from efax._src.parametrization import Distribution, SimpleDistribution
 from efax._src.types import Path
 
-from .estimator import MaximumLikelihoodEstimator
+from .estimator import Estimator
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
 
@@ -20,7 +20,7 @@ SP = TypeVar("SP", bound=SimpleDistribution, default=Any)
 
 
 @dataclass
-class Flattener(MaximumLikelihoodEstimator[P]):
+class Flattener(Estimator[P]):
     """This class can flatten and unflatten distributions.
 
     The flattener can optionally map the values to and from the full plane.  This is useful when

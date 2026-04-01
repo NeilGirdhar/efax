@@ -11,9 +11,9 @@ from tjax import JaxArray, JaxComplexArray, KeyArray, Shape, assert_tree_allclos
 
 from efax import (
     Distribution,
+    Estimator,
     ExpectationParametrization,
     JointDistribution,
-    MaximumLikelihoodEstimator,
     Multidimensional,
     NaturalParametrization,
     Samplable,
@@ -111,7 +111,7 @@ def _verify_maximum_likelihood_estimate(
     rtol = 4e-2
     sample_axes = tuple(range(len(sample_shape)))
     newaxes = (jnp.newaxis,) * len(sample_shape)
-    estimator = MaximumLikelihoodEstimator.create_estimator(exp_parameters[*newaxes, ...])
+    estimator = Estimator.create_estimator(exp_parameters[*newaxes, ...])
     sampled_exp_parameters = estimator.sufficient_statistics(samples)
     maximum_likelihood_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
     assert_tree_allclose(maximum_likelihood_parameters, exp_parameters, rtol=rtol, atol=atol)

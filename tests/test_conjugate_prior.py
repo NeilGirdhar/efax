@@ -6,7 +6,7 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose
 
-from efax import HasConjugatePrior, HasGeneralizedConjugatePrior, MaximumLikelihoodEstimator
+from efax import Estimator, HasConjugatePrior, HasGeneralizedConjugatePrior
 
 from .distribution_info import DistributionInfo
 
@@ -57,7 +57,7 @@ def test_from_conjugate_prior(
 
     # Find its conjugate prior at that point with many observations.
     cp_q = p.conjugate_prior_distribution(n)
-    p_estimator = MaximumLikelihoodEstimator.create_estimator(p)
+    p_estimator = Estimator.create_estimator(p)
     p_prime, n_prime = p_estimator.from_conjugate_prior_distribution(cp_q)
     assert_tree_allclose(p, p_prime, atol=1.5)
     assert_allclose(n, n_prime, atol=1.5)

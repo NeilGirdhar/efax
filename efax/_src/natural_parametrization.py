@@ -21,7 +21,7 @@ from typing_extensions import TypeVar
 
 from .iteration import parameters
 from .parametrization import Distribution
-from .structure.estimator import MaximumLikelihoodEstimator
+from .structure.estimator import Estimator
 from .structure.flattener import Flattener
 from .structure.structure import Structure
 from .tools import parameter_dot_product
@@ -116,7 +116,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
         Args:
             x: The sample.
         """
-        estimator = MaximumLikelihoodEstimator.create_estimator_from_natural(self)
+        estimator = Estimator.create_estimator_from_natural(self)
         tx = estimator.sufficient_statistics(x)
         return parameter_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 

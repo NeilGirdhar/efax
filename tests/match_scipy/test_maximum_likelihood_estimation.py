@@ -9,7 +9,7 @@ from numpy.random import Generator
 from tjax import assert_tree_allclose
 
 from efax import (
-    MaximumLikelihoodEstimator,
+    Estimator,
     NaturalParametrization,
     flat_dict_of_observations,
     flat_dict_of_parameters,
@@ -66,7 +66,7 @@ def test_maximum_likelihood_estimation(
         if flat_efax_x_clamped.keys() == {()}
         else unflatten_mapping(flat_efax_x_clamped)
     )
-    estimator = MaximumLikelihoodEstimator.create_estimator(exp_parameters)
+    estimator = Estimator.create_estimator(exp_parameters)
     sufficient_stats = estimator.sufficient_statistics(efax_x_clamped)
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.

@@ -411,7 +411,7 @@ instead.
     import jax.random as jr
     from tjax import print_generic
 
-    from efax import DirichletEP, DirichletNP, MaximumLikelihoodEstimator, parameter_mean
+    from efax import DirichletEP, DirichletNP, Estimator, parameter_mean
 
     # Consider a Dirichlet distribution with a given alpha.
     alpha = jnp.asarray([2.0, 3.0, 4.0])
@@ -424,7 +424,7 @@ instead.
 
     # Now, let's find the maximum likelihood Dirichlet distribution that fits it.
     # First, convert the samples to their sufficient statistics.
-    estimator = MaximumLikelihoodEstimator.create_simple_estimator(DirichletEP)
+    estimator = Estimator.create_simple_estimator(DirichletEP)
     ss = estimator.sufficient_statistics(samples)
     # ss has type DirichletEP.  This is similar to the conjguate prior of the
     # Dirichlet distribution.

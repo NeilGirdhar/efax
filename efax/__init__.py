@@ -92,7 +92,7 @@ from ._src.parameter.support import (
     VectorSupport,
 )
 from ._src.parametrization import Distribution, SimpleDistribution
-from ._src.structure.estimator import MaximumLikelihoodEstimator
+from ._src.structure.estimator import Estimator
 from ._src.structure.flattener import Flattener
 from ._src.structure.structure import Structure, SubDistributionInfo
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
@@ -123,6 +123,7 @@ __all__ = [
     "DirichletEP",
     "DirichletNP",
     "Distribution",
+    "Estimator",
     "ExpectationParametrization",
     "ExponentialEP",
     "ExponentialNP",
@@ -153,7 +154,6 @@ __all__ = [
     "LogNormalNP",
     "LogarithmicEP",
     "LogarithmicNP",
-    "MaximumLikelihoodEstimator",
     "Multidimensional",
     "MultinomialEP",
     "MultinomialNP",

@@ -22,7 +22,7 @@ SP = TypeVar("SP", bound=SimpleDistribution)
 
 
 @dataclass
-class MaximumLikelihoodEstimator(Structure[P]):
+class Estimator(Structure[P]):
     """This class does maximum likelihood estimation.
 
     To do this, it needs to store the structure and the fixed parameters.
@@ -33,7 +33,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
     @classmethod
     def create_simple_estimator(
         cls, type_p: type[SP], **fixed_parameters: JaxArray
-    ) -> "MaximumLikelihoodEstimator[SP]":
+    ) -> "Estimator[SP]":
         """Create an estimator for a simple expectation parametrization class.
 
         This doesn't work with things like JointDistributionE.
@@ -43,7 +43,7 @@ class MaximumLikelihoodEstimator(Structure[P]):
         )
 
         assert issubclass(type_p, ExpectationParametrization)
-        return MaximumLikelihoodEstimator(
+        return Estimator(
             [SubDistributionInfo((), type_p, 0, [])],
             {(name,): value for name, value in fixed_parameters.items()},
         )
@@ -61,11 +61,11 @@ class MaximumLikelihoodEstimator(Structure[P]):
         return cls(infos, fixed_parameters)
 
     @classmethod
-    def create_estimator_from_natural(cls, p: "NP") -> "MaximumLikelihoodEstimator[NP]":
+    def create_estimator_from_natural(cls, p: "NP") -> "Estimator[NP]":
         """Create an estimator for a natural parametrization."""
-        infos = MaximumLikelihoodEstimator.create(p).to_exp().infos  # type: ignore
+        infos = Estimator.create(p).to_exp().infos  # type: ignore
         fixed_parameters = parameters(p, fixed=True)
-        return MaximumLikelihoodEstimator(infos, fixed_parameters)
+        return Estimator(infos, fixed_parameters)
 
     def sufficient_statistics(self, x: dict[str, Any] | JaxComplexArray) -> P:
         from efax._src.expectation_parametrization import (  # noqa: PLC0415
