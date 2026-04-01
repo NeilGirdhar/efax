@@ -42,7 +42,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
             retval[i] = (
-                this_object.sample(shape=shape, rng=rng)
+                this_object.sample(shape=shape, rng=rng)  # ty: ignore
                 if hasattr(this_object, "sample")
                 else this_object.rvs(size=shape, random_state=rng)
             )
@@ -65,7 +65,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
                 else:
                     x_ij = x[*i, *j]
                     assert x_ij.ndim == 0
-                value = this_object.pdf(x_ij)
+                value = this_object.pdf(x_ij)  # ty: ignore
                 retval[*i, *j] = value
         return retval
 
@@ -77,7 +77,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
             if not hasattr(this_object, "pmf"):
                 raise NotImplementedError
             for j in np.ndindex(*x.shape[self.ndim :]):
-                value = this_object.pmf(x[*i, *j])
+                value = this_object.pmf(x[*i, *j])  # ty: ignore
                 retval[*i, *j] = value
         return retval
 
@@ -85,7 +85,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
-            retval[i] = this_object.entropy()
+            retval[i] = this_object.entropy()  # ty: ignore
         return retval
 
     def access_object(self, index: tuple[int, ...]) -> T:

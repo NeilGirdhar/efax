@@ -49,7 +49,7 @@ class VonMisesFisherNP(
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
-        half_k = self.dimensions() * 0.5
+        half_k = xp.asarray(self.dimensions() * 0.5)
         kappa = xp.linalg.vector_norm(self.mean_times_concentration, axis=-1)
         return (
             kappa
