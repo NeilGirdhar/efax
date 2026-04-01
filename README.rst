@@ -254,7 +254,7 @@ EFAX supports the following distributions:
 - on a finite set:
 
   - Bernoulli
-  - multinomial
+  - categorical
 
 - on the nonnegative integers:
 

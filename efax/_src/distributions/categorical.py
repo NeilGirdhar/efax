@@ -22,13 +22,13 @@ from .gen_dirichlet import GeneralizedDirichletNP
 
 
 @dataclass
-class MultinomialNP(
-    HasEntropyNP["MultinomialEP"],
+class CategoricalNP(
+    HasEntropyNP["CategoricalEP"],
     Samplable,
-    NaturalParametrization["MultinomialEP", JaxRealArray],
+    NaturalParametrization["CategoricalEP", JaxRealArray],
     Multidimensional,
 ):
-    """The natural parametrization of the multinomial distribution.
+    """The natural parametrization of the categorical distribution.
 
     Args:
         log_odds: [log(p_i / p_n)]_{i in 1...n-1}.
@@ -55,12 +55,12 @@ class MultinomialNP(
         return max_q + log_scaled_a
 
     @override
-    def to_exp(self) -> MultinomialEP:
+    def to_exp(self) -> CategoricalEP:
         xp = array_namespace(self)
         max_q = xp.maximum(0.0, xp.max(self.log_odds, axis=-1))
         q_minus_max_q = self.log_odds - max_q[..., np.newaxis]
         log_scaled_a = xp.logaddexp(-max_q, jss.logsumexp(q_minus_max_q, axis=-1))
-        return MultinomialEP(xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
+        return CategoricalEP(xp.exp(q_minus_max_q - log_scaled_a[..., np.newaxis]))
 
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
@@ -69,8 +69,8 @@ class MultinomialNP(
 
     @override
     @classmethod
-    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> MultinomialEP:
-        return MultinomialEP(x)
+    def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> CategoricalEP:
+        return CategoricalEP(x)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -102,13 +102,13 @@ class MultinomialNP(
 
 
 @dataclass
-class MultinomialEP(
-    HasEntropyEP[MultinomialNP], Samplable, HasGeneralizedConjugatePrior, Multidimensional
+class CategoricalEP(
+    HasEntropyEP[CategoricalNP], Samplable, HasGeneralizedConjugatePrior, Multidimensional
 ):
-    """The expectation parametrization of the multinomial distribution.
+    """The expectation parametrization of the categorical distribution.
 
     Args:
-        log_odds: The probability vector with the final element omitted, i.e., [p_i]_{i in 1...n-1}.
+        probability: The probability vector with the final element omitted, i.e., [p_i]_{i in 1...n-1}.
     """
 
     probability: JaxRealArray = distribution_parameter(
@@ -127,14 +127,14 @@ class MultinomialEP(
 
     @classmethod
     @override
-    def natural_parametrization_cls(cls) -> type[MultinomialNP]:
-        return MultinomialNP
+    def natural_parametrization_cls(cls) -> type[CategoricalNP]:
+        return CategoricalNP
 
     @override
-    def to_nat(self) -> MultinomialNP:
+    def to_nat(self) -> CategoricalNP:
         xp = array_namespace(self)
         p_k = 1.0 - xp.sum(self.probability, axis=-1, keepdims=True)
-        return MultinomialNP(xp.log(self.probability / p_k))
+        return CategoricalNP(xp.log(self.probability / p_k))
 
     @override
     def expected_carrier_measure(self) -> JaxRealArray:

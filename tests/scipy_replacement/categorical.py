@@ -9,7 +9,7 @@ from tjax import NumpyIntegralArray, NumpyRealArray, Shape
 
 
 @dataclass
-class ScipyMultinomial:
+class ScipyCategorical:
     probabilities: NumpyRealArray
 
     def pmf(self, x: NumpyIntegralArray) -> NumpyRealArray:

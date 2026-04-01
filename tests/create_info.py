@@ -51,8 +51,8 @@ from efax import (
     LogarithmicNP,
     LogNormalEP,
     LogNormalNP,
-    MultinomialEP,
-    MultinomialNP,
+    CategoricalEP,
+    CategoricalNP,
     MultivariateDiagonalNormalEP,
     MultivariateDiagonalNormalNP,
     MultivariateFixedVarianceNormalEP,
@@ -91,7 +91,7 @@ from .scipy_replacement.complex_multivariate_normal import ScipyComplexMultivari
 from .scipy_replacement.complex_normal import ScipyComplexNormal
 from .scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
 from .scipy_replacement.joint import ScipyJointDistribution
-from .scipy_replacement.multinomial import ScipyMultinomial
+from .scipy_replacement.categorical import ScipyCategorical
 from .scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from .scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
 from .scipy_replacement.wishart import ScipyWishart
@@ -553,27 +553,27 @@ class MultivariateFixedVarianceNormalInfo(
         return MultivariateFixedVarianceNormalNP
 
 
-class MultinomialInfo(DistributionInfo[MultinomialNP, MultinomialEP, NumpyRealArray]):
+class CategoricalInfo(DistributionInfo[CategoricalNP, CategoricalEP, NumpyRealArray]):
     def __init__(self, dimensions: int) -> None:
         super().__init__(dimensions=dimensions, safety=0.1)
 
     @override
-    def exp_to_scipy_distribution(self, p: MultinomialEP) -> Any:
+    def exp_to_scipy_distribution(self, p: CategoricalEP) -> Any:
         final_p = 1.0 - np.sum(np.asarray(p.probability), axis=-1, keepdims=True)
         all_p = np.concatenate((np.asarray(p.probability), final_p), axis=-1)
-        return ScipyMultinomial(all_p)
+        return ScipyCategorical(all_p)
 
     @override
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
         return jnp.asarray(x[..., :-1], dtype=jnp.float64)
 
     @override
-    def exp_class(self) -> type[MultinomialEP]:
-        return MultinomialEP
+    def exp_class(self) -> type[CategoricalEP]:
+        return CategoricalEP
 
     @override
-    def nat_class(self) -> type[MultinomialNP]:
-        return MultinomialNP
+    def nat_class(self) -> type[CategoricalNP]:
+        return CategoricalNP
 
 
 class MultivariateNormalInfo(
@@ -839,7 +839,7 @@ def create_infos() -> list[DistributionInfo]:
         LogarithmicInfo(),
         MultivariateDiagonalNormalInfo(dimensions=4),
         MultivariateFixedVarianceNormalInfo(dimensions=2),
-        MultinomialInfo(dimensions=3),
+        CategoricalInfo(dimensions=3),
         MultivariateNormalInfo(dimensions=4),
         MultivariateUnitVarianceNormalInfo(dimensions=5),
         NegativeBinomialInfo(),
