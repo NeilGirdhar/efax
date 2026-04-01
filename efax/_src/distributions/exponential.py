@@ -127,5 +127,5 @@ class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior, Samplable):
         return (cls(-n / cp.negative_rate), n)
 
     @override
-    def conjugate_prior_observation(self) -> JaxRealArray:
+    def as_conjugate_prior_observation(self) -> JaxRealArray:
         return self.mean

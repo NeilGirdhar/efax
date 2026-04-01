@@ -19,7 +19,13 @@ type SP = JaxRealArray
 
 
 class ExpToNatMinimizer:
+    """Strategy that solves the EP-to-NP root-finding problem for an ExpToNat distribution."""
+
     def solve(self, exp_to_nat: ExpToNat) -> SP:
+        """Solve for the natural parameters corresponding to exp_to_nat's expectation parameters.
+
+        Returns a flat array of search parameters (natural parameters in flattened form).
+        """
         raise NotImplementedError
 
 
@@ -34,6 +40,8 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
     minimizer: ExpToNatMinimizer | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
+        # Select a default minimizer based on the dimensionality of the search space.
+        # Bisection is used for scalar problems; Newton's method for vector problems.
         if hasattr(super(), "__post_init__"):
             super().__post_init__()  # pyright: ignore
         if self.minimizer is None:
@@ -51,6 +59,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
     @jit
     @override
     def to_nat(self) -> NP:
+        """Return the natural parameters by numerically inverting the gradient log-normalizer."""
         flattener, flattened = Flattener[Self].flatten(self)
 
         def solve(flattener: Flattener[Self], flattened: JaxRealArray) -> JaxRealArray:

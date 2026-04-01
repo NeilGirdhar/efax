@@ -130,5 +130,5 @@ class UnitVarianceNormalEP(HasEntropyEP[UnitVarianceNormalNP], HasConjugatePrior
         return (cls(mean), n)
 
     @override
-    def conjugate_prior_observation(self) -> JaxRealArray:
+    def as_conjugate_prior_observation(self) -> JaxRealArray:
         return self.mean

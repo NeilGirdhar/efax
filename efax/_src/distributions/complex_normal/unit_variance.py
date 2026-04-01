@@ -121,5 +121,5 @@ class ComplexUnitVarianceNormalEP(HasEntropyEP[ComplexUnitVarianceNormalNP], Sam
     #     negative_half_precision = -0.5 * n * xp.ones(self.shape)
     #     return IsotropicNormalNP(n * self.mean, negative_half_precision)
     #
-    # def conjugate_prior_observation(self) -> JaxComplexArray:
+    # def as_conjugate_prior_observation(self) -> JaxComplexArray:
     #     return self.mean

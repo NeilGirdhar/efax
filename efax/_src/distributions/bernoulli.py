@@ -141,5 +141,5 @@ class BernoulliEP(HasEntropyEP[BernoulliNP], HasConjugatePrior, Samplable):
         return (cls(probability), n)
 
     @override
-    def conjugate_prior_observation(self) -> JaxRealArray:
+    def as_conjugate_prior_observation(self) -> JaxRealArray:
         return self.probability

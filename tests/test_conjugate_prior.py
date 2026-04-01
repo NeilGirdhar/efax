@@ -29,7 +29,7 @@ def test_conjugate_prior(
     assert cp_q.shape == p.shape
 
     # Produce a copy of p that matches the conjugate prior distribution.
-    cp_x = p.conjugate_prior_observation()
+    cp_x = p.as_conjugate_prior_observation()
 
     # Produce a function that calculates the gradient of the density with respect to p.  Ensure that
     # it is broadcasted according to the shape.
@@ -81,7 +81,7 @@ def test_generalized_conjugate_prior(
     assert gcp_q.shape == p.shape
 
     # Produce a copy of p that matches the conjugate prior distribution.
-    cp_x = p.conjugate_prior_observation()
+    cp_x = p.as_conjugate_prior_observation()
 
     # Produce a function that calculates the gradient of the density with respect to p.  Ensure that
     # it is broadcasted according to the shape.

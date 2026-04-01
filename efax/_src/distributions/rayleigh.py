@@ -65,7 +65,7 @@ class RayleighNP(
 
     @override
     @classmethod
-    def sample_to_base_sample(cls, x: Array, **fixed_parameters: JaxArray) -> JaxRealArray:
+    def untransform_sample(cls, x: Array, **fixed_parameters: JaxArray) -> JaxRealArray:
         xp = array_namespace(x)
         return xp.square(x)
 

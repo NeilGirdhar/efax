@@ -60,7 +60,7 @@ class UnitVarianceLogNormalNP(
 
     @override
     @classmethod
-    def sample_to_base_sample(cls, x: Array, **fixed_parameters: JaxArray) -> JaxRealArray:
+    def untransform_sample(cls, x: Array, **fixed_parameters: JaxArray) -> JaxRealArray:
         xp = array_namespace(x)
         return xp.log(x)
 
@@ -139,5 +139,5 @@ class UnitVarianceLogNormalEP(
         return (cls(uvn.mean), n)
 
     @override
-    def conjugate_prior_observation(self) -> JaxRealArray:
+    def as_conjugate_prior_observation(self) -> JaxRealArray:
         return self.mean

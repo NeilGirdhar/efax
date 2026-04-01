@@ -30,24 +30,25 @@ class ExpectationParametrization(Distribution, Generic[NP]):
     @classmethod
     @abstractmethod
     def natural_parametrization_cls(cls) -> type[NP]:
+        """Return the NaturalParametrization class paired with this ExpectationParametrization."""
         raise NotImplementedError
 
     @abstractmethod
     def to_nat(self) -> NP:
-        """The corresponding natural parameters."""
+        """Return the corresponding natural parameters."""
         raise NotImplementedError
 
     @jit
     @final
     def kl_divergence(self, q: NP, *, self_nat: NP | None = None) -> JaxRealArray:
-        """The Kullback-Leibler divergence.
+        """Return the Kullback-Leibler divergence KL(self ‖ q).
 
-        This can be quite slow since it depends on a conversion to natural parameters.
+        Can be slow because it requires converting self to natural parameters.
 
         Args:
-            self: The expectation parameters of the first distribution.
-            q: The natural parameters of second destribution.
-            self_nat: The natural parameters of the first distribution, if available.
+            q: The natural parameters of the second distribution.
+            self_nat: The natural parameters of self, if already available, to avoid
+                recomputing them.
         """
         if self_nat is None:
             self_nat = self.to_nat()

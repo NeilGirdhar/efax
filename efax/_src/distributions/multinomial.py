@@ -171,7 +171,7 @@ class MultinomialEP(
         return GeneralizedDirichletNP(alpha_minus_one, gamma)
 
     @override
-    def conjugate_prior_observation(self) -> JaxRealArray:
+    def as_conjugate_prior_observation(self) -> JaxRealArray:
         return self.probability
 
     @override

@@ -15,28 +15,37 @@ NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 
 
 class HasEntropy(Distribution):
+    """A Distribution whose Shannon entropy can be computed."""
+
     def entropy(self) -> JaxRealArray:
+        """Return the Shannon entropy of the distribution."""
         raise NotImplementedError
 
 
 class HasEntropyEP(ExpectationParametrization[NP], HasEntropy, JaxAbstractClass, Generic[NP]):
+    """An ExpectationParametrization with analytically tractable entropy.
+
+    Provides entropy and cross-entropy via the inner-product form of the exponential family,
+    requiring only the expected carrier measure as an additional implementation detail.
+    """
+
     @abstract_jit
     @abstractmethod
     def expected_carrier_measure(self) -> JaxRealArray:
-        """The expected carrier measure of the distribution.
+        """Return the expected carrier measure E[h(x)] under this distribution.
 
-        This is the missing term from the inner product between the observed distribution and the
-        predicted distribution.  Often, it is just xp.zeros(self.shape).
+        This is the term missing from the natural-parameter inner product ⟨η, E[T(x)]⟩
+        when computing entropy or cross-entropy.  Often zero (e.g. for Normal, Poisson).
         """
         raise NotImplementedError
 
     @jit
     @final
     def cross_entropy(self, q: NP) -> JaxRealArray:
-        """The cross entropy.
+        """Return the cross-entropy H(self, q) = -E_self[log q(x)].
 
         Args:
-            q: The natural parameters of the prediction.
+            q: The natural parameters of the predictive distribution.
         """
         return (
             -parameter_dot_product(q, self) + q.log_normalizer() - self.expected_carrier_measure()
@@ -46,9 +55,10 @@ class HasEntropyEP(ExpectationParametrization[NP], HasEntropy, JaxAbstractClass,
     @final
     @override
     def entropy(self) -> JaxRealArray:
-        """The Shannon entropy.
+        """Return the Shannon entropy H(self) = -E_self[log self(x)].
 
-        This can be quite slow since it depends on a conversion to natural parameters.
+        Computed as self.cross_entropy(self.to_nat()).  Can be slow for distributions
+        that require numerical inversion to obtain natural parameters.
         """
         return self.cross_entropy(stop_gradient(self.to_nat()))
 
@@ -57,9 +67,14 @@ EP = TypeVar("EP", bound=HasEntropyEP, default=Any)
 
 
 class HasEntropyNP(NaturalParametrization[EP], HasEntropy, Generic[EP]):
+    """A NaturalParametrization with analytically tractable entropy.
+
+    Delegates to the corresponding expectation parametrization's cross_entropy.
+    """
+
     @jit
     @final
     @override
     def entropy(self) -> JaxRealArray:
-        """The Shannon entropy."""
+        """Return the Shannon entropy H(self) = -E_self[log self(x)]."""
         return self.to_exp().cross_entropy(self)

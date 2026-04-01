@@ -14,7 +14,12 @@ from .parameter import Support
 
 @dataclass
 class Distribution(JaxAbstractClass):
-    """The Distribution is the base class of all distributions."""
+    """The base class of all distributions.
+
+    A Distribution is a JAX-compatible dataclass whose fields are parameter arrays.
+    The generic indexing operator slices all parameter arrays simultaneously, enabling
+    vectorised operations over batches of distributions.
+    """
 
     def __getitem__(self, key: tuple[int | slice | EllipsisType | None, ...]) -> Self:
         from .iteration import parameters  # noqa: PLC0415
@@ -25,19 +30,31 @@ class Distribution(JaxAbstractClass):
 
     @abstractmethod
     def sub_distributions(self) -> Mapping[str, Distribution]:
+        """Return the named sub-distributions that make up this distribution.
+
+        Returns an empty mapping for simple (non-joint) distributions.
+        """
         raise NotImplementedError
 
     @property
     @abstractmethod
     def shape(self) -> Shape:
+        """The batch shape of this distribution — the shape of a scalar statistic."""
         raise NotImplementedError
 
     @property
     def ndim(self) -> int:
+        """The number of batch dimensions (len(self.shape))."""
         return len(self.shape)
 
     @classmethod
     def adjust_support(cls, support: Support, name: str, **kwargs: JaxArray) -> Support:
+        """Optionally adjust the support of a parameter given sibling parameter values.
+
+        The default implementation returns the support unchanged.  Subclasses override
+        this when the valid range of one parameter depends on another (e.g. a scale
+        parameter whose minimum depends on a fixed dimension count).
+        """
         return support
 
     def __array_namespace__(self, api_version: str | None = None) -> ModuleType:  # noqa: PLW3201
@@ -49,9 +66,10 @@ class Distribution(JaxAbstractClass):
 
 @dataclass
 class SimpleDistribution(Distribution):
-    """A SimpleDistribution has no sub-distributions.
+    """A Distribution with no sub-distributions.
 
-    As a consequence, its domain is a simple support (rather than a dict).
+    As a consequence, its observation domain is described by a single Support object
+    rather than a dict of supports.
     """
 
     @override
@@ -61,4 +79,5 @@ class SimpleDistribution(Distribution):
     @classmethod
     @abstractmethod
     def domain_support(cls) -> Support:
+        """Return the support that constrains observations drawn from this distribution."""
         raise NotImplementedError

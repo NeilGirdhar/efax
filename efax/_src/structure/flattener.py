@@ -37,7 +37,7 @@ class Flattener(Estimator[P]):
     mapped_to_plane: bool = field(static=True)
 
     def final_dimension_size(self) -> int:
-        """Return the size of the last (parameter) dimension of the flat array produced by flatten."""
+        """Return the size of the last dimension of the flat array produced by flatten."""
         return sum(
             support.num_elements(info.dimensions)
             for info in self.infos

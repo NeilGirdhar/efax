@@ -175,7 +175,7 @@ class MultivariateFixedVarianceNormalEP(
         return MultivariateDiagonalNormalNP(n_over_variance * self.mean, negative_half_precision)
 
     @override
-    def conjugate_prior_observation(self) -> JaxRealArray:
+    def as_conjugate_prior_observation(self) -> JaxRealArray:
         return self.mean
 
     @override

@@ -95,12 +95,13 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
 
     @classmethod
     def expectation_parametrization_cls(cls) -> type[EP]:
+        """Return the ExpectationParametrization class paired with this NaturalParametrization."""
         return get_type_hints(cls.to_exp)["return"]
 
     @jit
     @final
     def pdf(self, x: Domain) -> JaxRealArray:
-        """The distribution's density or mass function at x.
+        """Return the probability density (or mass) at x.
 
         Args:
             x: The sample.
@@ -111,7 +112,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
     @jit
     @final
     def log_pdf(self, x: Domain) -> JaxRealArray:
-        """The distribution's density or mass function at x.
+        """Return the log probability density (or log mass) at x.
 
         Args:
             x: The sample.
@@ -162,7 +163,8 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
         return structure.assemble(final_parameters)
 
     @final
-    def jeffreys_prior(self) -> JaxRealArray:
+    def jeffreys_prior_density(self) -> JaxRealArray:
+        """Return the Jeffreys prior density at this point: sqrt(det(Fisher information matrix))."""
         xp = array_namespace(self)
         fisher_matrix = self._fisher_information_matrix()
         return xp.sqrt(xp.linalg.det(fisher_matrix))
@@ -170,14 +172,17 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
     @jit
     @final
     def apply_fisher_information(self, vector: EP) -> tuple[EP, Self]:
-        """Efficiently apply the Fisher information matrix to a vector.
+        """Apply the Fisher information matrix to a vector of expectation parameters.
+
+        Computes both self.to_exp() and F(self) @ vector in a single VJP pass, which
+        is more efficient than computing them separately.
 
         Args:
-            vector: Some set of expectation parameters.
+            vector: A set of expectation parameters to multiply by the Fisher information.
 
         Returns:
-            The expectation parameters corresponding to self.
-            The Fisher information of self applied to the inputted vector.
+            The expectation parameters of self (self.to_exp()).
+            The Fisher information of self applied to vector.
         """
         expectation_parameters: EP
         expectation_parameters, f_vjp = vjp(type(self).to_exp, self)
@@ -185,6 +190,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
 
     @final
     def kl_divergence(self, q: Self) -> JaxRealArray:
+        """Return the Kullback-Leibler divergence KL(self ‖ q)."""
         return self.to_exp().kl_divergence(q, self_nat=self)
 
     def _complexify(self, t: Self) -> Self:
