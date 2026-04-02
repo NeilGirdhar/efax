@@ -15,6 +15,8 @@ from efax import (
     BernoulliNP,
     BetaEP,
     BetaNP,
+    CategoricalEP,
+    CategoricalNP,
     ChiEP,
     ChiNP,
     ChiSquareEP,
@@ -51,8 +53,6 @@ from efax import (
     LogarithmicNP,
     LogNormalEP,
     LogNormalNP,
-    CategoricalEP,
-    CategoricalNP,
     MultivariateDiagonalNormalEP,
     MultivariateDiagonalNormalNP,
     MultivariateFixedVarianceNormalEP,
@@ -87,11 +87,11 @@ from efax import (
 )
 
 from .distribution_info import DistributionInfo
+from .scipy_replacement.categorical import ScipyCategorical
 from .scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from .scipy_replacement.complex_normal import ScipyComplexNormal
 from .scipy_replacement.dirichlet import ScipyDirichlet, ScipyGeneralizedDirichlet
 from .scipy_replacement.joint import ScipyJointDistribution
-from .scipy_replacement.categorical import ScipyCategorical
 from .scipy_replacement.multivariate_normal import ScipyMultivariateNormal
 from .scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
 from .scipy_replacement.wishart import ScipyWishart

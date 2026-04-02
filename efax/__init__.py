@@ -2,6 +2,7 @@
 
 from ._src.distributions.bernoulli import BernoulliEP, BernoulliNP
 from ._src.distributions.beta import BetaEP, BetaNP
+from ._src.distributions.categorical import CategoricalEP, CategoricalNP
 from ._src.distributions.chi import ChiEP, ChiNP
 from ._src.distributions.chi_square import ChiSquareEP, ChiSquareNP
 from ._src.distributions.cmvn.circularly_symmetric import (
@@ -31,7 +32,6 @@ from ._src.distributions.log_normal.unit_variance import (
     UnitVarianceLogNormalNP,
 )
 from ._src.distributions.logarithmic import LogarithmicEP, LogarithmicNP
-from ._src.distributions.categorical import CategoricalEP, CategoricalNP
 from ._src.distributions.multivariate_normal.arbitrary import (
     MultivariateNormalEP,
     MultivariateNormalNP,
@@ -105,6 +105,8 @@ __all__ = [
     "BetaEP",
     "BetaNP",
     "BooleanRing",
+    "CategoricalEP",
+    "CategoricalNP",
     "ChiEP",
     "ChiNP",
     "ChiSquareEP",
@@ -156,8 +158,6 @@ __all__ = [
     "LogarithmicEP",
     "LogarithmicNP",
     "Multidimensional",
-    "CategoricalEP",
-    "CategoricalNP",
     "MultivariateDiagonalNormalEP",
     "MultivariateDiagonalNormalNP",
     "MultivariateDiagonalNormalVP",

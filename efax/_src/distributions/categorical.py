@@ -108,7 +108,8 @@ class CategoricalEP(
     """The expectation parametrization of the categorical distribution.
 
     Args:
-        probability: The probability vector with the final element omitted, i.e., [p_i]_{i in 1...n-1}.
+        probability: The probability vector with the final element omitted, i.e.,
+            [p_i]_{i in 1...n-1}.
     """
 
     probability: JaxRealArray = distribution_parameter(
