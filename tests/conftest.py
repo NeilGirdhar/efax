@@ -56,15 +56,21 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers", "nondistribution: mark a test as not related to a particular distribution"
     )
+    config.addinivalue_line("markers", "run(order): requested test execution order")
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
-    if config.getoption("--distribution") is None:
-        return
-    skip_non_distribution = pytest.mark.skip(reason="Distribution selected")
-    for item in items:
-        if "nondistribution" in item.keywords:
-            item.add_marker(skip_non_distribution)
+    if config.getoption("--distribution") is not None:
+        skip_non_distribution = pytest.mark.skip(reason="Distribution selected")
+        for item in items:
+            if "nondistribution" in item.keywords:
+                item.add_marker(skip_non_distribution)
+
+    items.sort(
+        key=lambda item: (
+            0 if item.nodeid == "tests/test_jax_quirks.py::test_jax_not_initialized" else 1
+        )
+    )
 
 
 _all_infos = create_infos()
