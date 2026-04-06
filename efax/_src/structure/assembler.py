@@ -129,7 +129,7 @@ class Assembler(Generic[P]):
         ]
         q_values = parameters(q).values()
         q_params_as_p = dict(zip(p_paths, q_values, strict=True))
-        return self.assemble(q_params_as_p)
+        return self.assemble(q_params_as_p)  # ty: ignore
 
     def domain_support(self) -> dict[Path, Support]:
         """Return the domain support constraints for each simple sub-distribution in the tree."""
