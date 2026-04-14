@@ -68,7 +68,9 @@ class Assembler(Generic[P]):
 
         infos = []
         for info in self.infos:
-            assert issubclass(info.type_, ExpectationParametrization)
+            if not issubclass(info.type_, ExpectationParametrization):
+                msg = f"{info.type_.__name__} is not an EP"
+                raise TypeError(msg)
             infos.append(
                 SubDistributionInfo(
                     info.path,
@@ -85,7 +87,9 @@ class Assembler(Generic[P]):
 
         infos: list[SubDistributionInfo] = []
         for info in self.infos:
-            assert issubclass(info.type_, NaturalParametrization)
+            if not issubclass(info.type_, NaturalParametrization):
+                msg = f"{info.type_.__name__} is not an NP"
+                raise TypeError(msg)
             infos.append(
                 SubDistributionInfo(
                     info.path,

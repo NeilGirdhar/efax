@@ -31,7 +31,6 @@ def triangular_number_index(k: int, /) -> int | None:
 
 
 class Support:
-    @override
     def __init__(self, *, ring: Ring = real_field) -> None:
         super().__init__()
         self.ring = ring

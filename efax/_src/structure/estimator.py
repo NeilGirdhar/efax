@@ -45,7 +45,9 @@ class Estimator(Assembler[P]):
             ExpectationParametrization,
         )
 
-        assert issubclass(type_p, ExpectationParametrization)
+        if not issubclass(type_p, ExpectationParametrization):
+            msg = f"{type_p.__name__} is not an EP"
+            raise TypeError(msg)
         return Estimator(
             [SubDistributionInfo((), type_p, 0, [])],
             {(name,): value for name, value in fixed_parameters.items()},
@@ -63,7 +65,9 @@ class Estimator(Assembler[P]):
         )
 
         infos = cls.create_assembler(p).infos
-        assert isinstance(p, ExpectationParametrization)
+        if not isinstance(p, ExpectationParametrization):
+            msg = f"{type(p).__name__} is not an EP"
+            raise TypeError(msg)
         fixed_parameters = parameters(p, fixed=True)
         return cls(infos, fixed_parameters)
 
