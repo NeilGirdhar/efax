@@ -24,15 +24,21 @@ def apply(x: JaxRealArray, x_bar: JaxRealArray) -> JaxRealArray:
     return x - 1e-4 * x_bar
 
 
-def body_fun(q: BernoulliNP) -> BernoulliNP:
-    q_bar = gradient_cross_entropy(target_distribution, q)
-    return parameter_map(apply, q, q_bar)
+# Carry (q, q_bar) as the loop state so the gradient is computed exactly
+# once per step rather than once in cond_fun and once in body_fun.
+type State = tuple[BernoulliNP, BernoulliNP]
 
 
-def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
-    q_bar = gradient_cross_entropy(target_distribution, q)
+def cond_fun(state: State) -> JaxBooleanArray:
+    _, q_bar = state
     total = jnp.sum(parameter_dot_product(q_bar, q_bar))
     return total > 1e-6  # noqa: PLR2004
+
+
+def body_fun(state: State) -> State:
+    q, q_bar = state
+    q_new = parameter_map(apply, q, q_bar)
+    return q_new, gradient_cross_entropy(target_distribution, q_new)
 
 
 # The target_distribution is represented as the expectation parameters of a
@@ -43,9 +49,12 @@ target_distribution = BernoulliEP(jnp.asarray([0.3, 0.4, 0.7]))
 # of a Bernoulli distribution corresponding to log-odds 0, which is probability
 # 0.5.
 initial_predictive_distribution = BernoulliNP(jnp.zeros(3))
+initial_gradient = gradient_cross_entropy(target_distribution, initial_predictive_distribution)
 
 # Optimize the predictive distribution iteratively.
-predictive_distribution = lax.while_loop(cond_fun, body_fun, initial_predictive_distribution)
+predictive_distribution, _ = lax.while_loop(
+    cond_fun, body_fun, (initial_predictive_distribution, initial_gradient)
+)
 
 # Compare the optimized predictive distribution with the target value in the
 # same natural parametrization.

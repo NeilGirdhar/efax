@@ -128,13 +128,21 @@ Every `NaturalParametrization` has methods:
 - `jeffreys_prior_density`, which returns the square root of the Fisher information
   determinant,
 - `characteristic_function`, which evaluates the characteristic function of the sufficient
-  statistics via analytic continuation of the log-normalizer, and
+  statistics via analytic continuation of the log-normalizer (note: for distributions such
+  as `GammaNP` that keep one or more natural parameters real in `_complexify`, the result
+  is approximate — check `NaturalParametrization.characteristic_function_exact` on the
+  class before relying on every component), and
 - `kl_divergence`, which is the KL divergence.
 
 Every `ExpectationParametrization` has methods:
 
 - `to_nat` to convert itself to natural parameters, and
 - `kl_divergence`, which is the KL divergence.
+
+The module-level function `expectation_parameters_from_characteristic_function(t, cf_values)`
+estimates the expectation parameters from characteristic-function evaluations via ordinary
+least squares.  It is exact for the normal distribution (whose log-CF is linear in the
+frequencies) and a first-order approximation for other families.
 
 Some parametrizations inherit from these interfaces:
 
@@ -280,7 +288,7 @@ EFAX supports the following distributions:
   - Dirichlet
   - generalized Dirichlet
 
-- on the n-sphere:
+- on spheres:
 
   - von Mises-Fisher
   - complex von Mises
@@ -415,15 +423,21 @@ Using the cross entropy to iteratively optimize a prediction is simple:
         return x - 1e-4 * x_bar
 
 
-    def body_fun(q: BernoulliNP) -> BernoulliNP:
-        q_bar = gradient_cross_entropy(target_distribution, q)
-        return parameter_map(apply, q, q_bar)
+    # Carry (q, q_bar) as the loop state so the gradient is computed exactly
+    # once per step rather than once in cond_fun and once in body_fun.
+    type State = tuple[BernoulliNP, BernoulliNP]
 
 
-    def cond_fun(q: BernoulliNP) -> JaxBooleanArray:
-        q_bar = gradient_cross_entropy(target_distribution, q)
+    def cond_fun(state: State) -> JaxBooleanArray:
+        _, q_bar = state
         total = jnp.sum(parameter_dot_product(q_bar, q_bar))
         return total > 1e-6  # noqa: PLR2004
+
+
+    def body_fun(state: State) -> State:
+        q, q_bar = state
+        q_new = parameter_map(apply, q, q_bar)
+        return q_new, gradient_cross_entropy(target_distribution, q_new)
 
 
     # The target_distribution is represented as the expectation parameters of a
@@ -434,10 +448,13 @@ Using the cross entropy to iteratively optimize a prediction is simple:
     # of a Bernoulli distribution corresponding to log-odds 0, which is probability
     # 0.5.
     initial_predictive_distribution = BernoulliNP(jnp.zeros(3))
+    initial_gradient = gradient_cross_entropy(target_distribution,
+                                              initial_predictive_distribution)
 
     # Optimize the predictive distribution iteratively.
-    predictive_distribution = lax.while_loop(cond_fun, body_fun,
-                                             initial_predictive_distribution)
+    predictive_distribution, _ = lax.while_loop(
+        cond_fun, body_fun, (initial_predictive_distribution, initial_gradient)
+    )
 
     # Compare the optimized predictive distribution with the target value in the
     # same natural parametrization.
@@ -502,6 +519,8 @@ instead.
     # Dirichlet distribution.
 
     # Take the mean over the first axis.
+    # parameter_mean averages only variable parameters; fixed parameters (e.g.
+    # the failure count in NegativeBinomialNP) are preserved unchanged.
     ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
     # Convert this back to the natural parametrization.

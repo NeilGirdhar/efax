@@ -1,10 +1,10 @@
 """Maximum likelihood estimation.
 
-This example is based on section 1.3.2 from exponential_families.pdf, entitled
-Maximum likelihood estimation.
+This example is based on section 1.3.2 from exponential_families.pdf, entitled Maximum
+likelihood estimation.
 
 Suppose you have some samples from a distribution family with unknown
-parameters, and you want to estimate the maximum likelihood parmaters of the
+parameters, and you want to estimate the maximum likelihood parameters of the
 distribution.
 """
 
@@ -27,10 +27,12 @@ samples = source_distribution.sample(key_a, (n_samples,))
 # First, convert the samples to their sufficient statistics.
 estimator = Estimator.from_type(DirichletEP)
 ss = estimator.sufficient_statistics(samples)
-# ss has type DirichletEP.  This is similar to the conjguate prior of the
+# ss has type DirichletEP.  This is similar to the conjugate prior of the
 # Dirichlet distribution.
 
 # Take the mean over the first axis.
+# parameter_mean averages only variable parameters; fixed parameters (e.g.
+# the failure count in NegativeBinomialNP) are preserved unchanged.
 ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
 # Convert this back to the natural parametrization.
