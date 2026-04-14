@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Self, override
+from typing import ClassVar, Self, override
 
 import jax.random as jr
 import jax.scipy.special as jss
@@ -38,6 +38,8 @@ class GammaNP(
         negative_rate: The negative rate.
         shape_minus_one: The shape minus one.
     """
+
+    characteristic_function_exact: ClassVar[bool] = False
 
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
     shape_minus_one: JaxRealArray = distribution_parameter(
@@ -83,9 +85,10 @@ class GammaNP(
     def _complexify(self, t: Self) -> Self:  # ty: ignore
         """Only complexify negative_rate; jss.gammaln does not accept complex inputs.
 
-        This means characteristic_function cannot query the log x sufficient
-        statistic (the shape_minus_one component).  Querying it returns 1
-        instead of the true E[exp(i·t·log x)].
+        shape_minus_one is kept real, so ``characteristic_function`` cannot
+        query the log-x sufficient statistic: that component returns 1 instead
+        of the true E[exp(i·t·log x)].  Consequently,
+        ``characteristic_function_exact = False`` on this class.
         """
         return type(self)(self.negative_rate + 1j * t.negative_rate, self.shape_minus_one)
 

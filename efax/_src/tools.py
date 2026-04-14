@@ -38,12 +38,13 @@ T = TypeVar("T", bound=Distribution)
 
 
 def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
-    """Return the mean of the parameters (fixed and variable)."""
+    """Return the mean of the variable parameters; fixed parameters are preserved unchanged."""
     xp = array_namespace(x)
     structure = Assembler.create_assembler(x)
-    p = parameters(x)
-    q = {path: xp.mean(value, axis=axis) for path, value in p.items()}
-    return structure.assemble(q)
+    fixed = parameters(x, fixed=True)
+    variable = parameters(x, fixed=False)
+    averaged = {path: xp.mean(value, axis=axis) for path, value in variable.items()}
+    return structure.assemble({**fixed, **averaged})
 
 
 def parameter_map[T: Distribution](

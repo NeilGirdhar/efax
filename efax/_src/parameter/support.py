@@ -279,6 +279,12 @@ class SquareMatrixSupport(Support):
         x = self.ring.unflattened(y, map_from_plane=map_from_plane)
         return xp.reshape(x, x.shape[:-1] + self.shape(dimensions))
 
+    @override
+    def generate(
+        self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
+    ) -> JaxRealArray:
+        return self.ring.generate(xp, rng, (*shape, dimensions, dimensions), safety)
+
 
 class CircularBoundedSupport(VectorSupport):
     def __init__(self, radius: float) -> None:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, Self, final, get_type_hints
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, Self, final, get_type_hints
 
 import jax
 import jax.numpy as jnp
@@ -53,7 +53,17 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
 
     The motivation for the natural parametrization is combining and scaling independent predictive
     evidence.  In the natural parametrization, these operations correspond to scaling and addition.
+
+    Class variables:
+        characteristic_function_exact: True when `_complexify` shifts every natural parameter
+            into the complex plane, so `characteristic_function` queries all sufficient
+            statistics exactly.  Set to False in subclasses that must keep one or more
+            parameters real (e.g. because `log_normalizer` calls a function such as
+            ``gammaln`` that does not accept complex inputs); those components return 1
+            instead of the true characteristic-function value.
     """
+
+    characteristic_function_exact: ClassVar[bool] = True
 
     @abstract_custom_jvp(_log_normalizer_jvp)
     @abstract_jit
@@ -196,11 +206,13 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
     def _complexify(self, t: Self) -> Self:
         """Shift natural parameters into the complex plane: η → η + i·t.
 
-        The default shifts every field.  Subclasses must override this when
-        ``log_normalizer`` calls functions that don't accept complex inputs
-        (e.g. ``gammaln``).  Keeping parameter k real means
-        ``characteristic_function`` cannot query the k-th sufficient statistic:
-        it will silently return 1 for that component instead of the true value.
+        The default shifts every field, which is correct for any distribution
+        whose ``log_normalizer`` accepts fully complex inputs.  Subclasses that
+        must keep one or more parameters real (e.g. because ``log_normalizer``
+        calls ``gammaln``, which rejects complex inputs) must override this
+        method **and** set ``characteristic_function_exact = False`` on the
+        class.  For those parameters, ``characteristic_function`` returns 1
+        instead of the true E[exp(i·⟨t, T(x)⟩)] component.
 
         Args:
             t: Imaginary displacements, same pytree structure as self.
@@ -236,6 +248,13 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
             omegas = 2 * jnp.pi * jnp.fft.fftfreq(k, d=dx)
             t_grid = PoissonNP(omegas)           # shape (k,)
             phi = p.characteristic_function(t_grid)  # shape (k,)
+
+        Note: when ``type(self).characteristic_function_exact`` is False, one
+        or more natural parameters are kept real in ``_complexify`` because
+        ``log_normalizer`` uses a function that rejects complex inputs.  The
+        corresponding sufficient-statistic components return 1 rather than
+        the true value.  Check the class attribute before relying on the
+        result for those components.
 
         Args:
             t: Frequencies in natural-parameter space, same structure as self.

@@ -50,9 +50,19 @@ class JointDistribution(Distribution):
     @property
     @override
     def shape(self) -> Shape:
-        for distribution in self._sub_distributions.values():
-            return distribution.shape
-        raise ValueError
+        shapes = [d.shape for d in self._sub_distributions.values()]
+        if not shapes:
+            msg = "JointDistribution has no sub-distributions"
+            raise ValueError(msg)
+        shape = shapes[0]
+        if any(s != shape for s in shapes[1:]):
+            names = list(self._sub_distributions)
+            msg = (
+                f"Sub-distribution shapes are inconsistent: "
+                f"{dict(zip(names, shapes, strict=True))}"
+            )
+            raise ValueError(msg)
+        return shape
 
 
 @dataclass
