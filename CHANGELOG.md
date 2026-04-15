@@ -1,8 +1,7 @@
 # Changelog
 
-This changelog summarizes EFAX minor release lines inferred from version changes in
-`pyproject.toml`. Patch releases are folded into their minor release line, so each section covers
-changes since the previous minor release line.
+This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
+Each section covers changes since the previous release.
 
 ## 2.2.0 - 2026-04-01
 
