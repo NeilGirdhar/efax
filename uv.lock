@@ -379,7 +379,7 @@ wheels = [
 
 [[package]]
 name = "efax"
-version = "2.2.0"
+version = "2.2.4"
 source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },

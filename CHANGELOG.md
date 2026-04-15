@@ -3,6 +3,12 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.2.4 - 2026-04-15
+
+- Fixed correctness issues in parameter operations and joint distributions.
+- Fixed type annotation and validation issues.
+- Fixed von Mises Fisher tests, categorical distribution formatting, and ordered test.
+
 ## 2.2.0 - 2026-04-01
 
 - Renamed `Structure` to `Assembler` and `MaximumLikelihoodEstimator` to `Estimator`.
