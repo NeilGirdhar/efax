@@ -23,6 +23,7 @@ from efax import (
     flat_dict_of_parameters,
     flatten_mapping,
     parameter_mean,
+    parameters,
 )
 
 from .create_info import (
@@ -191,3 +192,37 @@ def test_multidimensional_sample_shape_matches_dimensions(
                 () if support.axes() == 0 else samples[path].shape[-support.axes() :]
             )
             assert sample_event_shape == support.shape(distribution.dimensions())
+
+
+def test_sufficient_statistics_consistent_shapes(
+    generator: Generator,
+    key: KeyArray,
+    sampling_distribution_info: DistributionInfo,
+    *,
+    distribution_name: str | None,
+    natural: bool,
+) -> None:
+    """Test that sufficient_statistics returns EP parameters with consistent batch shapes.
+
+    All parameters of the returned EP (fixed and variable) should share the same batch shape,
+    i.e. shape[:-support.axes()] for parameters with axes > 0, or shape for scalar parameters.
+    """
+    sampling_distribution_info.skip_if_deselected(distribution_name)
+    distribution_shape = (4,)
+    sample_shape = (8, 16)
+
+    exp_parameters, samples = _produce_samples(
+        generator, key, sampling_distribution_info, distribution_shape, sample_shape, natural=natural
+    )
+
+    estimator = Estimator.from_expectation(exp_parameters)
+    result = estimator.sufficient_statistics(samples)
+
+    # For each simple sub-distribution in the result, all parameters must share a batch shape.
+    for path, (value, support) in parameters(result, support=True).items():
+        na = support.axes()
+        batch_shape = value.shape[:-na] if na > 0 else value.shape
+        expected_batch_shape = (*sample_shape, *distribution_shape)
+        assert batch_shape == expected_batch_shape, (
+            f"Parameter {path!r}: expected batch shape {expected_batch_shape}, got {batch_shape}"
+        )

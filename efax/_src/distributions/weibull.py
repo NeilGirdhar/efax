@@ -68,8 +68,8 @@ class WeibullNP(
     @classmethod
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> WeibullEP:
         xp = array_namespace(x)
-        concentration = fixed_parameters["concentration"]
-        return WeibullEP(xp.broadcast_to(concentration, x.shape), x**concentration)
+        concentration = xp.broadcast_to(fixed_parameters["concentration"], x.shape)
+        return WeibullEP(concentration, x**concentration)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

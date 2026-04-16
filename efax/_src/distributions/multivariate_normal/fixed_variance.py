@@ -76,7 +76,10 @@ class MultivariateFixedVarianceNormalNP(
     def sufficient_statistics(
         cls, x: JaxRealArray, **fixed_parameters: JaxArray
     ) -> MultivariateFixedVarianceNormalEP:
-        return MultivariateFixedVarianceNormalEP(x, variance=fixed_parameters["variance"])
+        xp = array_namespace(x)
+        return MultivariateFixedVarianceNormalEP(
+            x, variance=xp.broadcast_to(fixed_parameters["variance"], x.shape[:-1])
+        )
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
