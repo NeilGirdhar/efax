@@ -38,13 +38,17 @@ T = TypeVar("T", bound=Distribution)
 
 
 def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
-    """Return the mean of the variable parameters; fixed parameters are preserved unchanged."""
+    """Return the mean over axis of all parameters, including fixed ones.
+
+    Fixed parameters are constant along the reduced axes (having been broadcast to the sample shape
+    in sufficient_statistics), so their mean equals their value.  Integer-typed parameters remain
+    integers after the mean because the Array API spec requires mean to preserve integer dtypes.
+    """
     xp = array_namespace(x)
     structure = Assembler.create_assembler(x)
-    fixed = parameters(x, fixed=True)
-    variable = parameters(x, fixed=False)
-    averaged = {path: xp.mean(value, axis=axis) for path, value in variable.items()}
-    return structure.assemble({**fixed, **averaged})
+    all_params = parameters(x)
+    averaged = {path: xp.mean(value, axis=axis) for path, value in all_params.items()}
+    return structure.assemble(averaged)
 
 
 def parameter_map[T: Distribution](
