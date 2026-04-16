@@ -3,6 +3,11 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.2.5 - 2026-04-16
+
+- Reverted a breaking change to `parameter_mean`.
+- Added tests for `sufficient_statistics`'s effect on dimensions.
+
 ## 2.2.4 - 2026-04-15
 
 - Fixed correctness issues in parameter operations and joint distributions.
