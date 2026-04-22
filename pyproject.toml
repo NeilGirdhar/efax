@@ -8,11 +8,11 @@ dev = [
   "lefthook>=2",
   "pytest-xdist[psutil]>=3",
   "pytest>=9",
-  "ruff>=0.15",
+  "ruff>=0.15.11",
   "scipy-stubs>=1.15",
   "scipy>=1.15",
   "toml-sort>=0.24",
-  "ty>=0.0.29"
+  "ty>=0.0.32"
 ]
 
 [project]

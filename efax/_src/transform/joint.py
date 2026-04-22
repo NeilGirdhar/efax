@@ -58,8 +58,7 @@ class JointDistribution(Distribution):
         if any(s != shape for s in shapes[1:]):
             names = list(self._sub_distributions)
             msg = (
-                f"Sub-distribution shapes are inconsistent: "
-                f"{dict(zip(names, shapes, strict=True))}"
+                f"Sub-distribution shapes are inconsistent: {dict(zip(names, shapes, strict=True))}"
             )
             raise ValueError(msg)
         return shape

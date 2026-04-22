@@ -212,7 +212,12 @@ def test_sufficient_statistics_consistent_shapes(
     sample_shape = (8, 16)
 
     exp_parameters, samples = _produce_samples(
-        generator, key, sampling_distribution_info, distribution_shape, sample_shape, natural=natural
+        generator,
+        key,
+        sampling_distribution_info,
+        distribution_shape,
+        sample_shape,
+        natural=natural,
     )
 
     estimator = Estimator.from_expectation(exp_parameters)

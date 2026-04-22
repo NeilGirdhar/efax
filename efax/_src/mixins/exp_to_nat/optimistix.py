@@ -55,7 +55,7 @@ class OptimistixRootFinder(ExpToNatMinimizer):
 
 
 default_minimizer = OptimistixRootFinder(
-    solver=optx.Newton[JaxRealArray, JaxRealArray, None](rtol=0.0, atol=1e-7),  # ty: ignore
+    solver=optx.Newton[JaxRealArray, JaxRealArray, None](rtol=0.0, atol=1e-7),
     max_steps=1000,
 )
 
