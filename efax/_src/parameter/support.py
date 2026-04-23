@@ -177,6 +177,57 @@ class SimplexSupport(Support):
         return x[..., :-1]
 
 
+class SubsimplexSupport(Support):
+    @override
+    def axes(self) -> int:
+        return 1
+
+    @override
+    def shape(self, dimensions: int) -> Shape:
+        return (dimensions,)
+
+    @override
+    def num_elements(self, dimensions: int) -> int:
+        return self.ring.num_elements(dimensions)
+
+    @override
+    def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
+        if not map_to_plane:
+            return self.ring.flattened(x, map_to_plane=False)
+        xp = array_namespace(x)
+        residual = 1.0 - xp.sum(x, axis=-1, keepdims=True)
+        return xp.log(x / residual)
+
+    @override
+    def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
+        if not map_from_plane:
+            x = self.ring.unflattened(y, map_from_plane=False)
+            assert x.shape[-1] == dimensions
+            return x
+        xp = array_namespace(y)
+        assert y.shape[-1] == dimensions
+        logits = xp.concat((y, xp.zeros((*y.shape[:-1], 1), dtype=y.dtype)), axis=-1)
+        return jss.softmax(logits, axis=-1)[..., :-1]
+
+    @override
+    def clamp(self, x: JaxArray) -> JaxArray:
+        xp = array_namespace(x)
+        eps = xp.finfo(x.dtype).eps
+        s = xp.sum(x, axis=-1, keepdims=True)
+        x *= xp.minimum(1.0, (1.0 - eps) / s)
+        return xp.clip(x, min=eps, max=1.0 - eps)
+
+    @override
+    def generate(
+        self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
+    ) -> JaxRealArray:
+        alpha = xp.ones(dimensions + 1)
+        x = xp.asarray(rng.dirichlet(alpha, size=shape))[..., :-1]
+        if safety > 0.0:
+            x *= 1.0 - safety
+        return x
+
+
 class SymmetricMatrixSupport(Support):
     @override
     def __init__(

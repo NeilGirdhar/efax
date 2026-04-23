@@ -4,7 +4,7 @@ import jax.numpy as jnp
 import numpy as np
 from numpy.testing import assert_allclose
 
-from efax import CircularBoundedSupport, ComplexField, SimplexSupport
+from efax import CircularBoundedSupport, ComplexField, SimplexSupport, SubsimplexSupport
 
 
 def test_complex_field_zero_plane_mapping_is_finite() -> None:
@@ -66,3 +66,33 @@ def test_simplex_support_generate() -> None:
     assert bool(jnp.all(x > 0.0))
     assert bool(jnp.all(residual > 0.0))
     assert bool(jnp.all(jnp.sum(x, axis=-1) < 1.0))
+
+
+def test_subsimplex_support_preserves_dimension() -> None:
+    support = SubsimplexSupport()
+    dimensions = 4
+
+    assert support.shape(dimensions) == (dimensions,)
+    assert support.num_elements(dimensions) == dimensions
+    assert_allclose(
+        support.unflattened(jnp.asarray([0.2, 0.3, 0.1, 0.15]), dimensions, map_from_plane=False),
+        jnp.asarray([0.2, 0.3, 0.1, 0.15]),
+    )
+
+
+def test_subsimplex_support_plane_round_trip() -> None:
+    support = SubsimplexSupport()
+    x = jnp.asarray([[0.2, 0.3, 0.1, 0.15], [0.1, 0.1, 0.2, 0.3]])
+
+    flattened = support.flattened(x, map_to_plane=True)
+    unflattened = support.unflattened(flattened, 4, map_from_plane=True)
+
+    assert_allclose(unflattened, x, rtol=1e-6)
+
+
+def test_subsimplex_support_clamp_preserves_subsimplex() -> None:
+    support = SubsimplexSupport()
+    clamped = support.clamp(jnp.asarray([[0.8, 0.7, 0.6], [0.2, 0.3, 0.4]]))
+
+    assert bool(jnp.all(clamped > 0.0))
+    assert bool(jnp.all(jnp.sum(clamped, axis=-1) < 1.0))

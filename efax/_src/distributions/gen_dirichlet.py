@@ -12,14 +12,20 @@ from typing import override
 
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, Shape, softplus
+from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, jit, softplus
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.multidimensional import Multidimensional
 from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
-from efax._src.parameter import RealField, VectorSupport, distribution_parameter, negative_support
+from efax._src.parameter import (
+    RealField,
+    SubsimplexSupport,
+    VectorSupport,
+    distribution_parameter,
+    negative_support,
+)
 
 
 @dataclass
@@ -42,8 +48,8 @@ class GeneralizedDirichletNP(
 
     @override
     @classmethod
-    def domain_support(cls) -> VectorSupport:
-        return VectorSupport()
+    def domain_support(cls) -> SubsimplexSupport:
+        return SubsimplexSupport()
 
     @override
     def log_normalizer(self) -> JaxRealArray:
@@ -119,13 +125,55 @@ class GeneralizedDirichletEP(
 
     @override
     @classmethod
-    def domain_support(cls) -> VectorSupport:
-        return VectorSupport()
+    def domain_support(cls) -> SubsimplexSupport:
+        return SubsimplexSupport()
 
     @classmethod
     @override
     def natural_parametrization_cls(cls) -> type[GeneralizedDirichletNP]:
         return GeneralizedDirichletNP
+
+    @jit
+    @override
+    def to_nat(self) -> GeneralizedDirichletNP:
+        xp = array_namespace(self)
+        zero = xp.zeros_like(self.mean_log_cumulative_probability[..., :1])
+        beta_bar = xp.concat(
+            [
+                self.mean_log_cumulative_probability[..., :1],
+                xp.diff(self.mean_log_cumulative_probability, axis=-1),
+            ],
+            axis=-1,
+        )
+        alpha_bar_direct = self.mean_log_probability - xp.concat(
+            [zero, self.mean_log_cumulative_probability[..., :-1]],
+            axis=-1,
+        )
+        alpha, beta = _beta_parameters_from_expected_logs(alpha_bar_direct, beta_bar)
+        alpha_roll = xp.concat([alpha[..., 1:], zero], axis=-1)
+        gamma = -xp.diff(beta, axis=-1, append=xp.ones_like(zero)) - alpha_roll
+        return GeneralizedDirichletNP(alpha - 1.0, gamma)
+
+    @override
+    def initial_search_parameters(self) -> JaxRealArray:
+        xp = array_namespace(self)
+        beta_bar = xp.concat(
+            [
+                self.mean_log_cumulative_probability[..., :1],
+                xp.diff(self.mean_log_cumulative_probability, axis=-1),
+            ],
+            axis=-1,
+        )
+        zero = xp.zeros_like(self.mean_log_cumulative_probability[..., :1])
+        alpha_bar_direct = self.mean_log_probability - xp.concat(
+            [zero, self.mean_log_cumulative_probability[..., :-1]],
+            axis=-1,
+        )
+        alpha, beta = _beta_parameters_from_expected_logs(alpha_bar_direct, beta_bar)
+        alpha_roll = xp.concat([alpha[..., 1:], zero], axis=-1)
+        gamma = -xp.diff(beta, axis=-1, append=xp.ones_like(zero)) - alpha_roll
+        gamma = xp.maximum(gamma, 1e-3)
+        return xp.concat([inverse_softplus(alpha), inverse_softplus(gamma)], axis=-1)
 
     @override
     def search_to_natural(self, search_parameters: JaxRealArray) -> GeneralizedDirichletNP:
@@ -144,3 +192,68 @@ class GeneralizedDirichletEP(
     @override
     def dimensions(self) -> int:
         return self.mean_log_probability.shape[-1]
+
+
+inverse_digamma_switch = -2.22
+
+
+def _inverse_digamma(y: JaxRealArray) -> JaxRealArray:
+    xp = array_namespace(y)
+    x = xp.where(
+        y >= inverse_digamma_switch,
+        xp.exp(y) + 0.5,
+        -1.0 / (y - jss.digamma(1.0)),
+    )
+    for _ in range(8):
+        x -= (jss.digamma(x) - y) / jss.polygamma(1, x)
+    return x
+
+
+def _beta_parameters_from_expected_logs(
+    mean_log_probability: JaxRealArray,
+    mean_log_complement: JaxRealArray,
+) -> tuple[JaxRealArray, JaxRealArray]:
+    xp = array_namespace(mean_log_probability, mean_log_complement)
+    mean = xp.exp(mean_log_probability)
+    complement = xp.exp(mean_log_complement)
+    simplex_mean = mean / (mean + complement)
+    concentration = xp.maximum(2.0, 1.0 / xp.maximum(simplex_mean * (1.0 - simplex_mean), 1e-3))
+    for _ in range(20):
+        psi_sum = jss.digamma(concentration)
+        alpha = _inverse_digamma(mean_log_probability + psi_sum)
+        beta = _inverse_digamma(mean_log_complement + psi_sum)
+        concentration = xp.maximum(alpha + beta, 1e-6)
+    alpha = xp.maximum(alpha, 1e-6)
+    beta = xp.maximum(beta, 1e-6)
+    log_alpha = xp.log(alpha)
+    log_beta = xp.log(beta)
+    for _ in range(20):
+        alpha = xp.exp(log_alpha)
+        beta = xp.exp(log_beta)
+        delta_log_alpha, delta_log_beta = _beta_expected_log_newton_step(
+            alpha, beta, mean_log_probability, mean_log_complement
+        )
+        log_alpha -= delta_log_alpha
+        log_beta -= delta_log_beta
+    alpha = xp.exp(log_alpha)
+    beta = xp.exp(log_beta)
+    return alpha, beta
+
+
+def _beta_expected_log_newton_step(
+    alpha: JaxRealArray,
+    beta: JaxRealArray,
+    mean_log_probability: JaxRealArray,
+    mean_log_complement: JaxRealArray,
+) -> tuple[JaxRealArray, JaxRealArray]:
+    trigamma_sum = jss.polygamma(1, alpha + beta)
+    f1 = jss.digamma(alpha) - jss.digamma(alpha + beta) - mean_log_probability
+    f2 = jss.digamma(beta) - jss.digamma(alpha + beta) - mean_log_complement
+    j11 = alpha * (jss.polygamma(1, alpha) - trigamma_sum)
+    j12 = -beta * trigamma_sum
+    j21 = -alpha * trigamma_sum
+    j22 = beta * (jss.polygamma(1, beta) - trigamma_sum)
+    determinant = j11 * j22 - j12 * j21
+    delta_log_alpha = (j22 * f1 - j12 * f2) / determinant
+    delta_log_beta = (-j21 * f1 + j11 * f2) / determinant
+    return delta_log_alpha, delta_log_beta
