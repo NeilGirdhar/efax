@@ -42,7 +42,7 @@ class LogNormalNP(
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=positive_support)
 
     @override
     @classmethod
@@ -103,7 +103,7 @@ class LogNormalEP(
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=positive_support)
 
     @classmethod
     @override

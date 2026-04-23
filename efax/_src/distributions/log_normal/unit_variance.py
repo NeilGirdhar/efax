@@ -17,7 +17,7 @@ from efax._src.mixins.transformed_parametrization import (
     TransformedNaturalParametrization,
 )
 from efax._src.natural_parametrization import NaturalParametrization
-from efax._src.parameter import ScalarSupport, distribution_parameter
+from efax._src.parameter import ScalarSupport, distribution_parameter, positive_support
 
 
 @dataclass
@@ -35,7 +35,7 @@ class UnitVarianceLogNormalNP(
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=positive_support)
 
     @override
     @classmethod
@@ -90,7 +90,7 @@ class UnitVarianceLogNormalEP(
     @override
     @classmethod
     def domain_support(cls) -> ScalarSupport:
-        return ScalarSupport()
+        return ScalarSupport(ring=positive_support)
 
     @classmethod
     @override
