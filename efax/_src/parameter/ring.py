@@ -142,7 +142,7 @@ class RealField(Ring):
             minimum = xp.asarray(self.minimum)
             maximum = xp.asarray(self.maximum)
             domain_width = xp.maximum(maximum - minimum - safety, 0.0)
-            true_minimum = xp.mean(minimum, maximum) - domain_width * 0.5
+            true_minimum = (minimum + maximum - domain_width) * 0.5
             return xp.asarray(true_minimum + domain_width * rng.uniform(size=shape))
         return xp.asarray(rng.normal(scale=1.0, size=shape) * self.generation_scale)
 
