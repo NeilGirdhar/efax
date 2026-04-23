@@ -141,13 +141,22 @@ class SimplexSupport(Support):
 
     @override
     def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
-        return self.ring.flattened(x, map_to_plane=map_to_plane)
+        if not map_to_plane:
+            return self.ring.flattened(x, map_to_plane=False)
+        xp = array_namespace(x)
+        residual = 1.0 - xp.sum(x, axis=-1, keepdims=True)
+        return xp.log(x / residual)
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
-        x = self.ring.unflattened(y, map_from_plane=map_from_plane)
-        assert x.shape[-1] == dimensions
-        return x
+        if not map_from_plane:
+            x = self.ring.unflattened(y, map_from_plane=False)
+            assert x.shape[-1] == dimensions - 1
+            return x
+        xp = array_namespace(y)
+        assert y.shape[-1] == dimensions - 1
+        logits = xp.concat((y, xp.zeros((*y.shape[:-1], 1), dtype=y.dtype)), axis=-1)
+        return jss.softmax(logits, axis=-1)[..., :-1]
 
     @override
     def clamp(self, x: JaxArray) -> JaxArray:
@@ -161,7 +170,11 @@ class SimplexSupport(Support):
     def generate(
         self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
     ) -> JaxRealArray:
-        raise NotImplementedError
+        alpha = xp.ones(dimensions)
+        x = xp.asarray(rng.dirichlet(alpha, size=shape))
+        if safety > 0.0:
+            x = x * (1.0 - safety) + safety / dimensions
+        return x[..., :-1]
 
 
 class SymmetricMatrixSupport(Support):

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import jax.numpy as jnp
+import numpy as np
 from numpy.testing import assert_allclose
 
-from efax import CircularBoundedSupport, ComplexField
+from efax import CircularBoundedSupport, ComplexField, SimplexSupport
 
 
 def test_complex_field_zero_plane_mapping_is_finite() -> None:
@@ -31,3 +32,37 @@ def test_circular_bounded_support_zero_plane_mapping_is_finite() -> None:
 
     assert_allclose(flattened, jnp.zeros(2))
     assert_allclose(unflattened, jnp.zeros(2))
+
+
+def test_simplex_support_uses_reduced_dimension() -> None:
+    support = SimplexSupport()
+    dimensions = 4
+    reduced_dimensions = dimensions - 1
+
+    assert support.shape(dimensions) == (reduced_dimensions,)
+    assert support.num_elements(dimensions) == reduced_dimensions
+    assert_allclose(
+        support.unflattened(jnp.asarray([0.2, 0.3, 0.4]), dimensions, map_from_plane=False),
+        jnp.asarray([0.2, 0.3, 0.4]),
+    )
+
+
+def test_simplex_support_plane_round_trip() -> None:
+    support = SimplexSupport()
+    x = jnp.asarray([[0.2, 0.3, 0.1], [0.1, 0.1, 0.7]])
+
+    flattened = support.flattened(x, map_to_plane=True)
+    unflattened = support.unflattened(flattened, 4, map_from_plane=True)
+
+    assert_allclose(unflattened, x, rtol=1e-6)
+
+
+def test_simplex_support_generate() -> None:
+    support = SimplexSupport()
+    x = support.generate(jnp, np.random.default_rng(123), (5, 2), 0.01, 4)
+    residual = 1.0 - jnp.sum(x, axis=-1)
+
+    assert x.shape == (5, 2, 3)
+    assert bool(jnp.all(x > 0.0))
+    assert bool(jnp.all(residual > 0.0))
+    assert bool(jnp.all(jnp.sum(x, axis=-1) < 1.0))
