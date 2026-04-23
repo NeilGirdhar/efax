@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, final, override
+from typing import Any, Generic, cast, final, override
 
 import jax.numpy as jnp
 import pytest
@@ -13,7 +13,8 @@ from efax import (
     Assembler,
     ExpectationParametrization,
     NaturalParametrization,
-    SubDistributionInfo,
+    SimpleDistribution,
+    SimpleDistributionInfo,
 )
 
 from .scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistribution
@@ -67,10 +68,22 @@ class DistributionInfo(Generic[NP, EP, Domain]):
         return jnp.asarray(x)
 
     def exp_structure(self) -> Assembler[EP]:
-        return Assembler([SubDistributionInfo((), self.exp_class(), self.dimensions, [])])
+        return Assembler(
+            [
+                SimpleDistributionInfo(
+                    (), cast("type[SimpleDistribution]", self.exp_class()), self.dimensions
+                )
+            ]
+        )
 
     def nat_structure(self) -> Assembler[NP]:
-        return Assembler([SubDistributionInfo((), self.nat_class(), self.dimensions, [])])
+        return Assembler(
+            [
+                SimpleDistributionInfo(
+                    (), cast("type[SimpleDistribution]", self.nat_class()), self.dimensions
+                )
+            ]
+        )
 
     def exp_class(self) -> type[EP]:
         raise NotImplementedError

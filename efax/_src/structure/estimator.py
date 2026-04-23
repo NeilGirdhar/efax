@@ -9,7 +9,7 @@ from efax._src.iteration import flatten_mapping, parameters
 from efax._src.parametrization import Distribution, SimpleDistribution
 from efax._src.types import Path
 
-from .assembler import Assembler, SubDistributionInfo
+from .assembler import Assembler, JointDistributionInfo, SimpleDistributionInfo
 from .parameter_names import parameter_names
 
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ class Estimator(Assembler[P]):
             msg = f"{type_p.__name__} is not an EP"
             raise TypeError(msg)
         return Estimator(
-            [SubDistributionInfo((), type_p, 0, [])],
+            [SimpleDistributionInfo((), type_p, 0)],
             {(name,): value for name, value in fixed_parameters.items()},
         )
 
@@ -97,8 +97,7 @@ class Estimator(Assembler[P]):
 
         constructed: dict[Path, ExpectationParametrization] = {}
 
-        def g(info: SubDistributionInfo, x: JaxComplexArray) -> None:
-            assert not info.sub_distribution_names
+        def g(info: SimpleDistributionInfo, x: JaxComplexArray) -> None:
             exp_cls = info.type_
             assert issubclass(exp_cls, ExpectationParametrization)
 
@@ -113,7 +112,7 @@ class Estimator(Assembler[P]):
             assert isinstance(p, ExpectationParametrization)
             constructed[info.path] = p
 
-        def h(info: SubDistributionInfo) -> None:
+        def h(info: JointDistributionInfo) -> None:
             exp_cls = info.type_
             assert issubclass(exp_cls, JointDistributionE)
             sub_distributions = {
@@ -123,13 +122,16 @@ class Estimator(Assembler[P]):
 
         if isinstance(x, JaxArray):
             (info,) = self.infos
+            assert isinstance(info, SimpleDistributionInfo)
             g(info, x)
         else:
             flat_x = flatten_mapping(x)
             for info in self.infos:
                 if info.path in flat_x:
+                    assert isinstance(info, SimpleDistributionInfo)
                     g(info, flat_x[info.path])
                 else:
+                    assert isinstance(info, JointDistributionInfo)
                     h(info)
         return cast("P", constructed[()])
 
@@ -146,6 +148,12 @@ class Estimator(Assembler[P]):
         constructed: dict[Path, Distribution] = {}
         n = None
         for info in self.infos:
+            if isinstance(info, JointDistributionInfo):
+                sub_distributions = {
+                    name: constructed[*info.path, name] for name in info.sub_distribution_names
+                }
+                constructed[info.path] = info.type_(_sub_distributions=sub_distributions)
+                continue
             assert issubclass(info.type_, HasConjugatePrior)
             fixed_parameters = {
                 this_field.name: self.fixed_parameters[*info.path, this_field.name]
@@ -156,7 +164,7 @@ class Estimator(Assembler[P]):
             for path_element in info.path:
                 assert isinstance(cp_i, JointDistributionN)
                 cp_i = cp_i.sub_distributions()[path_element]
-            p, n_i = info.type_.from_conjugate_prior_distribution(cp, **fixed_parameters)
+            p, n_i = info.type_.from_conjugate_prior_distribution(cp_i, **fixed_parameters)
             if n is None:
                 n = n_i
             else:

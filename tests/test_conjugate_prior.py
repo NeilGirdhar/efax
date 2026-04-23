@@ -6,7 +6,15 @@ from numpy.random import Generator
 from numpy.testing import assert_allclose
 from tjax import assert_tree_allclose
 
-from efax import Estimator, HasConjugatePrior, HasGeneralizedConjugatePrior
+from efax import (
+    BernoulliEP,
+    Estimator,
+    HasConjugatePrior,
+    HasGeneralizedConjugatePrior,
+    JointDistributionE,
+    JointDistributionN,
+    UnitVarianceNormalEP,
+)
 
 from .distribution_info import DistributionInfo
 
@@ -61,6 +69,27 @@ def test_from_conjugate_prior(
     p_prime, n_prime = p_estimator.from_conjugate_prior(cp_q)
     assert_tree_allclose(p, p_prime, atol=1.5)
     assert_allclose(n, n_prime, atol=1.5)
+
+
+def test_joint_from_conjugate_prior() -> None:
+    """Test that joint CP recovery passes each leaf its own CP distribution."""
+    n = 123.0 * jnp.ones((4, 3))
+    p = JointDistributionE(
+        {
+            "normal": UnitVarianceNormalEP(jnp.full((4, 3), 0.25)),
+            "bernoulli": BernoulliEP(jnp.full((4, 3), 0.7)),
+        }
+    )
+    cp_sub_distributions = {}
+    for name, value in p.sub_distributions().items():
+        assert isinstance(value, HasConjugatePrior)
+        cp_sub_distributions[name] = value.conjugate_prior_distribution(n)
+    cp_q = JointDistributionN(cp_sub_distributions)
+
+    p_prime, n_prime = Estimator.from_expectation(p).from_conjugate_prior(cp_q)
+
+    assert_tree_allclose(p, p_prime)
+    assert_allclose(n, n_prime)
 
 
 def test_generalized_conjugate_prior(

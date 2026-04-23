@@ -11,6 +11,7 @@ from efax._src.iteration import parameters
 from efax._src.parametrization import Distribution, SimpleDistribution
 from efax._src.types import Path
 
+from .assembler import JointDistributionInfo, SimpleDistributionInfo
 from .estimator import Estimator
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
@@ -42,6 +43,7 @@ class Flattener(Estimator[P]):
         return sum(
             support.num_elements(info.dimensions)
             for info in self.infos
+            if isinstance(info, SimpleDistributionInfo)
             for _, support, _ in parameter_supports(info.type_, fixed=False)
         )
 
@@ -63,6 +65,12 @@ class Flattener(Estimator[P]):
         constructed: dict[Path, Distribution] = {}
         available = flattened.shape[-1]
         for info in self.infos:
+            if isinstance(info, JointDistributionInfo):
+                sub_distributions = {
+                    name: constructed[*info.path, name] for name in info.sub_distribution_names
+                }
+                constructed[info.path] = info.type_(_sub_distributions=sub_distributions)
+                continue
             regular_kwargs: dict[str, JaxArray] = {}
             for name, support, value_receptacle in parameter_supports(info.type_, fixed=False):
                 k = support.num_elements(info.dimensions)
@@ -80,11 +88,6 @@ class Flattener(Estimator[P]):
             )
             for name in parameter_names(info.type_, fixed=True):
                 kwargs[name] = self.fixed_parameters[*info.path, name]
-            sub_distributions = {
-                name: constructed[*info.path, name] for name in info.sub_distribution_names
-            }
-            if sub_distributions:
-                kwargs["_sub_distributions"] = sub_distributions
             constructed[info.path] = info.type_(**kwargs)
         if consumed != available:
             raise ValueError("Incompatible array")  # noqa: TRY003

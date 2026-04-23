@@ -48,6 +48,7 @@ from efax import (
     IsotropicNormalEP,
     IsotropicNormalNP,
     JointDistributionE,
+    JointDistributionInfo,
     JointDistributionN,
     LogarithmicEP,
     LogarithmicNP,
@@ -69,9 +70,9 @@ from efax import (
     PoissonNP,
     RayleighEP,
     RayleighNP,
+    SimpleDistributionInfo,
     SoftplusNormalEP,
     SoftplusNormalNP,
-    SubDistributionInfo,
     UnitVarianceLogNormalEP,
     UnitVarianceLogNormalNP,
     UnitVarianceNormalEP,
@@ -436,19 +437,21 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
     def exp_structure(self) -> Assembler[JointDistributionE]:
         infos = []
         for name, info in self.infos.items():
-            infos.extend(
-                [
-                    SubDistributionInfo(
-                        (*sub_info.path, name),
-                        sub_info.type_,
-                        sub_info.dimensions,
-                        sub_info.sub_distribution_names,
+            for sub_info in info.exp_structure().infos:
+                path = (*sub_info.path, name)
+                if isinstance(sub_info, JointDistributionInfo):
+                    infos.append(
+                        JointDistributionInfo(
+                            path,
+                            sub_info.type_,
+                            sub_info.dimensions,
+                            sub_info.sub_distribution_names,
+                        )
                     )
-                    for sub_info in info.exp_structure().infos
-                ]
-            )
+                else:
+                    infos.append(SimpleDistributionInfo(path, sub_info.type_, sub_info.dimensions))
         infos.append(
-            SubDistributionInfo((), self.exp_class(), self.dimensions, list(self.infos.keys()))
+            JointDistributionInfo((), self.exp_class(), self.dimensions, list(self.infos.keys()))
         )
         return Assembler(infos)
 
@@ -456,19 +459,21 @@ class JointInfo(DistributionInfo[JointDistributionN, JointDistributionE, dict[st
     def nat_structure(self) -> Assembler[JointDistributionN]:
         infos = []
         for name, info in self.infos.items():
-            infos.extend(
-                [
-                    SubDistributionInfo(
-                        (*sub_info.path, name),
-                        sub_info.type_,
-                        sub_info.dimensions,
-                        sub_info.sub_distribution_names,
+            for sub_info in info.nat_structure().infos:
+                path = (*sub_info.path, name)
+                if isinstance(sub_info, JointDistributionInfo):
+                    infos.append(
+                        JointDistributionInfo(
+                            path,
+                            sub_info.type_,
+                            sub_info.dimensions,
+                            sub_info.sub_distribution_names,
+                        )
                     )
-                    for sub_info in info.nat_structure().infos
-                ]
-            )
+                else:
+                    infos.append(SimpleDistributionInfo(path, sub_info.type_, sub_info.dimensions))
         infos.append(
-            SubDistributionInfo((), self.nat_class(), self.dimensions, list(self.infos.keys()))
+            JointDistributionInfo((), self.nat_class(), self.dimensions, list(self.infos.keys()))
         )
         return Assembler(infos)
 

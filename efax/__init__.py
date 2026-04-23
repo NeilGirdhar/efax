@@ -92,7 +92,12 @@ from ._src.parameter.support import (
     VectorSupport,
 )
 from ._src.parametrization import Distribution, SimpleDistribution
-from ._src.structure.assembler import Assembler, SubDistributionInfo
+from ._src.structure.assembler import (
+    Assembler,
+    JointDistributionInfo,
+    SimpleDistributionInfo,
+    SubDistributionInfo,
+)
 from ._src.structure.estimator import Estimator
 from ._src.structure.flattener import Flattener
 from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
@@ -152,6 +157,7 @@ __all__ = [
     "IsotropicNormalNP",
     "JointDistribution",
     "JointDistributionE",
+    "JointDistributionInfo",
     "JointDistributionN",
     "LogNormalEP",
     "LogNormalNP",
@@ -184,6 +190,7 @@ __all__ = [
     "Samplable",
     "ScalarSupport",
     "SimpleDistribution",
+    "SimpleDistributionInfo",
     "SimplexSupport",
     "SoftplusNormalEP",
     "SoftplusNormalNP",

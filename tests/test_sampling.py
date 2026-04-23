@@ -18,7 +18,7 @@ from efax import (
     Multidimensional,
     NaturalParametrization,
     Samplable,
-    SimpleDistribution,
+    SimpleDistributionInfo,
     flat_dict_of_observations,
     flat_dict_of_parameters,
     flatten_mapping,
@@ -82,7 +82,7 @@ def _verify_sample_shape(
             *info.type_.domain_support().shape(info.dimensions),
         )
         for info in structure.infos
-        if issubclass(info.type_, SimpleDistribution)
+        if isinstance(info, SimpleDistributionInfo)
     }
     samples_shape = {path: s.shape for path, s in flat_map_of_samples.items()}
     assert samples_shape == ideal_samples_shape
