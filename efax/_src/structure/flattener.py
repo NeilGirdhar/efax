@@ -60,7 +60,15 @@ class Flattener(Estimator[P]):
         """
         xp = array_namespace(flattened)
         if raveled:
-            flattened = xp.reshape(flattened, (-1, self.final_dimension_size()))
+            final_dimension_size = self.final_dimension_size()
+            if final_dimension_size == 0:
+                if flattened.size != 0:
+                    raise ValueError("Incompatible array")  # noqa: TRY003
+                fixed_parameters = parameters(self.assemble(self.fixed_parameters))
+                shape = next(iter(fixed_parameters.values())).shape
+                flattened = xp.reshape(flattened, (*shape, 0))
+            else:
+                flattened = xp.reshape(flattened, (-1, final_dimension_size))
         consumed = 0
         constructed: dict[Path, Distribution] = {}
         available = flattened.shape[-1]
@@ -114,7 +122,7 @@ class Flattener(Estimator[P]):
             for x in xs
         ]
 
-        flattened_array = xp.concat(arrays, axis=-1)
+        flattened_array = xp.concat(arrays, axis=-1) if arrays else xp.empty((*p.shape, 0))
         return (
             cls(cls._extract_distributions(p), parameters(p, fixed=True), mapped_to_plane),
             flattened_array,

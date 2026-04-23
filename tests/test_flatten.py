@@ -4,11 +4,31 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 from numpy.random import Generator
-from tjax import assert_tree_allclose
+from tjax import Shape, assert_tree_allclose
+from tjax.dataclasses import dataclass
 
-from efax import Flattener, MultivariateUnitVarianceNormalNP
+from efax import (
+    Flattener,
+    MultivariateUnitVarianceNormalNP,
+    ScalarSupport,
+    SimpleDistribution,
+    distribution_parameter,
+)
 
 from .distribution_info import DistributionInfo
+
+
+@dataclass
+class FixedOnlyDistribution(SimpleDistribution):
+    value: jnp.ndarray = distribution_parameter(ScalarSupport(), fixed=True)
+
+    @property
+    def shape(self) -> Shape:
+        return self.value.shape
+
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
+        return ScalarSupport()
 
 
 @pytest.mark.parametrize("natural", [False, True])
@@ -39,6 +59,18 @@ def test_unflatten_raveled() -> None:
     raveled = jnp.ravel(flattened)
     assert raveled.shape == (30,)
     assert_tree_allclose(flattener.unflatten(raveled, raveled=True), m)
+
+
+@pytest.mark.nondistribution
+def test_flatten_fixed_only_distribution() -> None:
+    p = FixedOnlyDistribution(jnp.arange(6.0).reshape(2, 3))
+
+    flattener, flattened = Flattener.flatten(p)
+
+    assert flattened.shape == (2, 3, 0)
+    assert flattener.final_dimension_size() == 0
+    assert_tree_allclose(flattener.unflatten(flattened), p)
+    assert_tree_allclose(flattener.unflatten(jnp.zeros(0), raveled=True), p)
 
 
 @pytest.mark.nondistribution
