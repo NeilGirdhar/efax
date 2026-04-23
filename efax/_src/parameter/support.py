@@ -10,7 +10,7 @@ import numpy as np
 from array_api_compat import array_namespace
 from numpy.random import Generator
 from opt_einsum import contract
-from tjax import JaxArray, JaxRealArray, Shape
+from tjax import JaxArray, JaxRealArray, Shape, divide_where
 
 from efax._src.types import Namespace
 
@@ -299,7 +299,12 @@ class CircularBoundedSupport(VectorSupport):
         xp = array_namespace(x)
         magnitude = xp.linalg.norm(x, 2, axis=-1, keepdims=True)
         corrected_magnitude = jss.logit((magnitude / self.radius) * 0.5 + 0.5)
-        return x * corrected_magnitude / magnitude
+        return x * divide_where(
+            corrected_magnitude,
+            magnitude,
+            where=magnitude != 0.0,
+            otherwise=xp.zeros_like(magnitude),
+        )
 
     @override
     def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
@@ -310,4 +315,9 @@ class CircularBoundedSupport(VectorSupport):
         assert y.shape[-1] == dimensions
         corrected_magnitude = cast("JaxRealArray", xp.linalg.norm(y, 2, axis=-1, keepdims=True))
         magnitude = self.radius * (jss.expit(corrected_magnitude) - 0.5) * 2.0
-        return y * magnitude / corrected_magnitude
+        return y * divide_where(
+            magnitude,
+            corrected_magnitude,
+            where=corrected_magnitude != 0.0,
+            otherwise=xp.zeros_like(corrected_magnitude),
+        )
