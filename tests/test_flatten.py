@@ -31,6 +31,17 @@ def test_flatten(
 
 
 @pytest.mark.nondistribution
+def test_unflatten_raveled() -> None:
+    """Test that raveled=True accepts a 1D raveled array and matches the normal path."""
+    m = MultivariateUnitVarianceNormalNP(jnp.zeros((3, 10)))
+    flattener, flattened = Flattener.flatten(m)
+    assert flattened.shape == (3, 10)
+    raveled = jnp.ravel(flattened)
+    assert raveled.shape == (30,)
+    assert_tree_allclose(flattener.unflatten(raveled, raveled=True), m)
+
+
+@pytest.mark.nondistribution
 def test_raises() -> None:
     """Test that unflattening raises for bad shapes."""
     m = MultivariateUnitVarianceNormalNP(jnp.zeros(10))

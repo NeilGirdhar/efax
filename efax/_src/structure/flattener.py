@@ -45,15 +45,19 @@ class Flattener(Estimator[P]):
             for _, support, _ in parameter_supports(info.type_, fixed=False)
         )
 
-    def unflatten(self, flattened: JaxRealArray, *, return_vector: bool = False) -> P:
+    def unflatten(self, flattened: JaxRealArray, *, raveled: bool = False) -> P:
         """Decode a flat array back into a Distribution, reinserting fixed parameters.
 
         Args:
             flattened: The flat array produced by flatten.
-            return_vector: If true, reshape the leading dimensions so that a vector is returned.
+            raveled: If False (default), flattened must have shape
+                (..., n_components, params_per_component) as produced by Flattener.flatten.
+                If True, flattened may be a 1D vector of shape
+                (n_components * params_per_component,) — i.e., the caller has raveled the
+                structured flat array.
         """
         xp = array_namespace(flattened)
-        if return_vector:
+        if raveled:
             flattened = xp.reshape(flattened, (-1, self.final_dimension_size()))
         consumed = 0
         constructed: dict[Path, Distribution] = {}
