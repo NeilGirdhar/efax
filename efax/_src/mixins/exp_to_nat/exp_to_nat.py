@@ -43,7 +43,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         # Select a default minimizer based on the dimensionality of the search space.
         # Bisection is used for scalar problems; Newton's method for vector problems.
         if hasattr(super(), "__post_init__"):
-            super().__post_init__()  # pyright: ignore
+            super().__post_init__()  # ty: ignore
         if self.minimizer is None:
             from .optimistix import default_bisection_minimizer, default_minimizer  # noqa: PLC0415
 
