@@ -311,7 +311,7 @@ class GammaInfo(DistributionInfo[GammaNP, GammaEP, NumpyRealArray]):
     def nat_to_scipy_distribution(self, q: GammaNP) -> Any:
         shape = np.asarray(q.shape_minus_one) + 1.0
         scale = -np.reciprocal(q.negative_rate)
-        return Gamma(a=shape) * scale  # pyright: ignore
+        return Gamma(a=shape) * scale
 
     @override
     def exp_class(self) -> type[GammaEP]:
@@ -383,7 +383,7 @@ class InverseGaussianInfo(DistributionInfo[InverseGaussianNP, InverseGaussianEP,
     def nat_to_scipy_distribution(self, q: InverseGaussianNP) -> Any:
         mu = np.sqrt(q.negative_lambda_over_two / q.negative_lambda_over_two_mu_squared)
         lambda_ = -np.asarray(q.negative_lambda_over_two) * 2.0
-        return InverseGaussian(mu=mu / lambda_) * lambda_  # pyright: ignore
+        return InverseGaussian(mu=mu / lambda_) * lambda_
 
     @override
     def exp_class(self) -> type[InverseGaussianEP]:
@@ -524,7 +524,7 @@ class MultivariateDiagonalNormalInfo(
     @override
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
         variance = np.asarray(p.variance())
-        covariance = xpx.create_diagonal(variance)  # pyright: ignore
+        covariance = xpx.create_diagonal(variance)
         assert isinstance(covariance, np.ndarray)
         return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
 
@@ -790,7 +790,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: WeibullEP) -> Any:
         scale = np.asarray(p.chi) ** np.reciprocal(p.concentration)
-        return Weibull(c=p.concentration) * scale  # pyright: ignore  # ty: ignore
+        return Weibull(c=p.concentration) * scale  # ty: ignore
 
     @override
     def exp_class(self) -> type[WeibullEP]:

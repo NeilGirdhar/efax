@@ -52,15 +52,6 @@ dependencies = [
 [project.urls]
 source = "https://github.com/NeilGirdhar/efax"
 
-[tool.pyright]
-include = ["efax", "tests", "examples"]
-stubPath = ""
-venvPath = "."
-venv = ".venv"
-reportMatchNotExhaustive = true
-reportMissingParameterType = true
-reportMissingTypeArgument = true
-
 [tool.ruff]
 line-length = 100
 

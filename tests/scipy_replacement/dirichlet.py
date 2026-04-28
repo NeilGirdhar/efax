@@ -31,7 +31,7 @@ class ScipyDirichletFixRVsAndPDF:
     def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> onp.ArrayND[np.float64]:
         # This somehow fixes the behaviour of scipy's ``dirichlet.rvs``.
         return self.distribution.rvs(  # type: ignore
-            size=shape,  # pyright: ignore
+            size=shape,
             random_state=rng,
         )
 

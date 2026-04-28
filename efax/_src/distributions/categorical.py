@@ -80,7 +80,7 @@ class CategoricalNP(
         logits = xp.concat((self.log_odds, xp.zeros((*self.shape, 1))), axis=-1)
         retval = xpx.one_hot(jr.categorical(key, logits, shape=shape), self.dimensions() + 1)  # type: ignore
         assert isinstance(retval, JaxArray)
-        return retval[..., :-1]  # pyright: ignore
+        return retval[..., :-1]
 
     @override
     def dimensions(self) -> int:
