@@ -145,7 +145,7 @@ def test_sampling_and_estimation(
     flat_map_of_samples = (
         {(): samples} if isinstance(samples, JaxArray) else flatten_mapping(samples)
     )
-    _verify_sample_shape(distribution_shape, sample_shape, assembler, flat_map_of_samples)  # type: ignore
+    _verify_sample_shape(distribution_shape, sample_shape, assembler, flat_map_of_samples)  # ty: ignore
     _verify_maximum_likelihood_estimate(
         sampling_distribution_info, sample_shape, assembler, exp_parameters, samples
     )

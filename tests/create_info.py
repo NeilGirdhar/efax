@@ -221,7 +221,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         pseudo_second_moment = np.asarray(p.pseudo_second_moment, dtype=np.complex128)
         return ScipyComplexNormal(
             mean,
-            second_moment - cast("NumpyRealArray", abs_square(mean)),  # type: ignore
+            second_moment - cast("NumpyRealArray", abs_square(mean)),  # ty: ignore
             pseudo_second_moment - np.square(mean),
         )
 

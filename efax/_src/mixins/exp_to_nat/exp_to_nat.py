@@ -96,7 +96,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
             unflatten_as_type=np_cls,
             mapped_to_plane=True,
         )
-        return flattener.unflatten(search_parameters)  # type: ignore
+        return flattener.unflatten(search_parameters)  # ty: ignore
 
     def search_gradient(self, search_parameters: SP) -> SP:
         """Convert the search parameters to the natural gradient.

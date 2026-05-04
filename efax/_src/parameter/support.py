@@ -288,10 +288,10 @@ class SymmetricMatrixSupport(Support):
             i = int(i_)
             j = int(j_)
             xk = x[..., k]
-            result = xpx.at(result)[..., i, j].set(xk)  # type: ignore
+            result = xpx.at(result)[..., i, j].set(xk)  # ty: ignore
             if i != j:
                 cxk = xp.conj(xk) if self.hermitian else xk
-                result = xpx.at(result)[..., j, i].set(cxk)  # type: ignore
+                result = xpx.at(result)[..., j, i].set(cxk)  # ty: ignore
         assert isinstance(result, JaxArray)
         return result
 

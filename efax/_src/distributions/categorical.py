@@ -78,7 +78,7 @@ class CategoricalNP(
         if shape is not None:
             shape += self.shape
         logits = xp.concat((self.log_odds, xp.zeros((*self.shape, 1))), axis=-1)
-        retval = xpx.one_hot(jr.categorical(key, logits, shape=shape), self.dimensions() + 1)  # type: ignore
+        retval = xpx.one_hot(jr.categorical(key, logits, shape=shape), self.dimensions() + 1)  # ty: ignore
         assert isinstance(retval, JaxArray)
         return retval[..., :-1]
 

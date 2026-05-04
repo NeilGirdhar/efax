@@ -9,7 +9,7 @@ from tjax import NumpyRealArray
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyVonMises(ShapedDistribution[object]):  # type: ignore
+class ScipyVonMises(ShapedDistribution[object]):  # ty: ignore
     """This class allows distributions having a non-empty shape."""
 
     @override
@@ -27,7 +27,7 @@ class ScipyVonMises(ShapedDistribution[object]):  # type: ignore
         super().__init__(shape, rvs_shape, dtype, objects, multivariate=False)
 
 
-class ScipyVonMisesFisher(ShapedDistribution[object]):  # type: ignore
+class ScipyVonMisesFisher(ShapedDistribution[object]):  # ty: ignore
     """This class allows distributions having a non-empty shape."""
 
     @override

@@ -72,7 +72,7 @@ class ScipyComplexNormalUnvectorized:
         return 0.5 * np.stack([xx_xy, yx_yy], axis=-2)
 
 
-class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):  # type: ignore
+class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):  # ty: ignore
     """This class allows distributions having a non-empty shape."""
 
     @override

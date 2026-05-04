@@ -84,7 +84,7 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
 
 class ScipyComplexMultivariateNormal(
-    ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]  # type: ignore
+    ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]  # ty: ignore
 ):
     """This class allows distributions having a non-empty shape."""
 
