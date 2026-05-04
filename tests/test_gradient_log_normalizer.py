@@ -72,8 +72,8 @@ def _unit_tangent(nat_parameters: NaturalParametrization) -> NaturalParametrizat
         path: zero_from_primal(value, symbolic_zeros=False)
         for path, value in parameters(nat_parameters, fixed=True).items()
     }
-    structure = Assembler.create_assembler(nat_parameters)
-    return structure.assemble({**new_variable_parameters, **new_fixed_parameters})
+    assembler = Assembler.create_assembler(nat_parameters)
+    return assembler.assemble({**new_variable_parameters, **new_fixed_parameters})
 
 
 def test_jvp(generator: Generator, distribution_info: DistributionInfo) -> None:

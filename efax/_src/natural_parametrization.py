@@ -157,7 +157,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
         """
         xp = array_namespace(self)
         fisher_information_diagonal = self.fisher_information_diagonal()
-        structure = Assembler.create_assembler(self)
+        assembler = Assembler.create_assembler(self)
         final_parameters = parameters(self)
         for path, (value, support) in parameters(fisher_information_diagonal, support=True).items():
             na = support.axes()
@@ -170,7 +170,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
             else:
                 raise RuntimeError
             final_parameters[path] = new_value
-        return structure.assemble(final_parameters)
+        return assembler.assemble(final_parameters)
 
     @final
     def jeffreys_prior_density(self) -> JaxRealArray:

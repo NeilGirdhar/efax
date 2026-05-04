@@ -45,10 +45,10 @@ def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
     integers after the mean because the Array API spec requires mean to preserve integer dtypes.
     """
     xp = array_namespace(x)
-    structure = Assembler.create_assembler(x)
+    assembler = Assembler.create_assembler(x)
     all_params = parameters(x)
     averaged = {path: xp.mean(value, axis=axis) for path, value in all_params.items()}
-    return structure.assemble(averaged)
+    return assembler.assemble(averaged)
 
 
 def parameter_map[T: Distribution](

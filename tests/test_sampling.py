@@ -19,7 +19,6 @@ from efax import (
     NaturalParametrization,
     Samplable,
     SimpleDistributionInfo,
-    flat_dict_of_observations,
     flat_dict_of_parameters,
     flatten_mapping,
     parameter_mean,
@@ -142,14 +141,13 @@ def test_sampling_and_estimation(
         sample_shape,
         natural=natural,
     )
-    flat_map_of_samples = flat_dict_of_observations(samples)
-    structure = Assembler.create_assembler(exp_parameters)
+    assembler = Assembler.create_assembler(exp_parameters)
     flat_map_of_samples = (
         {(): samples} if isinstance(samples, JaxArray) else flatten_mapping(samples)
     )
-    _verify_sample_shape(distribution_shape, sample_shape, structure, flat_map_of_samples)  # type: ignore
+    _verify_sample_shape(distribution_shape, sample_shape, assembler, flat_map_of_samples)  # type: ignore
     _verify_maximum_likelihood_estimate(
-        sampling_distribution_info, sample_shape, structure, exp_parameters, samples
+        sampling_distribution_info, sample_shape, assembler, exp_parameters, samples
     )
 
 
