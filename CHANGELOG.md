@@ -3,6 +3,13 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.3.0 - 2026-05-06
+
+- Fixed the JVP of `characteristic_function`.
+- Fixed `GeneralizedDirichletEP.to_nat`, `SimplexSupport`, a joint conjugate-prior bug, and a misuse of `xp.mean`; corrected support handling and the resulting failing tests.
+- Allowed flattening empty distributions and switched flatteners to `divide_where` to avoid NaNs.
+- Renamed `return_vector` to `raveled`, renamed structure variables to assembler, and refreshed ty, Ruff, and ignore directives.
+
 ## 2.2.5 - 2026-04-16
 
 - Reverted a breaking change to `parameter_mean`.
