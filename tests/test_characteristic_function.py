@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import jax
 import jax.numpy as jnp
 import numpy as np
 import scipy.integrate as si
@@ -14,6 +15,51 @@ from efax import (
     NormalNP,
     PoissonNP,
 )
+
+
+def test_cf_jacfwd_does_not_raise() -> None:
+    """Fix complex JVP path for characteristic_function Jacobian.
+
+    jax.jacfwd through characteristic_function must not raise the dtype-mismatch
+    error from log_normalizer's custom JVP, and must produce a complex Jacobian.
+
+    Regression for: when natural parameters are analytically continued via
+    `_complexify`, `log_normalizer` returns complex; the JVP rule must use the
+    holomorphic inner product on this path.
+    """
+    p = NormalNP(jnp.float64(0.5), jnp.float64(-0.5))
+    t_zero = NormalNP(jnp.float64(0.0), jnp.float64(0.0))
+    jac = jax.jacfwd(p.characteristic_function)(t_zero)
+    leaves = jax.tree_util.tree_leaves(jac)
+    assert leaves, "expected at least one Jacobian leaf"
+    for leaf in leaves:
+        assert jnp.iscomplexobj(leaf), f"Jacobian leaf has non-complex dtype: {leaf.dtype}"
+
+
+def test_cf_jacfwd_matches_finite_differences() -> None:
+    """Check jax.jacfwd CF derivative against central difference.
+
+    For Exponential (1-D natural param), compare jax.jacfwd of CF to a
+    central-difference reference. The CF is rate / (rate - i·f); its derivative
+    in f at f=0 is i / rate.
+    """
+    rate = 1.7
+    p = ExponentialNP(jnp.float64(-rate))
+    t_zero = ExponentialNP(jnp.float64(0.0))
+
+    def cf(t: ExponentialNP) -> jnp.ndarray:
+        return p.characteristic_function(t)
+
+    jac = jax.jacfwd(cf)(t_zero)
+    # Pull the (sole) leaf out as a complex scalar.
+    (leaf,) = jax.tree_util.tree_leaves(jac)
+    eps = 1e-3
+    plus = cf(ExponentialNP(jnp.float64(eps)))
+    minus = cf(ExponentialNP(jnp.float64(-eps)))
+    fd = (plus - minus) / (2 * eps)
+    assert_allclose(complex(leaf), complex(fd), rtol=1e-4, atol=1e-6)
+    # Sanity check against the analytic value i / rate.
+    assert_allclose(complex(leaf), 1j / rate, rtol=1e-4, atol=1e-6)
 
 
 def _normal_cf_x2(mu: float, sigma2: float, g: float) -> complex:

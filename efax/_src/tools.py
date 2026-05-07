@@ -16,22 +16,38 @@ from .structure.assembler import Assembler
 from .types import Axis
 
 
-@jit
-def parameter_dot_product(x: Distribution, y: Distribution, /) -> JaxRealArray:
-    """Return the vectorized dot product over all of the variable parameters."""
-
-    def dotted_fields() -> Iterable[JaxRealArray]:
+def _walk_parameters(x: Distribution, y: Distribution, *, hermitian: bool) -> JaxComplexArray:
+    def dotted_fields() -> Iterable[JaxComplexArray]:
         xs = parameters(x, fixed=False, support=True).values()
         ys = parameters(y, fixed=False, support=True).values()
 
         for (x_value, x_support), (y_value, y_support) in zip(xs, ys, strict=True):
             axes = x_support.axes()
             assert y_support.axes() == axes
-            yield _parameter_dot_product(x_value, y_value, axes)
+            yield _parameter_inner_product(x_value, y_value, axes, hermitian=hermitian)
 
     dotted_fields_list = list(dotted_fields())
     xp = array_namespace(*dotted_fields_list)
     return reduce(xp.add, dotted_fields_list)
+
+
+@jit
+def parameter_dot_product(x: Distribution, y: Distribution, /) -> JaxRealArray:
+    """Return the vectorized Hermitian dot product over all of the variable parameters."""
+    return _walk_parameters(x, y, hermitian=True)
+
+
+@jit
+def parameter_holomorphic_dot(x: Distribution, y: Distribution, /) -> JaxComplexArray:
+    """Vectorized holomorphic dot product over the variable parameters.
+
+    Returns ``Σ x · y`` over each variable parameter's support axes (no
+    conjugation, no real-part).  For real-dtype inputs this is equal to
+    :func:`parameter_dot_product`.  Required by :func:`log_normalizer`'s custom
+    JVP on the analytic-continuation path used by :meth:`characteristic_function`,
+    where the primal output is complex and JAX expects a complex tangent.
+    """
+    return _walk_parameters(x, y, hermitian=False)
 
 
 T = TypeVar("T", bound=Distribution)
@@ -80,8 +96,21 @@ def join_mappings[T, V](**field_to_map: Mapping[T, V]) -> dict[T, dict[str, V]]:
 
 
 # Private functions --------------------------------------------------------------------------------
-def _parameter_dot_product(x: JaxComplexArray, y: JaxComplexArray, n_axes: int) -> JaxRealArray:
-    """Returns the real component of the dot product of the final n_axes axes of two arrays."""
+def _parameter_inner_product(
+    x: JaxComplexArray,
+    y: JaxComplexArray,
+    n_axes: int,
+    *,
+    hermitian: bool,
+) -> JaxComplexArray:
+    """Per-tensor inner product over the final ``n_axes`` axes.
+
+    With ``hermitian=True`` returns ``Σ Re(x · conj(y))`` (real-valued); with
+    ``hermitian=False`` returns ``Σ x · y`` (the holomorphic form, complex when
+    inputs are complex).
+    """
     xp = array_namespace(x, y)
     axes = tuple(range(-n_axes, 0))
-    return xp.sum(xp.real(x * xp.conj(y)), axis=axes)
+    if hermitian:
+        return xp.sum(xp.real(x * xp.conj(y)), axis=axes)
+    return xp.sum(x * y, axis=axes)

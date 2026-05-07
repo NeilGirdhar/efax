@@ -101,7 +101,12 @@ from ._src.structure.assembler import (
 )
 from ._src.structure.estimator import Estimator
 from ._src.structure.flattener import Flattener
-from ._src.tools import parameter_dot_product, parameter_map, parameter_mean
+from ._src.tools import (
+    parameter_dot_product,
+    parameter_holomorphic_dot,
+    parameter_map,
+    parameter_mean,
+)
 from ._src.transform.joint import JointDistribution, JointDistributionE, JointDistributionN
 
 __all__ = [
@@ -219,6 +224,7 @@ __all__ = [
     "flat_dict_of_parameters",
     "flatten_mapping",
     "parameter_dot_product",
+    "parameter_holomorphic_dot",
     "parameter_map",
     "parameter_mean",
     "parameters",

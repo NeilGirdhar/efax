@@ -24,7 +24,7 @@ from .parametrization import Distribution
 from .structure.assembler import Assembler
 from .structure.estimator import Estimator
 from .structure.flattener import Flattener
-from .tools import parameter_dot_product
+from .tools import parameter_dot_product, parameter_holomorphic_dot
 
 if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
@@ -37,13 +37,24 @@ Domain = TypeVar("Domain", bound=JaxComplexArray | dict[str, Any], default=Any)
 def _log_normalizer_jvp(
     primals: tuple[NaturalParametrization],
     tangents: tuple[NaturalParametrization],
-) -> tuple[JaxRealArray, JaxRealArray]:
-    """The log-normalizer's special JVP vastly improves numerical stability."""
+) -> tuple[JaxArray, JaxArray]:
+    """The log-normalizer's special JVP vastly improves numerical stability.
+
+    On the analytic-continuation path used by ``characteristic_function`` the
+    natural parameters live in ℂⁿ and the primal output ``y`` is complex; the
+    holomorphic derivative ``Σ q_dot · p`` is what JAX expects as the complex
+    tangent.  In every other case (real distributions, and intrinsically-complex
+    distributions whose ``log_normalizer`` returns a real scalar) the Hermitian
+    form is correct.  Dispatching on ``y.dtype`` distinguishes the two.
+    """
     (q,) = primals
     (q_dot,) = tangents
     y = q.log_normalizer()
     p = q.to_exp()
-    y_dot = parameter_dot_product(q_dot, p)
+    if jnp.iscomplexobj(y):
+        y_dot = parameter_holomorphic_dot(q_dot, p)
+    else:
+        y_dot = parameter_dot_product(q_dot, p)
     return y, y_dot
 
 
