@@ -21,25 +21,6 @@ from efax import (
 from .distribution_info import DistributionInfo
 
 
-def test_cf_jacfwd_does_not_raise() -> None:
-    """Fix complex JVP path for characteristic_function Jacobian.
-
-    jax.jacfwd through characteristic_function must not raise the dtype-mismatch
-    error from log_normalizer's custom JVP, and must produce a complex Jacobian.
-
-    Regression for: when natural parameters are analytically continued,
-    `log_normalizer` returns complex; the JVP rule must use the holomorphic
-    inner product on this path.
-    """
-    p = NormalNP(jnp.float64(0.5), jnp.float64(-0.5))
-    t_zero = NormalNP(jnp.float64(0.0), jnp.float64(0.0))
-    jac = jax.jacfwd(p.characteristic_function)(t_zero)
-    leaves = jax.tree_util.tree_leaves(jac)
-    assert leaves, "expected at least one Jacobian leaf"
-    for leaf in leaves:
-        assert jnp.iscomplexobj(leaf), f"Jacobian leaf has non-complex dtype: {leaf.dtype}"
-
-
 def test_cf_jacfwd_matches_finite_differences() -> None:
     """Check jax.jacfwd CF derivative against central difference.
 
