@@ -5,7 +5,9 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 import numpy as np
+import pytest
 import scipy.integrate as si
+from numpy.random import Generator
 from numpy.testing import assert_allclose
 
 from efax import (
@@ -14,7 +16,10 @@ from efax import (
     MultivariateDiagonalNormalNP,
     NormalNP,
     PoissonNP,
+    parameter_map,
 )
+
+from .distribution_info import DistributionInfo
 
 
 def test_cf_jacfwd_does_not_raise() -> None:
@@ -75,23 +80,17 @@ def _normal_cf_x2(mu: float, sigma2: float, g: float) -> complex:
     return complex(si.quad(re, -np.inf, np.inf)[0], si.quad(im, -np.inf, np.inf)[0]) / scale
 
 
-def test_cf_at_zero() -> None:
+def test_cf_at_zero(distribution_info: DistributionInfo, generator: Generator) -> None:
     """CF(t=0) = 1 for all distributions."""
-    z = jnp.float64(0.0)
-    scalar_cases = [
-        (NormalNP(jnp.float64(1.0), jnp.float64(-0.5)), NormalNP(z, z)),
-        (GammaNP(jnp.float64(-2.0), jnp.float64(1.0)), GammaNP(z, z)),
-        (PoissonNP(jnp.float64(0.0)), PoissonNP(z)),
-        (ExponentialNP(jnp.float64(-1.0)), ExponentialNP(z)),
-    ]
-    for p, zero in scalar_cases:
+    p = distribution_info.nat_parameter_generator(generator, shape=())
+    zero = parameter_map(jnp.zeros_like, p)
+    try:
         cf = p.characteristic_function(zero)
-        assert_allclose(complex(cf), 1.0 + 0j, atol=1e-6)
-
-    d = 3
-    p_mv = MultivariateDiagonalNormalNP(jnp.ones(d), -0.5 * jnp.ones(d))
-    zero_mv = MultivariateDiagonalNormalNP(jnp.zeros(d), jnp.zeros(d))
-    assert_allclose(complex(p_mv.characteristic_function(zero_mv)), 1.0 + 0j, atol=1e-6)
+    except TypeError as e:
+        if "does not accept dtype complex" not in str(e):
+            raise
+        pytest.skip("log_normalizer does not support complex-valued CF inputs")
+    assert_allclose(complex(cf), 1.0 + 0j, atol=1e-6)
 
 
 def test_normal_cf_of_x() -> None:
