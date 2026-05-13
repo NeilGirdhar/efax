@@ -6,6 +6,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import scipy.integrate as si
+import scipy.special as sc
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 
@@ -118,17 +119,23 @@ def test_exponential_cf() -> None:
         assert_allclose(complex(cf), rate / (rate - 1j * f), rtol=1e-5)
 
 
-def test_gamma_cf_of_x() -> None:
-    # Gamma T(x) = (x, log x). With t=(f, 0), the CF reduces to
-    # E[exp(i*f*x)] for the x statistic.
+def test_gamma_cf_of_x_and_log_x() -> None:
+    # Gamma T(x) = (x, log x).
     rng = np.random.default_rng(4)
     for _ in range(10):
         rate = rng.uniform(0.5, 3)
         alpha = rng.uniform(0.5, 3)
         f = rng.normal(0, 1)
+        g = rng.uniform(-0.3, 0.3)
         p = GammaNP(jnp.float64(-rate), jnp.float64(alpha - 1))
-        cf = p.characteristic_function(GammaNP(jnp.float64(f), jnp.float64(0.0)))
-        assert_allclose(complex(cf), (rate / (rate - 1j * f)) ** alpha, rtol=1e-5)
+        cf = p.characteristic_function(GammaNP(jnp.float64(f), jnp.float64(g)))
+        expected = np.exp(
+            sc.loggamma(alpha + 1j * g)
+            - sc.loggamma(alpha)
+            + alpha * np.log(rate)
+            - (alpha + 1j * g) * np.log(rate - 1j * f)
+        )
+        assert_allclose(complex(cf), expected, rtol=1e-5)
 
 
 def test_multivariate_diagonal_normal_cf() -> None:
