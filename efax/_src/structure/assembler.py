@@ -8,6 +8,7 @@ from tjax import JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
 from typing_extensions import TypeVar
 
+from efax._src.analytic_continuation import ComplexContinuation
 from efax._src.iteration import parameters
 from efax._src.parameter import Support
 from efax._src.parametrization import Distribution, SimpleDistribution
@@ -136,13 +137,13 @@ class Assembler(Generic[P]):
             )
         return Assembler(infos)
 
-    def assemble(self, params: Mapping[Path, JaxComplexArray]) -> P:
+    def assemble(self, params: Mapping[Path, JaxComplexArray | ComplexContinuation]) -> P:
         """Reassemble a Distribution from a mapping of paths to parameter arrays.
 
         This is the core operation: given the raw parameter values (keyed by their paths in the
         distribution tree), reconstruct the full Distribution object using the stored type metadata.
         """
-        constructed: dict[Path, Distribution | JaxComplexArray] = dict(params)
+        constructed: dict[Path, Distribution | JaxComplexArray | ComplexContinuation] = dict(params)
         for info in self.infos:
             if isinstance(info, JointDistributionInfo):
                 sub_distributions = {
@@ -151,9 +152,9 @@ class Assembler(Generic[P]):
                 }
                 constructed[info.path] = info.type_(_sub_distributions=sub_distributions)
                 continue
-            kwargs: dict[str, Distribution | JaxComplexArray | dict[str, Any]] = {
-                name: constructed[*info.path, name] for name in parameter_names(info.type_)
-            }
+            kwargs: dict[
+                str, Distribution | JaxComplexArray | ComplexContinuation | dict[str, Any]
+            ] = {name: constructed[*info.path, name] for name in parameter_names(info.type_)}
             constructed[info.path] = info.type_(**kwargs)
         retval = constructed[()]
         assert isinstance(retval, Distribution)

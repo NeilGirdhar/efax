@@ -8,6 +8,7 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 
+from efax._src.analytic_continuation import analytic_abs_square
 from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
@@ -48,8 +49,7 @@ class ComplexUnitVarianceNormalNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        mean = self.two_mean * 0.5
-        return abs_square(mean) + math.log(math.pi)
+        return 0.25 * analytic_abs_square(self.two_mean) + math.log(math.pi)
 
     @override
     def to_exp(self) -> ComplexUnitVarianceNormalEP:

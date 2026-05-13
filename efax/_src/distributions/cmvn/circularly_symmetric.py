@@ -8,6 +8,7 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, outer_product
 from tjax.dataclasses import dataclass
 
+from efax._src.analytic_continuation import complex_value
 from efax._src.interfaces.multidimensional import Multidimensional
 from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -57,8 +58,9 @@ class ComplexCircularlySymmetricNormalNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = array_namespace(self)
-        log_det_s = xp.log(xp.real(xp.linalg.det(-self.negative_precision)))
+        negative_precision = complex_value(self.negative_precision)
+        xp = array_namespace(negative_precision)
+        log_det_s = xp.log(xp.real(xp.linalg.det(-negative_precision)))
         return -log_det_s + self.dimensions() * math.log(math.pi)
 
     @override

@@ -8,11 +8,14 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplus, softplus
 from tjax.dataclasses import dataclass
 
+from efax._src.analytic_continuation import analytic_abs_square
 from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import ComplexField, ScalarSupport, complex_field, distribution_parameter
 from efax._src.parametrization import SimpleDistribution
+
+from .von_mises import _log_bessel_iv_over_power
 
 
 @dataclass
@@ -43,9 +46,9 @@ class ComplexVonMisesNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = array_namespace(self)
-        kappa = xp.abs(self.mean_times_concentration)
-        return kappa + math.log(2.0 * math.pi) + xp.log(jss.i0e(kappa))
+        rho = analytic_abs_square(self.mean_times_concentration)
+        xp = array_namespace(rho)
+        return math.log(2.0 * math.pi) + _log_bessel_iv_over_power(xp.asarray(0.0), rho)
 
     @override
     def to_exp(self) -> ComplexVonMisesEP:

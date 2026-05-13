@@ -10,6 +10,7 @@ from array_api_compat import array_namespace
 from jax import jit
 from tjax import JaxComplexArray, JaxRealArray
 
+from .analytic_continuation import ComplexContinuation
 from .iteration import parameters
 from .parametrization import Distribution
 from .structure.assembler import Assembler
@@ -68,7 +69,7 @@ def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
 
 
 def parameter_map[T: Distribution](
-    operation: Callable[..., JaxComplexArray], x: T, /, *ys: Distribution
+    operation: Callable[..., JaxComplexArray | ComplexContinuation], x: T, /, *ys: Distribution
 ) -> T:
     """Return a new distribution created by operating on the variable fields of the inputs."""
     paths = parameters(x, fixed=False).keys()

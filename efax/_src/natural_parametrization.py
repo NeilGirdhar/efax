@@ -18,6 +18,7 @@ from tjax import (
 from tjax.dataclasses import dataclass
 from typing_extensions import TypeVar
 
+from .analytic_continuation import analytic_continue_parameter
 from .iteration import parameters
 from .parametrization import Distribution
 from .structure.assembler import Assembler
@@ -237,7 +238,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
 
         Returns: Complex CF values, shape ``(*batch, *s)``.
         """
-        shifted = parameter_map(lambda eta, delta: eta + 1j * delta, self, t)
+        shifted = parameter_map(analytic_continue_parameter, self, t)
         return jnp.exp(shifted.log_normalizer() - self.log_normalizer())
 
     @classmethod
