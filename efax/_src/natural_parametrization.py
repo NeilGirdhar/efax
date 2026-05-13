@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, Self, final, get_type_hints
 
-import jax
 import jax.numpy as jnp
 from array_api_compat import array_namespace
 from jax import grad, jacfwd, vjp, vmap
@@ -24,7 +23,7 @@ from .parametrization import Distribution
 from .structure.assembler import Assembler
 from .structure.estimator import Estimator
 from .structure.flattener import Flattener
-from .tools import parameter_dot_product, parameter_holomorphic_dot
+from .tools import parameter_dot_product, parameter_holomorphic_dot, parameter_map
 
 if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
@@ -230,7 +229,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
 
         Returns: A copy of self with each field replaced by ``η + i·t``.
         """
-        return jax.tree_util.tree_map(lambda eta, delta: eta + 1j * delta, self, t)
+        return parameter_map(lambda eta, delta: eta + 1j * delta, self, t)
 
     @jit
     @final
