@@ -5,7 +5,6 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 import numpy as np
-import pytest
 import scipy.integrate as si
 from numpy.random import Generator
 from numpy.testing import assert_allclose
@@ -84,12 +83,7 @@ def test_cf_at_zero(distribution_info: DistributionInfo, generator: Generator) -
     """CF(t=0) = 1 for all distributions."""
     p = distribution_info.nat_parameter_generator(generator, shape=())
     zero = parameter_map(jnp.zeros_like, p)
-    try:
-        cf = p.characteristic_function(zero)
-    except TypeError as e:
-        if "does not accept dtype complex" not in str(e):
-            raise
-        pytest.skip("log_normalizer does not support complex-valued CF inputs")
+    cf = p.characteristic_function(zero)
     assert_allclose(complex(cf), 1.0 + 0j, atol=1e-6)
 
 

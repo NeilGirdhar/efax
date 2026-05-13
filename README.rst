@@ -134,10 +134,7 @@ Every `NaturalParametrization` has methods:
 - `jeffreys_prior_density`, which returns the square root of the Fisher information
   determinant,
 - `characteristic_function`, which evaluates the characteristic function of the sufficient
-  statistics via analytic continuation of the log-normalizer (note: for distributions such
-  as `GammaNP` that keep one or more natural parameters real in `_complexify`, the result
-  is approximate — check `NaturalParametrization.characteristic_function_exact` on the
-  class before relying on every component), and
+  statistics via analytic continuation of the log-normalizer, and
 - `kl_divergence`, which is the KL divergence.
 
 Every `ExpectationParametrization` has methods:

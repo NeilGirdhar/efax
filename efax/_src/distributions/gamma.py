@@ -1,11 +1,19 @@
 from __future__ import annotations
 
-from typing import ClassVar, Self, override
+from typing import ClassVar, override
 
 import jax.random as jr
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, KeyArray, Shape, inverse_softplus, softplus
+from tjax import (
+    JaxArray,
+    JaxRealArray,
+    KeyArray,
+    Shape,
+    complex_gammaln,
+    inverse_softplus,
+    softplus,
+)
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.samplable import Samplable
@@ -60,7 +68,7 @@ class GammaNP(
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.shape_minus_one + 1.0
-        return jss.gammaln(shape) - shape * xp.log(-self.negative_rate)
+        return complex_gammaln(shape) - shape * xp.log(-self.negative_rate)
 
     @override
     def to_exp(self) -> GammaEP:
@@ -80,17 +88,6 @@ class GammaNP(
     def sufficient_statistics(cls, x: JaxRealArray, **fixed_parameters: JaxArray) -> GammaEP:
         xp = array_namespace(x)
         return GammaEP(x, xp.log(x))
-
-    @override
-    def _complexify(self, t: Self) -> Self:  # ty: ignore
-        """Only complexify negative_rate; jss.gammaln does not accept complex inputs.
-
-        shape_minus_one is kept real, so ``characteristic_function`` cannot
-        query the log-x sufficient statistic: that component returns 1 instead
-        of the true E[exp(i·t·log x)].  Consequently,
-        ``characteristic_function_exact = False`` on this class.
-        """
-        return type(self)(self.negative_rate + 1j * t.negative_rate, self.shape_minus_one)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:

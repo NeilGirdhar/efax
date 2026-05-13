@@ -6,7 +6,7 @@ from typing import override
 import jax.random as jr
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape, complex_gammaln
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.samplable import Samplable
@@ -46,7 +46,7 @@ class ChiSquareNP(
     @override
     def log_normalizer(self) -> JaxRealArray:
         k_over_two = self.k_over_two_minus_one + 1.0
-        return jss.gammaln(k_over_two) - k_over_two * math.log(0.5)
+        return complex_gammaln(k_over_two) - k_over_two * math.log(0.5)
 
     @override
     def to_exp(self) -> ChiSquareEP:

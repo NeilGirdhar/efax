@@ -6,7 +6,7 @@ from typing import Any, override
 import jax.numpy as jnp
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, Shape, softplus
+from tjax import JaxArray, JaxRealArray, Shape, complex_multigammaln, softplus
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.multidimensional import Multidimensional
@@ -67,7 +67,7 @@ class WishartNP(
         return (
             -half_df * logdet_precision
             + half_df * self.dimensions() * math.log(2.0)
-            + jss.multigammaln(half_df, self.dimensions())
+            + complex_multigammaln(half_df, self.dimensions())
         )
 
     @override

@@ -12,7 +12,7 @@ from typing import override
 
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, Shape, inverse_softplus, jit, softplus
+from tjax import JaxArray, JaxRealArray, Shape, complex_betaln, inverse_softplus, jit, softplus
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.multidimensional import Multidimensional
@@ -55,7 +55,7 @@ class GeneralizedDirichletNP(
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         alpha, beta = self.alpha_beta()
-        return xp.sum(jss.betaln(alpha, beta), axis=-1)
+        return xp.sum(complex_betaln(alpha, beta), axis=-1)
 
     @override
     def to_exp(self) -> GeneralizedDirichletEP:

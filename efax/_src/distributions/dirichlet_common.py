@@ -5,7 +5,7 @@ from typing import Any, override
 import jax.random as jr
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from tjax import JaxRealArray, KeyArray, Shape
+from tjax import JaxRealArray, KeyArray, Shape, complex_gammaln
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.multidimensional import Multidimensional
@@ -33,7 +33,7 @@ class DirichletCommonNP[EP: "DirichletCommonEP[Any]"](
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         q = self.alpha_minus_one
-        return xp.sum(jss.gammaln(q + 1.0), axis=-1) - jss.gammaln(
+        return xp.sum(complex_gammaln(q + 1.0), axis=-1) - complex_gammaln(
             xp.sum(q, axis=-1) + self.dimensions()
         )
 
