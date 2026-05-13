@@ -3,7 +3,6 @@
 The OLS inversion works for distributions where all of the following hold:
 - All NP tree_leaves are real floats (excludes complex fields, NegativeBinomial)
 - log_normalizer is complex-analytic for all fields:
-  - Excludes VonMisesFisher/VonMises (vector_norm returns real)
   - Excludes MultivariateNormal (outer_product uses conjugation, breaking analyticity)
 - sufficient_statistics does not require fixed_parameters (excludes Weibull,
   MultivariateFixedVarianceNormal)
@@ -75,7 +74,7 @@ def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -
             pytest.skip(f"{nat_cls.__name__}: CF returned non-finite values")
 
         # Skip if Im(log φ) is essentially zero everywhere — indicates log_normalizer
-        # doesn't support complex inputs (e.g. VonMisesFisher uses vector_norm→real).
+        # doesn't support complex inputs.
         b_all = jnp.imag(jnp.log(cf))
         if float(jnp.std(b_all)) < 1e-6:  # noqa: PLR2004
             pytest.skip(f"{nat_cls.__name__}: log_normalizer not complex-analytic (Im(log φ) ≈ 0)")

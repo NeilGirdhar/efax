@@ -3,6 +3,9 @@ from __future__ import annotations
 import math
 from typing import cast, override
 
+import jax
+import jax.numpy as jnp
+import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import (
     JaxArray,
@@ -10,7 +13,6 @@ from tjax import (
     Shape,
     bessel_iv_ratio,
     inverse_softplus,
-    log_bessel_ive,
     softplus,
 )
 from tjax.dataclasses import dataclass
@@ -20,6 +22,8 @@ from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import CircularBoundedSupport, VectorSupport, distribution_parameter
+
+_BESSEL_SERIES_TERMS = 200
 
 
 @dataclass
@@ -50,13 +54,8 @@ class VonMisesFisherNP(
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self)
         half_k = xp.asarray(self.dimensions() * 0.5)
-        kappa = xp.linalg.vector_norm(self.mean_times_concentration, axis=-1)
-        return (
-            kappa
-            - (half_k - 1.0) * xp.log(kappa)
-            + half_k * math.log(2.0 * math.pi)
-            + log_bessel_ive(half_k - 1.0, kappa)
-        )
+        rho = xp.sum(xp.square(self.mean_times_concentration), axis=-1)
+        return half_k * math.log(2.0 * math.pi) + _log_bessel_iv_over_power(half_k - 1.0, rho)
 
     @override
     def to_exp(self) -> VonMisesFisherEP:
@@ -166,3 +165,27 @@ class VonMisesFisherEP(
 # Private functions --------------------------------------------------------------------------------
 def _a_k(k: JaxRealArray, kappa: JaxRealArray) -> JaxRealArray:
     return bessel_iv_ratio(k * 0.5, kappa)
+
+
+def _log_bessel_iv_over_power(v: JaxRealArray, rho: JaxArray) -> JaxArray:
+    """Return ``log(I_v(sqrt(rho)) / sqrt(rho)^v)`` by its rho-series."""
+    rho = jnp.asarray(rho)
+    rho_is_complex = jnp.iscomplexobj(rho)
+    v, rho = jnp.broadcast_arrays(jnp.asarray(v), rho)
+    dtype = jnp.result_type(rho, 1j)
+    rho = rho.astype(dtype)
+    v = v.astype(jnp.result_type(v, 1.0))
+    term0 = jnp.exp(
+        -v.astype(dtype) * jnp.log(jnp.asarray(2.0, dtype=dtype))
+        - jss.gammaln(v + 1.0).astype(dtype)
+    )
+
+    def body(i: int, carry: tuple[JaxArray, JaxArray]) -> tuple[JaxArray, JaxArray]:
+        term, total = carry
+        i_array = jnp.asarray(i, dtype=v.dtype)
+        term = term * rho / (4.0 * i_array * (i_array + v))
+        return term, total + term
+
+    _, total = jax.lax.fori_loop(1, _BESSEL_SERIES_TERMS, body, (term0, term0))
+    result = jnp.log(total)
+    return result if rho_is_complex else jnp.real(result)

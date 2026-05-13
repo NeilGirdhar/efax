@@ -16,6 +16,7 @@ from efax import (
     MultivariateDiagonalNormalNP,
     NormalNP,
     PoissonNP,
+    VonMisesFisherNP,
     parameter_map,
 )
 
@@ -136,6 +137,19 @@ def test_gamma_cf_of_x_and_log_x() -> None:
             - (alpha + 1j * g) * np.log(rate - 1j * f)
         )
         assert_allclose(complex(cf), expected, rtol=1e-5)
+
+
+def test_von_mises_fisher_cf_derivative_recovers_mean() -> None:
+    p = VonMisesFisherNP(jnp.asarray([1.2, -0.7], dtype=jnp.float64))
+    t_zero = VonMisesFisherNP(jnp.zeros(2, dtype=jnp.float64))
+
+    jac = jax.jacfwd(p.characteristic_function)(t_zero)
+
+    assert_allclose(
+        np.asarray(jac.mean_times_concentration),
+        1j * np.asarray(p.to_exp().mean),
+        rtol=1e-5,
+    )
 
 
 def test_multivariate_diagonal_normal_cf() -> None:
