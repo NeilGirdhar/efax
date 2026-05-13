@@ -27,9 +27,9 @@ def test_cf_jacfwd_does_not_raise() -> None:
     jax.jacfwd through characteristic_function must not raise the dtype-mismatch
     error from log_normalizer's custom JVP, and must produce a complex Jacobian.
 
-    Regression for: when natural parameters are analytically continued via
-    `_complexify`, `log_normalizer` returns complex; the JVP rule must use the
-    holomorphic inner product on this path.
+    Regression for: when natural parameters are analytically continued,
+    `log_normalizer` returns complex; the JVP rule must use the holomorphic
+    inner product on this path.
     """
     p = NormalNP(jnp.float64(0.5), jnp.float64(-0.5))
     t_zero = NormalNP(jnp.float64(0.0), jnp.float64(0.0))
@@ -138,9 +138,8 @@ def test_exponential_cf() -> None:
 
 
 def test_gamma_cf_of_x() -> None:
-    # Gamma T(x) = (x, log x).  GammaNP._complexify keeps shape_minus_one real
-    # (gammaln not complex-safe in JAX), so t=(f, 0) gives E[exp(i*f*x)] correctly
-    # and t=(0, g) silently returns 1 instead of E[exp(i*g*log x)].
+    # Gamma T(x) = (x, log x). With t=(f, 0), the CF reduces to
+    # E[exp(i*f*x)] for the x statistic.
     rng = np.random.default_rng(4)
     for _ in range(10):
         rate = rng.uniform(0.5, 3)

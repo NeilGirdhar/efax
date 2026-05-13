@@ -2,9 +2,7 @@
 
 The OLS inversion works for distributions where all of the following hold:
 - All NP tree_leaves are real floats (excludes complex fields, NegativeBinomial)
-- _complexify is not overridden (excludes Gamma)
 - log_normalizer is complex-analytic for all fields:
-  - Excludes Chi/ChiSquare/InverseGamma/Beta/Dirichlet/GeneralizedDirichlet (gammaln)
   - Excludes VonMisesFisher/VonMises (vector_norm returns real)
   - Excludes MultivariateNormal (outer_product uses conjugation, breaking analyticity)
 - sufficient_statistics does not require fixed_parameters (excludes Weibull,
@@ -23,7 +21,7 @@ import pytest
 from numpy.random import Generator
 from numpy.testing import assert_allclose
 
-from efax import expectation_parameters_from_characteristic_function
+from efax import expectation_parameters_from_characteristic_function, parameters
 
 from .distribution_info import DistributionInfo
 
@@ -43,15 +41,14 @@ def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -
         if not all(jnp.issubdtype(leaf.dtype, jnp.floating) for leaf in leaves_q):
             pytest.skip(f"{nat_cls.__name__}: non-real NP fields")
 
-        # Skip if _complexify is overridden — the CF only probes a subset of EP fields
-        # (e.g. GammaNP keeps shape_minus_one real so mean_log cannot be recovered).
-        if "_complexify" in type(q).__dict__:
-            pytest.skip(f"{nat_cls.__name__}: custom _complexify")
-
         # Scale frequencies so that max phase |⟨t, E[T(x)]⟩| stays well below π,
         # preventing phase wrapping in Im(log φ).  We use the ground-truth EP to set
         # the scale — this is fine in a test where we know the answer.
         ep_true = q.to_exp()
+        for path, (value, support) in parameters(ep_true, support=True).items():
+            if not bool(jnp.allclose(value, support.clamp(value), rtol=0.0, atol=1e-12)):
+                pytest.skip(f"{nat_cls.__name__}: invalid generated EP at {path}")
+
         ep_magnitudes = [
             abs(float(v))
             for leaf in jtu.tree_leaves(ep_true)
@@ -72,12 +69,7 @@ def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -
 
         # Evaluate CF by vmapping over the k dimension — avoids rank-promotion errors
         # when field shapes are vectors/matrices (e.g. MultivariateDiagonalNormal).
-        # Skip if log_normalizer is not complex-analytic
-        # (e.g. Chi/ChiSquare/InverseGamma call gammaln which rejects complex inputs).
-        try:
-            cf = jax.vmap(q.characteristic_function)(t)
-        except Exception as e:  # noqa: BLE001
-            pytest.skip(f"{nat_cls.__name__}: CF evaluation failed: {e}")
+        cf = jax.vmap(q.characteristic_function)(t)
 
         if not bool(jnp.all(jnp.isfinite(jnp.abs(cf)))):
             pytest.skip(f"{nat_cls.__name__}: CF returned non-finite values")

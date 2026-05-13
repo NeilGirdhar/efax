@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar, override
+from typing import override
 
 import jax.random as jr
 import jax.scipy.special as jss
@@ -46,8 +46,6 @@ class GammaNP(
         negative_rate: The negative rate.
         shape_minus_one: The shape minus one.
     """
-
-    characteristic_function_exact: ClassVar[bool] = False
 
     negative_rate: JaxRealArray = distribution_parameter(ScalarSupport(ring=negative_support))
     shape_minus_one: JaxRealArray = distribution_parameter(
