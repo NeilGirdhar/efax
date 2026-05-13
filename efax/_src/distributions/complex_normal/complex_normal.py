@@ -8,7 +8,7 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, abs_square
 from tjax.dataclasses import dataclass
 
-from efax._src.analytic_continuation import analytic_abs_square, analytic_conj, analytic_real
+from efax._src.analytic_continuation import complex_parts
 from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
@@ -64,17 +64,14 @@ class ComplexNormalNP(
     @override
     def log_normalizer(self) -> JaxRealArray:
         xp = array_namespace(self.negative_precision)
-        pseudo_precision = analytic_conj(self.pseudo_precision)
-        _, s, mu = self._r_s_mu()
-        det_s = s
-        det_h = -self.negative_precision
-        return (
-            -analytic_abs_square(mu) * self.negative_precision
-            - analytic_real(mu * mu * pseudo_precision)
-            + 0.5 * xp.log(det_s)
-            - 0.5 * xp.log(det_h)
-            + math.log(math.pi)
-        )
+        eta_x, eta_y = complex_parts(self.mean_times_precision)
+        pseudo_x, pseudo_y = complex_parts(self.pseudo_precision)
+        h_xx = self.negative_precision + pseudo_x
+        h_xy = pseudo_y
+        h_yy = self.negative_precision - pseudo_x
+        det_h = h_xx * h_yy - h_xy**2
+        h_inv_quadratic = (h_yy * eta_x**2 - 2.0 * h_xy * eta_x * eta_y + h_xx * eta_y**2) / det_h
+        return math.log(math.pi) - 0.5 * xp.log(det_h) - 0.25 * h_inv_quadratic
 
     @override
     def to_exp(self) -> ComplexNormalEP:
@@ -98,16 +95,16 @@ class ComplexNormalNP(
 
     def _r_s_mu(self) -> tuple[JaxComplexArray, JaxRealArray, JaxComplexArray]:
         xp = array_namespace(self.negative_precision)
-        r = -analytic_conj(self.pseudo_precision) / self.negative_precision
-        s = xp.reciprocal((analytic_abs_square(r) - 1.0) * self.negative_precision)
-        k = analytic_conj(self.pseudo_precision) / self.negative_precision
+        r = -xp.conj(self.pseudo_precision) / self.negative_precision
+        s = xp.reciprocal((abs_square(r) - 1.0) * self.negative_precision)
+        k = xp.conj(self.pseudo_precision) / self.negative_precision
         l_eta = (
             xp.asarray(0.5)
-            * analytic_conj(self.mean_times_precision)
-            / ((analytic_abs_square(k) - 1.0) * self.negative_precision)
+            * xp.conj(self.mean_times_precision)
+            / ((abs_square(k) - 1.0) * self.negative_precision)
         )
-        mu = analytic_conj(l_eta) - (self.pseudo_precision / self.negative_precision) * l_eta
-        return r, s, mu  # ty:ignore[invalid-return-type]
+        mu = xp.conj(l_eta) - (self.pseudo_precision / self.negative_precision) * l_eta
+        return r, s, mu
 
     @override
     @classmethod
