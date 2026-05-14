@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Generic, final
 
-import jax
 import jax.numpy as jnp
 from array_api_compat import array_namespace
 from tjax import JaxComplexArray, JaxRealArray, jit
@@ -101,7 +100,7 @@ def expectation_parameters_from_characteristic_function(
     Returns: ExpectationParametrization with shape ``(*s,)`` whose fields are
         the OLS estimates of ``E[T(x)]``.
     """
-    _, design = Flattener.flatten(t, mapped_to_plane=False)
+    nat_flattener, design = Flattener.flatten(t, mapped_to_plane=False)
 
     # Response: Im(log φ), shape (*s, k)
     b = jnp.imag(jnp.log(cf_values))
@@ -111,12 +110,13 @@ def expectation_parameters_from_characteristic_function(
     rhs = jnp.einsum("...ki,...k->...i", design, b)  # (*s, total_dim)
     chi = jnp.linalg.solve(gram, rhs[..., jnp.newaxis]).squeeze(-1)  # (*s, total_dim)
 
-    # Reconstruct EP: use sufficient_statistics on a dummy to get an EP flattener.
-    leaves = jax.tree_util.tree_leaves(t)
-    n_t = len(t.shape)
-    first_field_shape = leaves[0].shape[n_t:]
-    dummy_ep = type(t).sufficient_statistics(jnp.zeros(first_field_shape))
-    ep_flattener = Flattener.create_flattener(dummy_ep, mapped_to_plane=False)
+    # Reconstruct EP from the paired parametrization metadata.  This avoids guessing
+    # the observation shape from natural-parameter field shapes, which differ for
+    # reduced-domain supports such as Dirichlet.
+    ep_assembler = nat_flattener.to_exp()
+    ep_flattener = Flattener(
+        ep_assembler.infos, nat_flattener.fixed_parameters, mapped_to_plane=False
+    )
     chi = _undouble_symmetric_coordinates(chi, ep_flattener)
     return ep_flattener.unflatten(chi)
 
