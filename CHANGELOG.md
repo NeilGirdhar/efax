@@ -3,6 +3,25 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.4.0 - 2026-05-13
+
+- Characteristic-function complex support:
+  - Added complex-coordinate support across the CF pipeline.
+  - Preserved analytic continuation for complex natural fields, Von Mises Fisher, circular complex
+    normal log-normalizers, and fixed parameters.
+- CF inversion:
+  - Built the EP flattener from parametrization metadata.
+  - Split Hermitian and symmetric matrix support.
+  - Switched continued matrix log-normalizers to analytic logdet.
+- Tests:
+  - Added Gamma CF coverage for the log statistic.
+  - Made test_cf_at_zero run across all distributions.
+  - Removed the CF complexify hook test path.
+  - Dropped redundant JVP smoke coverage and unused skip logic.
+- Cleanup:
+  - Replaced dead code with tjax helpers.
+  - Optimized pyproject.
+
 ## 2.3.0 - 2026-05-06
 
 - Fixed the JVP of `characteristic_function`.
