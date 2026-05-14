@@ -31,6 +31,7 @@ from .create_info import (
     MultivariateNormalInfo,
 )
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_SMALL, SAMPLE_SHAPE_LARGE, SAMPLE_SHAPE_SMALL
 
 type _Path = tuple[str, ...]
 
@@ -129,8 +130,8 @@ def test_sampling_and_estimation(
     mean of the sufficient statistics, and verifies that it equals the expectation parameters.
     """
     sampling_distribution_info.skip_if_deselected(distribution_name)
-    distribution_shape = (4,)  # The number of distributions that are being estimated.
-    sample_shape = (1024, 64)  # The number of samples that are taken to do the estimation.
+    distribution_shape = DIST_SHAPE_SMALL  # number of distributions being estimated
+    sample_shape = SAMPLE_SHAPE_LARGE  # number of samples drawn for the estimation
     exp_parameters, samples = _produce_samples(
         generator,
         key,
@@ -159,8 +160,8 @@ def test_multidimensional_sample_shape_matches_dimensions(
 ) -> None:
     """Test that sampled event shapes agree with support.shape(dimensions())."""
     sampling_distribution_info.skip_if_deselected(distribution_name)
-    distribution_shape = (4,)
-    sample_shape = (8, 16)
+    distribution_shape = DIST_SHAPE_SMALL
+    sample_shape = SAMPLE_SHAPE_SMALL
 
     sampling_object: Distribution
     if natural:
@@ -204,8 +205,8 @@ def test_sufficient_statistics_consistent_shapes(
     i.e. shape[:-support.axes()] for parameters with axes > 0, or shape for scalar parameters.
     """
     sampling_distribution_info.skip_if_deselected(distribution_name)
-    distribution_shape = (4,)
-    sample_shape = (8, 16)
+    distribution_shape = DIST_SHAPE_SMALL
+    sample_shape = SAMPLE_SHAPE_SMALL
 
     exp_parameters, samples = _produce_samples(
         generator,

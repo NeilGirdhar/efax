@@ -9,6 +9,7 @@ from efax import MultivariateNormalNP
 
 from .create_info import MultivariateNormalInfo
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_MEDIUM
 
 
 def test_mvn_fisher_information(distribution_name: str | None) -> None:
@@ -70,7 +71,7 @@ def test_mvn_fisher_information_b(distribution_name: str | None) -> None:
 def test_fisher_information_is_convex(
     generator: Generator, distribution_info: DistributionInfo
 ) -> None:
-    shape = (3, 2)
+    shape = DIST_SHAPE_MEDIUM
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
     fisher_information = nat_parameters._fisher_information_matrix()  # noqa: SLF001
     assert issubclass(fisher_information.dtype.type, jnp.floating)

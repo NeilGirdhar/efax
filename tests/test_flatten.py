@@ -16,6 +16,7 @@ from efax import (
 )
 
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_MEDIUM
 
 
 @dataclass
@@ -39,7 +40,7 @@ def test_flatten(
     natural: bool,
 ) -> None:
     """Test that unflattening restores the source of flattening."""
-    shape = (3, 4)
+    shape = DIST_SHAPE_MEDIUM
     p = (
         distribution_info.exp_parameter_generator(generator, shape=shape)
         if natural

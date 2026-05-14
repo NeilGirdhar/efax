@@ -6,12 +6,13 @@ from numpy.random import Generator
 from tjax import KeyArray
 
 from .create_info import NormalInfo
+from .shapes import DIST_SHAPE_SMALL
 
 
 def test_normal(distribution_name: str | None, generator: Generator, key: KeyArray) -> None:
     NormalInfo.skip_if_deselected(distribution_name)
     distribution_info = NormalInfo()
-    shape = (3,)
+    shape = DIST_SHAPE_SMALL
     n_samples = 4
     normal_np = distribution_info.nat_parameter_generator(generator, shape=shape)
     d = normal_np.to_deviation_parametrization()

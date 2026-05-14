@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest
 from numpy.random import Generator
 from tjax import assert_tree_allclose, print_generic, tree_allclose
@@ -8,6 +9,7 @@ from efax import parameters
 
 from .create_info import GeneralizedDirichletInfo
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_MEDIUM
 
 
 def test_conversion(generator: Generator, distribution_info: DistributionInfo) -> None:
@@ -15,21 +17,20 @@ def test_conversion(generator: Generator, distribution_info: DistributionInfo) -
     if isinstance(distribution_info, GeneralizedDirichletInfo):
         pytest.skip()
 
-    n = 30
-    shape = (n,)
+    shape = DIST_SHAPE_MEDIUM
     original_np = distribution_info.nat_parameter_generator(generator, shape=shape)
     intermediate_ep = original_np.to_exp()
     final_np = intermediate_ep.to_nat()
 
     # Check round trip.
     if not tree_allclose(final_np, original_np):
-        for i in range(n):
-            if not tree_allclose(final_np[i], original_np[i]):
+        for index in np.ndindex(shape):
+            if not tree_allclose(final_np[index], original_np[index]):
                 print_generic(
                     {
-                        "original": original_np[i],
-                        "intermediate": intermediate_ep[i],
-                        "final": final_np[i],
+                        "original": original_np[index],
+                        "intermediate": intermediate_ep[index],
+                        "final": final_np[index],
                     }
                 )
                 pytest.fail("Conversion failure")

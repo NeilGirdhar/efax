@@ -11,6 +11,7 @@ from tjax import JaxArray, JaxRealArray, KeyArray, RngStream, hessian
 from efax import Flattener, Samplable, SimpleDistribution, flatten_mapping
 
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_MEDIUM
 
 
 def _sample_using_flattened(
@@ -39,11 +40,12 @@ def _calculate_jacobian(
     keys: KeyArray,
 ) -> JaxRealArray:
     flattener, flattened = Flattener.flatten(p)
-    jacobian_sample = vmap(jacobian(_sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
+    jacobian_sample = jacobian(_sample_using_flattened, argnums=(0,))
+    for _ in p.shape:
+        jacobian_sample = vmap(jacobian_sample, in_axes=(0, 0, 0))
     (parameters_jacobian,) = jacobian_sample(flattened, flattener, keys)
-    assert parameters_jacobian.shape[0:1] == p.shape
-    parameters_jacobian = jnp.sum(parameters_jacobian, axis=0)
-    return jnp.sum(parameters_jacobian, axis=0)
+    assert parameters_jacobian.shape[: len(p.shape)] == p.shape
+    return jnp.sum(parameters_jacobian, axis=tuple(range(len(p.shape) + 1)))
 
 
 def _calculate_curvature(
@@ -52,12 +54,14 @@ def _calculate_curvature(
 ) -> JaxRealArray:
     # Calculate curvature.
     flattener, flattened = Flattener.flatten(p)
-    hessian_sample = vmap(hessian(_sample_using_flattened, argnums=(0,)), in_axes=(0, 0, 0))
+    hessian_sample = hessian(_sample_using_flattened, argnums=(0,))
+    for _ in p.shape:
+        hessian_sample = vmap(hessian_sample, in_axes=(0, 0, 0))
     (parameters_hessian_x,) = hessian_sample(flattened, flattener, keys)
     (parameters_hessian,) = parameters_hessian_x
 
-    assert parameters_hessian.shape[0:1] == p.shape
-    parameters_hessian = jnp.sum(parameters_hessian, axis=0)
+    assert parameters_hessian.shape[: len(p.shape)] == p.shape
+    parameters_hessian = jnp.sum(parameters_hessian, axis=tuple(range(len(p.shape))))
 
     assert parameters_hessian.shape[-2] == parameters_hessian.shape[-1]
     diagonal_hessian = jnp.linalg.diagonal(parameters_hessian)
@@ -85,7 +89,7 @@ def test_sampling_cotangents(
     """Test that the curvature is nonzero."""
     info = sampling_wc_distribution_info
     info.skip_if_deselected(distribution_name)
-    distribution_shape = (23,)
+    distribution_shape = DIST_SHAPE_MEDIUM
     jacobian_keys, curvature_keys = jr.split(key, (2, *distribution_shape))
     p: SimpleDistribution = (
         info.nat_parameter_generator(generator, distribution_shape)

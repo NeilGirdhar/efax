@@ -97,6 +97,7 @@ ignore = [
   "PLR0913", # Too many function arguments.
   "PLR6301", # Method does not use self.
   "RUF002", # Ambiguous Unicode character.
+  "RUF003", # Ambiguous minus sign.
   "RUF021", # Parenthesize mixed and/or.
   "RUF069", # Float equality comparison.
   "S101", # Assert used.

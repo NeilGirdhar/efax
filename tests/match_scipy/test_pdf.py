@@ -18,6 +18,7 @@ from efax import (
 from tests.create_info import MultivariateDiagonalNormalInfo
 from tests.distribution_info import DistributionInfo
 from tests.scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistribution
+from tests.shapes import DIST_SHAPE_SMALL
 
 
 def _check_observation_shape(
@@ -40,7 +41,7 @@ def _check_observation_shape(
 
 def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Test that the density/mass function calculation matches scipy's."""
-    distribution_shape = (10,)
+    distribution_shape = DIST_SHAPE_SMALL
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=distribution_shape)
     scipy_distribution = distribution_info.nat_to_scipy_distribution(nat_parameters)
     scipy_x = scipy_distribution.sample(rng=generator)

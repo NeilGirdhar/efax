@@ -20,12 +20,13 @@ from efax import (
 
 from .create_info import GammaInfo, MultivariateNormalInfo, NormalInfo
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_MEDIUM
 
 
 def _prelude(
     generator: Generator, distribution_info_kl: DistributionInfo, distribution_name: str | None
 ) -> tuple[ExpectationParametrization, NaturalParametrization, JaxRealArray]:
-    shape = (3, 2)
+    shape = DIST_SHAPE_MEDIUM
     distribution_info_kl.skip_if_deselected(distribution_name)
     x = distribution_info_kl.exp_parameter_generator(generator, shape=shape)
     y = distribution_info_kl.nat_parameter_generator(generator, shape=shape)

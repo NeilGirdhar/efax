@@ -6,11 +6,12 @@ from numpy.testing import assert_allclose
 from efax import HasEntropyEP, HasEntropyNP
 from tests.create_info import ChiInfo, ChiSquareInfo
 from tests.distribution_info import DistributionInfo
+from tests.shapes import DIST_SHAPE_LARGE
 
 
 def test_nat_entropy(generator: Generator, entropy_distribution_info: DistributionInfo) -> None:
     """Test that the entropy calculation matches scipy's."""
-    shape = (7, 13)
+    shape = DIST_SHAPE_LARGE
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
     assert isinstance(nat_parameters, HasEntropyNP)
     scipy_distribution = entropy_distribution_info.nat_to_scipy_distribution(nat_parameters)
@@ -22,7 +23,7 @@ def test_nat_entropy(generator: Generator, entropy_distribution_info: Distributi
 
 def test_exp_entropy(generator: Generator, entropy_distribution_info: DistributionInfo) -> None:
     """Test that the entropy calculation matches scipy's."""
-    shape = (7, 13)
+    shape = DIST_SHAPE_LARGE
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
     assert isinstance(exp_parameters, HasEntropyEP)
     scipy_distribution = entropy_distribution_info.exp_to_scipy_distribution(exp_parameters)

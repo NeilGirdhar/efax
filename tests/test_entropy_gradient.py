@@ -22,6 +22,7 @@ from efax import Flattener, GammaEP, GammaVP, HasEntropy
 
 from .create_info import GammaInfo
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_LARGE
 
 
 @jit
@@ -54,7 +55,7 @@ def test_nat_entropy_gradient(
     generator: Generator,
     entropy_distribution_info: DistributionInfo,
 ) -> None:
-    shape = (7, 13)
+    shape = DIST_SHAPE_LARGE
     nat_parameters = entropy_distribution_info.nat_parameter_generator(generator, shape=shape)
     _check_entropy_gradient(nat_parameters)
 
@@ -63,7 +64,7 @@ def test_exp_entropy_gradient(
     generator: Generator,
     entropy_distribution_info: DistributionInfo,
 ) -> None:
-    shape = (7, 13)
+    shape = DIST_SHAPE_LARGE
     exp_parameters = entropy_distribution_info.exp_parameter_generator(generator, shape=shape)
     _check_entropy_gradient(exp_parameters)
 

@@ -17,6 +17,7 @@ from efax import (
 )
 
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_MEDIUM
 
 
 def test_conjugate_prior(
@@ -24,7 +25,7 @@ def test_conjugate_prior(
 ) -> None:
     """Test that the conjugate prior actually matches the distribution."""
     cp_distribution_info.skip_if_deselected(distribution_name)
-    shape = (4, 3)
+    shape = DIST_SHAPE_MEDIUM
     n = 100.0 * jnp.ones(shape)
 
     # Choose a random distribution.
@@ -56,7 +57,7 @@ def test_from_conjugate_prior(
 ) -> None:
     """Test that the conjugate prior is reversible."""
     cp_distribution_info.skip_if_deselected(distribution_name)
-    shape = (4, 3)
+    shape = DIST_SHAPE_MEDIUM
     n = 123.0 * jnp.ones(shape)
 
     # Choose a random distribution.
@@ -73,11 +74,11 @@ def test_from_conjugate_prior(
 
 def test_joint_from_conjugate_prior() -> None:
     """Test that joint CP recovery passes each leaf its own CP distribution."""
-    n = 123.0 * jnp.ones((4, 3))
+    n = 123.0 * jnp.ones(DIST_SHAPE_MEDIUM)
     p = JointDistributionE(
         {
-            "normal": UnitVarianceNormalEP(jnp.full((4, 3), 0.25)),
-            "bernoulli": BernoulliEP(jnp.full((4, 3), 0.7)),
+            "normal": UnitVarianceNormalEP(jnp.full(DIST_SHAPE_MEDIUM, 0.25)),
+            "bernoulli": BernoulliEP(jnp.full(DIST_SHAPE_MEDIUM, 0.7)),
         }
     )
     cp_sub_distributions = {}
@@ -97,7 +98,7 @@ def test_generalized_conjugate_prior(
 ) -> None:
     """Same as test_conjugate_prior, but with generalized_conjugate_prior_distribution."""
     gcp_distribution_info.skip_if_deselected(distribution_name)
-    shape = (4, 3)
+    shape = DIST_SHAPE_MEDIUM
 
     # Choose a random distribution.
     p = gcp_distribution_info.exp_parameter_generator(generator, shape=shape)

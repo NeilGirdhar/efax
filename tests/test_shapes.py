@@ -5,11 +5,12 @@ from numpy.random import Generator
 from efax import HasEntropyEP, HasEntropyNP, SimpleDistribution, parameters
 
 from .distribution_info import DistributionInfo
+from .shapes import DIST_SHAPE_MEDIUM
 
 
 def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> None:
     """Test that the methods produce the correct shapes."""
-    shape = (3, 4)
+    shape = DIST_SHAPE_MEDIUM
 
     p = distribution_info.exp_parameter_generator(generator, shape=shape)
     q = distribution_info.nat_parameter_generator(generator, shape=shape)
