@@ -10,12 +10,13 @@ from tjax import (
     JaxRealArray,
     KeyArray,
     Shape,
+    bilinear_outer,
     matrix_dot_product,
     matrix_vector_mul,
-    outer_product,
 )
 from tjax.dataclasses import dataclass
 
+from efax._src.analytic_continuation import complex_logdet
 from efax._src.interfaces.multidimensional import Multidimensional
 from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -57,8 +58,8 @@ class MultivariateNormalNP(
         xp = array_namespace(self)
         eta = self.mean_times_precision
         h_inv = xp.linalg.inv(self.negative_half_precision)
-        a = matrix_dot_product(h_inv, outer_product(eta, eta))
-        _, ld = xp.linalg.slogdet(-self.negative_half_precision)
+        a = matrix_dot_product(h_inv, bilinear_outer(eta, eta))
+        ld = complex_logdet(-self.negative_half_precision)
         return -0.25 * a - 0.5 * ld + 0.5 * self.dimensions() * math.log(math.pi)
 
     @override
@@ -86,7 +87,7 @@ class MultivariateNormalNP(
         h_inv = cast("JaxRealArray", h_inv)
         h_inv_times_eta = matrix_vector_mul(h_inv, self.mean_times_precision)
         mean = -0.5 * h_inv_times_eta
-        second_moment = 0.25 * outer_product(h_inv_times_eta, h_inv_times_eta) - 0.5 * h_inv
+        second_moment = 0.25 * bilinear_outer(h_inv_times_eta, h_inv_times_eta) - 0.5 * h_inv
         return MultivariateNormalEP(mean, second_moment)
 
     @override
@@ -99,7 +100,7 @@ class MultivariateNormalNP(
     def sufficient_statistics(
         cls, x: JaxRealArray, **fixed_parameters: JaxArray
     ) -> MultivariateNormalEP:
-        return MultivariateNormalEP(x, outer_product(x, x))
+        return MultivariateNormalEP(x, bilinear_outer(x, x))
 
     @override
     def dimensions(self) -> int:
@@ -150,7 +151,7 @@ class MultivariateNormalEP(HasEntropyEP[MultivariateNormalNP], Multidimensional,
         return self.mean.shape[-1]
 
     def variance(self) -> JaxRealArray:
-        return self.second_moment - outer_product(self.mean, self.mean)
+        return self.second_moment - bilinear_outer(self.mean, self.mean)
 
     def to_variance_parametrization(self) -> MultivariateNormalVP:
         return MultivariateNormalVP(self.mean, self.variance())
@@ -188,5 +189,5 @@ class MultivariateNormalVP(Samplable, Multidimensional):
         return self.mean.shape[-1]
 
     def to_exp(self) -> MultivariateNormalEP:
-        second_moment = self.variance + outer_product(self.mean, self.mean)
+        second_moment = self.variance + bilinear_outer(self.mean, self.mean)
         return MultivariateNormalEP(self.mean, second_moment)

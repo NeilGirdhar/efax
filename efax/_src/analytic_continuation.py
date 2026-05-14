@@ -106,3 +106,12 @@ def complex_value(z: JaxArray | ComplexContinuation) -> JaxArray:
     """Return the ordinary complex value represented by real and imaginary coordinates."""
     real, imag = complex_parts(z)
     return real + 1j * imag
+
+
+def complex_logdet(z: JaxArray) -> JaxArray:
+    """Return a real log determinant for real arrays and analytic log determinant for complex."""
+    xp = array_namespace(z)
+    if xp.isdtype(z.dtype, "complex floating"):
+        return xp.log(xp.linalg.det(z))
+    _, logdet = xp.linalg.slogdet(z)
+    return logdet

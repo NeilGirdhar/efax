@@ -9,6 +9,7 @@ from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape, complex_multigammaln, softplus
 from tjax.dataclasses import dataclass
 
+from efax._src.analytic_continuation import complex_logdet
 from efax._src.interfaces.multidimensional import Multidimensional
 from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
@@ -61,9 +62,8 @@ class WishartNP(
 
     @override
     def log_normalizer(self) -> JaxRealArray:
-        xp = array_namespace(self)
         half_df = self.half_df()
-        _, logdet_precision = xp.linalg.slogdet(self.precision())
+        logdet_precision = complex_logdet(self.precision())
         return (
             -half_df * logdet_precision
             + half_df * self.dimensions() * math.log(2.0)

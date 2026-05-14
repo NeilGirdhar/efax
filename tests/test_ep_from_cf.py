@@ -1,8 +1,7 @@
 """Generic test for expectation_parameters_from_characteristic_function.
 
 The OLS inversion works for distributions where all of the following hold:
-- log_normalizer is complex-analytic for all fields:
-  - Excludes MultivariateNormal (outer_product uses conjugation, breaking analyticity)
+- log_normalizer is complex-analytic for all fields
 - sufficient_statistics does not require fixed_parameters (excludes Weibull,
   MultivariateFixedVarianceNormal)
 
@@ -67,23 +66,6 @@ def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -
         # Evaluate CF by vmapping over the k dimension — avoids rank-promotion errors
         # when field shapes are vectors/matrices (e.g. MultivariateDiagonalNormal).
         cf = jax.vmap(q.characteristic_function)(t)
-
-        # Per-coordinate check: verify each real coordinate independently contributes
-        # to Im(log φ). If a coordinate contributes nothing, OLS cannot recover it.
-        for i_coordinate in range(total_dim):
-            t_single_flat = jnp.zeros_like(t_flat)
-            t_single_flat = t_single_flat.at[:, i_coordinate].set(t_flat[:, i_coordinate])
-            t_single = _broadcast_fixed_parameters(q_flattener.unflatten(t_single_flat))
-            try:
-                cf_leaf = jax.vmap(q.characteristic_function)(t_single)
-            except Exception:  # noqa: BLE001
-                break
-            b_leaf = jnp.imag(jnp.log(cf_leaf))
-            if float(jnp.std(b_leaf)) < 1e-6:  # noqa: PLR2004
-                pytest.skip(
-                    f"{nat_cls.__name__}: coordinate {i_coordinate} doesn't contribute "
-                    f"to Im(log φ) — log_normalizer not complex-analytic for this coordinate"
-                )
 
         # Invert via OLS — skip if sufficient_statistics requires fixed_parameters
         # (e.g. WeibullNP requires concentration as a fixed parameter).
