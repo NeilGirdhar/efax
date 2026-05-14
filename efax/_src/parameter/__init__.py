@@ -14,6 +14,7 @@ from .ring import (
 )
 from .support import (
     CircularBoundedSupport,
+    HermitianMatrixSupport,
     ScalarSupport,
     SimplexSupport,
     SquareMatrixSupport,
@@ -27,6 +28,7 @@ __all__ = [
     "BooleanRing",
     "CircularBoundedSupport",
     "ComplexField",
+    "HermitianMatrixSupport",
     "IntegralRing",
     "RealField",
     "Ring",

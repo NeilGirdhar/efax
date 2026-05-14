@@ -84,6 +84,7 @@ from ._src.parameter.parameter import distribution_parameter
 from ._src.parameter.ring import BooleanRing, ComplexField, IntegralRing, RealField, Ring
 from ._src.parameter.support import (
     CircularBoundedSupport,
+    HermitianMatrixSupport,
     ScalarSupport,
     SimplexSupport,
     SquareMatrixSupport,
@@ -154,6 +155,7 @@ __all__ = [
     "HasEntropyEP",
     "HasEntropyNP",
     "HasGeneralizedConjugatePrior",
+    "HermitianMatrixSupport",
     "IntegralRing",
     "InverseGammaEP",
     "InverseGammaNP",

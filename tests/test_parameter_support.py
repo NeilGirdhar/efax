@@ -4,7 +4,14 @@ import jax.numpy as jnp
 import numpy as np
 from numpy.testing import assert_allclose
 
-from efax import CircularBoundedSupport, ComplexField, SimplexSupport, SubsimplexSupport
+from efax import (
+    CircularBoundedSupport,
+    ComplexField,
+    HermitianMatrixSupport,
+    SimplexSupport,
+    SubsimplexSupport,
+    SymmetricMatrixSupport,
+)
 
 
 def test_complex_field_zero_plane_mapping_is_finite() -> None:
@@ -32,6 +39,53 @@ def test_circular_bounded_support_zero_plane_mapping_is_finite() -> None:
 
     assert_allclose(flattened, jnp.zeros(2))
     assert_allclose(unflattened, jnp.zeros(2))
+
+
+def test_symmetric_matrix_support_is_transpose_symmetric() -> None:
+    support = SymmetricMatrixSupport(ring=ComplexField())
+    matrix = jnp.asarray(
+        [
+            [1 + 0j, 2 + 3j],
+            [2 + 3j, 4 + 0j],
+        ]
+    )
+
+    flattened = support.flattened(matrix, map_to_plane=False)
+    unflattened = support.unflattened(flattened, 2, map_from_plane=False)
+
+    expected_flattened = jnp.asarray([1, 2, 4, 0, 3, 0])
+
+    assert support.num_elements(2) == expected_flattened.shape[-1]
+    assert_allclose(flattened, expected_flattened)
+    assert_allclose(unflattened, matrix)
+
+
+def test_hermitian_matrix_support_round_trip() -> None:
+    support = HermitianMatrixSupport()
+    matrix = jnp.asarray(
+        [
+            [1 + 0j, 2 + 3j],
+            [2 - 3j, 4 + 0j],
+        ]
+    )
+
+    flattened = support.flattened(matrix, map_to_plane=False)
+    unflattened = support.unflattened(flattened, 2, map_from_plane=False)
+
+    expected_flattened = jnp.asarray([1, 2, 4, 3])
+
+    assert support.num_elements(2) == expected_flattened.shape[-1]
+    assert_allclose(flattened, expected_flattened)
+    assert_allclose(unflattened, matrix)
+
+
+def test_hermitian_matrix_support_generation_is_hermitian() -> None:
+    support = HermitianMatrixSupport(positive_semidefinite=True)
+    matrix = support.generate(jnp, np.random.default_rng(123), (5,), 0.01, 3)
+
+    assert matrix.shape == (5, 3, 3)
+    assert_allclose(matrix, jnp.conj(jnp.matrix_transpose(matrix)), rtol=1e-6)
+    assert bool(jnp.all(jnp.linalg.eigvalsh(matrix) >= 0.0))
 
 
 def test_simplex_support_uses_reduced_dimension() -> None:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from math import comb, isqrt
-from typing import Any, cast, override
+from typing import cast, override
 
 import array_api_extra as xpx
 import jax.scipy.special as jss
@@ -228,20 +228,15 @@ class SubsimplexSupport(Support):
         return x
 
 
-class SymmetricMatrixSupport(Support):
-    @override
+class _SelfAdjointMatrixSupport(Support):
     def __init__(
         self,
         *,
         positive_semidefinite: bool = False,
         negative_semidefinite: bool = False,
-        hermitian: bool = False,
-        **kwargs: Any,
+        ring: Ring = real_field,
     ) -> None:
-        if hermitian:
-            kwargs.setdefault("ring", complex_field)
-        super().__init__(**kwargs)
-        self.hermitian = hermitian
+        super().__init__(ring=ring)
         self.positive_semidefinite = positive_semidefinite
         self.negative_semidefinite = negative_semidefinite
 
@@ -253,6 +248,32 @@ class SymmetricMatrixSupport(Support):
     def shape(self, dimensions: int) -> Shape:
         return (dimensions, dimensions)
 
+    @override
+    def generate(
+        self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
+    ) -> JaxRealArray:
+        # Generate a random matrix.
+        m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions), safety)
+        if self.negative_semidefinite or self.positive_semidefinite:
+            # Perform QR decomposition to obtain an orthogonal or unitary matrix Q.
+            q, _ = xp.linalg.qr(m)
+            # Generate Eigenvalues.
+            assert isinstance(self.ring, RealField | ComplexField)
+            eig_field = (
+                RealField(minimum=0.0) if self.positive_semidefinite else RealField(maximum=0.0)
+            )
+            eig = eig_field.generate(xp, rng, (*shape, dimensions), safety)
+            return contract("...ji,...j,...jk->...ik", self._left_factor(q), eig, q)
+        return m + self._mirror(m)
+
+    def _left_factor(self, x: JaxArray) -> JaxArray:
+        return x
+
+    def _mirror(self, x: JaxArray) -> JaxArray:
+        return array_namespace(x).matrix_transpose(x)
+
+
+class SymmetricMatrixSupport(_SelfAdjointMatrixSupport):
     @override
     def num_elements(self, dimensions: int) -> int:
         return self.ring.num_elements(triangular_number(dimensions))
@@ -290,32 +311,80 @@ class SymmetricMatrixSupport(Support):
             xk = x[..., k]
             result = xpx.at(result)[..., i, j].set(xk)  # ty: ignore
             if i != j:
-                cxk = xp.conj(xk) if self.hermitian else xk
-                result = xpx.at(result)[..., j, i].set(cxk)  # ty: ignore
+                result = xpx.at(result)[..., j, i].set(xk)  # ty: ignore
+        assert isinstance(result, JaxArray)
+        return result
+
+
+class HermitianMatrixSupport(_SelfAdjointMatrixSupport):
+    def __init__(
+        self,
+        *,
+        positive_semidefinite: bool = False,
+        negative_semidefinite: bool = False,
+    ) -> None:
+        super().__init__(
+            positive_semidefinite=positive_semidefinite,
+            negative_semidefinite=negative_semidefinite,
+            ring=complex_field,
+        )
+
+    @override
+    def num_elements(self, dimensions: int) -> int:
+        return dimensions**2
+
+    @override
+    def flattened(self, x: JaxArray, *, map_to_plane: bool) -> JaxRealArray:
+        xp = array_namespace(x)
+        dimensions = x.shape[-1]
+        assert x.shape[-2] == dimensions
+        index_a, index_b = np.triu_indices(dimensions)
+        x_triangular = xp.stack(
+            [x[..., i, j] for i, j in zip(index_a, index_b, strict=True)], axis=-1
+        )
+        off_diagonal = index_a != index_b
+        return xp.concat(
+            [
+                xp.real(x_triangular),
+                xp.imag(x_triangular[..., off_diagonal]),
+            ],
+            axis=-1,
+        )
+
+    @override
+    def unflattened(self, y: JaxRealArray, dimensions: int, *, map_from_plane: bool) -> JaxArray:
+        xp = array_namespace(y)
+        if y.shape[-1] != dimensions**2:
+            msg = (
+                f"The final dimension of the flattened vector, {y.shape[-1]}, "
+                f"is not {dimensions**2}"
+            )
+            raise ValueError(msg)
+        triangular = triangular_number(dimensions)
+        index_a, index_b = np.triu_indices(dimensions)
+        off_diagonal = index_a != index_b
+        imaginary = xp.zeros_like(y[..., :triangular])
+        imaginary = xpx.at(imaginary)[..., off_diagonal].set(y[..., triangular:])  # ty: ignore
+        x = y[..., :triangular] + 1j * imaginary  # ty: ignore
+        result = xp.empty((*x.shape[:-1], dimensions, dimensions), dtype=x.dtype)
+        for k, (i_, j_) in enumerate(zip(index_a, index_b, strict=True)):
+            i = int(i_)
+            j = int(j_)
+            xk = x[..., k]
+            result = xpx.at(result)[..., i, j].set(xk)
+            if i != j:
+                result = xpx.at(result)[..., j, i].set(xp.conj(xk))
         assert isinstance(result, JaxArray)
         return result
 
     @override
-    def generate(
-        self, xp: Namespace, rng: Generator, shape: Shape, safety: float, dimensions: int
-    ) -> JaxRealArray:
-        # Generate a random matrix.
-        m = self.ring.generate(xp, rng, (*shape, dimensions, dimensions), safety)
-        if self.negative_semidefinite or self.positive_semidefinite:
-            # Perform QR decomposition to obtain an orthogonal matrix Q
-            q, _ = xp.linalg.qr(m)
-            # Generate Eigenvalues.
-            assert isinstance(self.ring, RealField | ComplexField)
-            eig_field = (
-                RealField(minimum=0.0) if self.positive_semidefinite else RealField(maximum=0.0)
-            )
-            eig = eig_field.generate(xp, rng, (*shape, dimensions), safety)
-            # Return Q.T @ diag(eig) @ Q.
-            return contract("...ji,...j,...jk->...ik", xp.conj(q) if self.hermitian else q, eig, q)
-        mt = xp.matrix_transpose(m)
-        if self.hermitian:
-            mt = xp.conj(mt)
-        return m + mt
+    def _left_factor(self, x: JaxArray) -> JaxArray:
+        return array_namespace(x).conj(x)
+
+    @override
+    def _mirror(self, x: JaxArray) -> JaxArray:
+        xp = array_namespace(x)
+        return xp.conj(xp.matrix_transpose(x))
 
 
 class SquareMatrixSupport(Support):

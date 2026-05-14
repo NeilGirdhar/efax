@@ -14,7 +14,7 @@ from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import (
-    SymmetricMatrixSupport,
+    HermitianMatrixSupport,
     VectorSupport,
     complex_field,
     distribution_parameter,
@@ -37,7 +37,7 @@ class ComplexCircularlySymmetricNormalNP(
     """
 
     negative_precision: JaxComplexArray = distribution_parameter(
-        SymmetricMatrixSupport(hermitian=True, negative_semidefinite=True)
+        HermitianMatrixSupport(negative_semidefinite=True)
     )
     # S = -1/negative_precision, U = 0
     # P = S.conjugate, R = 0
@@ -102,7 +102,7 @@ class ComplexCircularlySymmetricNormalEP(
     """
 
     variance: JaxComplexArray = distribution_parameter(
-        SymmetricMatrixSupport(hermitian=True, positive_semidefinite=True)
+        HermitianMatrixSupport(positive_semidefinite=True)
     )
 
     @property

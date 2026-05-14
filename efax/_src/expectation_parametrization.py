@@ -10,8 +10,11 @@ from tjax import JaxComplexArray, JaxRealArray, jit
 from typing_extensions import TypeVar
 
 from .natural_parametrization import NaturalParametrization
+from .parameter import ComplexField, HermitianMatrixSupport, SymmetricMatrixSupport
 from .parametrization import Distribution
+from .structure.assembler import SimpleDistributionInfo
 from .structure.flattener import Flattener
+from .structure.parameter_supports import parameter_supports
 from .tools import parameter_dot_product, parameter_map
 
 NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
@@ -114,4 +117,35 @@ def expectation_parameters_from_characteristic_function(
     first_field_shape = leaves[0].shape[n_t:]
     dummy_ep = type(t).sufficient_statistics(jnp.zeros(first_field_shape))
     ep_flattener = Flattener.create_flattener(dummy_ep, mapped_to_plane=False)
+    chi = _undouble_symmetric_coordinates(chi, ep_flattener)
     return ep_flattener.unflatten(chi)
+
+
+def _undouble_symmetric_coordinates(
+    flattened: JaxRealArray,
+    flattener: Flattener,
+) -> JaxRealArray:
+    """Convert full-matrix symmetric pairings back to stored coordinates.
+
+    Symmetric and Hermitian supports store one off-diagonal coordinate for a mirrored
+    matrix pair.  The CF pairing sees both entries, so OLS recovers twice the stored
+    off-diagonal expectation.  Build that multiplicity through the support's own
+    flattening convention and divide by it.
+    """
+    xp = array_namespace(flattened)
+    scale_chunks: list[JaxRealArray] = []
+    for info in flattener.infos:
+        if not isinstance(info, SimpleDistributionInfo):
+            continue
+        for _, support, _ in parameter_supports(info.type_, fixed=False):
+            if not isinstance(support, SymmetricMatrixSupport | HermitianMatrixSupport):
+                scale_chunks.append(
+                    xp.ones(support.num_elements(info.dimensions), dtype=flattened.dtype)
+                )
+                continue
+
+            multiplicity = 2.0 - xp.eye(info.dimensions, dtype=flattened.dtype)
+            if isinstance(support.ring, ComplexField):
+                multiplicity *= 1 + 1j
+            scale_chunks.append(xp.reciprocal(support.flattened(multiplicity, map_to_plane=False)))
+    return flattened * xp.concat(scale_chunks)
