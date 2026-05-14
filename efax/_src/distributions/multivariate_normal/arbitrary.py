@@ -11,12 +11,12 @@ from tjax import (
     KeyArray,
     Shape,
     bilinear_outer,
+    complex_logdet,
     matrix_dot_product,
     matrix_vector_mul,
 )
 from tjax.dataclasses import dataclass
 
-from efax._src.analytic_continuation import complex_logdet
 from efax._src.interfaces.multidimensional import Multidimensional
 from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP

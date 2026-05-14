@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from numpy.random import Generator
 from numpy.testing import assert_allclose
-from tjax import NumpyComplexArray, NumpyRealArray, Shape
+from tjax import NumpyComplexArray, NumpyRealArray, Shape, bilinear_outer, sesquilinear_outer
 
 from .scipy_replacement.complex_multivariate_normal import ScipyComplexMultivariateNormal
 from .scipy_replacement.complex_normal import ScipyComplexNormal
@@ -81,12 +81,12 @@ def test_multivariate_rvs(generator: Generator) -> None:
     centered_rvs = rvs - dist.mean[(...,) + (np.newaxis,) * len(rvs_shape) + (slice(None),)]
     estimated_variance = np.real(
         np.average(
-            centered_rvs[..., np.newaxis] * np.conj(centered_rvs)[..., np.newaxis, :],
+            sesquilinear_outer(centered_rvs, centered_rvs),
             axis=rvs_axes2,
         )
     )
     estimated_pseudo_variance = np.average(
-        centered_rvs[..., np.newaxis] * centered_rvs[..., np.newaxis, :], axis=rvs_axes2
+        bilinear_outer(centered_rvs, centered_rvs), axis=rvs_axes2
     )
     assert_allclose(estimated_mean, dist.mean, rtol=1e-2, atol=1e-2)
     assert_allclose(estimated_variance, dist.variance, rtol=2e-1, atol=5e-1)

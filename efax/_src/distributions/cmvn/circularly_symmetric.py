@@ -5,10 +5,18 @@ from typing import override
 
 import jax.random as jr
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxComplexArray, JaxRealArray, KeyArray, Shape, sesquilinear_outer
+from tjax import (
+    JaxArray,
+    JaxComplexArray,
+    JaxRealArray,
+    KeyArray,
+    Shape,
+    complex_logdet,
+    sesquilinear_outer,
+)
 from tjax.dataclasses import dataclass
 
-from efax._src.analytic_continuation import ComplexContinuation, complex_logdet, complex_value
+from efax._src.analytic_continuation import ComplexContinuation, complex_value
 from efax._src.interfaces.multidimensional import Multidimensional
 from efax._src.interfaces.samplable import Samplable
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP

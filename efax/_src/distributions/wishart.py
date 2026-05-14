@@ -6,10 +6,9 @@ from typing import Any, override
 import jax.numpy as jnp
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, Shape, complex_multigammaln, softplus
+from tjax import JaxArray, JaxRealArray, Shape, complex_logdet, complex_multigammaln, softplus
 from tjax.dataclasses import dataclass
 
-from efax._src.analytic_continuation import complex_logdet
 from efax._src.interfaces.multidimensional import Multidimensional
 from efax._src.mixins.exp_to_nat.exp_to_nat import ExpToNat
 from efax._src.mixins.has_entropy import HasEntropyEP, HasEntropyNP
