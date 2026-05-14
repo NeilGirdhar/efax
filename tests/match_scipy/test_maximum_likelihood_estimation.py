@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import Any
 
-import numpy as np
 from jax import Array
 from numpy.random import Generator
 from tjax import assert_tree_allclose
@@ -13,7 +11,6 @@ from efax import (
     NaturalParametrization,
     flat_dict_of_observations,
     flat_dict_of_parameters,
-    parameter_map,
     unflatten_mapping,
 )
 from tests.create_info import (
@@ -72,9 +69,5 @@ def test_maximum_likelihood_estimation(
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
     estimator = Estimator.from_expectation(exp_parameters)
-    sufficient_stats = estimator.sufficient_statistics(efax_x_clamped)
-    calculated_parameters = parameter_map(
-        partial(np.mean, axis=0),
-        sufficient_stats,
-    )
+    calculated_parameters = estimator.mle(efax_x_clamped, axis=0)
     assert_tree_allclose(exp_parameters, calculated_parameters, rtol=rtol, atol=atol)

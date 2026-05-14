@@ -1,13 +1,14 @@
 from dataclasses import fields
+from functools import partial
 from typing import TYPE_CHECKING, Any, Self, TypeVar, cast
 
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxComplexArray, JaxRealArray
+from tjax import JaxArray, JaxComplexArray, JaxRealArray, jit
 from tjax.dataclasses import dataclass
 
 from efax._src.iteration import flatten_mapping, parameters
 from efax._src.parametrization import Distribution, SimpleDistribution
-from efax._src.types import Path
+from efax._src.types import Axis, Path
 
 from .assembler import Assembler, JointDistributionInfo, SimpleDistributionInfo
 from .parameter_names import parameter_names
@@ -134,6 +135,17 @@ class Estimator(Assembler[P]):
                     assert isinstance(info, JointDistributionInfo)
                     h(info)
         return cast("P", constructed[()])
+
+    @partial(jit, static_argnames=("axis",))
+    def mle(self, x: dict[str, Any] | JaxComplexArray, *, axis: Axis | None = None) -> P:
+        """Maximum likelihood estimate: mean of sufficient statistics over sample axes.
+
+        Equivalent to ``parameter_mean(self.sufficient_statistics(x), axis=axis)`` but fused under
+        jit.  Pass ``axis`` as the axis (or tuple of axes) over which observations are stacked.
+        """
+        from efax._src.tools import parameter_mean  # noqa: PLC0415
+
+        return parameter_mean(self.sufficient_statistics(x), axis=axis)
 
     def from_conjugate_prior(self, cp: "NaturalParametrization") -> tuple[P, JaxRealArray]:
         """Recover distribution parameters and observation count from a conjugate prior.

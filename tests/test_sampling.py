@@ -21,7 +21,6 @@ from efax import (
     SimpleDistributionInfo,
     flat_dict_of_parameters,
     flatten_mapping,
-    parameter_mean,
     parameters,
 )
 
@@ -112,8 +111,7 @@ def _verify_maximum_likelihood_estimate(
     sample_axes = tuple(range(len(sample_shape)))
     newaxes = (jnp.newaxis,) * len(sample_shape)
     estimator = Estimator.from_expectation(exp_parameters[*newaxes, ...])
-    sampled_exp_parameters = estimator.sufficient_statistics(samples)
-    maximum_likelihood_parameters = parameter_mean(sampled_exp_parameters, axis=sample_axes)
+    maximum_likelihood_parameters = estimator.mle(samples, axis=sample_axes)
     assert_tree_allclose(maximum_likelihood_parameters, exp_parameters, rtol=rtol, atol=atol)
 
 
