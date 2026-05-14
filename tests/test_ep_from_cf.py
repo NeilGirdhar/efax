@@ -68,15 +68,6 @@ def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -
         # when field shapes are vectors/matrices (e.g. MultivariateDiagonalNormal).
         cf = jax.vmap(q.characteristic_function)(t)
 
-        if not bool(jnp.all(jnp.isfinite(jnp.abs(cf)))):
-            pytest.skip(f"{nat_cls.__name__}: CF returned non-finite values")
-
-        # Skip if Im(log φ) is essentially zero everywhere — indicates log_normalizer
-        # doesn't support complex inputs.
-        b_all = jnp.imag(jnp.log(cf))
-        if float(jnp.std(b_all)) < 1e-6:  # noqa: PLR2004
-            pytest.skip(f"{nat_cls.__name__}: log_normalizer not complex-analytic (Im(log φ) ≈ 0)")
-
         # Per-coordinate check: verify each real coordinate independently contributes
         # to Im(log φ). If a coordinate contributes nothing, OLS cannot recover it.
         for i_coordinate in range(total_dim):
