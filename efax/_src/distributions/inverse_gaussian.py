@@ -91,7 +91,7 @@ class InverseGaussianNP(
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.ndim)
         key1, key2 = jr.split(key)
         nu = jr.normal(key1, shape)
         z = jr.uniform(key2, shape)

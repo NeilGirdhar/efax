@@ -67,7 +67,7 @@ class ExponentialNP(
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.ndim)
         return -jr.exponential(key, shape) / self.negative_rate[grow]
 
 
@@ -110,7 +110,7 @@ class ExponentialEP(HasEntropyEP[ExponentialNP], HasConjugatePrior, Samplable):
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.ndim)
         return jr.exponential(key, shape) * self.mean[grow]
 
     @override

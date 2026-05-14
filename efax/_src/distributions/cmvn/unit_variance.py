@@ -123,7 +123,7 @@ class ComplexMultivariateUnitVarianceNormalEP(
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxComplexArray:
         xp = array_namespace(self)
         shape = self.mean.shape if shape is None else shape + self.mean.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.mean.ndim)
         key_a, key_b = jr.split(key)
         a = jr.normal(key_a, shape)
         b = jr.normal(key_b, shape)

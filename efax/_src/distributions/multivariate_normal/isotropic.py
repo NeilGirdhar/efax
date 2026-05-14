@@ -133,7 +133,7 @@ class IsotropicNormalEP(HasEntropyEP[IsotropicNormalNP], Samplable, Multidimensi
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.mean.shape if shape is None else shape + self.mean.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.mean.ndim)
         deviation = xp.sqrt(self.variance())
         return jr.normal(key, shape) * deviation[*grow, ..., xp.newaxis] + self.mean[grow]
 

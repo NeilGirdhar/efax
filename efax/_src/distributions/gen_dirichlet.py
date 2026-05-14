@@ -88,7 +88,7 @@ class GeneralizedDirichletNP(
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         xp = array_namespace(self, x)
-        return xp.zeros(x.shape[: len(x.shape) - 1])
+        return xp.zeros(x.shape[:-1])
 
     @override
     def dimensions(self) -> int:

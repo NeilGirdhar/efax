@@ -211,7 +211,7 @@ class NormalDP(Samplable, SimpleDistribution):
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.ndim)
         return jr.normal(key, shape) * self.deviation[grow] + self.mean[grow]
 
     def log_pdf(self, x: JaxRealArray) -> JaxRealArray:

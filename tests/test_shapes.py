@@ -20,7 +20,7 @@ def test_shapes(generator: Generator, distribution_info: DistributionInfo) -> No
 
     def check(z: SimpleDistribution) -> None:
         for xf, support in parameters(z, support=True).values():
-            assert xf.shape[: len(xf.shape) - support.axes()] == shape
+            assert xf.shape[: xf.ndim - support.axes()] == shape
 
     assert p.shape == shape
     assert q.shape == shape

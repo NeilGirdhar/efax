@@ -41,11 +41,11 @@ def _calculate_jacobian(
 ) -> JaxRealArray:
     flattener, flattened = Flattener.flatten(p)
     jacobian_sample = jacobian(_sample_using_flattened, argnums=(0,))
-    for _ in p.shape:
+    for _ in range(p.ndim):
         jacobian_sample = vmap(jacobian_sample, in_axes=(0, 0, 0))
     (parameters_jacobian,) = jacobian_sample(flattened, flattener, keys)
-    assert parameters_jacobian.shape[: len(p.shape)] == p.shape
-    return jnp.sum(parameters_jacobian, axis=tuple(range(len(p.shape) + 1)))
+    assert parameters_jacobian.shape[: p.ndim] == p.shape
+    return jnp.sum(parameters_jacobian, axis=tuple(range(p.ndim + 1)))
 
 
 def _calculate_curvature(
@@ -55,13 +55,13 @@ def _calculate_curvature(
     # Calculate curvature.
     flattener, flattened = Flattener.flatten(p)
     hessian_sample = hessian(_sample_using_flattened, argnums=(0,))
-    for _ in p.shape:
+    for _ in range(p.ndim):
         hessian_sample = vmap(hessian_sample, in_axes=(0, 0, 0))
     (parameters_hessian_x,) = hessian_sample(flattened, flattener, keys)
     (parameters_hessian,) = parameters_hessian_x
 
-    assert parameters_hessian.shape[: len(p.shape)] == p.shape
-    parameters_hessian = jnp.sum(parameters_hessian, axis=tuple(range(len(p.shape))))
+    assert parameters_hessian.shape[: p.ndim] == p.shape
+    parameters_hessian = jnp.sum(parameters_hessian, axis=tuple(range(p.ndim)))
 
     assert parameters_hessian.shape[-2] == parameters_hessian.shape[-1]
     diagonal_hessian = jnp.linalg.diagonal(parameters_hessian)

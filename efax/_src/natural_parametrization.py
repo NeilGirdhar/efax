@@ -254,6 +254,6 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
     def _fisher_information_matrix(self) -> JaxRealArray:
         flattener, flattened = Flattener.flatten(self, mapped_to_plane=False)
         fisher_info_f = jacfwd(grad(self._flat_log_normalizer))
-        for _ in range(len(self.shape)):
+        for _ in range(self.ndim):
             fisher_info_f = vmap(fisher_info_f)
         return fisher_info_f(flattened, flattener)

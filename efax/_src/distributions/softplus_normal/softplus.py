@@ -75,7 +75,7 @@ class SoftplusNormalNP(
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.ndim)
         normal_dp = self.base_distribution().to_deviation_parametrization()
         return softplus(jr.normal(key, shape) * normal_dp.deviation[grow] + normal_dp.mean[grow])
 
@@ -120,6 +120,6 @@ class SoftplusNormalEP(
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
         xp = array_namespace(self)
         shape = self.shape if shape is None else shape + self.shape
-        grow = (xp.newaxis,) * (len(shape) - len(self.mean.shape))
+        grow = (xp.newaxis,) * (len(shape) - self.mean.ndim)
         normal_dp = self.base_distribution().to_deviation_parametrization()
         return softplus(jr.normal(key, shape) * normal_dp.deviation[grow] + normal_dp.mean[grow])
