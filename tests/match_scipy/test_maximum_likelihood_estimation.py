@@ -18,6 +18,7 @@ from efax import (
 )
 from tests.create_info import (
     ComplexCircularlySymmetricNormalInfo,
+    GeneralizedDirichletInfo,
     IsotropicNormalInfo,
     MultivariateFixedVarianceNormalInfo,
     MultivariateNormalInfo,
@@ -47,7 +48,9 @@ def test_maximum_likelihood_estimation(
         atol = 1e-3
     else:
         atol = 1e-6
-    n = 70000
+    # Generalized Dirichlet is the slow tail of this parametrized test; use a smaller
+    # still-large power-of-two sample count while keeping other distributions near the old size.
+    n = 32768 if isinstance(distribution_info, GeneralizedDirichletInfo) else 65536
     # Generate a distribution with expectation parameters.
     exp_parameters = distribution_info.exp_parameter_generator(generator, shape=())
     # Generate variates from the corresponding scipy distribution.
@@ -66,10 +69,10 @@ def test_maximum_likelihood_estimation(
         if flat_efax_x_clamped.keys() == {()}
         else unflatten_mapping(flat_efax_x_clamped)
     )
-    estimator = Estimator.from_expectation(exp_parameters)
-    sufficient_stats = estimator.sufficient_statistics(efax_x_clamped)
 
     # Verify that the mean of the sufficient statistics equals the expectation parameters.
+    estimator = Estimator.from_expectation(exp_parameters)
+    sufficient_stats = estimator.sufficient_statistics(efax_x_clamped)
     calculated_parameters = parameter_map(
         partial(np.mean, axis=0),
         sufficient_stats,
