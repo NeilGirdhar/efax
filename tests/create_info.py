@@ -524,7 +524,7 @@ class MultivariateDiagonalNormalInfo(
     @override
     def exp_to_scipy_distribution(self, p: MultivariateDiagonalNormalEP) -> Any:
         variance = np.asarray(p.variance())
-        covariance = xpx.create_diagonal(variance)
+        covariance = xpx.create_diagonal(variance)  # type: ignore
         assert isinstance(covariance, np.ndarray)
         return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
 
