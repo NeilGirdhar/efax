@@ -43,7 +43,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         # Select a default minimizer based on the dimensionality of the search space.
         # Bisection is used for scalar problems; Newton's method for vector problems.
         if hasattr(super(), "__post_init__"):
-            super().__post_init__()  # ty: ignore
+            super().__post_init__()  # type: ignore
         if self.minimizer is None:
             from .optimistix import default_bisection_minimizer, default_minimizer  # noqa: PLC0415
 
@@ -96,7 +96,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
             unflatten_as_type=np_cls,
             mapped_to_plane=True,
         )
-        return flattener.unflatten(search_parameters)  # ty: ignore
+        return flattener.unflatten(search_parameters)  # type: ignore
 
     def search_gradient(self, search_parameters: SP) -> SP:
         """Convert the search parameters to the natural gradient.
@@ -109,7 +109,7 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         Returns: The gradient of the loss wrt to the search parameters.
         """
         search_np = self.search_to_natural(search_parameters)
-        search_ep: ExpToNat[NP] = search_np.to_exp()
+        search_ep = search_np.to_exp()
         _, self_flat = Flattener.flatten(self, mapped_to_plane=False)
         _, search_flat = Flattener.flatten(search_ep, mapped_to_plane=False)
         return search_flat - self_flat

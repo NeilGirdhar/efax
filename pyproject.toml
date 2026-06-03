@@ -63,6 +63,12 @@ Documentation = "https://github.com/NeilGirdhar/efax#readme"
 Issues = "https://github.com/NeilGirdhar/efax/issues"
 Source = "https://github.com/NeilGirdhar/efax"
 
+[tool.pyrefly]
+project-includes = [
+  "**/*.py*",
+  "**/*.ipynb"
+]
+
 [tool.pytest]
 testpaths = ["tests"]
 

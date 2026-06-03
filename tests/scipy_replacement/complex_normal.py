@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Self, override
+from typing import Self
 
 import numpy as np
 from numpy.random import Generator
@@ -12,14 +12,14 @@ from tjax import (
     Shape,
 )
 
+from .base import ScipyDistribution
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyComplexNormalUnvectorized:
+class ScipyComplexNormalUnvectorized(ScipyDistribution):
     """Represents an array of univariate complex normal distributions."""
 
-    @override
     def __init__(
         self,
         mean: NumpyComplexNumeric,
@@ -40,8 +40,8 @@ class ScipyComplexNormalUnvectorized:
             msg = "Shape mismatch."
             raise ValueError(msg)
 
-    def pdf(self, z: NumpyComplexNumeric, out: None = None) -> NumpyRealNumeric:
-        zr: NumpyRealArray = np.stack([np.real(z), np.imag(z)], axis=-1)
+    def pdf(self, x: NumpyComplexNumeric, out: None = None) -> NumpyRealArray:
+        zr: NumpyRealArray = np.stack([np.real(x), np.imag(x)], axis=-1)
         return self.as_multivariate_normal().pdf(zr)
 
     def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyComplexArray:
@@ -52,8 +52,8 @@ class ScipyComplexNormalUnvectorized:
         )
         return xy_rvs[..., 0] + 1j * xy_rvs[..., 1]
 
-    def entropy(self) -> float:
-        return self.as_multivariate_normal().entropy().item()
+    def entropy(self) -> NumpyRealArray:
+        return self.as_multivariate_normal().entropy()
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormalUnvectorized:
         mv_mean = self._multivariate_normal_mean()
@@ -72,10 +72,9 @@ class ScipyComplexNormalUnvectorized:
         return 0.5 * np.stack([xx_xy, yx_yy], axis=-2)
 
 
-class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):  # ty: ignore
+class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
     """This class allows distributions having a non-empty shape."""
 
-    @override
     def __init__(
         self,
         mean: NumpyComplexArray | None = None,

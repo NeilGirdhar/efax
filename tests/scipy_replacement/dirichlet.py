@@ -9,10 +9,11 @@ from numpy.random import Generator
 from scipy.special import beta as scipy_beta
 from tjax import NumpyComplexArray, NumpyRealArray, Shape
 
+from .base import ScipyDistribution
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyDirichletFixRVsAndPDF:
+class ScipyDirichletFixRVsAndPDF(ScipyDistribution):
     """This class repairs dirichlet.
 
     See https://github.com/scipy/scipy/issues/6005 and https://github.com/scipy/scipy/issues/6006.
@@ -22,15 +23,15 @@ class ScipyDirichletFixRVsAndPDF:
         super().__init__()
         self.distribution = ss.dirichlet(alpha=alpha)
 
-    def pdf(self, x: onp.ToFloatND) -> np.float64:
+    def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
         x = np.asarray(x)
         if x.ndim == 2:  # noqa: PLR2004
-            return np.float64(self.distribution.pdf(x.T))
-        return np.float64(self.distribution.pdf(x))
+            return np.asarray(self.distribution.pdf(x.T))
+        return np.asarray(self.distribution.pdf(x))
 
     def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> onp.ArrayND[np.float64]:
         # This somehow fixes the behaviour of scipy's ``dirichlet.rvs``.
-        return self.distribution.rvs(  # ty: ignore
+        return self.distribution.rvs(  # type: ignore
             size=shape,
             random_state=rng,
         )
@@ -42,7 +43,6 @@ class ScipyDirichletFixRVsAndPDF:
 class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
     """This class allows distributions having a non-empty shape."""
 
-    @override
     def __init__(self, alpha: NumpyRealArray) -> None:
         shape = alpha[..., -1].shape
         rvs_shape = (alpha.shape[-1],)
@@ -61,8 +61,7 @@ class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
         return super().pdf(x)
 
 
-class ScipyGeneralizedDirichlet:
-    @override
+class ScipyGeneralizedDirichlet(ScipyDistribution):
     def __init__(self, alpha: NumpyRealArray, beta: NumpyRealArray) -> None:
         super().__init__()
         self.alpha = alpha
@@ -76,7 +75,7 @@ class ScipyGeneralizedDirichlet:
         terms = x ** (self.alpha - 1.0) * (1.0 - cs_x) ** gamma / scipy_beta(self.alpha, self.beta)
         return np.prod(terms, axis=-1)
 
-    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyComplexArray:
+    def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyRealArray:
         sample_size = shape + self.alpha.shape
         if rng is None:
             rng = np.random.default_rng()

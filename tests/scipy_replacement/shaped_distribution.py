@@ -1,21 +1,34 @@
 from __future__ import annotations
 
-from typing import Any, TypeVar, cast, override
+from typing import Any, TypeVar, cast
 
 import numpy as np
 import numpy.typing as npt
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyIntegralArray, NumpyRealArray, Shape
 
-from .base import ScipyDiscreteDistribution, ScipyDistribution
+from .base import (
+    OldStyleScipyDiscreteDistribution,
+    OldStyleScipyDistribution,
+    ScipyComplexDistribution,
+    ScipyDiscreteDistribution,
+    ScipyDistribution,
+)
 
-T = TypeVar("T", bound=ScipyDiscreteDistribution | ScipyDistribution)
+type AnyScipy = (
+    ScipyDiscreteDistribution
+    | ScipyDistribution
+    | ScipyComplexDistribution
+    | OldStyleScipyDiscreteDistribution
+    | OldStyleScipyDistribution
+)
+
+T = TypeVar("T", bound=AnyScipy)
 
 
-class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
+class ShapedDistribution[T: AnyScipy]:
     """Allow a distributions with shape."""
 
-    @override
     def __init__(
         self,
         shape: Shape,
@@ -41,11 +54,11 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         retval = np.empty(self.shape + shape + self.rvs_shape, dtype=self.rvs_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
-            retval[i] = (
-                this_object.sample(shape=shape, rng=rng)  # ty: ignore
-                if hasattr(this_object, "sample")
-                else this_object.rvs(size=shape, random_state=rng)
-            )
+            match this_object:
+                case ScipyDistribution() | ScipyComplexDistribution() | ScipyDiscreteDistribution():
+                    retval[i] = this_object.sample(shape=shape, rng=rng)
+                case OldStyleScipyDistribution() | OldStyleScipyDiscreteDistribution():
+                    retval[i] = this_object.rvs(size=shape, random_state=rng)
         return retval
 
     def pdf(self, x: NumpyComplexArray) -> NumpyRealArray:
@@ -65,7 +78,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
                 else:
                     x_ij = x[*i, *j]
                     assert x_ij.ndim == 0
-                value = this_object.pdf(x_ij)  # ty: ignore
+                value = this_object.pdf(x_ij)  # type: ignore
                 retval[*i, *j] = value
         return retval
 
@@ -77,7 +90,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
             if not hasattr(this_object, "pmf"):
                 raise NotImplementedError
             for j in np.ndindex(*x.shape[self.ndim :]):
-                value = this_object.pmf(x[*i, *j])  # ty: ignore
+                value = this_object.pmf(x[*i, *j])  # type: ignore
                 retval[*i, *j] = value
         return retval
 
@@ -85,7 +98,7 @@ class ShapedDistribution[T: ScipyDiscreteDistribution | ScipyDistribution]:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
-            retval[i] = this_object.entropy()  # ty: ignore
+            retval[i] = this_object.entropy()  # type: ignore
         return retval
 
     def access_object(self, index: tuple[int, ...]) -> T:

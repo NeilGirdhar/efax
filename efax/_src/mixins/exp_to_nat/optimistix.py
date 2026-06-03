@@ -61,7 +61,7 @@ default_minimizer = OptimistixRootFinder(
 
 
 default_bisection_minimizer = OptimistixRootFinder(
-    solver=optx.Bisection(  # ty: ignore
+    solver=optx.Bisection(  # type: ignore
         rtol=0.0, atol=1e-7, flip="detect", expand_if_necessary=True
     ),
     max_steps=1000,

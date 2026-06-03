@@ -8,10 +8,12 @@ import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyRealArray, Shape
 
+from tests.scipy_replacement.base import ScipyDistribution
+
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyMultivariateNormalUnvectorized:
+class ScipyMultivariateNormalUnvectorized(ScipyDistribution):
     """This class repairs multivariate_normal.
 
     See https://github.com/scipy/scipy/issues/7689.

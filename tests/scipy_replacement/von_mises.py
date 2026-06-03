@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from typing import override
-
 import numpy as np
 import scipy.stats as ss
 from tjax import NumpyRealArray
 
+from .base import OldStyleScipyDistribution
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyVonMises(ShapedDistribution[object]):  # ty: ignore
+class ScipyVonMises(ShapedDistribution[OldStyleScipyDistribution]):
     """This class allows distributions having a non-empty shape."""
 
-    @override
     def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None) -> None:
         if loc is None:
             loc = np.zeros_like(kappa)
@@ -27,10 +25,9 @@ class ScipyVonMises(ShapedDistribution[object]):  # ty: ignore
         super().__init__(shape, rvs_shape, dtype, objects, multivariate=False)
 
 
-class ScipyVonMisesFisher(ShapedDistribution[object]):  # ty: ignore
+class ScipyVonMisesFisher(ShapedDistribution[OldStyleScipyDistribution]):
     """This class allows distributions having a non-empty shape."""
 
-    @override
     def __init__(self, mu: NumpyRealArray, kappa: NumpyRealArray) -> None:
         assert mu.shape[:-1] == kappa.shape
         shape = kappa.shape

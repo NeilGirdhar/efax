@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
 import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyRealArray, Shape
 
+from .base import OldStyleScipyDistribution
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyWishart(ShapedDistribution[Any]):
+class ScipyWishart(ShapedDistribution[OldStyleScipyDistribution]):
     """A shape-aware wrapper around ``scipy.stats.wishart``."""
 
     def __init__(self, df: NumpyRealArray, scale: NumpyRealArray) -> None:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, final, override
+from typing import Any, Generic, Self, final, override
 
 from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit, stop_gradient
 from typing_extensions import TypeVar
@@ -77,4 +77,5 @@ class HasEntropyNP(NaturalParametrization[EP], HasEntropy, Generic[EP]):
     @override
     def entropy(self) -> JaxRealArray:
         """Return the Shannon entropy H(self) = -E_self[log self(x)]."""
-        return self.to_exp().cross_entropy(self)
+        exp: HasEntropyEP[Self] = self.to_exp()
+        return exp.cross_entropy(self)

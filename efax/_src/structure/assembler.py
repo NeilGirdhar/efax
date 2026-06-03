@@ -83,7 +83,7 @@ class Assembler(Generic[P]):
             ExpectationParametrization,
         )
 
-        infos = []
+        infos: list[SubDistributionInfo] = []
         for info in self.infos:
             if not issubclass(info.type_, ExpectationParametrization):
                 msg = f"{info.type_.__name__} is not an EP"
@@ -167,12 +167,12 @@ class Assembler(Generic[P]):
         this Assembler, producing a distribution of type P with q's numeric values.  Useful
         for switching between parametrizations when the parameter layouts are known to match.
         """
-        p_paths = [
+        p_paths: list[Path] = [
             (*info.path, name) for info in self.infos for name in parameter_names(info.type_)
         ]
         q_values = parameters(q).values()
         q_params_as_p = dict(zip(p_paths, q_values, strict=True))
-        return self.assemble(q_params_as_p)  # ty: ignore
+        return self.assemble(q_params_as_p)
 
     def domain_support(self) -> dict[Path, Support]:
         """Return the domain support constraints for each simple sub-distribution in the tree."""

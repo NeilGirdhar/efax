@@ -17,7 +17,11 @@ from efax import (
 )
 from tests.create_info import MultivariateDiagonalNormalInfo
 from tests.distribution_info import DistributionInfo
-from tests.scipy_replacement.base import ScipyDiscreteDistribution, ScipyDistribution
+from tests.scipy_replacement.base import (
+    ScipyComplexDistribution,
+    ScipyDiscreteDistribution,
+    ScipyDistribution,
+)
 from tests.shapes import DIST_SHAPE_SMALL
 
 
@@ -55,11 +59,11 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
     elif isinstance(scipy_distribution, ss._distribution_infrastructure.ContinuousDistribution):  # noqa: SLF001
         scipy_density = scipy_distribution.pdf(scipy_x)
     elif isinstance(scipy_distribution, ScipyDiscreteDistribution) and not isinstance(
-        scipy_distribution, ScipyDistribution
+        scipy_distribution, (ScipyDistribution, ScipyComplexDistribution)
     ):
         scipy_density = scipy_distribution.pmf(scipy_x)
     else:
-        assert isinstance(scipy_distribution, ScipyDistribution)
+        assert isinstance(scipy_distribution, (ScipyDistribution, ScipyComplexDistribution))
         scipy_density = scipy_distribution.pdf(scipy_x)
 
     if isinstance(distribution_info, MultivariateDiagonalNormalInfo):

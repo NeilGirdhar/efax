@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-from typing import override
-
 import numpy as np
 from numpy.random import Generator
 from tjax import NumpyComplexArray, NumpyRealArray, Shape
 
+from .base import ScipyComplexDistribution
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyComplexMultivariateNormalUnvectorized:
+class ScipyComplexMultivariateNormalUnvectorized(ScipyComplexDistribution):
     """Represents a multivariate complex normal distribution."""
 
-    @override
     def __init__(
         self,
         mean: NumpyComplexArray,
@@ -47,10 +45,10 @@ class ScipyComplexMultivariateNormalUnvectorized:
             msg = "The pseudo-variance is not symmetric."
             raise ValueError(msg)
 
-    def pdf(self, z: NumpyComplexArray, out: None = None) -> float:
-        assert z.ndim == 1
-        zr = np.concat([np.real(z), np.imag(z)], axis=-1)
-        return self.as_multivariate_normal().pdf(zr).item()
+    def pdf(self, x: NumpyComplexArray, out: None = None) -> NumpyRealArray:
+        assert x.ndim == 1
+        zr = np.concat([np.real(x), np.imag(x)], axis=-1)
+        return self.as_multivariate_normal().pdf(zr)
 
     def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> NumpyComplexArray:
         if rng is None:
@@ -60,8 +58,8 @@ class ScipyComplexMultivariateNormalUnvectorized:
         )
         return xy_rvs[..., : self.size] + 1j * xy_rvs[..., self.size :]
 
-    def entropy(self) -> float:
-        return self.as_multivariate_normal().entropy().item()
+    def entropy(self) -> NumpyRealArray:
+        return self.as_multivariate_normal().entropy()
 
     def as_multivariate_normal(self) -> ScipyMultivariateNormalUnvectorized:
         mv_mean = self._multivariate_normal_mean()
@@ -84,11 +82,10 @@ class ScipyComplexMultivariateNormalUnvectorized:
 
 
 class ScipyComplexMultivariateNormal(
-    ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]  # ty: ignore
+    ShapedDistribution[ScipyComplexMultivariateNormalUnvectorized]
 ):
     """This class allows distributions having a non-empty shape."""
 
-    @override
     def __init__(
         self,
         mean: NumpyComplexArray | None = None,

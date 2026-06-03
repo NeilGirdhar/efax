@@ -309,9 +309,9 @@ class SymmetricMatrixSupport(_SelfAdjointMatrixSupport):
             i = int(i_)
             j = int(j_)
             xk = x[..., k]
-            result = xpx.at(result)[..., i, j].set(xk)  # ty: ignore
+            result = xpx.at(result)[..., i, j].set(xk)  # type: ignore
             if i != j:
-                result = xpx.at(result)[..., j, i].set(xk)  # ty: ignore
+                result = xpx.at(result)[..., j, i].set(xk)  # type: ignore
         assert isinstance(result, JaxArray)
         return result
 
@@ -364,8 +364,8 @@ class HermitianMatrixSupport(_SelfAdjointMatrixSupport):
         index_a, index_b = np.triu_indices(dimensions)
         off_diagonal = index_a != index_b
         imaginary = xp.zeros_like(y[..., :triangular])
-        imaginary = xpx.at(imaginary)[..., off_diagonal].set(y[..., triangular:])  # ty: ignore
-        x = y[..., :triangular] + 1j * imaginary  # ty: ignore
+        imaginary = xpx.at(imaginary)[..., off_diagonal].set(y[..., triangular:])  # type: ignore
+        x = y[..., :triangular] + 1j * imaginary  # type: ignore
         result = xp.empty((*x.shape[:-1], dimensions, dimensions), dtype=x.dtype)
         for k, (i_, j_) in enumerate(zip(index_a, index_b, strict=True)):
             i = int(i_)
