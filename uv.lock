@@ -92,14 +92,14 @@ wheels = [
 
 [[package]]
 name = "array-api-extra"
-version = "0.10.1"
+version = "0.10.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "array-api-compat" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/25/77/2ef35219b7cf612366da9b26c95307d8b3b0bb0c0e9767314554a15f4117/array_api_extra-0.10.1.tar.gz", hash = "sha256:712ea45bd122d51c05085fc5fa30cdf66a10cc5d1af81d3e7beaff620ef1e1f2", size = 89510, upload-time = "2026-02-27T17:14:47.06Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b2/4d/ff0cb01001385ad31d4798906e96c5e43e17770037a93dc5f33cd44ecd9d/array_api_extra-0.10.3.tar.gz", hash = "sha256:6cabfefe10db45f5eb4c642fc2465646ad0ed017d3774fc16d763486b31ee5ae", size = 94321, upload-time = "2026-06-03T14:34:31.057Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/f7/9e14be985fd77ae26fee9136c9735e8987772e0ecf5f1f4e6e2b84cadc46/array_api_extra-0.10.1-py3-none-any.whl", hash = "sha256:9c2003079ccd2a0c92b1cf797b5867b9d7ea9428e75f70c7f78c1c0842d54368", size = 88377, upload-time = "2026-02-27T17:14:45.422Z" },
+    { url = "https://files.pythonhosted.org/packages/8f/16/b950ac4018ee149924ca1155ea749c5d175800b78234f0941fdfcb79233b/array_api_extra-0.10.3-py3-none-any.whl", hash = "sha256:4968892e6641b8d2b6f5e4fdcdbd979951f601411436948f4342831a626ba03c", size = 91055, upload-time = "2026-06-03T14:34:29.766Z" },
 ]
 
 [[package]]
@@ -409,7 +409,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-compat", specifier = ">=1.10" },
-    { name = "array-api-extra", specifier = ">=0.9.2" },
+    { name = "array-api-extra", specifier = ">=0.10.3" },
     { name = "jax", specifier = ">=0.9.0" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "opt-einsum", specifier = ">=3.4" },
@@ -2054,11 +2054,11 @@ wheels = [
 
 [[package]]
 name = "traitlets"
-version = "5.15.0"
+version = "5.15.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/1b/22/40f55b26baeab80c2d7b3f1db0682f8954e4617fee7d90ce634022ef05c6/traitlets-5.15.0.tar.gz", hash = "sha256:4fead733f81cf1c4c938e06f8ca4633896833c9d89eff878159457f4d4392971", size = 163197, upload-time = "2026-05-06T08:05:58.016Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/57/a9/a2584b8313b89f94869ddb3c4074617a691de1812a614d2d50e32ca5a7a6/traitlets-5.15.1.tar.gz", hash = "sha256:7b1c07854fe25acb39e009bae49f11b79ff6cbb2f27999104e9110e7a6b53722", size = 163344, upload-time = "2026-06-03T12:26:06.181Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/98/a9937a969d018a23badfea0b381f66783649d48e0ea6c41923265c3cbeb3/traitlets-5.15.0-py3-none-any.whl", hash = "sha256:fb36a18867a6803deab09f3c5e0fa81bb7b26a5c9e82501c9933f759166eff40", size = 85877, upload-time = "2026-05-06T08:05:55.853Z" },
+    { url = "https://files.pythonhosted.org/packages/96/8d/1080ee4c231f361b6ce4470d556c8c435b67c7e0753aaa641497ee92f88b/traitlets-5.15.1-py3-none-any.whl", hash = "sha256:770a53705f84b81ac107e83a1b3328ff2dae16094d8fc3cfc004e4b22dfd8e92", size = 85858, upload-time = "2026-06-03T12:26:04.395Z" },
 ]
 
 [[package]]

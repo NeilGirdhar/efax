@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import cast, override
 
+import array_api_extra as xpx
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape, inverse_softplus, softplus
@@ -74,8 +75,7 @@ class ComplexVonMisesNP(
         return xp.abs(self.mean_times_concentration)
 
     def angle(self) -> JaxRealArray:
-        xp = array_namespace(self)
-        return xp.angle(self.mean_times_concentration)
+        return xpx.angle(self.mean_times_concentration)  # type: ignore
 
 
 @dataclass
