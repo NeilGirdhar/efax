@@ -84,7 +84,7 @@ def test_hermitian_matrix_support_generation_is_hermitian() -> None:
     matrix = support.generate(jnp, np.random.default_rng(123), (5,), 0.01, 3)
 
     assert matrix.shape == (5, 3, 3)
-    assert_allclose(matrix, jnp.conj(jnp.matrix_transpose(matrix)), rtol=1e-6)
+    assert_allclose(matrix, jnp.conj(matrix.mT), rtol=1e-6)
     assert bool(jnp.all(jnp.linalg.eigvalsh(matrix) >= 0.0))
 
 

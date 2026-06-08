@@ -270,7 +270,7 @@ class _SelfAdjointMatrixSupport(Support):
         return x
 
     def _mirror(self, x: JaxArray) -> JaxArray:
-        return array_namespace(x).matrix_transpose(x)
+        return x.mT
 
 
 class SymmetricMatrixSupport(_SelfAdjointMatrixSupport):
@@ -384,7 +384,7 @@ class HermitianMatrixSupport(_SelfAdjointMatrixSupport):
     @override
     def _mirror(self, x: JaxArray) -> JaxArray:
         xp = array_namespace(x)
-        return xp.conj(xp.matrix_transpose(x))
+        return xp.conj(x.mT)
 
 
 class SquareMatrixSupport(Support):
