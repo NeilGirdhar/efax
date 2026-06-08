@@ -40,7 +40,7 @@ class ScipyDirichletFixRVsAndPDF(ScipyDistribution):
         return np.asarray(self.distribution.entropy())
 
 
-class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF]):
+class ScipyDirichlet(ShapedDistribution[ScipyDirichletFixRVsAndPDF], ScipyDistribution):
     """This class allows distributions having a non-empty shape."""
 
     def __init__(self, alpha: NumpyRealArray) -> None:

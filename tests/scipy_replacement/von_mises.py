@@ -4,11 +4,11 @@ import numpy as np
 import scipy.stats as ss
 from tjax import NumpyRealArray
 
-from .base import OldStyleScipyDistribution
+from .base import OldStyleScipyDistribution, ScipyDistribution
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyVonMises(ShapedDistribution[OldStyleScipyDistribution]):
+class ScipyVonMises(ShapedDistribution[OldStyleScipyDistribution], ScipyDistribution):
     """This class allows distributions having a non-empty shape."""
 
     def __init__(self, kappa: NumpyRealArray, loc: NumpyRealArray | None = None) -> None:
@@ -25,7 +25,7 @@ class ScipyVonMises(ShapedDistribution[OldStyleScipyDistribution]):
         super().__init__(shape, rvs_shape, dtype, objects, multivariate=False)
 
 
-class ScipyVonMisesFisher(ShapedDistribution[OldStyleScipyDistribution]):
+class ScipyVonMisesFisher(ShapedDistribution[OldStyleScipyDistribution], ScipyDistribution):
     """This class allows distributions having a non-empty shape."""
 
     def __init__(self, mu: NumpyRealArray, kappa: NumpyRealArray) -> None:

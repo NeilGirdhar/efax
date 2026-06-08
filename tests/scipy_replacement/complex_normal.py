@@ -12,12 +12,12 @@ from tjax import (
     Shape,
 )
 
-from .base import ScipyDistribution
+from .base import ScipyComplexDistribution
 from .multivariate_normal import ScipyMultivariateNormal, ScipyMultivariateNormalUnvectorized
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyComplexNormalUnvectorized(ScipyDistribution):
+class ScipyComplexNormalUnvectorized(ScipyComplexDistribution):
     """Represents an array of univariate complex normal distributions."""
 
     def __init__(
@@ -72,7 +72,9 @@ class ScipyComplexNormalUnvectorized(ScipyDistribution):
         return 0.5 * np.stack([xx_xy, yx_yy], axis=-2)
 
 
-class ScipyComplexNormal(ShapedDistribution[ScipyComplexNormalUnvectorized]):
+class ScipyComplexNormal(
+    ShapedDistribution[ScipyComplexNormalUnvectorized], ScipyComplexDistribution
+):
     """This class allows distributions having a non-empty shape."""
 
     def __init__(

@@ -17,11 +17,13 @@ from efax import (
 )
 from tests.create_info import MultivariateDiagonalNormalInfo
 from tests.distribution_info import DistributionInfo
+from tests.dtypes import is_complex, is_integral, is_real
 from tests.scipy_replacement.base import (
     ScipyComplexDistribution,
     ScipyDiscreteDistribution,
     ScipyDistribution,
 )
+from tests.scipy_replacement.joint import ScipyJointDistribution
 from tests.shapes import DIST_SHAPE_SMALL
 
 
@@ -55,16 +57,25 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
     # Verify that the density matches scipy.
     efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
     if isinstance(scipy_distribution, ss._distribution_infrastructure.DiscreteDistribution):  # noqa: SLF001
-        scipy_density = scipy_distribution.pmf(scipy_x)
+        scipy_density = scipy_distribution.pmf(np.astype(scipy_x, np.int64))
     elif isinstance(scipy_distribution, ss._distribution_infrastructure.ContinuousDistribution):  # noqa: SLF001
+        assert is_real(scipy_x)
         scipy_density = scipy_distribution.pdf(scipy_x)
-    elif isinstance(scipy_distribution, ScipyDiscreteDistribution) and not isinstance(
-        scipy_distribution, (ScipyDistribution, ScipyComplexDistribution)
-    ):
-        scipy_density = scipy_distribution.pmf(scipy_x)
     else:
-        assert isinstance(scipy_distribution, (ScipyDistribution, ScipyComplexDistribution))
-        scipy_density = scipy_distribution.pdf(scipy_x)
+        match scipy_distribution:
+            case ScipyJointDistribution():
+                scipy_density = scipy_distribution.pdf(scipy_x)
+            case ScipyDiscreteDistribution():
+                assert is_integral(scipy_x)
+                scipy_density = scipy_distribution.pmf(scipy_x)
+            case ScipyDistribution():
+                assert is_real(scipy_x)
+                scipy_density = scipy_distribution.pdf(scipy_x)
+            case ScipyComplexDistribution():
+                assert is_complex(scipy_x)
+                scipy_density = scipy_distribution.pdf(scipy_x)
+            case _:
+                raise RuntimeError
 
     if isinstance(distribution_info, MultivariateDiagonalNormalInfo):
         atol = 1e-5

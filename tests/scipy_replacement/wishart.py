@@ -5,11 +5,11 @@ import scipy.stats as ss
 from numpy.random import Generator
 from tjax import NumpyRealArray, Shape
 
-from .base import OldStyleScipyDistribution
+from .base import OldStyleScipyDistribution, ScipyDistribution
 from .shaped_distribution import ShapedDistribution
 
 
-class ScipyWishart(ShapedDistribution[OldStyleScipyDistribution]):
+class ScipyWishart(ShapedDistribution[OldStyleScipyDistribution], ScipyDistribution):
     """A shape-aware wrapper around ``scipy.stats.wishart``."""
 
     def __init__(self, df: NumpyRealArray, scale: NumpyRealArray) -> None:

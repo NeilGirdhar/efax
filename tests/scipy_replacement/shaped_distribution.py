@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -22,8 +22,6 @@ type AnyScipy = (
     | OldStyleScipyDiscreteDistribution
     | OldStyleScipyDistribution
 )
-
-T = TypeVar("T", bound=AnyScipy)
 
 
 class ShapedDistribution[T: AnyScipy]:

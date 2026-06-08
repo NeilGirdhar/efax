@@ -7,9 +7,11 @@ import numpy as np
 from numpy.random import Generator
 from tjax import NumpyIntegralArray, NumpyRealArray, Shape
 
+from .base import ScipyDiscreteDistribution
+
 
 @dataclass
-class ScipyCategorical:
+class ScipyCategorical(ScipyDiscreteDistribution):
     probabilities: NumpyRealArray
 
     def pmf(self, x: NumpyIntegralArray) -> NumpyRealArray:
