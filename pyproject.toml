@@ -48,15 +48,15 @@ classifiers = [
   "Typing :: Typed"
 ]
 dependencies = [
-  "array_api_compat>=1.10",
-  "array_api_extra>=0.10.3",
+  "array-api-compat>=1.10",
+  "array-api-extra>=0.10.3",
   "jax>=0.9.0",
   "numpy>=2.0",
   "opt-einsum>=3.4",
   "optimistix>=0.0.9",
   "optype[numpy]>=0.8.0",
   "tjax>=1.6.0",
-  "typing_extensions>=4.8"
+  "typing-extensions>=4.8"
 ]
 
 [project.urls]
