@@ -99,19 +99,19 @@ from .scipy_replacement.von_mises import ScipyVonMises, ScipyVonMisesFisher
 from .scipy_replacement.wishart import ScipyWishart
 from .softplus import softplus_distribution
 
-Bernoulli = ss.make_distribution(ss.bernoulli)  # type: ignore
+Bernoulli = ss.make_distribution(ss.bernoulli)
 Beta = ss.make_distribution(ss.beta)
 Chi = ss.make_distribution(ss.chi)
 ChiSquare = ss.make_distribution(ss.chi2)
 Exponential = ss.make_distribution(ss.expon)
 Gamma = ss.make_distribution(ss.gamma)
-Geometric = ss.make_distribution(ss.geom)  # type: ignore
+Geometric = ss.make_distribution(ss.geom)
 InverseGamma = ss.make_distribution(ss.invgamma)
 InverseGaussian = ss.make_distribution(ss.invgauss)
 LogNormal = ss.make_distribution(ss.lognorm)
-Logarithmic = ss.make_distribution(ss.logser)  # type: ignore
-NegativeBinomial = ss.make_distribution(ss.nbinom)  # type: ignore
-Poisson = ss.make_distribution(ss.poisson)  # type: ignore
+Logarithmic = ss.make_distribution(ss.logser)
+NegativeBinomial = ss.make_distribution(ss.nbinom)
+Poisson = ss.make_distribution(ss.poisson)
 Rayleigh = ss.make_distribution(ss.rayleigh)
 Weibull = ss.make_distribution(ss.weibull_min)
 
@@ -119,7 +119,7 @@ Weibull = ss.make_distribution(ss.weibull_min)
 class BernoulliInfo(DistributionInfo[BernoulliNP, BernoulliEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: BernoulliEP) -> Any:
-        return Bernoulli(p=p.probability)  # type: ignore
+        return Bernoulli(p=p.probability)
 
     @override
     def exp_class(self) -> type[BernoulliEP]:
@@ -137,7 +137,7 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: BetaNP) -> Any:
         n1 = q.alpha_minus_one + 1.0
-        return Beta(a=n1[..., 0], b=n1[..., 1])  # type: ignore
+        return Beta(a=n1[..., 0], b=n1[..., 1])
 
     @override
     def exp_class(self) -> type[BetaEP]:
@@ -151,7 +151,7 @@ class BetaInfo(DistributionInfo[BetaNP, BetaEP, NumpyRealArray]):
 class ChiInfo(DistributionInfo[ChiNP, ChiEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: ChiNP) -> Any:
-        return Chi(df=(q.k_over_two_minus_one + 1.0) * 2.0)  # type: ignore
+        return Chi(df=(q.k_over_two_minus_one + 1.0) * 2.0)
 
     @override
     def exp_class(self) -> type[ChiEP]:
@@ -165,7 +165,7 @@ class ChiInfo(DistributionInfo[ChiNP, ChiEP, NumpyRealArray]):
 class ChiSquareInfo(DistributionInfo[ChiSquareNP, ChiSquareEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: ChiSquareNP) -> Any:
-        return ChiSquare(df=(q.k_over_two_minus_one + 1.0) * 2.0)  # type: ignore
+        return ChiSquare(df=(q.k_over_two_minus_one + 1.0) * 2.0)
 
     @override
     def exp_class(self) -> type[ChiSquareEP]:
@@ -348,7 +348,7 @@ class GeometricInfo(DistributionInfo[GeometricNP, GeometricEP, NumpyRealArray]):
     def exp_to_scipy_distribution(self, p: GeometricEP) -> Any:
         # Scipy uses a different definition geometric distribution.  The parameter p is inverse
         # odds.
-        return Geometric(p=np.reciprocal(1.0 + p.mean))  # type: ignore
+        return Geometric(p=np.reciprocal(1.0 + p.mean))
 
     @override
     def scipy_to_exp_family_observation(self, x: NumpyRealArray) -> JaxRealArray:
@@ -368,7 +368,7 @@ class InverseGammaInfo(DistributionInfo[InverseGammaNP, InverseGammaEP, NumpyRea
     def nat_to_scipy_distribution(self, q: InverseGammaNP) -> Any:
         shape = q.shape_minus_one + 1.0
         scale = -q.negative_scale
-        return InverseGamma(a=shape) * scale  # type: ignore
+        return InverseGamma(a=shape) * scale
 
     @override
     def exp_class(self) -> type[InverseGammaEP]:
@@ -491,10 +491,7 @@ class LogNormalInfo(DistributionInfo[LogNormalNP, LogNormalEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: LogNormalEP) -> Any:
         normal_dp = p.base_distribution().to_deviation_parametrization()
-        return (
-            LogNormal(s=np.asarray(normal_dp.deviation))  # type: ignore
-            * np.exp(np.asarray(normal_dp.mean))
-        )
+        return LogNormal(s=np.asarray(normal_dp.deviation)) * np.exp(np.asarray(normal_dp.mean))
 
     @override
     def exp_class(self) -> type[LogNormalEP]:
@@ -508,7 +505,7 @@ class LogNormalInfo(DistributionInfo[LogNormalNP, LogNormalEP, NumpyRealArray]):
 class LogarithmicInfo(DistributionInfo[LogarithmicNP, LogarithmicEP, NumpyRealArray]):
     @override
     def nat_to_scipy_distribution(self, q: LogarithmicNP) -> Any:
-        return Logarithmic(p=np.exp(q.log_probability))  # type: ignore
+        return Logarithmic(p=np.exp(q.log_probability))
 
     @override
     def exp_class(self) -> type[LogarithmicEP]:
@@ -629,7 +626,7 @@ class NegativeBinomialInfo(
 ):
     @override
     def exp_to_scipy_distribution(self, p: NegativeBinomialEP) -> Any:
-        return NegativeBinomial(n=p.failures, p=np.reciprocal(1.0 + p.mean / p.failures))  # type: ignore
+        return NegativeBinomial(n=p.failures, p=np.reciprocal(1.0 + p.mean / p.failures))
 
     @override
     def exp_class(self) -> type[NegativeBinomialEP]:
@@ -658,7 +655,7 @@ class NormalInfo(DistributionInfo[NormalNP, NormalEP, NumpyRealArray]):
 class PoissonInfo(DistributionInfo[PoissonNP, PoissonEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: PoissonEP) -> Any:
-        return Poisson(mu=p.mean)  # type: ignore
+        return Poisson(mu=p.mean)
 
     @override
     def exp_class(self) -> type[PoissonEP]:
@@ -703,7 +700,7 @@ class UnitVarianceLogNormalInfo(
 ):
     @override
     def exp_to_scipy_distribution(self, p: UnitVarianceLogNormalEP) -> Any:
-        return LogNormal(s=np.ones_like(p.mean)) * np.exp(np.asarray(p.mean))  # type: ignore
+        return LogNormal(s=np.ones_like(p.mean)) * np.exp(np.asarray(p.mean))
 
     @override
     def exp_class(self) -> type[UnitVarianceLogNormalEP]:
@@ -791,7 +788,7 @@ class WeibullInfo(DistributionInfo[WeibullNP, WeibullEP, NumpyRealArray]):
     @override
     def exp_to_scipy_distribution(self, p: WeibullEP) -> Any:
         scale = np.asarray(p.chi) ** np.reciprocal(p.concentration)
-        return Weibull(c=p.concentration) * scale  # type: ignore
+        return Weibull(c=p.concentration) * scale
 
     @override
     def exp_class(self) -> type[WeibullEP]:
