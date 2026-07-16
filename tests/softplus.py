@@ -1,5 +1,5 @@
 from array_api_compat import array_namespace
-from scipy.stats._distribution_infrastructure import (  # noqa: PLC2701
+from scipy.stats._distribution_infrastructure import (  # ruff:ignore[import-private-name]
     ContinuousDistribution,
     MonotonicTransformedDistribution,
 )

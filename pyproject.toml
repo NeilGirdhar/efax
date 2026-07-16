@@ -51,7 +51,7 @@ dependencies = [
   "array-api-compat>=1.10",
   "array-api-extra>=0.10.3",
   "jax>=0.9.0",
-  "numpy>=2.0",
+  "numpy>=2.2",
   "opt-einsum>=3.4",
   "optimistix>=0.0.9",
   "optype[numpy]>=0.8.0",
@@ -81,39 +81,39 @@ line-length = 100
 preview = true
 select = ["ALL"]
 ignore = [
-  "ARG001", # Unused function arg.
-  "ARG002", # Unused method arg.
-  "ARG003", # Unused class method arg.
-  "ARG004", # Unused static method arg.
-  "COM812", # Missing trailing comma.
-  "CPY001", # Missing copyright notice.
-  "D100", # Missing module docstring.
-  "D101", # Missing class docstring.
-  "D102", # Missing method docstring.
-  "D103", # Missing function docstring.
-  "D105", # Missing magic method docstring.
-  "D107", # Missing __init__ docstring.
-  "DOC201", # Missing return doc.
-  "DOC202", # Extraneous returns section.
-  "DOC402", # Missing yield doc.
-  "DOC501", # Missing raised exception doc.
-  "ERA001", # Commented-out code.
-  "FIX002", # TODO comment.
-  "G004", # Logging uses f-string.
-  "PD008", # Prefer .loc over .at.
-  "PGH003", # Use specific type-ignore codes.
-  "PLR0913", # Too many function arguments.
-  "PLR6301", # Method does not use self.
-  "RUF002", # Ambiguous Unicode character.
-  "RUF003", # Ambiguous minus sign.
-  "RUF021", # Parenthesize mixed and/or.
-  "RUF069", # Float equality comparison.
-  "S101", # Assert used.
-  "TC001", # Move app import into TYPE_CHECKING.
-  "TC002", # Move third-party import into TYPE_CHECKING.
-  "TC003", # Move stdlib import into TYPE_CHECKING.
-  "TD002", # TODO missing author.
-  "TD003" # TODO missing issue link.
+  "unused-function-argument",
+  "unused-method-argument",
+  "unused-class-method-argument",
+  "unused-static-method-argument",
+  "missing-trailing-comma",
+  "missing-copyright-notice",
+  "undocumented-public-module",
+  "undocumented-public-class",
+  "undocumented-public-method",
+  "undocumented-public-function",
+  "undocumented-magic-method",
+  "undocumented-public-init",
+  "docstring-missing-returns",
+  "docstring-extraneous-returns",
+  "docstring-missing-yields",
+  "docstring-missing-exception",
+  "commented-out-code",
+  "line-contains-todo",
+  "logging-f-string",
+  "pandas-use-of-dot-at",
+  "blanket-type-ignore",
+  "too-many-arguments",
+  "no-self-use",
+  "ambiguous-unicode-character-docstring",
+  "ambiguous-unicode-character-comment",
+  "parenthesize-chained-operators",
+  "float-equality-comparison",
+  "assert",
+  "typing-only-first-party-import",
+  "typing-only-third-party-import",
+  "typing-only-standard-library-import",
+  "missing-todo-author",
+  "missing-todo-link"
 ]
 
 [tool.ruff.lint.flake8-errmsg]

@@ -22,8 +22,8 @@ class Distribution(JaxAbstractClass):
     """
 
     def __getitem__(self, key: tuple[int | slice | EllipsisType | None, ...]) -> Self:
-        from .iteration import parameters  # noqa: PLC0415
-        from .structure.assembler import Assembler  # noqa: PLC0415
+        from .iteration import parameters  # ruff:ignore[import-outside-top-level]
+        from .structure.assembler import Assembler  # ruff:ignore[import-outside-top-level]
 
         parameters_ = {path: value[key] for path, value in parameters(self).items()}
         return Assembler.create_assembler(self).assemble(parameters_)
@@ -57,8 +57,8 @@ class Distribution(JaxAbstractClass):
         """
         return support
 
-    def __array_namespace__(self, api_version: str | None = None) -> ModuleType:  # noqa: PLW3201
-        from .iteration import parameters  # noqa: PLC0415
+    def __array_namespace__(self, api_version: str | None = None) -> ModuleType:  # ruff:ignore[bad-dunder-method-name]
+        from .iteration import parameters  # ruff:ignore[import-outside-top-level]
 
         values = parameters(self).values()
         return array_namespace(*values)

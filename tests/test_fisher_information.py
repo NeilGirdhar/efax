@@ -17,7 +17,7 @@ def test_mvn_fisher_information(distribution_name: str | None) -> None:
     m = MultivariateNormalNP(jnp.zeros(2), -0.5 * jnp.eye(2))
 
     assert_tree_allclose(
-        m._fisher_information_matrix(),  # noqa: SLF001
+        m._fisher_information_matrix(),  # ruff:ignore[private-member-access]
         np.asarray(
             [
                 [1.0, 0.0, 0.0, 0.0, 0.0],
@@ -44,7 +44,7 @@ def test_mvn_fisher_information_b(distribution_name: str | None) -> None:
     m = MultivariateNormalNP(jnp.asarray([3.0, 5.0]), jnp.asarray([[-0.5, 0.0], [0.0, -0.8]]))
 
     assert_tree_allclose(
-        m._fisher_information_matrix(),  # noqa: SLF001
+        m._fisher_information_matrix(),  # ruff:ignore[private-member-access]
         jnp.asarray(
             [
                 [1.0, -0.0, 6.0, 6.25, -0.0],
@@ -73,7 +73,7 @@ def test_fisher_information_is_convex(
 ) -> None:
     shape = DIST_SHAPE_MEDIUM
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
-    fisher_information = nat_parameters._fisher_information_matrix()  # noqa: SLF001
+    fisher_information = nat_parameters._fisher_information_matrix()  # ruff:ignore[private-member-access]
     assert issubclass(fisher_information.dtype.type, jnp.floating)
     eigvals = jnp.linalg.eigvals(fisher_information)
     if not jnp.all(eigvals >= 0.0):

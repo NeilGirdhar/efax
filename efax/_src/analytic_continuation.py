@@ -21,7 +21,7 @@ class ComplexContinuation:
         xp = array_namespace(self.real, self.imag)
         return xp.result_type(self.real, self.imag)
 
-    def __array_namespace__(self, *, api_version: str | None = None) -> object:  # noqa: PLW3201
+    def __array_namespace__(self, *, api_version: str | None = None) -> object:  # ruff:ignore[bad-dunder-method-name]
         return array_namespace(self.real, self.imag, api_version=api_version)
 
     def __neg__(self) -> ComplexContinuation:

@@ -56,9 +56,9 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
 
     # Verify that the density matches scipy.
     efax_density = np.asarray(nat_parameters.pdf(efax_x), dtype=np.float64)
-    if isinstance(scipy_distribution, ss._distribution_infrastructure.DiscreteDistribution):  # noqa: SLF001
+    if isinstance(scipy_distribution, ss._distribution_infrastructure.DiscreteDistribution):  # ruff:ignore[private-member-access]
         scipy_density = scipy_distribution.pmf(np.astype(scipy_x, np.int64))  # type: ignore
-    elif isinstance(scipy_distribution, ss._distribution_infrastructure.ContinuousDistribution):  # noqa: SLF001
+    elif isinstance(scipy_distribution, ss._distribution_infrastructure.ContinuousDistribution):  # ruff:ignore[private-member-access]
         assert is_real(scipy_x)
         scipy_density = scipy_distribution.pdf(scipy_x)  # type: ignore
     else:

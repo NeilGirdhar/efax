@@ -42,7 +42,7 @@ class Estimator(Assembler[P]):
         Use this when you have a type rather than an instance.  Does not work with composite
         distributions such as JointDistributionE.
         """
-        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # ruff:ignore[import-outside-top-level]
             ExpectationParametrization,
         )
 
@@ -61,7 +61,7 @@ class Estimator(Assembler[P]):
         Extracts the distribution tree structure from p and records which of its parameters
         are marked fixed, so they will be held constant during estimation.
         """
-        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # ruff:ignore[import-outside-top-level]
             ExpectationParametrization,
         )
 
@@ -90,11 +90,15 @@ class Estimator(Assembler[P]):
         estimates, so this is the primary estimation operation.  Fixed parameters are supplied
         automatically from this Estimator's stored values.
         """
-        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # ruff:ignore[import-outside-top-level]
             ExpectationParametrization,
         )
-        from efax._src.natural_parametrization import NaturalParametrization  # noqa: PLC0415
-        from efax._src.transform.joint import JointDistributionE  # noqa: PLC0415
+        from efax._src.natural_parametrization import (  # ruff:ignore[import-outside-top-level]
+            NaturalParametrization,
+        )
+        from efax._src.transform.joint import (  # ruff:ignore[import-outside-top-level]
+            JointDistributionE,
+        )
 
         constructed: dict[Path, ExpectationParametrization] = {}
 
@@ -143,7 +147,7 @@ class Estimator(Assembler[P]):
         Equivalent to ``parameter_mean(self.sufficient_statistics(x), axis=axis)`` but fused under
         jit.  Pass ``axis`` as the axis (or tuple of axes) over which observations are stacked.
         """
-        from efax._src.tools import parameter_mean  # noqa: PLC0415
+        from efax._src.tools import parameter_mean  # ruff:ignore[import-outside-top-level]
 
         return parameter_mean(self.sufficient_statistics(x), axis=axis)
 
@@ -154,8 +158,12 @@ class Estimator(Assembler[P]):
         are encoded in cp together with the pseudo-observation count n.  Fixed parameters are
         supplied automatically from this Estimator's stored values.
         """
-        from efax._src.interfaces.conjugate_prior import HasConjugatePrior  # noqa: PLC0415
-        from efax._src.transform.joint import JointDistributionN  # noqa: PLC0415
+        from efax._src.interfaces.conjugate_prior import (  # ruff:ignore[import-outside-top-level]
+            HasConjugatePrior,
+        )
+        from efax._src.transform.joint import (  # ruff:ignore[import-outside-top-level]
+            JointDistributionN,
+        )
 
         constructed: dict[Path, Distribution] = {}
         n = None

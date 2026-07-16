@@ -79,7 +79,7 @@ class Assembler(Generic[P]):
 
     def to_nat(self) -> Assembler:
         """Return a copy with distribution types converted to their natural parametrization."""
-        from efax._src.expectation_parametrization import (  # noqa: PLC0415
+        from efax._src.expectation_parametrization import (  # ruff:ignore[import-outside-top-level]
             ExpectationParametrization,
         )
 
@@ -110,7 +110,9 @@ class Assembler(Generic[P]):
 
     def to_exp(self) -> Assembler:
         """Return a copy with distribution types converted to their expectation parametrization."""
-        from efax._src.natural_parametrization import NaturalParametrization  # noqa: PLC0415
+        from efax._src.natural_parametrization import (  # ruff:ignore[import-outside-top-level]
+            NaturalParametrization,
+        )
 
         infos: list[SubDistributionInfo] = []
         for info in self.infos:
@@ -213,8 +215,12 @@ class Assembler(Generic[P]):
 
     @classmethod
     def _make_info(cls, q: Distribution, path: Path) -> SubDistributionInfo:
-        from efax._src.interfaces.multidimensional import Multidimensional  # noqa: PLC0415
-        from efax._src.transform.joint import JointDistribution  # noqa: PLC0415
+        from efax._src.interfaces.multidimensional import (  # ruff:ignore[import-outside-top-level]
+            Multidimensional,
+        )
+        from efax._src.transform.joint import (  # ruff:ignore[import-outside-top-level]
+            JointDistribution,
+        )
 
         dimensions = q.dimensions() if isinstance(q, Multidimensional) else 1
         match q:

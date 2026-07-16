@@ -160,7 +160,7 @@ def parameters(
 
 
 def flat_dict_of_parameters(d: Distribution) -> dict[Path, SimpleDistribution]:
-    from .transform.joint import JointDistribution  # noqa: PLC0415
+    from .transform.joint import JointDistribution  # ruff:ignore[import-outside-top-level]
 
     if isinstance(d, JointDistribution):
         return flatten_mapping(d.as_dict())

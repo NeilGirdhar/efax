@@ -41,7 +41,7 @@ def _broadcast_fixed_parameters[D: Distribution](q: D) -> D:
     return Assembler.create_assembler(q).assemble(final_parameters)
 
 
-def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -> None:  # noqa: PLR0914
+def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -> None:  # ruff:ignore[too-many-locals]
     """OLS CF inversion recovers expectation parameters for compatible distributions."""
     nat_cls = distribution_info.nat_class()
 
@@ -71,7 +71,7 @@ def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -
         # (e.g. WeibullNP requires concentration as a fixed parameter).
         try:
             ep = expectation_parameters_from_characteristic_function(t, cf)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # ruff:ignore[blind-except]
             pytest.skip(f"{nat_cls.__name__}: OLS inversion failed: {e}")
 
         _, ep_flat = Flattener.flatten(ep, mapped_to_plane=False)

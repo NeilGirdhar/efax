@@ -63,7 +63,7 @@ class Flattener(Estimator[P]):
             final_dimension_size = self.final_dimension_size()
             if final_dimension_size == 0:
                 if flattened.size != 0:
-                    raise ValueError("Incompatible array")  # noqa: TRY003
+                    raise ValueError("Incompatible array")  # ruff:ignore[raise-vanilla-args]
                 fixed_parameters = parameters(self.assemble(self.fixed_parameters))
                 shape = next(iter(fixed_parameters.values())).shape
                 flattened = xp.reshape(flattened, (*shape, 0))
@@ -83,7 +83,7 @@ class Flattener(Estimator[P]):
             for name, support, value_receptacle in parameter_supports(info.type_, fixed=False):
                 k = support.num_elements(info.dimensions)
                 if consumed + k > available:
-                    raise ValueError("Incompatible array")  # noqa: TRY003
+                    raise ValueError("Incompatible array")  # ruff:ignore[raise-vanilla-args]
                 value = regular_kwargs[name] = support.unflattened(
                     flattened[..., consumed : consumed + k],
                     info.dimensions,
@@ -98,7 +98,7 @@ class Flattener(Estimator[P]):
                 kwargs[name] = self.fixed_parameters[*info.path, name]
             constructed[info.path] = info.type_(**kwargs)
         if consumed != available:
-            raise ValueError("Incompatible array")  # noqa: TRY003
+            raise ValueError("Incompatible array")  # ruff:ignore[raise-vanilla-args]
         return cast("P", constructed[()])
 
     @classmethod

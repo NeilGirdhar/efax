@@ -20,7 +20,7 @@ Domain = TypeVar("Domain", bound=JaxComplexArray, default=JaxComplexArray)
 
 class TransformedNaturalParametrization(
     NaturalParametrization[TEP, Domain],
-    Generic[NP, EP, TEP, Domain],  # noqa: UP046
+    Generic[NP, EP, TEP, Domain],  # ruff:ignore[non-pep695-generic-class]
 ):
     """A NaturalParametrization defined by a differentiable transformation of a base distribution.
 
@@ -88,7 +88,7 @@ class TransformedNaturalParametrization(
             jac_y = jacobian(bound_fy)(x)
             if jac_y.ndim == 0:
                 pass
-            elif jac_y.ndim == 2:  # noqa: PLR2004
+            elif jac_y.ndim == 2:  # ruff:ignore[magic-value-comparison]
                 jac_y = xp.linalg.det(jac_y)
             else:
                 raise RuntimeError
@@ -116,7 +116,7 @@ class TransformedNaturalParametrization(
 TNP = TypeVar("TNP", bound=TransformedNaturalParametrization, default=Any)
 
 
-class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):  # noqa: UP046
+class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):  # ruff:ignore[non-pep695-generic-class]
     """An ExpectationParametrization defined by a transformation of a base distribution.
 
     Implements to_nat entirely in terms of the base distribution EP and the natural

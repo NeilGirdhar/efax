@@ -167,7 +167,7 @@ class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]
                 new_value = value
             elif na == 1:
                 new_value = xp.sum(value, axis=-1)
-            elif na == 2:  # noqa: PLR2004
+            elif na == 2:  # ruff:ignore[magic-value-comparison]
                 new_value = xp.sum(xp.triu(value), axis=(-2, -1))
             else:
                 raise RuntimeError

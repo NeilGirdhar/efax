@@ -8,7 +8,7 @@ import numpy as np
 from numpy.random import Generator
 from tjax import NumpyRealArray, NumpyRealNumeric, Shape
 
-from efax._src.tools import join_mappings  # noqa: PLC2701
+from efax._src.tools import join_mappings  # ruff:ignore[import-private-name]
 
 
 @dataclass

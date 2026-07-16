@@ -1,11 +1,11 @@
-import jax._src.xla_bridge as xb  # noqa: PLC2701
+import jax._src.xla_bridge as xb  # ruff:ignore[import-private-name]
 import pytest
 
-import efax  # noqa: F401
+import efax  # ruff:ignore[unused-import]
 
 
 def jax_is_initialized() -> bool:
-    return bool(xb._backends)  # noqa: SLF001
+    return bool(xb._backends)  # ruff:ignore[private-member-access]
 
 
 @pytest.mark.run(order=1)

@@ -25,7 +25,7 @@ class ScipyDirichletFixRVsAndPDF(ScipyDistribution):
 
     def pdf(self, x: NumpyRealArray) -> NumpyRealArray:
         x = np.asarray(x)
-        if x.ndim == 2:  # noqa: PLR2004
+        if x.ndim == 2:  # ruff:ignore[magic-value-comparison]
             return np.asarray(self.distribution.pdf(x.T))
         return np.asarray(self.distribution.pdf(x))
 

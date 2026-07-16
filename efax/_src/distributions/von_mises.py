@@ -87,7 +87,7 @@ class VonMisesFisherNP(
         return xp.linalg.vector_norm(self.mean_times_concentration, axis=-1)
 
     def to_kappa_angle(self) -> tuple[JaxRealArray, JaxRealArray]:
-        if self.dimensions() != 2:  # noqa: PLR2004
+        if self.dimensions() != 2:  # ruff:ignore[magic-value-comparison]
             raise ValueError
         xp = array_namespace(self)
         kappa = self.kappa()
