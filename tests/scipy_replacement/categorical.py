@@ -22,7 +22,11 @@ class ScipyCategorical(ScipyDiscreteDistribution):
         cdf = np.cumsum(self.probabilities, axis=-1)
         uniforms = rng.random(shape + self.probabilities.shape[:-1])
         categories = np.sum(uniforms[..., np.newaxis] > cdf, axis=-1)
-        return xpx.one_hot(categories, self.probabilities.shape[-1], dtype=np.int64)
+        return xpx.one_hot(  # pyrefly: ignore [bad-return]
+            categories,  # pyrefly: ignore [bad-argument-type]
+            self.probabilities.shape[-1],
+            dtype=np.int64,
+        )
 
     def entropy(self) -> NumpyRealArray:
         return -np.sum(self.probabilities * np.log(self.probabilities), axis=-1)

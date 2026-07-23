@@ -524,7 +524,10 @@ class MultivariateDiagonalNormalInfo(
         variance = np.asarray(p.variance())
         covariance = xpx.create_diagonal(variance)  # type: ignore
         assert isinstance(covariance, np.ndarray)
-        return ScipyMultivariateNormal.from_mc(mean=np.asarray(p.mean), cov=covariance)
+        return ScipyMultivariateNormal.from_mc(
+            mean=np.asarray(p.mean),
+            cov=covariance,  # pyrefly: ignore [bad-argument-type]
+        )
 
     @override
     def exp_class(self) -> type[MultivariateDiagonalNormalEP]:
