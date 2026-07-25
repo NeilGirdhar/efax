@@ -100,7 +100,6 @@ ignore = [
   "no-self-use",
   "pandas-use-of-dot-at",
   "parenthesize-chained-operators",
-  "too-many-arguments",
   "typing-only-first-party-import",
   "typing-only-standard-library-import",
   "typing-only-third-party-import",
