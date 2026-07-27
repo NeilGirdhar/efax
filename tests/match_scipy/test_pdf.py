@@ -64,7 +64,7 @@ def test_pdf(generator: Generator, distribution_info: DistributionInfo) -> None:
     else:
         match scipy_distribution:
             case ScipyJointDistribution():
-                scipy_density = scipy_distribution.pdf(scipy_x)
+                scipy_density = scipy_distribution.pdf(scipy_x)  # ty: ignore[invalid-argument-type]
             case ScipyDiscreteDistribution():
                 assert is_integral(scipy_x)
                 scipy_density = scipy_distribution.pmf(scipy_x)

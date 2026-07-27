@@ -222,7 +222,7 @@ class ComplexNormalInfo(DistributionInfo[ComplexNormalNP, ComplexNormalEP, Numpy
         pseudo_second_moment = np.asarray(p.pseudo_second_moment, dtype=np.complex128)
         return ScipyComplexNormal(
             mean,
-            second_moment - cast("NumpyRealArray", abs_square(mean)),  # type: ignore
+            second_moment - cast("NumpyRealArray", abs_square(mean)),
             pseudo_second_moment - np.square(mean),
         )
 
@@ -526,7 +526,7 @@ class MultivariateDiagonalNormalInfo(
         assert isinstance(covariance, np.ndarray)
         return ScipyMultivariateNormal.from_mc(
             mean=np.asarray(p.mean),
-            cov=covariance,  # pyrefly: ignore [bad-argument-type]
+            cov=covariance,  # pyrefly: ignore [bad-argument-type]  # ty: ignore[invalid-argument-type]
         )
 
     @override

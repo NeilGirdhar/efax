@@ -131,8 +131,8 @@ def test_gamma_cf_of_x_and_log_x() -> None:
         p = GammaNP(jnp.float64(-rate), jnp.float64(alpha - 1))
         cf = p.characteristic_function(GammaNP(jnp.float64(f), jnp.float64(g)))
         expected = np.exp(
-            sc.loggamma(alpha + 1j * g)
-            - sc.loggamma(alpha)
+            sc.loggamma(alpha + 1j * g)  # ty: ignore[no-matching-overload]
+            - sc.loggamma(alpha)  # ty: ignore[no-matching-overload]
             + alpha * np.log(rate)
             - (alpha + 1j * g) * np.log(rate - 1j * f)
         )
