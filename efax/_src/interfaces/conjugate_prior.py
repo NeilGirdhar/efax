@@ -56,9 +56,20 @@ class HasConjugatePrior(ExpectationParametrization):
 class HasGeneralizedConjugatePrior(HasConjugatePrior, Multidimensional):
     """A HasConjugatePrior for multidimensional distributions.
 
-    Extends HasConjugatePrior with a generalized conjugate prior whose pseudo-observation
-    count has shape (*self.shape, self.dimensions()) rather than self.shape, allowing
-    independent pseudo-observation counts along each dimension.
+    The ordinary conjugate prior encodes a single scalar pseudo-observation count.  The
+    generalized conjugate prior (GCP) instead carries one count n per component, with shape
+    (*self.shape, self.dimensions()).
+
+    For a distribution with k expectation parameters x, the GCP is a distribution over x with
+    2k natural parameters: the counts n and the scaled values diag(n) x.  The counts are the
+    diagonal of the Fisher information of the expectation parameters, so a GCP is a conjugate
+    prior whose precision is free per component rather than tied to a single count.
+
+    Examples:
+        - The multivariate normal distribution with isotropic variance, whose GCP is the
+          multivariate normal with diagonal variance.  For (n, x), its natural parameters are
+          the mean-times-precision diag(n) x and the precision diag(n).
+        - The categorical distribution, whose GCP is the generalized Dirichlet distribution.
     """
 
     @abstractmethod
@@ -66,7 +77,7 @@ class HasGeneralizedConjugatePrior(HasConjugatePrior, Multidimensional):
         """Return the generalized conjugate prior distribution centred on this distribution.
 
         Args:
-            n: The nonnegative pseudo-observation counts.
+            n: The nonnegative per-component pseudo-observation counts.
                 Must have shape == (*self.shape, self.dimensions()).
         """
         raise NotImplementedError
