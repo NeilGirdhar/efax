@@ -434,7 +434,7 @@ Using the cross entropy to iteratively optimize a prediction is simple:
     def cond_fun(state: State) -> JaxBooleanArray:
         _, q_bar = state
         total = jnp.sum(parameter_dot_product(q_bar, q_bar))
-        return total > 1e-6  # noqa: PLR2004
+        return total > 1e-6  # ruff:ignore[magic-value-comparison]
 
 
     def body_fun(state: State) -> State:

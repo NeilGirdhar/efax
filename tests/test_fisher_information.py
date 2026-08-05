@@ -73,7 +73,8 @@ def test_fisher_information_is_convex(
 ) -> None:
     shape = DIST_SHAPE_MEDIUM
     nat_parameters = distribution_info.nat_parameter_generator(generator, shape=shape)
-    fisher_information = nat_parameters._fisher_information_matrix()  # ruff:ignore[private-member-access]
+    # ruff:ignore[private-member-access]
+    fisher_information = nat_parameters._fisher_information_matrix()
     assert issubclass(fisher_information.dtype.type, jnp.floating)
     eigvals = jnp.linalg.eigvals(fisher_information)
     if not jnp.all(eigvals >= 0.0):

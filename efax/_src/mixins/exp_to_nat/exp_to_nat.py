@@ -45,10 +45,8 @@ class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
         if hasattr(super(), "__post_init__"):
             super().__post_init__()  # type: ignore
         if self.minimizer is None:
-            from .optimistix import (  # ruff:ignore[import-outside-top-level]
-                default_bisection_minimizer,
-                default_minimizer,
-            )
+            # ruff:ignore[import-outside-top-level]
+            from .optimistix import default_bisection_minimizer, default_minimizer
 
             initial_search_parameters = self.initial_search_parameters()
             object.__setattr__(

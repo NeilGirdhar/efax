@@ -116,7 +116,8 @@ class TransformedNaturalParametrization(
 TNP = TypeVar("TNP", bound=TransformedNaturalParametrization, default=Any)
 
 
-class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):  # ruff:ignore[non-pep695-generic-class]
+# ruff:ignore[non-pep695-generic-class]
+class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):
     """An ExpectationParametrization defined by a transformation of a base distribution.
 
     Implements to_nat entirely in terms of the base distribution EP and the natural

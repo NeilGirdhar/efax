@@ -41,7 +41,8 @@ def _broadcast_fixed_parameters[D: Distribution](q: D) -> D:
     return Assembler.create_assembler(q).assemble(final_parameters)
 
 
-def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -> None:  # ruff:ignore[too-many-locals]
+# ruff:ignore[too-many-locals]
+def test_ep_from_cf(distribution_info: DistributionInfo, generator: Generator) -> None:
     """OLS CF inversion recovers expectation parameters for compatible distributions."""
     nat_cls = distribution_info.nat_class()
 

@@ -57,7 +57,8 @@ class Distribution(JaxAbstractClass):
         """
         return support
 
-    def __array_namespace__(self, api_version: str | None = None) -> ModuleType:  # ruff:ignore[bad-dunder-method-name]
+    # ruff:ignore[bad-dunder-method-name]
+    def __array_namespace__(self, api_version: str | None = None) -> ModuleType:
         from .iteration import parameters  # ruff:ignore[import-outside-top-level]
 
         values = parameters(self).values()
