@@ -526,7 +526,7 @@ class MultivariateDiagonalNormalInfo(
         assert isinstance(covariance, np.ndarray)
         return ScipyMultivariateNormal.from_mc(
             mean=np.asarray(p.mean),
-            cov=covariance,  # pyrefly: ignore [bad-argument-type]  # ty: ignore[invalid-argument-type]
+            cov=covariance,  # pyrefly: ignore [bad-argument-type]
         )
 
     @override

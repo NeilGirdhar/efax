@@ -14,7 +14,7 @@ dev = [
   "scipy-stubs>=1.15",
   "scipy>=1.15",
   "toml-sort>=0.24",
-  "ty>=0.0.66"
+  "ty>=0.0.69"
 ]
 
 [project]
