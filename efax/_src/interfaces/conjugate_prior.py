@@ -56,20 +56,30 @@ class HasConjugatePrior(ExpectationParametrization):
 class HasGeneralizedConjugatePrior(HasConjugatePrior, Multidimensional):
     """A HasConjugatePrior for multidimensional distributions.
 
-    The ordinary conjugate prior encodes a single scalar pseudo-observation count.  The
-    generalized conjugate prior (GCP) instead carries one count n per component, with shape
-    (*self.shape, self.dimensions()).
+    The ordinary conjugate prior encodes evidence with a single scalar pseudo-observation count n
+    shared by every component of the pseudo-sufficient statistics n x.  This is appropriate for a
+    point observation, but not for a distribution: a distribution can be sharp in one
+    sufficient-statistic dimension and diffuse in another, so its evidence strength should vary
+    across components.
 
-    For a distribution with k expectation parameters x, the GCP is a distribution over x with
-    2k natural parameters: the counts n and the scaled values diag(n) x.  The counts are the
-    diagonal of the Fisher information of the expectation parameters, so a GCP is a conjugate
-    prior whose precision is free per component rather than tied to a single count.
+    The generalized conjugate prior (GCP) captures this by assigning one count n per component,
+    with shape (*self.shape, self.dimensions()).  For a distribution with k expectation
+    parameters x, the GCP is a distribution over x with 2k natural parameters: the per-component
+    counts n and the scaled values diag(n) x, satisfying diag(n) == Fisher(x).  The count of each
+    component equals its Fisher information at that component's value, so a GCP is a conjugate
+    prior whose precision is free per component rather than tied to a single scalar count. Adding
+    two GCPs adds their natural parameters, implementing the standard conjugate update.
+
+    For k = 1, the GCP reduces to the ordinary conjugate prior: a single count and a single
+    scaled value.
 
     Examples:
         - The multivariate normal distribution with isotropic variance, whose GCP is the
           multivariate normal with diagonal variance.  For (n, x), its natural parameters are
           the mean-times-precision diag(n) x and the precision diag(n).
-        - The categorical distribution, whose GCP is the generalized Dirichlet distribution.
+        - The categorical distribution, whose GCP is the generalized Dirichlet distribution
+          (T.-T. Wong 1998. Generalized Dirichlet distribution in Bayesian analysis. Applied
+          Mathematics and Computation, volume 97, pp165-181).
     """
 
     @abstractmethod
