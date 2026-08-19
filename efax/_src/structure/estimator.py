@@ -79,7 +79,7 @@ class Estimator(Assembler[P]):
         Converts the distribution tree to expectation parametrization types while preserving
         the fixed parameter values from p.
         """
-        infos = Estimator.create_assembler(p).to_exp().infos  # type: ignore
+        infos = Estimator.create_assembler(p).to_exp().infos
         fixed_parameters = parameters(p, fixed=True)
         return Estimator(infos, fixed_parameters)
 
