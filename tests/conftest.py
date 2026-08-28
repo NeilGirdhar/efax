@@ -26,7 +26,7 @@ from efax import (
 from .create_info import GeneralizedDirichletInfo, create_infos
 
 
-@pytest.fixture(autouse=True, scope="session")
+@pytest.fixture(autouse=True, scope="session")  # ruff: ignore[pytest-fixture-autouse]
 def _jax_fixture(request: pytest.FixtureRequest) -> Generator[None]:
     with jax.debug_key_reuse(new_val=True), jax.numpy_rank_promotion("raise"), enable_x64():
         yield

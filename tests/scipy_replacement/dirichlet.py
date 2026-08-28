@@ -31,10 +31,7 @@ class ScipyDirichletFixRVsAndPDF(ScipyDistribution):
 
     def sample(self, shape: Shape = (), *, rng: Generator | None = None) -> onp.ArrayND[np.float64]:
         # This somehow fixes the behaviour of scipy's ``dirichlet.rvs``.
-        return self.distribution.rvs(  # type: ignore
-            size=shape,
-            random_state=rng,
-        )
+        return self.distribution.rvs(size=shape, random_state=rng)
 
     def entropy(self) -> NumpyRealArray:
         return np.asarray(self.distribution.entropy())
