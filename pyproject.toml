@@ -14,7 +14,7 @@ dev = [
   "scipy-stubs>=1.15",
   "scipy>=1.15",
   "toml-sort>=0.24",
-  "ty>=0.0.75"
+  "ty>=0.0.82"
 ]
 
 [project]
@@ -25,8 +25,8 @@ readme = "README.rst"
 requires-python = ">=3.12, <3.15"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-authors = [{name = "Neil Girdhar", email = "mistersheik@gmail.com"}]
-maintainers = [{name = "Neil Girdhar", email = "mistersheik@gmail.com"}]
+authors = [{ name = "Neil Girdhar", email = "mistersheik@gmail.com" }]
+maintainers = [{ name = "Neil Girdhar", email = "mistersheik@gmail.com" }]
 keywords = [
   "exponential-family",
   "jax",

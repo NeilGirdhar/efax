@@ -23,7 +23,7 @@ class ScipyCategorical(ScipyDiscreteDistribution):
         uniforms = rng.random(shape + self.probabilities.shape[:-1])
         categories = np.sum(uniforms[..., np.newaxis] > cdf, axis=-1)
         return xpx.one_hot(  # pyrefly: ignore [bad-return]
-            categories,  # pyrefly: ignore [bad-argument-type]
+            categories,  # pyrefly: ignore [bad-argument-type]  # ty: ignore[invalid-argument-type]
             self.probabilities.shape[-1],
             dtype=np.int64,
         )  # ty: ignore[invalid-return-type]
