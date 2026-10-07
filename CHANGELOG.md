@@ -3,6 +3,13 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.5.1 - 2026-10-07
+
+- Dropped the `typing-extensions` dependency.
+- Added a CI workflow for linting and tests, including a run against the lowest supported versions of direct dependencies.
+- Tidied the publish workflow.
+- Pointed README links at `main` instead of `master`.
+
 ## 2.5.0 - 2026-10-07
 
 - Dropped Python 3.12 support, following SPEC0.
