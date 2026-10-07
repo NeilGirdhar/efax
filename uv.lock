@@ -380,7 +380,6 @@ dependencies = [
     { name = "optimistix" },
     { name = "optype", extra = ["numpy"] },
     { name = "tjax" },
-    { name = "typing-extensions" },
 ]
 
 [package.dev-dependencies]
@@ -408,7 +407,6 @@ requires-dist = [
     { name = "optimistix", specifier = ">=0.0.9" },
     { name = "optype", extras = ["numpy"], specifier = ">=0.8.0" },
     { name = "tjax", specifier = ">=1.7.1" },
-    { name = "typing-extensions", specifier = ">=4.8" },
 ]
 
 [package.metadata.requires-dev]
