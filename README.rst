@@ -37,7 +37,7 @@ differential programming library `JAX <https://github.com/google/jax/>`_.
 The *exponential families* are an important class of probability distributions that include the
 normal, gamma, beta, exponential, Poisson, binomial, and Bernoulli distributions.
 For an explanation of the fundamental ideas behind this library, see our `overview on exponential
-families <https://github.com/NeilGirdhar/efax/blob/master/exponential_families.pdf>`_.
+families <https://github.com/NeilGirdhar/efax/blob/main/exponential_families.pdf>`_.
 
 The main motivation for using EFAX over a library like tensorflow-probability or the basic functions
 in JAX is that EFAX provides the two most important parametrizations for each exponential family—the
@@ -557,14 +557,14 @@ steps are:
   analytical solution, then there's a mixin that implements a numerical solution.  This can be seen
   in the Dirichlet distribution.
 
-- Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.
+- Add the new distribution to the tests by adding it to `create_info <https://github.com/NeilGirdhar/efax/blob/main/tests/create_info.py>`_.
 
 The implementation should be consistent with the surrounding style, be type annotated, and pass the
 linters below.
 
 The tests can be run using :bash:`pytest -n auto`.  Specific distributions can be run with
 :bash:`pytest -n auto --distribution=Gamma` where the names match the class names in
-`create_info <https://github.com/NeilGirdhar/efax/blob/master/tests/create_info.py>`_.
+`create_info <https://github.com/NeilGirdhar/efax/blob/main/tests/create_info.py>`_.
 
 There are a few tools to clean and check the source:
 
