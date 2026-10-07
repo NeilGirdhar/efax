@@ -5,7 +5,6 @@ from typing import Any, Self, cast, overload
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray
 from tjax.dataclasses import dataclass, field
-from typing_extensions import TypeVar
 
 from efax._src.iteration import parameters
 from efax._src.parametrization import Distribution, SimpleDistribution
@@ -16,12 +15,9 @@ from .estimator import Estimator
 from .parameter_names import parameter_names
 from .parameter_supports import parameter_supports
 
-P = TypeVar("P", bound=Distribution, default=Any)
-SP = TypeVar("SP", bound=SimpleDistribution, default=Any)
-
 
 @dataclass
-class Flattener(Estimator[P]):
+class Flattener[P: Distribution = Any](Estimator[P]):
     """An Estimator that also converts distributions to and from flat arrays.
 
     Extends Estimator with the ability to encode a Distribution as an array of shape
@@ -130,12 +126,12 @@ class Flattener(Estimator[P]):
 
     @overload
     @classmethod
-    def create_flattener(
+    def create_flattener[SP: SimpleDistribution = Any](
         cls, p: SP, *, unflatten_as_type: None = None, mapped_to_plane: bool = True
     ) -> "Flattener[SP]": ...
     @overload
     @classmethod
-    def create_flattener(
+    def create_flattener[SP: SimpleDistribution = Any](
         cls,
         p: SimpleDistribution,
         *,
@@ -143,7 +139,7 @@ class Flattener(Estimator[P]):
         mapped_to_plane: bool = True,
     ) -> "Flattener[SP]": ...
     @classmethod
-    def create_flattener(
+    def create_flattener[SP: SimpleDistribution = Any](
         cls,
         p: SimpleDistribution,
         *,

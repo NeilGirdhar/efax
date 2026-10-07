@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, final
+from typing import Any, final
 
 import jax.numpy as jnp
 from array_api_compat import array_namespace
 from tjax import JaxComplexArray, JaxRealArray, jit
-from typing_extensions import TypeVar
 
 from .natural_parametrization import NaturalParametrization
 from .parameter import ComplexField, HermitianMatrixSupport, SymmetricMatrixSupport
@@ -16,10 +15,8 @@ from .structure.flattener import Flattener
 from .structure.parameter_supports import parameter_supports
 from .tools import parameter_dot_product, parameter_map
 
-NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 
-
-class ExpectationParametrization(Distribution, Generic[NP]):
+class ExpectationParametrization[NP: NaturalParametrization = Any](Distribution):
     """The expectation parametrization of an exponential family distribution.
 
     This class also doubles as the sufficient statistics of an exponential family distribution.

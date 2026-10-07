@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, Generic, Self, final, override
+from typing import Any, Self, final, override
 
 from tjax import JaxAbstractClass, JaxRealArray, abstract_jit, jit, stop_gradient
-from typing_extensions import TypeVar
 
 from efax._src.expectation_parametrization import ExpectationParametrization
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parametrization import Distribution
 from efax._src.tools import parameter_dot_product
-
-NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 
 
 class HasEntropy(Distribution):
@@ -22,7 +19,9 @@ class HasEntropy(Distribution):
         raise NotImplementedError
 
 
-class HasEntropyEP(ExpectationParametrization[NP], HasEntropy, JaxAbstractClass, Generic[NP]):
+class HasEntropyEP[NP: NaturalParametrization = Any](
+    ExpectationParametrization[NP], HasEntropy, JaxAbstractClass
+):
     """An ExpectationParametrization with analytically tractable entropy.
 
     Provides entropy and cross-entropy via the inner-product form of the exponential family,
@@ -63,10 +62,7 @@ class HasEntropyEP(ExpectationParametrization[NP], HasEntropy, JaxAbstractClass,
         return self.cross_entropy(stop_gradient(self.to_nat()))
 
 
-EP = TypeVar("EP", bound=HasEntropyEP, default=Any)
-
-
-class HasEntropyNP(NaturalParametrization[EP], HasEntropy, Generic[EP]):
+class HasEntropyNP[EP: HasEntropyEP = Any](NaturalParametrization[EP], HasEntropy):
     """A NaturalParametrization with analytically tractable entropy.
 
     Delegates to the corresponding expectation parametrization's cross_entropy.

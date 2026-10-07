@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import KW_ONLY, field
-from typing import Any, Generic, Self, override
+from typing import Any, Self, override
 
 from array_api_compat import array_namespace
 from jax import vmap
 from tjax import JaxRealArray, jit
 from tjax.dataclasses import dataclass
-from typing_extensions import TypeVar
 
 from efax._src.expectation_parametrization import ExpectationParametrization
 from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parametrization import SimpleDistribution
 from efax._src.structure.flattener import Flattener
 
-NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
 type SP = JaxRealArray
 
 
@@ -30,7 +28,9 @@ class ExpToNatMinimizer:
 
 
 @dataclass
-class ExpToNat(ExpectationParametrization[NP], SimpleDistribution, Generic[NP]):
+class ExpToNat[NP: NaturalParametrization = Any](
+    ExpectationParametrization[NP], SimpleDistribution
+):
     """This mixin implements the conversion from expectation to natural parameters.
 
     It uses Newton's method with a Jacobian to invert the gradient log-normalizer.

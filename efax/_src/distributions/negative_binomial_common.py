@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Any, TypeVar, override
+from typing import override
 
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
@@ -13,11 +13,9 @@ from efax._src.natural_parametrization import NaturalParametrization
 from efax._src.parameter import ScalarSupport, integral_ring
 from efax._src.parametrization import SimpleDistribution
 
-EP = TypeVar("EP", bound="NBCommonEP[Any]")
-
 
 @dataclass
-class NBCommonNP(NaturalParametrization[EP, JaxRealArray], SimpleDistribution):
+class NBCommonNP[EP: "NBCommonEP"](NaturalParametrization[EP, JaxRealArray], SimpleDistribution):
     log_not_p: JaxRealArray
 
     @property
@@ -50,11 +48,8 @@ class NBCommonNP(NaturalParametrization[EP, JaxRealArray], SimpleDistribution):
         raise NotImplementedError
 
 
-NP = TypeVar("NP", bound=NBCommonNP[Any])
-
-
 @dataclass
-class NBCommonEP(ExpectationParametrization[NP], SimpleDistribution):
+class NBCommonEP[NP: NBCommonNP](ExpectationParametrization[NP], SimpleDistribution):
     mean: JaxRealArray
 
     @property

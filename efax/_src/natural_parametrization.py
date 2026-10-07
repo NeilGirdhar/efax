@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, Self, final, get_type_hints
+from typing import TYPE_CHECKING, Any, Self, final, get_type_hints
 
 import jax.numpy as jnp
 from array_api_compat import array_namespace
@@ -16,7 +16,6 @@ from tjax import (
     jit,
 )
 from tjax.dataclasses import dataclass
-from typing_extensions import TypeVar
 
 from .analytic_continuation import analytic_continue_parameter
 from .iteration import parameters
@@ -28,10 +27,6 @@ from .tools import parameter_dot_product, parameter_holomorphic_dot, parameter_m
 
 if TYPE_CHECKING:
     from .expectation_parametrization import ExpectationParametrization
-
-
-EP = TypeVar("EP", bound="ExpectationParametrization", default=Any)
-Domain = TypeVar("Domain", bound=JaxComplexArray | dict[str, Any], default=Any)
 
 
 def _log_normalizer_jvp(
@@ -59,7 +54,10 @@ def _log_normalizer_jvp(
 
 
 @dataclass
-class NaturalParametrization(Distribution, JaxAbstractClass, Generic[EP, Domain]):
+class NaturalParametrization[
+    EP: ExpectationParametrization = Any,
+    Domain: JaxComplexArray | dict[str, Any] = Any,
+](Distribution, JaxAbstractClass):
     """The natural parametrization of an exponential family distribution.
 
     The motivation for the natural parametrization is combining and scaling independent predictive

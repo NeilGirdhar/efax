@@ -1,4 +1,4 @@
-from typing import Any, TypeVar, override
+from typing import Any, override
 
 import optimistix as optx
 from array_api_compat import array_namespace
@@ -8,9 +8,6 @@ from tjax.dataclasses import dataclass, field
 
 from .exp_to_nat import ExpToNat, ExpToNatMinimizer
 
-Y = TypeVar("Y")
-Out = TypeVar("Out")
-Aux = TypeVar("Aux")
 type RootFinder[Y, Out, Aux] = (
     optx.AbstractRootFinder[Y, Out, Aux, Any]
     | optx.AbstractLeastSquaresSolver[Y, Out, Aux, Any]

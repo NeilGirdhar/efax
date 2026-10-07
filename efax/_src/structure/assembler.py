@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping
-from typing import TYPE_CHECKING, Any, Generic, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from numpy.random import Generator
 from tjax import JaxComplexArray, JaxRealArray, Shape
 from tjax.dataclasses import dataclass, field
-from typing_extensions import TypeVar
 
 from efax._src.analytic_continuation import ComplexContinuation
 from efax._src.iteration import parameters
@@ -42,12 +41,9 @@ class JointDistributionInfo:
 
 type SubDistributionInfo = SimpleDistributionInfo | JointDistributionInfo
 
-T = TypeVar("T")
-P = TypeVar("P", bound=Distribution, default=Any)
-
 
 @dataclass
-class Assembler(Generic[P]):
+class Assembler[P: Distribution = Any]:
     """Holds enough static information about a Distribution tree to reassemble one from raw data.
 
     Distribution classes alone lack the context needed to reconstruct themselves — for example, a
@@ -201,7 +197,7 @@ class Assembler(Generic[P]):
         return list(cls._walk(cls._make_info, p))
 
     @classmethod
-    def _walk(
+    def _walk[T](
         cls,
         f: Callable[[Distribution, Path], T],
         q: Distribution,

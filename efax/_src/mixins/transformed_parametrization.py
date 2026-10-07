@@ -2,25 +2,24 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from functools import partial
-from typing import Any, Generic, cast, override
+from typing import Any, cast, override
 
 from array_api_compat import array_namespace
 from jax import jacobian, vmap
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, Shape
-from typing_extensions import TypeVar
 
 from efax._src.expectation_parametrization import ExpectationParametrization
 from efax._src.iteration import parameters
-from efax._src.natural_parametrization import EP, NaturalParametrization
-
-TEP = TypeVar("TEP", bound=ExpectationParametrization, default=Any)
-NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
-Domain = TypeVar("Domain", bound=JaxComplexArray, default=JaxComplexArray)
+from efax._src.natural_parametrization import NaturalParametrization
 
 
-class TransformedNaturalParametrization(
+class TransformedNaturalParametrization[
+    NP: NaturalParametrization = Any,
+    EP: ExpectationParametrization = Any,
+    TEP: ExpectationParametrization = Any,
+    Domain: JaxComplexArray = JaxComplexArray,
+](
     NaturalParametrization[TEP, Domain],
-    Generic[NP, EP, TEP, Domain],  # ruff:ignore[non-pep695-generic-class]
 ):
     """A NaturalParametrization defined by a differentiable transformation of a base distribution.
 
@@ -113,11 +112,13 @@ class TransformedNaturalParametrization(
         )
 
 
-TNP = TypeVar("TNP", bound=TransformedNaturalParametrization, default=Any)
-
-
-# ruff:ignore[non-pep695-generic-class]
-class TransformedExpectationParametrization(ExpectationParametrization[TNP], Generic[EP, NP, TNP]):
+class TransformedExpectationParametrization[
+    EP: ExpectationParametrization = Any,
+    NP: NaturalParametrization = Any,
+    TNP: TransformedNaturalParametrization = Any,
+](
+    ExpectationParametrization[TNP],
+):
     """An ExpectationParametrization defined by a transformation of a base distribution.
 
     Implements to_nat entirely in terms of the base distribution EP and the natural

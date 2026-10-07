@@ -1,9 +1,8 @@
 from collections.abc import Iterable, Mapping
 from dataclasses import fields
-from typing import Any, Literal, overload
+from typing import Any, Literal, TypeIs, overload
 
 from tjax import JaxArray, JaxComplexArray
-from typing_extensions import TypeIs
 
 from .parameter import Support
 from .parametrization import Distribution, SimpleDistribution

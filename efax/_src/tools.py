@@ -4,7 +4,6 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable, Mapping
 from functools import reduce
 from itertools import starmap
-from typing import TypeVar
 
 from array_api_compat import array_namespace
 from jax import jit
@@ -49,9 +48,6 @@ def parameter_holomorphic_dot(x: Distribution, y: Distribution, /) -> JaxComplex
     where the primal output is complex and JAX expects a complex tangent.
     """
     return _walk_parameters(x, y, hermitian=False)
-
-
-T = TypeVar("T", bound=Distribution)
 
 
 def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:

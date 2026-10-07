@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Generic, cast, final, override
+from typing import Any, cast, final, override
 
 import jax.numpy as jnp
 import pytest
 from numpy.random import Generator
 from tjax import JaxComplexArray, NumpyComplexArray, Shape
-from typing_extensions import TypeVar
 
 from efax import (
     Assembler,
@@ -23,12 +22,12 @@ from .scipy_replacement.base import (
     ScipyDistribution,
 )
 
-NP = TypeVar("NP", bound=NaturalParametrization, default=Any)
-EP = TypeVar("EP", bound=ExpectationParametrization, default=Any)
-Domain = TypeVar("Domain", bound=NumpyComplexArray | dict[str, Any], default=Any)
 
-
-class DistributionInfo(Generic[NP, EP, Domain]):
+class DistributionInfo[
+    NP: NaturalParametrization = Any,
+    EP: ExpectationParametrization = Any,
+    Domain: NumpyComplexArray | dict[str, Any] = Any,
+]:
     def __init__(self, dimensions: int = 1, safety: float = 0.0) -> None:
         super().__init__()
         self.dimensions = dimensions

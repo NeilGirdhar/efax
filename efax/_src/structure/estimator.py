@@ -1,6 +1,6 @@
 from dataclasses import fields
 from functools import partial
-from typing import TYPE_CHECKING, Any, Self, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Self, cast
 
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxComplexArray, JaxRealArray, jit
@@ -16,14 +16,9 @@ from .parameter_names import parameter_names
 if TYPE_CHECKING:
     from efax._src.natural_parametrization import NaturalParametrization
 
-    NP = TypeVar("NP", bound=NaturalParametrization)
-
-P = TypeVar("P", bound=Distribution)
-SP = TypeVar("SP", bound=SimpleDistribution)
-
 
 @dataclass
-class Estimator(Assembler[P]):
+class Estimator[P: Distribution](Assembler[P]):
     """An Assembler that also performs maximum likelihood estimation.
 
     Extends Assembler by tracking which parameters are fixed (held constant during estimation)
@@ -36,7 +31,9 @@ class Estimator(Assembler[P]):
     fixed_parameters: dict[Path, JaxComplexArray]
 
     @classmethod
-    def from_type(cls, type_p: type[SP], **fixed_parameters: JaxArray) -> "Estimator[SP]":
+    def from_type[SP: SimpleDistribution](
+        cls, type_p: type[SP], **fixed_parameters: JaxArray
+    ) -> "Estimator[SP]":
         """Create an Estimator from a simple ExpectationParametrization class.
 
         Use this when you have a type rather than an instance.  Does not work with composite
@@ -73,7 +70,7 @@ class Estimator(Assembler[P]):
         return cls(infos, fixed_parameters)
 
     @classmethod
-    def from_natural(cls, p: "NP") -> "Estimator[NP]":
+    def from_natural[NP: NaturalParametrization](cls, p: NP) -> "Estimator[NP]":
         """Create an Estimator from a natural-parametrized distribution.
 
         Converts the distribution tree to expectation parametrization types while preserving

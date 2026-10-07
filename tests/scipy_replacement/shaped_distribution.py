@@ -88,7 +88,7 @@ class ShapedDistribution[T: AnyScipy]:
             if not hasattr(this_object, "pmf"):
                 raise NotImplementedError
             for j in np.ndindex(*x.shape[self.ndim :]):
-                value = this_object.pmf(x[*i, *j])  # type: ignore
+                value = this_object.pmf(x[*i, *j])
                 retval[*i, *j] = value
         return retval
 
@@ -96,7 +96,7 @@ class ShapedDistribution[T: AnyScipy]:
         retval = np.empty(self.shape, dtype=self.real_dtype)
         for i in np.ndindex(*self.shape):
             this_object = cast("T", self.objects[i])
-            retval[i] = this_object.entropy()  # type: ignore
+            retval[i] = this_object.entropy()
         return retval
 
     def access_object(self, index: tuple[int, ...]) -> T:
