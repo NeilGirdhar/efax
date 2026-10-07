@@ -28,21 +28,28 @@ license-files = ["LICENSE"]
 authors = [{ name = "Neil Girdhar", email = "mistersheik@gmail.com" }]
 maintainers = [{ name = "Neil Girdhar", email = "mistersheik@gmail.com" }]
 keywords = [
+  "bayesian",
+  "conjugate-prior",
+  "entropy",
   "exponential-family",
   "jax",
   "machine-learning",
-  "probability",
+  "maximum-likelihood",
+  "probability-distributions",
   "statistics"
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Mathematics",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Typing :: Typed"
 ]
