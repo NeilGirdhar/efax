@@ -3,6 +3,14 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.5.0 - 2026-10-07
+
+- Dropped Python 3.12 support, following SPEC0.
+- Upgraded tjax to 1.6.
+- Added `Estimator.mle`, which sped up testing, and unified test distribution and sample shapes.
+- Switched from `matrix_transpose` to `mT`, used `xpx.angle`, and preferred `.ndim` over `len(.shape)`.
+- Type-checked tests with several type checkers.
+
 ## 2.4.0 - 2026-05-13
 
 - Characteristic-function complex support:
