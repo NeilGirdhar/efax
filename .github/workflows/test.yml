@@ -57,3 +57,24 @@ jobs:
 
       - name: Test
         run: uv run --locked pytest -n auto
+
+  test-lowest:
+    name: Test (lowest direct dependencies)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install lowest direct dependencies
+        run: uv sync --resolution lowest-direct
+
+      - name: Test
+        run: uv run --no-sync pytest -n auto
