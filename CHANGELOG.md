@@ -3,6 +3,12 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.6.0 - 2026-10-09
+
+- Added Python 3.15 support.
+- Raised the minimum tjax version to 1.9.0.
+- Expanded the package keywords and added classifiers.
+
 ## 2.5.1 - 2026-10-07
 
 - Dropped the `typing-extensions` dependency.
