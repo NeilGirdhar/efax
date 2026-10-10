@@ -22,7 +22,7 @@ name = "efax"
 version = "2.5.1"
 description = "Exponential families for JAX"
 readme = "README.rst"
-requires-python = ">=3.13, <3.15"
+requires-python = ">=3.13, <3.16"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [{ name = "Neil Girdhar", email = "mistersheik@gmail.com" }]
@@ -61,7 +61,7 @@ dependencies = [
   "opt-einsum>=3.4",
   "optimistix>=0.0.10",
   "optype[numpy]>=0.8.0",
-  "tjax>=1.7.1"
+  "tjax>=1.9.0"
 ]
 
 [project.urls]
