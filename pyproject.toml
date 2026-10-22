@@ -10,11 +10,11 @@ dev = [
   "pyright>=1.1.410",
   "pytest-xdist[psutil]>=3",
   "pytest>=9",
-  "ruff>=0.16.5",
+  "ruff>=0.17.1",
   "scipy-stubs>=1.15",
   "scipy>=1.16.1",
   "toml-sort>=0.24",
-  "ty>=0.0.85"
+  "ty>=0.0.90"
 ]
 
 [project]

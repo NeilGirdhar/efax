@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import partial
 
 import jax.numpy as jnp
+import numpy as np
 import pytest
 from jax import grad, jit, tree, value_and_grad
 from jax.test_util import check_grads
@@ -41,7 +42,7 @@ def _check_entropy_gradient(distribution: HasEntropy, /) -> None:
     p_sum_entropy = partial(_sum_entropy, flattener=flattener)
     calculated_gradient = grad(p_sum_entropy)(flattened)
     if not _all_finite(calculated_gradient):
-        indices = jnp.argwhere(jnp.isnan(calculated_gradient))
+        indices = np.asarray(jnp.argwhere(jnp.isnan(calculated_gradient)))
         bad_distributions = [distribution[tuple(index)[:-1]] for index in indices]
         console = Console()
         with console.capture() as capture:
