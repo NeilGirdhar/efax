@@ -136,6 +136,8 @@ class VonMisesFisherEP(
         xp = array_namespace(self)
         mu: JaxRealArray = xp.linalg.vector_norm(self.mean, axis=-1)
         # 0 <= mu <= 1.0
+        # TODO: Use xpx.one_minus_square if it's added to array-api-extra, or
+        # jax.lax.one_minus_square if it's rejected.
         initial_kappa = xp.where(
             mu == 1.0, xp.asarray(xp.inf), (mu * self.dimensions() - mu**3) / (1.0 - mu**2)
         )

@@ -116,6 +116,8 @@ class ComplexVonMisesEP(
     def initial_search_parameters(self) -> JaxRealArray:
         xp = array_namespace(self)
         mu = xp.abs(self.mean)
+        # TODO: Use xpx.one_minus_square if it's added to array-api-extra, or
+        # jax.lax.one_minus_square if it's rejected.
         initial_kappa = xp.where(mu == 1.0, xp.asarray(xp.inf), (2.0 * mu - mu**3) / (1.0 - mu**2))
         initial_kappa = cast("JaxRealArray", initial_kappa)
         return inverse_softplus(initial_kappa)[..., xp.newaxis]
