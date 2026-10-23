@@ -1,10 +1,15 @@
 root = true
 
-[*.{py,rst,toml}]
-indent_style = space
+[*]
+charset = utf-8
 end_of_line = lf
-trim_trailing_whitespace = true
+indent_style = space
 insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+max_line_length = 100
+indent_size = 4
 
 [*.py]
 max_line_length = 100
@@ -15,5 +20,9 @@ max_line_length = 100
 indent_size = 2
 
 [*.toml]
-max_line_length = 150
+max_line_length = 120
+indent_size = 2
+
+[*.yml]
+max_line_length = 100
 indent_size = 2
