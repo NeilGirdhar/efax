@@ -21,7 +21,7 @@ dev = [
 name = "efax"
 version = "2.6.0"
 description = "Exponential families for JAX"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.13, <3.16"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
