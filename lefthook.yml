@@ -12,9 +12,15 @@ pre-commit:
     - name: ty
       glob: "*.py"
       run: uv run ty check {staged_files}
-    - name: toml-sort
+    - name: pyproject-fmt
+      glob: "pyproject.toml"
+      run: uv run pyproject-fmt {staged_files} || uv run pyproject-fmt --check {staged_files}
+      stage_fixed: true
+    - name: taplo
       glob: "*.toml"
-      run: uv run toml-sort -i {staged_files}
+      exclude:
+        - "pyproject.toml"
+      run: uv run taplo fmt {staged_files}
       stage_fixed: true
     - name: rumdl
       glob: "*.md"
