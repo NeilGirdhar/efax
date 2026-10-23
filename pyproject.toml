@@ -11,6 +11,7 @@ dev = [
   "pytest-xdist[psutil]>=3",
   "pytest>=9",
   "ruff>=0.17.1",
+  "rumdl>=0.3",
   "scipy-stubs>=1.15",
   "scipy>=1.16.1",
   "toml-sort>=0.24",

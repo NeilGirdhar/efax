@@ -16,3 +16,7 @@ pre-commit:
       glob: "*.toml"
       run: uv run toml-sort -i {staged_files}
       stage_fixed: true
+    - name: rumdl
+      glob: "*.md"
+      run: uv run rumdl fmt {staged_files}
+      stage_fixed: true
