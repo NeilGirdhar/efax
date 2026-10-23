@@ -12,7 +12,8 @@ Each section covers changes since the previous release.
 ## 2.5.1 - 2026-10-07
 
 - Dropped the `typing-extensions` dependency.
-- Added a CI workflow for linting and tests, including a run against the lowest supported versions of direct dependencies.
+- Added a CI workflow for linting and tests, including a run against the lowest supported versions
+  of direct dependencies.
 - Tidied the publish workflow.
 - Pointed README links at `main` instead of `master`.
 
@@ -21,34 +22,37 @@ Each section covers changes since the previous release.
 - Dropped Python 3.12 support, following SPEC0.
 - Upgraded tjax to 1.6.
 - Added `Estimator.mle`, which sped up testing, and unified test distribution and sample shapes.
-- Switched from `matrix_transpose` to `mT`, used `xpx.angle`, and preferred `.ndim` over `len(.shape)`.
+- Switched from `matrix_transpose` to `mT`, used `xpx.angle`, and preferred `.ndim` over
+  `len(.shape)`.
 - Type-checked tests with several type checkers.
 
 ## 2.4.0 - 2026-05-13
 
 - Characteristic-function complex support:
-  - Added complex-coordinate support across the CF pipeline.
-  - Preserved analytic continuation for complex natural fields, Von Mises Fisher, circular complex
-    normal log-normalizers, and fixed parameters.
+    - Added complex-coordinate support across the CF pipeline.
+    - Preserved analytic continuation for complex natural fields, Von Mises Fisher, circular complex
+      normal log-normalizers, and fixed parameters.
 - CF inversion:
-  - Built the EP flattener from parametrization metadata.
-  - Split Hermitian and symmetric matrix support.
-  - Switched continued matrix log-normalizers to analytic logdet.
+    - Built the EP flattener from parametrization metadata.
+    - Split Hermitian and symmetric matrix support.
+    - Switched continued matrix log-normalizers to analytic logdet.
 - Tests:
-  - Added Gamma CF coverage for the log statistic.
-  - Made test_cf_at_zero run across all distributions.
-  - Removed the CF complexify hook test path.
-  - Dropped redundant JVP smoke coverage and unused skip logic.
+    - Added Gamma CF coverage for the log statistic.
+    - Made test_cf_at_zero run across all distributions.
+    - Removed the CF complexify hook test path.
+    - Dropped redundant JVP smoke coverage and unused skip logic.
 - Cleanup:
-  - Replaced dead code with tjax helpers.
-  - Optimized pyproject.
+    - Replaced dead code with tjax helpers.
+    - Optimized pyproject.
 
 ## 2.3.0 - 2026-05-06
 
 - Fixed the JVP of `characteristic_function`.
-- Fixed `GeneralizedDirichletEP.to_nat`, `SimplexSupport`, a joint conjugate-prior bug, and a misuse of `xp.mean`; corrected support handling and the resulting failing tests.
+- Fixed `GeneralizedDirichletEP.to_nat`, `SimplexSupport`, a joint conjugate-prior bug, and a misuse
+  of `xp.mean`; corrected support handling and the resulting failing tests.
 - Allowed flattening empty distributions and switched flatteners to `divide_where` to avoid NaNs.
-- Renamed `return_vector` to `raveled`, renamed structure variables to assembler, and refreshed ty, Ruff, and ignore directives.
+- Renamed `return_vector` to `raveled`, renamed structure variables to assembler, and refreshed ty,
+  Ruff, and ignore directives.
 
 ## 2.2.5 - 2026-04-16
 
