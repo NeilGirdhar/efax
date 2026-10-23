@@ -1,34 +1,12 @@
 [build-system]
-requires = ["uv_build>=0.12.23,<0.13"]
 build-backend = "uv_build"
-
-[dependency-groups]
-dev = [
-  "jupyter>=1",
-  "lefthook>=2",
-  "pyproject-fmt>=2.30",
-  "pyrefly>=1.0",
-  "pyright>=1.1.410",
-  "pytest-xdist[psutil]>=3",
-  "pytest>=9",
-  "ruff>=0.17.1",
-  "rumdl>=0.3",
-  "scipy-stubs>=1.15",
-  "scipy>=1.16.1",
-  "taplo>=0.9",
-  "ty>=0.0.90",
-]
+requires = [ "uv-build>=0.12.23,<0.13" ]
 
 [project]
 name = "efax"
 version = "2.6.0"
 description = "Exponential families for JAX"
 readme = "README.md"
-requires-python = ">=3.13, <3.16"
-license = "Apache-2.0"
-license-files = ["LICENSE"]
-authors = [{ name = "Neil Girdhar", email = "mistersheik@gmail.com" }]
-maintainers = [{ name = "Neil Girdhar", email = "mistersheik@gmail.com" }]
 keywords = [
   "bayesian",
   "conjugate-prior",
@@ -40,20 +18,25 @@ keywords = [
   "probability-distributions",
   "statistics"
 ]
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
+maintainers = [ { name = "Neil Girdhar", email = "mistersheik@gmail.com" } ]
+authors = [ { name = "Neil Girdhar", email = "mistersheik@gmail.com" } ]
+requires-python = ">=3.13,<3.16"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3",
+  "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
-  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.15",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Scientific/Engineering :: Mathematics",
   "Topic :: Software Development :: Libraries :: Python Modules",
-  "Typing :: Typed"
+  "Typing :: Typed",
 ]
 dependencies = [
   "array-api-compat>=1.10",
@@ -62,32 +45,38 @@ dependencies = [
   "numpy>=2.2",
   "opt-einsum>=3.4",
   "optimistix>=0.0.10",
-  "optype[numpy]>=0.8.0",
-  "tjax>=1.9.0"
+  "optype[numpy]>=0.8",
+  "tjax>=1.9"
+]
+urls.Changelog = "https://github.com/NeilGirdhar/efax/blob/main/CHANGELOG.md"
+urls.Documentation = "https://github.com/NeilGirdhar/efax#readme"
+urls.Issues = "https://github.com/NeilGirdhar/efax/issues"
+urls.Source = "https://github.com/NeilGirdhar/efax"
+
+[dependency-groups]
+dev = [
+  "jupyter>=1",
+  "lefthook>=2",
+  "pyproject-fmt>=2.30",
+  "pyrefly>=1",
+  "pyright>=1.1.410",
+  "pytest>=9",
+  "pytest-xdist[psutil]>=3",
+  "ruff>=0.17.1",
+  "rumdl>=0.3",
+  "scipy>=1.16.1",
+  "scipy-stubs>=1.15",
+  "taplo>=0.9",
+  "ty>=0.0.90",
 ]
 
-[project.urls]
-Changelog = "https://github.com/NeilGirdhar/efax/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/NeilGirdhar/efax#readme"
-Issues = "https://github.com/NeilGirdhar/efax/issues"
-Source = "https://github.com/NeilGirdhar/efax"
-
-[tool.pyrefly]
-project-includes = ["tests/**/*.py*"]
-
-[tool.pyright]
-include = ["tests"]
-
-[tool.pytest]
-testpaths = ["tests"]
+[tool.uv]
+build-backend.module-root = ""
 
 [tool.ruff]
 line-length = 100
-
-[tool.ruff.lint]
-preview = true
-select = ["ALL"]
-ignore = [
+lint.select = [ "ALL" ]
+lint.ignore = [
   "ambiguous-unicode-character-comment",
   "ambiguous-unicode-character-docstring",
   "assert",
@@ -121,38 +110,35 @@ ignore = [
   "unused-method-argument",
   "unused-static-method-argument"
 ]
+lint.flake8-errmsg.max-string-length = 40
+lint.flake8-import-conventions.extend-aliases."jax.numpy" = "jnp"
+lint.flake8-import-conventions.extend-aliases."jax.random" = "jr"
+lint.flake8-import-conventions.extend-aliases."jax.scipy.special" = "jss"
+lint.flake8-import-conventions.extend-aliases."numpy.typing" = "npt"
+lint.flake8-import-conventions.extend-aliases."optype.numpy" = "onp"
+lint.flake8-import-conventions.extend-aliases."optype.numpy.compat" = "npc"
+lint.flake8-import-conventions.extend-aliases."optype.typing" = "opt"
+lint.flake8-import-conventions.extend-aliases."scipy.special" = "sc"
+lint.flake8-import-conventions.extend-aliases.array_api_extra = "xpx"
+lint.flake8-import-conventions.extend-aliases.ctypes = "ct"
+lint.flake8-import-conventions.extend-aliases.datetime = "dt"
+lint.flake8-import-conventions.extend-aliases.equinox = "eqx"
+lint.flake8-import-conventions.extend-aliases.itertools = "it"
+lint.flake8-import-conventions.extend-aliases.networkx = "nx"
+lint.flake8-import-conventions.extend-aliases.optimistix = "optx"
+lint.flake8-import-conventions.extend-aliases.optype = "op"
+lint.flake8-import-conventions.extend-aliases.pyqtgraph = "pg"
+lint.flake8-import-conventions.extend-aliases.seaborn = "sns"
+lint.isort.combine-as-imports = true
+lint.pydocstyle.convention = "google"
+lint.pylint.max-args = 8
+lint.preview = true
 
-[tool.ruff.lint.flake8-errmsg]
-max-string-length = 40
+[tool.pyrefly]
+project-includes = [ "tests/**/*.py*" ]
 
-[tool.ruff.lint.flake8-import-conventions.extend-aliases]
-"array_api_extra" = "xpx"
-"ctypes" = "ct"
-"datetime" = "dt"
-"equinox" = "eqx"
-"itertools" = "it"
-"jax.numpy" = "jnp"
-"jax.random" = "jr"
-"jax.scipy.special" = "jss"
-"networkx" = "nx"
-"numpy.typing" = "npt"
-"optimistix" = "optx"
-"optype" = "op"
-"optype.numpy" = "onp"
-"optype.numpy.compat" = "npc"
-"optype.typing" = "opt"
-"pyqtgraph" = "pg"
-"scipy.special" = "sc"
-"seaborn" = "sns"
+[tool.pyright]
+include = [ "tests" ]
 
-[tool.ruff.lint.isort]
-combine-as-imports = true
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
-[tool.ruff.lint.pylint]
-max-args = 8
-
-[tool.uv.build-backend]
-module-root = ""
+[tool.pytest]
+testpaths = [ "tests" ]
