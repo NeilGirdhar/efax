@@ -16,7 +16,7 @@ from tjax import (
     JaxRealArray,
     RealNumeric,
     Shape,
-    divide_where,
+    divide_or_zero,
     inverse_softplus,
     softplus,
 )
@@ -177,21 +177,17 @@ class ComplexField(Ring):
                 # x is outside the disk of the given minimum.  Map it to the plane.
                 magnitude = xp.abs(x)
                 corrected_magnitude = magnitude - minimum
-                corrected_x = x * divide_where(
+                corrected_x = x * divide_or_zero(
                     corrected_magnitude,
                     magnitude,
-                    where=magnitude != 0.0,
-                    otherwise=xp.zeros_like(magnitude),
                 )
             else:
                 # x is in the disk of the given maximum.  Map it to the plane.
                 magnitude = xp.abs(x)
                 corrected_magnitude = jss.logit(((magnitude - minimum) / maximum) * 0.5 + 0.5)
-                corrected_x = x * divide_where(
+                corrected_x = x * divide_or_zero(
                     corrected_magnitude,
                     magnitude,
-                    where=magnitude != 0.0,
-                    otherwise=xp.zeros_like(magnitude),
                 )
         else:
             corrected_x = x
@@ -217,20 +213,16 @@ class ComplexField(Ring):
             # x is outside the disk of the given minimum.  Map it to the plane.
             corrected_magnitude = xp.abs(corrected_x)
             magnitude = corrected_magnitude + minimum
-            return corrected_x * divide_where(
+            return corrected_x * divide_or_zero(
                 magnitude,
                 corrected_magnitude,
-                where=corrected_magnitude != 0.0,
-                otherwise=xp.zeros_like(corrected_magnitude),
             )
         # x is in the disk of the given maximum.  Map it to the plane.
         corrected_magnitude = xp.abs(corrected_x)
         magnitude = maximum * (jss.expit(corrected_magnitude) - 0.5) * 2.0 + minimum
-        return corrected_x * divide_where(
+        return corrected_x * divide_or_zero(
             magnitude,
             corrected_magnitude,
-            where=corrected_magnitude != 0.0,
-            otherwise=xp.zeros_like(corrected_magnitude),
         )
 
     @override

@@ -10,7 +10,7 @@ import numpy as np
 from array_api_compat import array_namespace
 from numpy.random import Generator
 from opt_einsum import contract
-from tjax import JaxArray, JaxRealArray, Shape, divide_where
+from tjax import JaxArray, JaxRealArray, Shape, divide_or_zero
 
 from efax._src.types import Namespace
 
@@ -432,11 +432,9 @@ class CircularBoundedSupport(VectorSupport):
         xp = array_namespace(x)
         magnitude = xp.linalg.norm(x, 2, axis=-1, keepdims=True)
         corrected_magnitude = jss.logit((magnitude / self.radius) * 0.5 + 0.5)
-        return x * divide_where(
+        return x * divide_or_zero(
             corrected_magnitude,
             magnitude,
-            where=magnitude != 0.0,
-            otherwise=xp.zeros_like(magnitude),
         )
 
     @override
@@ -448,9 +446,7 @@ class CircularBoundedSupport(VectorSupport):
         assert y.shape[-1] == dimensions
         corrected_magnitude = cast("JaxRealArray", xp.linalg.norm(y, 2, axis=-1, keepdims=True))
         magnitude = self.radius * (jss.expit(corrected_magnitude) - 0.5) * 2.0
-        return y * divide_where(
+        return y * divide_or_zero(
             magnitude,
             corrected_magnitude,
-            where=corrected_magnitude != 0.0,
-            otherwise=xp.zeros_like(corrected_magnitude),
         )

@@ -46,7 +46,7 @@ dependencies = [
   "opt-einsum>=3.4",
   "optimistix>=0.0.10",
   "optype[numpy]>=0.8",
-  "tjax>=1.9"
+  "tjax>=2.0.1"
 ]
 urls.Changelog = "https://github.com/NeilGirdhar/efax/blob/main/CHANGELOG.md"
 urls.Documentation = "https://github.com/NeilGirdhar/efax#readme"
