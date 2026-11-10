@@ -46,7 +46,7 @@ For example:
 
 ```python
 @dataclass
-class MultivariateNormalNP(NaturalParametrization['MultivariateNormalEP']):
+class MultivariateNormalNP(NaturalParametrization["MultivariateNormalEP"]):
     mean_times_precision: RealArray = distribution_parameter(VectorSupport())
     negative_half_precision: RealArray = distribution_parameter(SymmetricMatrixSupport())
 ```
@@ -258,6 +258,7 @@ A basic use of the two parametrizations:
 This example is based on section 1.4.1 from exponential_families.pdf, entitled Information
 theoretic statistics.
 """
+
 import jax.numpy as jnp
 from tjax import print_generic
 
@@ -298,6 +299,7 @@ evidence combination.
 Suppose you have a prior, and a set of likelihoods, and you want to combine all
 of the evidence into one distribution.
 """
+
 from operator import add
 
 import jax.numpy as jnp
@@ -305,10 +307,10 @@ from tjax import print_generic
 
 from efax import MultivariateDiagonalNormalVP, parameter_map
 
-prior = MultivariateDiagonalNormalVP(mean=jnp.zeros(2),
-                                     variance=10 * jnp.ones(2))
-likelihood = MultivariateDiagonalNormalVP(mean=jnp.asarray([1.1, -2.2]),
-                                          variance=jnp.asarray([3.0, 1.0]))
+prior = MultivariateDiagonalNormalVP(mean=jnp.zeros(2), variance=10 * jnp.ones(2))
+likelihood = MultivariateDiagonalNormalVP(
+    mean=jnp.asarray([1.1, -2.2]), variance=jnp.asarray([3.0, 1.0])
+)
 
 # Convert to the natural parametrization.
 prior_np = prior.to_nat()
@@ -320,9 +322,7 @@ posterior_np = parameter_map(add, prior_np, likelihood_np)
 
 # Convert to the source parametrization.
 posterior = posterior_np.to_variance_parametrization()
-print_generic({"prior": prior,
-               "likelihood": likelihood,
-               "posterior": posterior})
+print_generic({"prior": prior, "likelihood": likelihood, "posterior": posterior})
 # dict
 # ├── likelihood=MultivariateDiagonalNormalVP[dataclass]
 # │   ├── mean=Jax Array (2,) float32
@@ -353,6 +353,7 @@ context.  Suppose we have an unknown target value, and a loss function based on
 the cross-entropy between the target value and a predictive distribution.  We
 will optimize the predictive distribution by a small fraction of its cotangent.
 """
+
 import jax.numpy as jnp
 from jax import grad, lax
 from tjax import JaxBooleanArray, JaxRealArray, jit, print_generic
@@ -396,8 +397,7 @@ target_distribution = BernoulliEP(jnp.asarray([0.3, 0.4, 0.7]))
 # of a Bernoulli distribution corresponding to log-odds 0, which is probability
 # 0.5.
 initial_predictive_distribution = BernoulliNP(jnp.zeros(3))
-initial_gradient = gradient_cross_entropy(target_distribution,
-                                          initial_predictive_distribution)
+initial_gradient = gradient_cross_entropy(target_distribution, initial_predictive_distribution)
 
 # Optimize the predictive distribution iteratively.
 predictive_distribution, _ = lax.while_loop(
@@ -406,8 +406,12 @@ predictive_distribution, _ = lax.while_loop(
 
 # Compare the optimized predictive distribution with the target value in the
 # same natural parametrization.
-print_generic({"predictive_distribution": predictive_distribution,
-               "target_distribution": target_distribution.to_nat()})
+print_generic(
+    {
+        "predictive_distribution": predictive_distribution,
+        "target_distribution": target_distribution.to_nat(),
+    }
+)
 # dict
 # ├── predictive_distribution=BernoulliNP[dataclass]
 # │   └── log_odds=Jax Array (3,) float32
@@ -417,8 +421,12 @@ print_generic({"predictive_distribution": predictive_distribution,
 #         └──  -0.8473 │ -0.4055 │ 0.8473
 
 # Do the same in the expectation parametrization.
-print_generic({"predictive_distribution": predictive_distribution.to_exp(),
-               "target_distribution": target_distribution})
+print_generic(
+    {
+        "predictive_distribution": predictive_distribution.to_exp(),
+        "target_distribution": target_distribution,
+    }
+)
 # dict
 # ├── predictive_distribution=BernoulliEP[dataclass]
 # │   └── probability=Jax Array (3,) float32
@@ -444,6 +452,7 @@ Suppose you have some samples from a distribution family with unknown
 parameters, and you want to estimate the maximum likelihood parameters of the
 distribution.
 """
+
 import jax.numpy as jnp
 import jax.random as jr
 from tjax import print_generic
@@ -473,8 +482,9 @@ ss_mean = parameter_mean(ss, axis=0)  # ss_mean also has type DirichletEP.
 
 # Convert this back to the natural parametrization.
 estimated_distribution = ss_mean.to_nat()
-print_generic({"estimated_distribution": estimated_distribution,
-               "source_distribution": source_distribution})
+print_generic(
+    {"estimated_distribution": estimated_distribution, "source_distribution": source_distribution}
+)
 # dict
 # ├── estimated_distribution=DirichletNP[dataclass]
 # │   └── alpha_minus_one=Jax Array (3,) float32

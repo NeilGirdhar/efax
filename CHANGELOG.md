@@ -3,6 +3,17 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.6.1 - 2026-11-09
+
+- Raised the minimum tjax version to 2.0.1.
+- Added `NormalPP`, a mean-and-precision normal parametrization that handles zero precision without
+  NaN values or gradients
+- Added `NormalVP.cross_entropy`
+- `NormalNP.to_variance_parametrization` now goes through `NormalPP` to avoid cancellation.
+- Replaced `divide_where` with `divide_or_zero` in rings and supports
+- Converted the README to Markdown
+- Replaced toml-sort with pyproject-fmt and taplo, cleaned `.editorconfig`
+
 ## 2.6.0 - 2026-10-09
 
 - Added Python 3.15 support.
