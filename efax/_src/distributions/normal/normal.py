@@ -5,7 +5,7 @@ from typing import override
 import jax.random as jr
 import numpy as np
 from array_api_compat import array_namespace
-from tjax import JaxArray, JaxRealArray, KeyArray, Shape
+from tjax import JaxArray, JaxRealArray, KeyArray, Shape, divide_or_zero, divide_where
 from tjax.dataclasses import dataclass
 
 from efax._src.interfaces.samplable import Samplable
@@ -74,11 +74,19 @@ class NormalNP(
         xp = array_namespace(x)
         return NormalEP(x, xp.square(x))
 
+    def mean(self) -> JaxRealArray:
+        """Return the mean, or zero where the precision is zero."""
+        return divide_or_zero(self.mean_times_precision, -2.0 * self.negative_half_precision)
+
     def to_variance_parametrization(self) -> NormalVP:
-        return self.to_exp().to_variance_parametrization()
+        return self.to_precision_parametrization().to_variance_parametrization()
 
     def to_deviation_parametrization(self) -> NormalDP:
         return self.to_variance_parametrization().to_deviation_parametrization()
+
+    def to_precision_parametrization(self) -> NormalPP:
+        """Return the precision parametrization, with zero mean where the precision is zero."""
+        return NormalPP(self.mean(), -2.0 * self.negative_half_precision)
 
     @override
     def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
@@ -135,6 +143,9 @@ class NormalEP(HasEntropyEP[NormalNP], Samplable, SimpleDistribution):
     def to_deviation_parametrization(self) -> NormalDP:
         return self.to_variance_parametrization().to_deviation_parametrization()
 
+    def to_precision_parametrization(self) -> NormalPP:
+        return self.to_variance_parametrization().to_precision_parametrization()
+
 
 @dataclass
 class NormalVP(Samplable, SimpleDistribution):
@@ -168,6 +179,21 @@ class NormalVP(Samplable, SimpleDistribution):
     def pdf(self, x: JaxRealArray) -> JaxRealArray:
         return self.to_nat().pdf(x)
 
+    def cross_entropy(self, q: NormalVP) -> JaxRealArray:
+        """Return the cross-entropy H(self, q) = -E_self[log q(x)].
+
+        Uses the closed form in means and variances, which avoids converting either distribution
+        to natural parameters.
+
+        Args:
+            q: The variance parametrization of the predictive distribution.
+        """
+        xp = array_namespace(self, q)
+        return 0.5 * (
+            xp.log(2.0 * np.pi * q.variance)
+            + (self.variance + xp.square(self.mean - q.mean)) / q.variance
+        )
+
     def to_exp(self) -> NormalEP:
         xp = array_namespace(self)
         second_moment = self.variance + xp.square(self.mean)
@@ -183,6 +209,10 @@ class NormalVP(Samplable, SimpleDistribution):
     def to_deviation_parametrization(self) -> NormalDP:
         xp = array_namespace(self)
         return NormalDP(self.mean, xp.sqrt(self.variance))
+
+    def to_precision_parametrization(self) -> NormalPP:
+        """Return the precision parametrization, with infinite precision at zero variance."""
+        return NormalPP(self.mean, _reciprocal_or_infinity(self.variance))
 
 
 @dataclass
@@ -229,3 +259,61 @@ class NormalDP(Samplable, SimpleDistribution):
     def to_variance_parametrization(self) -> NormalVP:
         xp = array_namespace(self)
         return NormalVP(self.mean, xp.square(self.deviation))
+
+    def to_precision_parametrization(self) -> NormalPP:
+        return self.to_variance_parametrization().to_precision_parametrization()
+
+
+@dataclass
+class NormalPP(Samplable, SimpleDistribution):
+    """The precision parametrization of the normal distribution.
+
+    Unlike the variance parametrization, it includes the flat limit of zero precision, and it
+    converts to the natural parametrization without division.
+
+    Args:
+        mean: The mean.
+        precision: The precision.
+    """
+
+    mean: JaxRealArray = distribution_parameter(ScalarSupport())
+    precision: JaxRealArray = distribution_parameter(ScalarSupport(ring=positive_support))
+
+    @property
+    @override
+    def shape(self) -> Shape:
+        return self.mean.shape
+
+    @override
+    @classmethod
+    def domain_support(cls) -> ScalarSupport:
+        return ScalarSupport()
+
+    @override
+    def sample(self, key: KeyArray, shape: Shape | None = None) -> JaxRealArray:
+        return self.to_deviation_parametrization().sample(key, shape)
+
+    def log_pdf(self, x: JaxRealArray) -> JaxRealArray:
+        return self.to_nat().log_pdf(x)
+
+    def pdf(self, x: JaxRealArray) -> JaxRealArray:
+        return self.to_nat().pdf(x)
+
+    def to_exp(self) -> NormalEP:
+        return self.to_variance_parametrization().to_exp()
+
+    def to_nat(self) -> NormalNP:
+        return NormalNP(self.mean * self.precision, -0.5 * self.precision)
+
+    def to_variance_parametrization(self) -> NormalVP:
+        """Return the variance parametrization, with infinite variance at zero precision."""
+        return NormalVP(self.mean, _reciprocal_or_infinity(self.precision))
+
+    def to_deviation_parametrization(self) -> NormalDP:
+        return self.to_variance_parametrization().to_deviation_parametrization()
+
+
+def _reciprocal_or_infinity(x: JaxRealArray) -> JaxRealArray:
+    """Return 1 / x, or infinity with zero derivative where x is zero."""
+    xp = array_namespace(x)
+    return divide_where(xp.ones_like(x), x, where=x != 0.0, otherwise=xp.full_like(x, xp.inf))

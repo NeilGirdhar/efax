@@ -75,9 +75,9 @@ EFAX provides conversions between the two parametrizations through the
 `NaturalParametrization.to_exp` and `ExpectationParametrization.to_nat` methods.
 
 Some distributions also provide additional convenience parametrizations. For example, the normal
-distribution offers `NormalVP` (variance parametrization) and `NormalDP` (deviation
-parametrization), and the multivariate normal provides `MultivariateNormalVP` and
-`MultivariateDiagonalNormalVP`. These are not exponential-family parametrizations but are
+distribution offers `NormalVP` (variance parametrization), `NormalDP` (deviation parametrization),
+and `NormalPP` (precision parametrization). The multivariate normal provides `MultivariateNormalVP`
+and `MultivariateDiagonalNormalVP`. These are not exponential-family parametrizations but are
 useful for constructing and interpreting distributions.
 
 ### Important methods

@@ -52,7 +52,7 @@ from ._src.distributions.multivariate_normal.unit_variance import (
     MultivariateUnitVarianceNormalNP,
 )
 from ._src.distributions.negative_binomial import NegativeBinomialEP, NegativeBinomialNP
-from ._src.distributions.normal.normal import NormalDP, NormalEP, NormalNP, NormalVP
+from ._src.distributions.normal.normal import NormalDP, NormalEP, NormalNP, NormalPP, NormalVP
 from ._src.distributions.normal.unit_variance import UnitVarianceNormalEP, UnitVarianceNormalNP
 from ._src.distributions.poisson import PoissonEP, PoissonNP
 from ._src.distributions.rayleigh import RayleighEP, RayleighNP
@@ -188,6 +188,7 @@ __all__ = [
     "NormalDP",
     "NormalEP",
     "NormalNP",
+    "NormalPP",
     "NormalVP",
     "PoissonEP",
     "PoissonNP",
