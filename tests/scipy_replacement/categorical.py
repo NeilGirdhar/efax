@@ -26,7 +26,7 @@ class ScipyCategorical(ScipyDiscreteDistribution):
             categories,  # pyrefly: ignore [bad-argument-type]  # ty: ignore[invalid-argument-type]
             self.probabilities.shape[-1],
             dtype=np.int64,
-        )  # ty: ignore[invalid-return-type]
+        )  # ty: ignore[invalid-explicit-return]
 
     def entropy(self) -> NumpyRealArray:
         return -np.sum(self.probabilities * np.log(self.probabilities), axis=-1)
