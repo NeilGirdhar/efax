@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Callable, Iterable, Mapping
-from functools import reduce
+from collections.abc import Callable, Iterable, Mapping, Sequence
+from functools import partial, reduce
 from itertools import starmap
 
 from array_api_compat import array_namespace
@@ -58,22 +58,49 @@ def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
     integers after the mean because the Array API spec requires mean to preserve integer dtypes.
     """
     xp = array_namespace(x)
-    assembler = Assembler.create_assembler(x)
-    all_params = parameters(x)
-    averaged = {path: xp.mean(value, axis=axis) for path, value in all_params.items()}
-    return assembler.assemble(averaged)
+    return parameter_map(partial(xp.mean, axis=axis), x, fixed=True)
+
+
+def parameter_concat[T: Distribution](xs: Sequence[T], /, *, axis: int = 0) -> T:
+    """Return the concatenation of distributions along an axis of their shape.
+
+    Every parameter is concatenated, including fixed ones, so the distributions must have the same
+    type and shapes that agree except along the axis. The axis indexes the distribution's shape,
+    so a negative axis counts back from the end of that shape rather than from the end of a vector
+    or matrix parameter.
+    """
+    first = xs[0]
+    if not -first.ndim <= axis < first.ndim:
+        msg = f"axis {axis} is out of bounds for distributions with {first.ndim} dimensions"
+        raise ValueError(msg)
+    axis %= first.ndim
+    xp = array_namespace(*xs)
+    return parameter_map(lambda *values: xp.concat(values, axis=axis), first, *xs[1:], fixed=True)
 
 
 def parameter_map[T: Distribution](
-    operation: Callable[..., JaxComplexArray | ComplexContinuation], x: T, /, *ys: Distribution
+    operation: Callable[..., JaxComplexArray | ComplexContinuation],
+    x: T,
+    /,
+    *ys: Distribution,
+    fixed: bool = False,
 ) -> T:
-    """Return a new distribution created by operating on the variable fields of the inputs."""
-    paths = parameters(x, fixed=False).keys()
-    iterators = [parameters(y, fixed=False).values() for y in (x, *ys)]
+    """Return a new distribution created by operating on the parameters of the inputs.
+
+    Args:
+        operation: The function applied to corresponding parameters of x and ys.
+        x: The distribution whose type and structure the result takes.
+        ys: Further distributions whose parameters are passed to the operation after x's.
+        fixed: If true, operate on every parameter. Otherwise, operate on the variable parameters
+            and copy the fixed ones from x.
+    """
+    selection = None if fixed else False
+    paths = parameters(x, fixed=selection).keys()
+    iterators = [parameters(y, fixed=selection).values() for y in (x, *ys)]
     final_values = list(starmap(operation, zip(*iterators, strict=True)))
     operated_fields = dict(zip(paths, final_values, strict=True))
 
-    fixed_parameters = parameters(x, fixed=True)
+    fixed_parameters = {} if fixed else parameters(x, fixed=True)
     return Assembler.create_assembler(x).assemble({**fixed_parameters, **operated_fields})
 
 
