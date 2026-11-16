@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "EFAX: Exponential Families in JAX"
+abstract: >-
+  EFAX provides tools for working with exponential family distributions in JAX, including the
+  natural and expectation parametrizations of each family and a uniform interface to efficient
+  implementations of the functions that relate them.
+authors:
+  - family-names: Girdhar
+    given-names: Neil
+    email: mistersheik@gmail.com
+version: 2.6.1
+date-released: 2026-11-09
+license: Apache-2.0
+repository-code: "https://github.com/NeilGirdhar/efax"
+url: "https://github.com/NeilGirdhar/efax"
+keywords:
+  - bayesian
+  - conjugate-prior
+  - entropy
+  - exponential-family
+  - jax
+  - machine-learning
+  - maximum-likelihood
+  - probability-distributions
+  - statistics
