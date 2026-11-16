@@ -97,6 +97,8 @@ Every `NaturalParametrization` has methods:
 - `log_normalizer`, the log partition function,
 - `carrier_measure`, the base measure,
 - `pdf` and `log_pdf`, which are the density or mass function and its logarithm,
+- `scale_evidence`, which multiplies the natural parameters by a scale to weaken or strengthen
+  the distribution's evidence,
 - `fisher_information_diagonal` and `fisher_information_trace`, which return the
   diagonal and trace of the Fisher information matrix stored as distribution objects,
 - `apply_fisher_information`, which applies the Fisher information matrix to a vector of

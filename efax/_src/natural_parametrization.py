@@ -132,6 +132,34 @@ class NaturalParametrization[
         return parameter_dot_product(self, tx) - self.log_normalizer() + self.carrier_measure(x)
 
     @final
+    def scale_evidence(self, scale: JaxRealArray) -> Self:
+        """Return this distribution with its variable natural parameters multiplied by a scale.
+
+        Independent evidence adds in natural parameters, so the scale weights this distribution's
+        evidence. Fixed parameters are left unscaled.
+
+        The carrier measure is not scaled, so the result is this density raised to the power of the
+        scale and renormalized only when the carrier measure is constant.
+
+        The result is valid only if the scaled parameters stay in the family's domain. Any positive
+        scale works for the normal distribution, but for the gamma distribution with shape below
+        one, a scale above one can push shape - 1 below its minimum of -1.
+
+        Args:
+            scale: An array that broadcasts to this distribution's shape. Each entry scales all of
+                the corresponding component's parameters, including vector and matrix entries.
+        """
+        xp = array_namespace(self, scale)
+        assembler = Assembler.create_assembler(self)
+        final_parameters = parameters(self)
+        for path, (value, support) in parameters(self, fixed=False, support=True).items():
+            # Append one axis per parameter axis so that the scale broadcasts over the
+            # distribution's shape rather than over the parameter's trailing axes.
+            aligned_scale = xp.reshape(scale, (*scale.shape, *((1,) * support.axes())))
+            final_parameters[path] = aligned_scale * value
+        return assembler.assemble(final_parameters)
+
+    @final
     def fisher_information_diagonal(self) -> Self:
         """The diagonal elements of the Fisher information.
 
