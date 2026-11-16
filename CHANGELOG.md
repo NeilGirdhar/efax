@@ -3,6 +3,16 @@
 This changelog summarizes EFAX releases inferred from version changes in `pyproject.toml`.
 Each section covers changes since the previous release.
 
+## 2.6.2 - 2026-11-15
+
+- Added `NaturalParametrization.scale_evidence`, which scales natural parameters to weight a
+  distribution's evidence, broadcasting the scale over the distribution's shape.
+- Added `parameter_concat`, which also concatenates fixed parameters, and a `fixed` option to
+  `parameter_map`.
+- Made `parameter_mean`'s axis index the distribution's shape. Before, a negative or omitted axis
+  corrupted vector and matrix parameters such as those of a multivariate normal.
+- Added a `CITATION.cff` file and upgraded ty.
+
 ## 2.6.1 - 2026-11-09
 
 - Raised the minimum tjax version to 2.0.1.
