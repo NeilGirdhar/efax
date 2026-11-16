@@ -53,12 +53,16 @@ def parameter_holomorphic_dot(x: Distribution, y: Distribution, /) -> JaxComplex
 def parameter_mean[T: Distribution](x: T, /, *, axis: Axis | None = None) -> T:
     """Return the mean over axis of all parameters, including fixed ones.
 
+    The axis indexes the distribution's shape, so a negative axis counts back from the end of that
+    shape rather than from the end of a vector or matrix parameter, and no axis averages over the
+    whole shape.
+
     Fixed parameters are constant along the reduced axes (having been broadcast to the sample shape
     in sufficient_statistics), so their mean equals their value.  Integer-typed parameters remain
     integers after the mean because the Array API spec requires mean to preserve integer dtypes.
     """
     xp = array_namespace(x)
-    return parameter_map(partial(xp.mean, axis=axis), x, fixed=True)
+    return parameter_map(partial(xp.mean, axis=_shape_axes(x, axis)), x, fixed=True)
 
 
 def parameter_concat[T: Distribution](xs: Sequence[T], /, *, axis: int = 0) -> T:
@@ -70,12 +74,11 @@ def parameter_concat[T: Distribution](xs: Sequence[T], /, *, axis: int = 0) -> T
     or matrix parameter.
     """
     first = xs[0]
-    if not -first.ndim <= axis < first.ndim:
-        msg = f"axis {axis} is out of bounds for distributions with {first.ndim} dimensions"
-        raise ValueError(msg)
-    axis %= first.ndim
+    (shape_axis,) = _shape_axes(first, axis)
     xp = array_namespace(*xs)
-    return parameter_map(lambda *values: xp.concat(values, axis=axis), first, *xs[1:], fixed=True)
+    return parameter_map(
+        lambda *values: xp.concat(values, axis=shape_axis), first, *xs[1:], fixed=True
+    )
 
 
 def parameter_map[T: Distribution](
@@ -120,6 +123,22 @@ def join_mappings[T, V](**field_to_map: Mapping[T, V]) -> dict[T, dict[str, V]]:
 
 
 # Private functions --------------------------------------------------------------------------------
+def _shape_axes(x: Distribution, axis: Axis | None) -> tuple[int, ...]:
+    """Return the nonnegative axes of x's shape that axis names, or all of them for no axis.
+
+    Parameter arrays share the distribution's shape as their leading axes, so these axes index
+    every parameter, whatever its vector or matrix axes.
+    """
+    if axis is None:
+        return tuple(range(x.ndim))
+    axes = (axis,) if isinstance(axis, int) else axis
+    for this_axis in axes:
+        if not -x.ndim <= this_axis < x.ndim:
+            msg = f"axis {this_axis} is out of bounds for distributions with {x.ndim} dimensions"
+            raise ValueError(msg)
+    return tuple(this_axis % x.ndim for this_axis in axes)
+
+
 def _parameter_inner_product(
     x: JaxComplexArray,
     y: JaxComplexArray,
