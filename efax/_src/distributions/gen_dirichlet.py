@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from typing import override
 
+import jax
 import jax.scipy.special as jss
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, Shape, complex_betaln, inverse_softplus, jit, softplus
@@ -204,9 +205,11 @@ def _inverse_digamma(y: JaxRealArray) -> JaxRealArray:
         xp.exp(y) + 0.5,
         -1.0 / (y - jss.digamma(1.0)),
     )
-    for _ in range(8):
-        x -= (jss.digamma(x) - y) / jss.polygamma(1, x)
-    return x
+
+    def newton_step(_: int, x: JaxRealArray) -> JaxRealArray:
+        return x - (jss.digamma(x) - y) / jss.polygamma(1, x)
+
+    return jax.lax.fori_loop(0, 8, newton_step, x)
 
 
 def _beta_parameters_from_expected_logs(
@@ -218,23 +221,30 @@ def _beta_parameters_from_expected_logs(
     complement = xp.exp(mean_log_complement)
     simplex_mean = mean / (mean + complement)
     concentration = xp.maximum(2.0, 1.0 / xp.maximum(simplex_mean * (1.0 - simplex_mean), 1e-3))
-    for _ in range(20):
+
+    def fixed_point_step(
+        _: int, carry: tuple[JaxRealArray, JaxRealArray, JaxRealArray]
+    ) -> tuple[JaxRealArray, JaxRealArray, JaxRealArray]:
+        concentration = carry[0]
         psi_sum = jss.digamma(concentration)
         alpha = _inverse_digamma(mean_log_probability + psi_sum)
         beta = _inverse_digamma(mean_log_complement + psi_sum)
-        concentration = xp.maximum(alpha + beta, 1e-6)
-    alpha = xp.maximum(alpha, 1e-6)
-    beta = xp.maximum(beta, 1e-6)
-    log_alpha = xp.log(alpha)
-    log_beta = xp.log(beta)
-    for _ in range(20):
-        alpha = xp.exp(log_alpha)
-        beta = xp.exp(log_beta)
+        return xp.maximum(alpha + beta, 1e-6), alpha, beta
+
+    def newton_step(
+        _: int, carry: tuple[JaxRealArray, JaxRealArray]
+    ) -> tuple[JaxRealArray, JaxRealArray]:
+        log_alpha, log_beta = carry
         delta_log_alpha, delta_log_beta = _beta_expected_log_newton_step(
-            alpha, beta, mean_log_probability, mean_log_complement
+            xp.exp(log_alpha), xp.exp(log_beta), mean_log_probability, mean_log_complement
         )
-        log_alpha -= delta_log_alpha
-        log_beta -= delta_log_beta
+        return log_alpha - delta_log_alpha, log_beta - delta_log_beta
+
+    unset = xp.zeros_like(concentration)
+    _, alpha, beta = jax.lax.fori_loop(0, 20, fixed_point_step, (concentration, unset, unset))
+    log_alpha = xp.log(xp.maximum(alpha, 1e-6))
+    log_beta = xp.log(xp.maximum(beta, 1e-6))
+    log_alpha, log_beta = jax.lax.fori_loop(0, 20, newton_step, (log_alpha, log_beta))
     alpha = xp.exp(log_alpha)
     beta = xp.exp(log_beta)
     return alpha, beta
