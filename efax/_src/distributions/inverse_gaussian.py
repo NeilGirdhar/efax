@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import override
 
 import jax.random as jr
@@ -67,7 +68,7 @@ class InverseGaussianNP(
     @override
     def carrier_measure(self, x: JaxRealArray) -> JaxRealArray:
         xp = array_namespace(self, x)
-        return -0.5 * (xp.log(2.0 * xp.pi) + 3.0 * xp.log(x))
+        return -0.5 * (math.log(2.0 * math.pi) + 3.0 * xp.log(x))
 
     @override
     @classmethod

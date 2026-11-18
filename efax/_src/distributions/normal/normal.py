@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import override
 
 import jax.random as jr
-import numpy as np
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape, divide_or_zero, divide_where
 from tjax.dataclasses import dataclass
@@ -54,7 +53,7 @@ class NormalNP(
         xp = array_namespace(self)
         return -xp.square(self.mean_times_precision) / (
             4.0 * self.negative_half_precision
-        ) + 0.5 * xp.log(-np.pi / self.negative_half_precision)
+        ) + 0.5 * xp.log(-xp.pi / self.negative_half_precision)
 
     @override
     def to_exp(self) -> NormalEP:
@@ -190,7 +189,7 @@ class NormalVP(Samplable, SimpleDistribution):
         """
         xp = array_namespace(self, q)
         return 0.5 * (
-            xp.log(2.0 * np.pi * q.variance)
+            xp.log(2.0 * xp.pi * q.variance)
             + (self.variance + xp.square(self.mean - q.mean)) / q.variance
         )
 

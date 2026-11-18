@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 from typing import Self, override
 
 import jax.random as jr
@@ -56,7 +55,7 @@ class MultivariateFixedVarianceNormalNP(
         eta = self.mean_times_precision
         return 0.5 * (
             xp.sum(xp.square(eta), axis=-1) * self.variance
-            + self.dimensions() * xp.log(math.pi * 2.0 * self.variance)
+            + self.dimensions() * xp.log(xp.pi * 2.0 * self.variance)
         )
 
     @override

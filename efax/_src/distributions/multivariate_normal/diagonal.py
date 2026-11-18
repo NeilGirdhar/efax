@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import override
 
 import jax.random as jr
-import numpy as np
 from array_api_compat import array_namespace
 from tjax import JaxArray, JaxRealArray, KeyArray, Shape
 from tjax.dataclasses import dataclass
@@ -57,7 +56,7 @@ class MultivariateDiagonalNormalNP(
         xp = array_namespace(self)
         components = -xp.square(self.mean_times_precision) / (
             4.0 * self.negative_half_precision
-        ) + 0.5 * xp.log(-np.pi / self.negative_half_precision)
+        ) + 0.5 * xp.log(-xp.pi / self.negative_half_precision)
         return xp.sum(components, axis=-1)
 
     @override
