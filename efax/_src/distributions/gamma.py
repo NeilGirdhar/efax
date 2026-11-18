@@ -107,7 +107,7 @@ class GammaNP(
         rate = -self.negative_rate
         mean = shape / rate
         variance = shape / (rate**2)
-        normal_variance = xp.log(1 + variance / (mean**2))
+        normal_variance = xp.log1p(variance / (mean**2))
         normal_mean = xp.log(mean) - 0.5 * normal_variance
         normal_vp = NormalVP(normal_mean, normal_variance)
         return LogNormalEP.create_natural_from_base(normal_vp.to_nat())
